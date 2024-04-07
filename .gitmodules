@@ -1,0 +1,9 @@
+[submodule "Tes/nifxml"]
+	path = Tes/nifxml
+	url = git@github.com:niftools/nifxml.git
+[submodule "Tes/kfmxml"]
+	path = Tes/kfmxml
+	url = git@github.com:niftools/kfmxml.git
+[submodule "dotnet/OpenStack"]
+	path = dotnet/OpenStack
+	url = git@github.com:bclnet/OpenStack.git

@@ -1,0 +1,67 @@
+﻿{
+  "Q": {
+    "name": "Quake",
+    "files": [
+      {
+        "path": "PAK0.PAK:gfx.wad:BACKTILE.tex",
+        "type": "Wad"
+      },
+      {
+        "path": "PAK0.PAK:gfx/palette.lmp",
+        "type": "Lump:Palette"
+      },
+      {
+        "path": "PAK0.PAK:gfx/colormap.lmp",
+        "type": "Lump:Colormap"
+      },
+      {
+        "path": "PAK0.PAK:gfx/conback.lmp",
+        "type": "Lump"
+      },
+      {
+        "path": "maps/b_batt0.bsp",
+        "type": "Bsp"
+      },
+      {
+        "path": "gfx.wad:xxx",
+        "type": "Palette"
+      }
+    ]
+  },
+  "Q2": {
+    "name": "Quake II",
+    "files": []
+  },
+  "Q3:A": {
+    "name": "Quake III Arena",
+    "files": []
+  },
+  "D3": {
+    "name": "Doom 3",
+    "files": []
+  },
+  "R": {
+    "name": "Rage",
+    "files": []
+  },
+  "D": {
+    "name": "Doom (2016)",
+    "files": []
+  },
+  "D:VFR": {
+    "name": "Doom VFR",
+    "files": []
+  },
+  "R2": {
+    "name": "Rage 2",
+    "files": []
+  },
+  "D:E": {
+    "name": "Doom Eternal",
+    "files": []
+  },
+  "Q:C": {
+    "name": "Quake Champions",
+    "files": []
+  }
+}

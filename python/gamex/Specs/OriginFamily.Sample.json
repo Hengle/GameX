@@ -1,0 +1,205 @@
+﻿{
+  "U8": {
+    "name": "Ultima™ 8 Gold Edition",
+    "files": [
+      {
+        "path": "STATIC/GLOB.FLX",
+        "type": "Test"
+      },
+      {
+        "path": "STATIC/U8FONTS.FLX",
+        "type": "Test"
+      }
+    ]
+  },
+  "UO": {
+    "name": "Ultima Online",
+    "files": [
+      {
+        "path": "anim.idx:file00000.anim",
+        "type": "Anim"
+      },
+      {
+        "path": "animdata.mul",
+        "type": "Animdata"
+      },
+      {
+        "path": "fonts.mul",
+        "type": "AsciiFont"
+      },
+      {
+        "path": "Bodyconv.def",
+        "type": "BodyConverter"
+      },
+      {
+        "path": "Body.def",
+        "type": "BodyTable"
+      },
+      {
+        "path": "calibration.cfg",
+        "type": "CalibrationInfo"
+      },
+      {
+        "path": "gumpartLegacyMUL.uop:file00000.tex",
+        "type": "Gump"
+      },
+      {
+        "path": "gump.def",
+        "type": "GumpDef"
+      },
+      {
+        "path": "hues.mul",
+        "type": "Hues"
+      },
+      {
+        "path": "artLegacyMUL.uop:land/file00000.land",
+        "type": "Land"
+      },
+      {
+        "path": "lightidx.mul:file00000.light",
+        "type": "Light"
+      },
+      {
+        "path": "mobtypes.txt",
+        "type": "MobTypes"
+      },
+      {
+        "path": "Multimap.rle",
+        "type": "Multimap"
+      },
+      {
+        "path": "facet00.mul",
+        "type": "Multimap"
+      },
+      {
+        "path": "Music/Digital/Config.txt",
+        "type": "MusicDef"
+      },
+      {
+        "path": "multi.idx:file00000.multi",
+        "type": "Multi"
+      },
+      {
+        "path": "radarcol.mul",
+        "type": "RadarColor"
+      },
+      {
+        "path": "skillgrp.mul",
+        "type": "SkillGroups"
+      },
+      {
+        "path": "xxxx.mul",
+        "type": "Skills"
+      },
+      {
+        "path": "xxxx.mul",
+        "type": "Sound"
+      },
+      {
+        "path": "speech.mul",
+        "type": "SpeechList"
+      },
+      {
+        "path": "artLegacyMUL.uop:static/file04000.art",
+        "type": "Static"
+      },
+      {
+        "path": "Cliloc.enu",
+        "type": "StringTable"
+      },
+      {
+        "path": "tiledata.mul",
+        "type": "TileData"
+      },
+      {
+        "path": "unifont.mul",
+        "type": "Unifont"
+      },
+      {
+        "path": "verdata.mul",
+        "type": "Verdata"
+      },
+      {
+        "path": "Data/bodyTable.cfg",
+        "type": "ServerBodyTable"
+      },
+      {
+        "path": "Data/containers.cfg",
+        "type": "ServerContainer"
+      }
+    ]
+  },
+  "U9": {
+    "name": "Ultima IX",
+    "files": [
+      {
+        "path": "static/ankh.pal",
+        "type": "Palette"
+      },
+      {
+        "path": "sound/music.flx:file0000.sfm",
+        "type": "Music"
+      },
+      {
+        "path": "sound/sfx.flx:file0000.sfx",
+        "type": "Sfx"
+      },
+      {
+        "path": "sound/Speech.flx:file0000.spk",
+        "type": "Speech"
+      },
+      {
+        "path": "static/anim.flx:file00ac.anim",
+        "type": "Anim"
+      },
+      {
+        "path": "static/bitmap16.flx:file0001.bmp",
+        "type": "Bitmap"
+      },
+      {
+        "path": "static/BOOKS-EN.FLX:file0000.book",
+        "type": "Book"
+      },
+      {
+        "path": "static/misctext.flx:file0000.str",
+        "type": "Text"
+      },
+      {
+        "path": "static/text.flx:file0000.str",
+        "type": "Text"
+      },
+      {
+        "path": "static/sappear.flx:file0000.mesh",
+        "type": "Mesh"
+      },
+      {
+        "path": "static/Texture8.9:file043f.tex",
+        "type": "Texture"
+      },
+      {
+        "path": "static/Texture8.9:file04bb.tex",
+        "type": "Texture"
+      },
+      {
+        "path": "static/Texture8.9:file0550.tex",
+        "type": "Texture"
+      },
+      {
+        "path": "static/texture16.9:file043f.tex",
+        "type": "Texture"
+      },
+      {
+        "path": "static/Texture16.9:file04bb.tex",
+        "type": "Texture"
+      },
+      {
+        "path": "static/Texture16.9:file0550.tex",
+        "type": "Texture"
+      },
+      {
+        "path": "static/TYPENAME.FLX:file0001.type",
+        "type": "Typename"
+      }
+    ]
+  }
+}

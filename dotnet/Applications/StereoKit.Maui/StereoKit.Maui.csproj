@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0-android</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<UseMaui>true</UseMaui>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Hosting_\**" />
+	  <EmbeddedResource Remove="Hosting_\**" />
+	  <MauiCss Remove="Hosting_\**" />
+	  <MauiXaml Remove="Hosting_\**" />
+	  <None Remove="Hosting_\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="StereoKit" Version="0.3.7-preview.9" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\StereoKit.Controls\StereoKit.Controls.csproj" />
+	</ItemGroup>
+
+</Project>

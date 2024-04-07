@@ -1,0 +1,14 @@
+output
+.DS_Store
+.asciidoctor
+
+# build artifacts
+Gemfile.lock
+gamex.html
+gamex.pdf
+gamex.pdfmarks
+gamex.epub
+gamex.fb2.zip
+gamex-kf8.epub
+gamex.mobi
+contributors.txt
