@@ -1,6 +1,7 @@
 ﻿using GameX.Meta;
 using GameX.Platforms;
 using GameX.Unknown;
+using MathNet.Numerics;
 using OpenStack;
 using System;
 using System.Collections.Concurrent;
@@ -269,13 +270,9 @@ namespace GameX
         /// </summary>
         public FamilyGame Game { get; set; }
         /// <summary>
-        /// The Type
+        /// The Data
         /// </summary>
-        public string Type { get; set; }
-        /// <summary>
-        /// The Seed
-        /// </summary>
-        public object Seed { get; set; }
+        public Dictionary<string, object> Data { get; set; }
 
         /// <summary>
         /// Detector
@@ -288,20 +285,21 @@ namespace GameX
         {
             Id = id;
             Game = game;
-            ParseElem(game, elem);
+            Data = ParseElem(game, elem);
         }
 
-        public virtual void ParseElem(FamilyGame game, JsonElement elem)
-        {
-            Type = _value(elem, "type") ?? "md5";
-            Seed = _method(elem, "seed", CreateKey);
-            Hashs = _related(elem, "hashs", k => k.GetProperty("hash").GetString(), v => ParseHash(game, v));
-        }
+        public virtual Dictionary<string, object> ParseElem(FamilyGame game, JsonElement elem)
+           => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
+           {
+               "type" => _value(elem, "type"),
+               "seed" => _method(elem, "seed", CreateKey),
+               "hashs" => Hashs = _related(elem, "hashs", k => k.GetProperty("hash").GetString(), v => ParseHash(game, v)),
+               _ => _valueV(x.Value)
+           });
 
         public virtual Dictionary<string, object> ParseHash(FamilyGame game, JsonElement elem)
             => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
             {
-                null => default,
                 "edition" => game.Editions != null && game.Editions.TryGetValue(x.Value.GetString(), out var a) ? a : (object)x.Value.GetString(),
                 "locale" => game.Locales != null && game.Locales.TryGetValue(x.Value.GetString(), out var a) ? a : (object)x.Value.GetString(),
                 _ => _valueV(x.Value)
@@ -309,7 +307,8 @@ namespace GameX
 
         public unsafe virtual string GetHash(BinaryReader r)
         {
-            switch (Type)
+            var type = Data.TryGetValue("type", out var z) ? z : "md5";
+            switch (type)
             {
                 case "crc":
                     {
@@ -323,7 +322,6 @@ namespace GameX
                             for (j = 0; j < 8; j++) n = (n & 1) != 0 ? (n >> 1) ^ seed : n >> 1;
                             table[i] = n;
                         }
-
                         // generate crc
                         var crc = 0xFFFFFFFFU;
                         var len = r.BaseStream.Length;
@@ -339,18 +337,19 @@ namespace GameX
                         var h = md5.ComputeHash(data, 0, data.Length);
                         return $"{h[0]:x2}{h[1]:x2}{h[2]:x2}{h[3]:x2}{h[4]:x2}{h[5]:x2}{h[6]:x2}{h[7]:x2}{h[8]:x2}{h[9]:x2}{h[10]:x2}{h[11]:x2}{h[12]:x2}{h[13]:x2}{h[14]:x2}{h[15]:x2}";
                     }
-                default: throw new ArgumentOutOfRangeException(nameof(Type), $"Unknown Type {Type}");
+                default: throw new ArgumentOutOfRangeException(nameof(Type), $"Unknown Type {type}");
             }
         }
 
-        public T Get<T>(string key, object value, Func<T, T> func) where T : class => Cache.GetOrAdd(key, (k, v) =>
+        public T Get<T>(string key, object value, Func<Detector, T, T> func) where T : class => Cache.GetOrAdd(key, (k, v) =>
         {
             var s = Detect<T>(k, v);
-            return s == null || func == null ? s : func(s);
+            return s == null || func == null ? s : func(this, s);
         }, value) as T;
 
         public virtual T Detect<T>(string key, object value) where T : class
         {
+            if (Hashs == null) throw new NullReferenceException(nameof(Hashs));
             switch (value)
             {
                 case null: throw new ArgumentNullException(nameof(value));
@@ -1105,7 +1104,7 @@ namespace GameX
         /// <summary>
         /// Detect
         /// </summary>
-        public T Detect<T>(string id, string key, object value, Func<T, T> func = null) where T : class => Detectors.TryGetValue(id, out var z) ? z.Get(key, value, func) : default;
+        public T Detect<T>(string id, string key, object value, Func<Detector, T, T> func = null) where T : class => Detectors.TryGetValue(id, out var z) ? z.Get(key, value, func) : default;
 
         /// <summary>
         /// Ensures this instance.

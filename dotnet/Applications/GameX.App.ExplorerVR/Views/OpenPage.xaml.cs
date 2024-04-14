@@ -150,8 +150,7 @@ namespace GameX.App.Explorer.Views
             Family.SelectedIndex = FamilyManager.Families.Keys.ToList().IndexOf(Config.DefaultFamily);
             if (string.IsNullOrEmpty(Config.DefaultGame)) return;
             Game.SelectedIndex = ((List<FamilyGame>)Games).FindIndex(x => x.Id == Config.DefaultGame);
-            if (!string.IsNullOrEmpty(Config.DefaultEdition))
-                Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == Config.DefaultEdition);
+            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == (Config.DefaultEdition ?? string.Empty));
             if (Config.ForceOpen) Open_Click(null, null);
         }
     }

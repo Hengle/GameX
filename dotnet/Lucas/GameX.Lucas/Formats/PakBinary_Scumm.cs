@@ -76,9 +76,9 @@ namespace GameX.Lucas.Formats
 
             public ResourceIndex(BinaryReader r, FamilyGame game, Dictionary<string, object> detect)
             {
+                var varient = (Dictionary<string, object>)detect["variant"];
                 var features = ((Features)detect["features"]);
-                var variants = detect["variant"];
-                var version = (int)((FamilyGame.Edition)detect["edition"]).Data["version"];
+                var version = (int)varient["version"];
                 var oldBundle = version <= 3 && features.HasFlag(Features.SixteenColors);
                 switch (version)
                 {
@@ -580,8 +580,9 @@ namespace GameX.Lucas.Formats
         public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
         {
             var game = source.Game;
-            var detect = source.Game.Detect<Dictionary<string, object>>("scumm", source.PakPath, r, s =>
+            var detect = source.Game.Detect<Dictionary<string, object>>("scumm", source.PakPath, r, (p, s) =>
             {
+                s["variant"] = ((Dictionary<string, object>)p.Data["variants"])[(string)s["variant"]];
                 s["features"] = ((string)s["features"]).Split(' ').Aggregate(Features.None, (a, f) => a |= (Features)Enum.Parse(typeof(Features), f, true));
                 s["platform"] = (Platform)Enum.Parse(typeof(Platform), s.TryGetValue("platform", out var z) ? (string)z : "None", true);
                 return s;

@@ -90,9 +90,10 @@
         "https://en.wikipedia.org/wiki/Maniac_Mansion"
       ],
       "date": "October 5, 1987",
+      "searchBy": "Pak",
       "pakExt": "00.lfl",
       "editions": {
-        "original": {
+        "": {
           "name": "Original",
           "path": "original"
         },

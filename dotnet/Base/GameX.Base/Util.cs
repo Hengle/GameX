@@ -20,7 +20,8 @@ namespace GameX
             {
                 JsonValueKind.Number => elem.GetInt32(),
                 JsonValueKind.String => elem.GetString(),
-                JsonValueKind.Array => elem.EnumerateArray().Select(y => y.GetString()).ToArray(),
+                JsonValueKind.Array => elem.EnumerateArray().Select(s => s.GetString()).ToArray(),
+                JsonValueKind.Object => elem.EnumerateObject().ToDictionary(s => s.Name, s => _valueV(s.Value)),
                 _ => throw new ArgumentOutOfRangeException($"{elem}"),
             };
 
@@ -28,13 +29,13 @@ namespace GameX
         public static T[] _list<T>(JsonElement elem, string key, Func<string, T> func, T[] default_ = default)
             => elem.TryGetProperty(key, out var z) ? _listV(z, func) : default_;
         public static string[] _list(JsonElement elem, string key, string[] default_ = default)
-            => elem.TryGetProperty(key, out var z) ? _listV(z, x => x) : default_;
+            => elem.TryGetProperty(key, out var z) ? _listV(z, s => s) : default_;
         public static T[] _listV<T>(JsonElement elem, Func<string, T> func)
             => elem.ValueKind switch
             {
                 JsonValueKind.Number => new[] { func(elem.GetInt32().ToString()) },
                 JsonValueKind.String => new[] { func(elem.GetString()) },
-                JsonValueKind.Array => elem.EnumerateArray().Select(y => func(y.GetString())).ToArray(),
+                JsonValueKind.Array => elem.EnumerateArray().Select(s => func(s.GetString())).ToArray(),
                 _ => throw new ArgumentOutOfRangeException($"{elem}"),
             };
         public static string[] _listV(JsonElement elem)
@@ -42,7 +43,7 @@ namespace GameX
             {
                 JsonValueKind.Number => new[] { elem.GetInt32().ToString() },
                 JsonValueKind.String => new[] { elem.GetString() },
-                JsonValueKind.Array => elem.EnumerateArray().Select(y => y.GetString()).ToArray(),
+                JsonValueKind.Array => elem.EnumerateArray().Select(s => s.GetString()).ToArray(),
                 _ => throw new ArgumentOutOfRangeException($"{elem}"),
             };
 

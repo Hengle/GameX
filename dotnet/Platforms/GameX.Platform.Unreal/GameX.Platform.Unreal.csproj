@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Windows_NT'">
-	<Exec Command="xcopy /Y &quot;$(TargetDir)GameX.*.dll&quot; &quot;$(ProjectDir)..\..\Examples\Unreal\Simple\Managed\&quot;&#xD;&#xA;xcopy /Y &quot;$(TargetDir)OpenStack.*.dll&quot; &quot;$(ProjectDir)..\..\Examples\Unreal\Simple\Managed\&quot;&#xD;&#xA;xcopy /Y &quot;$(TargetDir)UnrealEngine.Framework.dll&quot; &quot;$(ProjectDir)..\..\Examples\Unreal\Simple\Managed\&quot;" />
+	<Exec Command="xcopy /Y &quot;$(TargetDir)GameX.*.dll&quot; &quot;$(ProjectDir)..\..\..\Examples\Unreal\Simple\Managed\&quot;&#xD;&#xA;xcopy /Y &quot;$(TargetDir)OpenStack.*.dll&quot; &quot;$(ProjectDir)..\..\..\Examples\Unreal\Simple\Managed\&quot;&#xD;&#xA;xcopy /Y &quot;$(TargetDir)UnrealEngine.Framework.dll&quot; &quot;$(ProjectDir)..\..\..\Examples\Unreal\Simple\Managed\&quot;" />
   </Target>
 
 </Project>

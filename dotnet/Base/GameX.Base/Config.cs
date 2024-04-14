@@ -1,4 +1,4 @@
-﻿#define Arkane
+﻿//#define Arkane
 //#define Bethesda
 //#define Bioware
 //#define Black
@@ -13,7 +13,7 @@
 //#define Frontier
 //#define Id
 //#define IW
-//#define Lucas
+#define Lucas
 //#define Monolith
 //#define Origin
 //#define Red
@@ -329,7 +329,7 @@ namespace GameX
 
         public static DefaultOptions AppDefaultOptions = new DefaultOptions
         {
-            ForceOpen = true,
+            //ForceOpen = true,
             ForcePath = "sample:0",
             Family = "Lucas",
             //Game = "PP", // PHM Pegasus
