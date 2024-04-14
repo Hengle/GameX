@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="30.0.1" />
+    <PackageReference Include="CsvHelper" Version="31.0.3" />
     <PackageReference Include="ZstdNet" Version="1.4.5" />
   </ItemGroup>
 

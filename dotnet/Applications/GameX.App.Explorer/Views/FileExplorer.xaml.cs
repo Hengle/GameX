@@ -1,24 +1,13 @@
-﻿using System;
+﻿using GameX.Meta;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Media;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Threading.Tasks;
-using System.Windows.Data;
-using GameX.Meta;
-using GameX.Formats;
-using System.Collections.Specialized;
-using System.Collections.ObjectModel;
-using OpenStack.Graphics.OpenGL.Renderer1.Renderers;
-using OpenStack.Graphics;
-using OpenStack;
-using static GameX.Formats.Unknown.IUnknownFileObject;
-using System.Drawing;
 
 namespace GameX.App.Explorer.Views
 {

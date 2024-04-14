@@ -108,7 +108,9 @@ class Detector:
         self.cache = {}
         self.id = id
         self.game = game
-        self.elem = elem
+        self.data = self.parse(game, elem)
+    def parse(self, game: FamilyGame, elem: dict[str, object]) -> dict[str, object]:
+        return None
     def __repr__(self): return f'detector#{self.game}'
 # end::Detector[]
 
@@ -169,8 +171,9 @@ fileManager: {self.fileManager if self.fileManager else None}'''
     # get Game
     def getGame(self, id: str, throwOnError: bool = True) -> FamilyGame:
         ids = id.rsplit('.', 1)
-        game = _value(self.games, ids[0]) or (throwOnError and _throw(f'Unknown game: {id}'))
-        edition = _value(self.games.editions, ids[1]) if len(ids) > 1 else None
+        gid = ids[0]; eid = ids[1] if len(ids) > 1 else ''
+        game = _value(self.games, gid) or (throwOnError and _throw(f'Unknown game: {id}'))
+        edition = _value(self.games.editions, eid) if len(ids) > 1 else None
         return (game, edition)
 
     # tag::Family.parseResource[]
@@ -216,6 +219,9 @@ class FamilyApp:
         self.name = _value(elem, 'name') or id
         self.explorerType = _value(elem, 'explorerAppType')
         self.explorer2Type = _value(elem, 'explorer2AppType')
+        self.data = self.parse(elem)
+    def parse(self, elem: dict[str, object]) -> dict[str, object]:
+        return None
     def __repr__(self): return f'\n  {self.id}: {self.name}'
 # end::FamilyApp[]
 
@@ -225,6 +231,10 @@ class FamilyEngine:
         self.family = family
         self.id = id
         self.name = _value(elem, 'name') or id
+        self.data = self.parse(elem)
+    def parse(self, elem: dict[str, object]) -> dict[str, object]:
+        abc = { k:v for k,v in elem.items() }
+        return None
     def __repr__(self): return f'\n  {self.id}: {self.name}'
 # end::FamilyEngine[]
 
@@ -236,6 +246,14 @@ class FamilySample:
             self.path = _value(elem, 'path')
             self.size = _value(elem, 'size') or 0
             self.type = _value(elem, 'type')
+            self.data = self.parse(elem)
+        def parse(self, elem: dict[str, object]) -> dict[str, object]:
+            def switch(k,v):
+                match k:
+                    case 'path': self.path = v; return v
+                    case 'size': return v
+                    case _: return v
+            return { k:switch(k,v) for k,v in elem.items() }
         def __repr__(self): return f'{self.path}'
 
     def __init__(self, elem: dict[str, object]):
@@ -250,6 +268,9 @@ class FamilyGame:
             self.id = id
             self.name = _value(elem, 'name') or id
             self.key = _method(elem, 'key', createKey)
+            self.data = self.parse(elem)
+        def parse(self, elem: dict[str, object]) -> dict[str, object]:
+            return None
         def __repr__(self): return f'{self.id}: {self.name}'
         
     class DownloadableContent:
@@ -257,12 +278,18 @@ class FamilyGame:
             self.id = id
             self.name = _value(elem, 'name') or id
             self.path = _value(elem, 'path')
+            self.data = self.parse(elem)
+        def parse(self, elem: dict[str, object]) -> dict[str, object]:
+            return None
         def __repr__(self): return f'{self.id}: {self.name}'
 
     class Locale:
         def __init__(self, id: str, elem: dict[str, object]):
             self.id = id
             self.name = _value(elem, 'name') or id
+            self.data = self.parse(elem)
+        def parse(self, elem: dict[str, object]) -> dict[str, object]:
+            return None
         def __repr__(self): return f'{self.id}: {self.name}'
 
     def __init__(self, family: Family, id: str, elem: dict[str, object], dgame: FamilyGame):

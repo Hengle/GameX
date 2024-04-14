@@ -4,17 +4,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace GameX.App.Explorer.Views
 {
@@ -97,24 +88,25 @@ namespace GameX.App.Explorer.Views
 
         void Family_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selected = (Family)Family.SelectedItem;
-            Games = selected?.Games.Values.Where(x => !x.Ignore).ToList();
+            var selectedFamily = (Family)Family.SelectedItem;
+            Games = selectedFamily?.Games.Values.Where(x => !x.Ignore).ToList();
             Game.SelectedIndex = -1;
         }
 
         void Game_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selected = (FamilyGame)Game.SelectedItem;
-            Editions = selected?.Editions.Values.ToList();
-            Edition.SelectedIndex = -1;
-            PakUris = selected?.ToPaks(null);
+            var selectedGame = (FamilyGame)Game.SelectedItem;
+            Editions = selectedGame?.Editions.Values.ToList();
+            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == string.Empty);
+            var selectedEdition = (FamilyGame.Edition)Edition.SelectedItem;
+            PakUris = selectedGame?.ToPaks(selectedEdition?.Id);
         }
 
         void Edition_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var selectedGame = (FamilyGame)Game.SelectedItem;
-            var selected = (FamilyGame.Edition)Edition.SelectedItem;
-            PakUris = selectedGame?.ToPaks(selected?.Id);
+            var selectedEdition = (FamilyGame.Edition)Edition.SelectedItem;
+            PakUris = selectedGame?.ToPaks(selectedEdition?.Id);
         }
 
         void Pak1Uri_Click(object sender, RoutedEventArgs e)
