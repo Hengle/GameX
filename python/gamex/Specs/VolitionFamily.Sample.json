@@ -1,0 +1,32 @@
+﻿{
+    "D": {
+        "name": "Descent",
+        "files": [
+            {
+                "path": "descent.hog:descent.pcx",
+                "type": "Image"
+            },
+            {
+                "path": "descent.pig:descent.pcx",
+                "type": "Image"
+            }
+        ]
+    },
+    "D2": {
+        "name": "Descent 2",
+        "files": [
+            {
+                "path": "groupa.pig",
+                "type": "Video"
+            },
+            {
+                "path": "groupa.pig",
+                "type": "Image"
+            },
+            {
+                "path": "descent2.hog:descent.pcx",
+                "type": "Image"
+            }
+        ]
+    }
+}

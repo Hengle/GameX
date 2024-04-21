@@ -2,6 +2,7 @@ import os, pathlib
 from PyQt6.QtWidgets import QWidget, QGridLayout, QFileDialog, QLabel, QComboBox, QLineEdit, QPushButton
 from PyQt6.QtCore import Qt
 from gamex import families, getFamily, config
+from gamex.util import _find
 
 familyValues = list(families.values())
 
@@ -9,6 +10,8 @@ familyValues = list(families.values())
 class OpenWidget(QWidget):
     def __init__(self, app, callback):
         super().__init__()
+        self.gameValues = []
+        self.editionValues = []
         self.app = app
         self.callback = callback
         self.result = None
@@ -88,26 +91,29 @@ class OpenWidget(QWidget):
         self.pak3uriInput.setText(pak3uri)
 
     def family_change(self, index):
-        selected = self.familySelected = familyValues[index - 1] if index > 0 else None
+        selectedFamily = self.familySelected = familyValues[index - 1] if index > 0 else None
         # related
         self.gameInput.clear()
-        if not selected or not selected.games: return
-        self.gameValues = list(selected.games.values())
-        self.gameInput.addItems([None] + [x.name for x in self.gameValues])
+        if selectedFamily and selectedFamily.games:
+            self.gameValues = list(selectedFamily.games.values())
+            self.gameInput.addItems([None] + [x.name for x in self.gameValues])
 
     def game_change(self, index):
-        selected = self.gameSelected = self.gameValues[index - 1] if index > 0 else None
-        self.pakUris = selected.toPaks(None) if selected else None
+        selectedGame = self.gameSelected = self.gameValues[index - 1] if index > 0 else None
         # related
         self.editionInput.clear()
-        if not selected or not selected.editions: return
-        self.editionValues = list(selected.editions.values())
-        self.editionInput.addItems([None] + [x.name for x in self.editionValues])
+        if selectedGame and selectedGame.editions:
+            self.editionValues = list(selectedGame.editions.values())
+            self.editionInput.addItems([None] + [x.name for x in self.editionValues])
+        index = _find(self.editionValues, '')
+        self.editionInput.setCurrentIndex(index + 1)
+        selectedEdition = self.editionSelected = self.editionValues[index - 1] if index > 0 else None
+        self.pakUris = selectedGame.toPaks(selectedEdition.id if selectedEdition else None) if selectedGame else None
 
     def edition_change(self, index):
         selectedGame = self.gameSelected
-        selected = self.editionSelected = self.editionValues[index - 1] if index > 0 else None
-        self.pakUris = selectedGame.toPaks(selected.id if selected else None) if selectedGame else None
+        selectedEdition = self.editionSelected = self.editionValues[index - 1] if index > 0 else None
+        self.pakUris = selectedGame.toPaks(selectedEdition.id if selectedEdition else None) if selectedGame else None
 
     def pak1uri_click(self):
         openDialog = QFileDialog.getExistingDirectory(self, "Directory", os.getcwd())
@@ -139,9 +145,8 @@ class OpenWidget(QWidget):
 
     def onReady(self):
         if not config.Family: return
-        self.familyInput.setCurrentIndex([x.id for x in familyValues].index(config.Family) + 1)
+        self.familyInput.setCurrentIndex(_find([x.id for x in familyValues], config.Family) + 1)
         if not config.Game: return
-        self.gameInput.setCurrentIndex([x.id for x in self.gameValues].index(config.Game) + 1)
-        if config.Edition:
-            self.editionInput.setCurrentIndex([x.id for x in self.editionValues].index(config.Edition) + 1)
+        self.gameInput.setCurrentIndex(_find([x.id for x in self.gameValues], config.Game) + 1)
+        self.editionInput.setCurrentIndex(_find([x.id for x in self.editionValues], config.Edition or '') + 1)
         if config.ForceOpen: self.open_click()

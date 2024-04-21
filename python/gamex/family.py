@@ -109,8 +109,23 @@ class Detector:
         self.id = id
         self.game = game
         self.data = self.parse(game, elem)
+    @property
+    def name(self): return self.data['name'] or self.id
     def parse(self, game: FamilyGame, elem: dict[str, object]) -> dict[str, object]:
-        return None
+        def switch(k,v):
+            match k:
+                case 'type': return v
+                case 'key': return _method(elem, 'key', createKey)
+                # case 'hashs': Hashs = _related(elem, 'hashs', k => k.GetProperty("hash").GetString(), v => parseHash(game, v)); return v
+                case _: return v
+        return { k:switch(k,v) for k,v in elem.items() }
+    def parseHash(self, game: FamilyGame, elem: dict[str, object]) -> dict[str, object]:
+        def switch(k,v):
+            match k:
+                case 'edition': return v
+                case 'locale': return v
+                case _: return v
+        return { k:switch(k,v) for k,v in elem.items() }
     def __repr__(self): return f'detector#{self.game}'
 # end::Detector[]
 
@@ -215,13 +230,17 @@ fileManager: {self.fileManager if self.fileManager else None}'''
 class FamilyApp:
     def __init__(self, family: Family, id: str, elem: dict[str, object]):
         self.family = family
-        self.id = id
-        self.name = _value(elem, 'name') or id
-        self.explorerType = _value(elem, 'explorerAppType')
-        self.explorer2Type = _value(elem, 'explorer2AppType')
+        self.id = self.name = id
         self.data = self.parse(elem)
     def parse(self, elem: dict[str, object]) -> dict[str, object]:
-        return None
+        def switch(k,v):
+            match k:
+                case 'name': self.name = v; return v
+                case 'explorerAppType': self.explorerType = v; return v
+                case 'explorer2AppType': self.explorer2Type = v; return v
+                case 'key': return _method(elem, 'key', createKey)
+                case _: return v
+        return { k:switch(k,v) for k,v in elem.items() }
     def __repr__(self): return f'\n  {self.id}: {self.name}'
 # end::FamilyApp[]
 
@@ -229,12 +248,15 @@ class FamilyApp:
 class FamilyEngine:
     def __init__(self, family: Family, id: str, elem: dict[str, object]):
         self.family = family
-        self.id = id
-        self.name = _value(elem, 'name') or id
+        self.id = self.name = id
         self.data = self.parse(elem)
     def parse(self, elem: dict[str, object]) -> dict[str, object]:
-        abc = { k:v for k,v in elem.items() }
-        return None
+        def switch(k,v):
+            match k:
+                case 'name': self.name = v; return v
+                case 'key': return _method(elem, 'key', createKey)
+                case _: return v
+        return { k:switch(k,v) for k,v in elem.items() }
     def __repr__(self): return f'\n  {self.id}: {self.name}'
 # end::FamilyEngine[]
 
@@ -243,9 +265,6 @@ class FamilySample:
     samples: dict[str, list[object]] = {}
     class File:
         def __init__(self, elem: dict[str, object]):
-            self.path = _value(elem, 'path')
-            self.size = _value(elem, 'size') or 0
-            self.type = _value(elem, 'type')
             self.data = self.parse(elem)
         def parse(self, elem: dict[str, object]) -> dict[str, object]:
             def switch(k,v):
@@ -265,12 +284,16 @@ class FamilySample:
 class FamilyGame:
     class Edition:
         def __init__(self, id: str, elem: dict[str, object]):
-            self.id = id
-            self.name = _value(elem, 'name') or id
-            self.key = _method(elem, 'key', createKey)
+            self.id = self.name = id
             self.data = self.parse(elem)
         def parse(self, elem: dict[str, object]) -> dict[str, object]:
-            return None
+            def switch(k,v):
+                match k:
+                    case 'name': self.name = v; return v
+                    case 'path': self.path = v; return v
+                    case 'key': return _method(elem, 'key', createKey)
+                    case _: return v
+            return { k:switch(k,v) for k,v in elem.items() }
         def __repr__(self): return f'{self.id}: {self.name}'
         
     class DownloadableContent:
@@ -280,16 +303,26 @@ class FamilyGame:
             self.path = _value(elem, 'path')
             self.data = self.parse(elem)
         def parse(self, elem: dict[str, object]) -> dict[str, object]:
-            return None
+            def switch(k,v):
+                match k:
+                    case 'name': self.name = v; return v
+                    case 'path': self.path = v; return v
+                    case 'key': return _method(elem, 'key', createKey)
+                    case _: return v
+            return { k:switch(k,v) for k,v in elem.items() }
         def __repr__(self): return f'{self.id}: {self.name}'
 
     class Locale:
         def __init__(self, id: str, elem: dict[str, object]):
-            self.id = id
-            self.name = _value(elem, 'name') or id
+            self.id = self.name = id
             self.data = self.parse(elem)
         def parse(self, elem: dict[str, object]) -> dict[str, object]:
-            return None
+            def switch(k,v):
+                match k:
+                    case 'name': self.name = v; return v
+                    case 'key': return _method(elem, 'key', createKey)
+                    case _: return v
+            return { k:switch(k,v) for k,v in elem.items() }
         def __repr__(self): return f'{self.id}: {self.name}'
 
     def __init__(self, family: Family, id: str, elem: dict[str, object], dgame: FamilyGame):
@@ -410,13 +443,14 @@ class FamilyGame:
 
     # find Paths
     def findPaths(self, fileSystem: IFileSystem, edition: Edition, dlc: DownloadableContent, searchPattern: str):
-        ignores = self.family.fileManager.ignores
-        gameIgnores = _value(ignores, self.id)
-        paths = [''] if dlc else self.paths or ['']
-        for path in self.paths or ['']:
+        ignores = _value(self.family.fileManager.ignores, self.id)
+        paths = [''] if dlc else \
+            [edition.path or ''] if edition else \
+            self.paths or ['']
+        for path in paths:
             searchPath = os.path.join(path, dlc.path) if dlc and dlc.path else path
             fileSearch = fileSystem.findPaths(searchPath, searchPattern)
-            if gameIgnores: fileSearch = [x for x in fileSearch if not os.path.basename(x) in gameIgnores]
+            if ignores: fileSearch = [x for x in fileSearch if not os.path.basename(x) in ignores]
             yield (path, list(fileSearch))
 
     # is a PakFile

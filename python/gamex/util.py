@@ -4,6 +4,9 @@ from typing import Any, Callable
 def _throw(message: str) -> None:
     raise Exception(message)
 
+def _find(list, item):
+    return list.index(item) if item in list else -1
+
 def _value(elem: dict[str, Any], key: str, default: Any = None) -> Any:
     return elem[key] if key in elem else default
 def _valueV(elem: Any) -> Any:

@@ -11,7 +11,7 @@ namespace GameX
         public static string GetPathByKey(string key)
         {
             var parts = key.Split(':', 2);
-            string k = parts[0], v = parts[1];
+            string k = parts[0], v = parts.Length > 1 ? parts[1] : default;
             return k switch
             {
                 "Steam" => Store_Steam.SteamPaths.TryGetValue(v, out var z) ? z : null,
@@ -22,7 +22,7 @@ namespace GameX
                 "Abandon" => Store_Abandon.AbandonPaths.TryGetValue(v, out var z) ? z : null,
                 "Unknown" => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(key), key),
-            };
+            };;
         }
     }
 }

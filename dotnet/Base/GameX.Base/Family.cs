@@ -1,7 +1,6 @@
 ﻿using GameX.Meta;
 using GameX.Platforms;
 using GameX.Unknown;
-using MathNet.Numerics;
 using OpenStack;
 using System;
 using System.Collections.Concurrent;
@@ -262,17 +261,21 @@ namespace GameX
         protected Dictionary<string, Dictionary<string, object>> Hashs;
 
         /// <summary>
-        /// The identifier
+        /// Gets the identifier
         /// </summary>
-        public string Id { get; set; }
+        public string Id { get; }
         /// <summary>
-        /// Gets or sets the Game.
+        /// Gets the Game.
         /// </summary>
-        public FamilyGame Game { get; set; }
+        public FamilyGame Game { get; }
         /// <summary>
-        /// The Data
+        /// Gets the Data
         /// </summary>
-        public Dictionary<string, object> Data { get; set; }
+        public Dictionary<string, object> Data { get; }
+        /// <summary>
+        /// Gets the game name.
+        /// </summary>
+        public string Name { get; protected set; }
 
         /// <summary>
         /// Detector
@@ -283,7 +286,7 @@ namespace GameX
         /// <exception cref="ArgumentNullException"></exception>
         public Detector(FamilyGame game, string id, JsonElement elem)
         {
-            Id = id;
+            Id = Name = id;
             Game = game;
             Data = Parse(game, elem);
         }
@@ -291,8 +294,9 @@ namespace GameX
         public virtual Dictionary<string, object> Parse(FamilyGame game, JsonElement elem)
            => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
            {
-               "type" => _value(elem, "type"),
-               "seed" => _method(elem, "seed", CreateKey),
+               "name" => Name = x.Value.GetString(),
+               "type" => x.Value.GetString(),
+               "key" => _method(elem, "key", CreateKey),
                "hashs" => Hashs = _related(elem, "hashs", k => k.GetProperty("hash").GetString(), v => ParseHash(game, v)),
                _ => _valueV(x.Value)
            });
@@ -663,29 +667,29 @@ namespace GameX
     public class FamilyApp
     {
         /// <summary>
-        /// Gets or sets the family.
+        /// Gets the family.
         /// </summary>
-        public Family Family { get; set; }
+        public Family Family { get; }
         /// <summary>
-        /// Gets or sets the game identifier.
+        /// Gets the identifier.
         /// </summary>
-        public string Id { get; set; }
+        public string Id { get; }
         /// <summary>
-        /// Gets or sets the game name.
-        /// </summary>
-        public string Name { get; set; }
-        /// <summary>
-        /// The Data
+        /// Gets the data.
         /// </summary>
         public Dictionary<string, object> Data { get; set; }
         /// <summary>
-        /// Gets or sets the explorer type.
+        /// Gets the name.
         /// </summary>
-        public Type ExplorerType { get; set; }
+        public string Name { get; protected set; }
         /// <summary>
-        /// Gets or sets the explorer2 type.
+        /// Gets the explorer type.
         /// </summary>
-        public Type Explorer2Type { get; set; }
+        public Type ExplorerType { get; protected set; }
+        /// <summary>
+        /// Gets the explorer2 type.
+        /// </summary>
+        public Type Explorer2Type { get; protected set; }
 
         /// <summary>
         /// FamilyApp
@@ -696,10 +700,7 @@ namespace GameX
         public FamilyApp(Family family, string id, JsonElement elem)
         {
             Family = family;
-            Id = id;
-            Name = _value(elem, "name") ?? id;
-            ExplorerType = _value(elem, "explorerAppType", z => Type.GetType(z.GetString(), false));
-            Explorer2Type = _value(elem, "explorer2AppType", z => Type.GetType(z.GetString(), false));
+            Id = Name = id;
             Data = Parse(elem);
         }
 
@@ -711,9 +712,10 @@ namespace GameX
         public virtual Dictionary<string, object> Parse(JsonElement elem)
            => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
            {
+               "name" => Name = x.Value.GetString(),
+               "explorerAppType" => ExplorerType = Type.GetType(x.Value.GetString(), false),
+               "explorerApp2Type" => Explorer2Type = Type.GetType(x.Value.GetString(), false),
                "key" => _method(elem, "key", CreateKey),
-               //"explorerAppType" => ExplorerType = _value(elem, "explorerAppType", z => Type.GetType(z.GetString(), false)),
-               //"explorer2AppType" => Explorer2Type = _value(elem, "explorer2AppType", z => Type.GetType(z.GetString(), false)),
                _ => _valueV(x.Value)
            });
 
@@ -747,21 +749,21 @@ namespace GameX
     public class FamilyEngine
     {
         /// <summary>
-        /// Gets or sets the family.
+        /// Gets the family.
         /// </summary>
-        public Family Family { get; set; }
+        public Family Family { get; }
         /// <summary>
-        /// Gets or sets the game identifier.
+        /// Gets the identifier.
         /// </summary>
-        public string Id { get; set; }
+        public string Id { get; }
         /// <summary>
-        /// Gets or sets the game name.
+        /// Gets the data.
         /// </summary>
-        public string Name { get; set; }
+        public Dictionary<string, object> Data { get; }
         /// <summary>
-        /// The Data
+        /// Gets the name.
         /// </summary>
-        public Dictionary<string, object> Data { get; set; }
+        public string Name { get; protected set; }
 
         /// <summary>
         /// FamilyEngine
@@ -773,8 +775,7 @@ namespace GameX
         public FamilyEngine(Family family, string id, JsonElement elem)
         {
             Family = family;
-            Id = id;
-            Name = _value(elem, "name") ?? id;
+            Id = Name = id;
             Data = Parse(elem);
         }
 
@@ -786,6 +787,7 @@ namespace GameX
         public virtual Dictionary<string, object> Parse(JsonElement elem)
            => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
            {
+               "name" => Name = x.Value.GetString(),
                "key" => _method(elem, "key", CreateKey),
                _ => _valueV(x.Value)
            });
@@ -829,11 +831,11 @@ namespace GameX
             /// <summary>
             /// The path
             /// </summary>
-            public string Path { get; set; }
+            public string Path { get; protected set; }
             /// <summary>
             /// The Data
             /// </summary>
-            public Dictionary<string, object> Data { get; set; }
+            public Dictionary<string, object> Data { get; }
 
             /// <summary>
             /// File
@@ -842,7 +844,6 @@ namespace GameX
             /// <exception cref="ArgumentNullException"></exception>
             public File(JsonElement elem)
             {
-                Path = _value(elem, "path");
                 Data = Parse(elem);
             }
 
@@ -854,7 +855,8 @@ namespace GameX
             public virtual Dictionary<string, object> Parse(JsonElement elem)
                => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
                {
-                   "size" => _value(elem, "size", x => x.GetInt64(), 0L),
+                   "path" => Path = x.Value.GetString(),
+                   "size" => x.Value.GetInt64(),
                    _ => _valueV(x.Value)
                });
 
@@ -893,21 +895,21 @@ namespace GameX
         public class Edition
         {
             /// <summary>
-            /// The identifier
+            /// Gets the identifier.
             /// </summary>
-            public string Id { get; set; }
+            public string Id { get; }
             /// <summary>
-            /// The name
+            /// Gets the data.
             /// </summary>
-            public string Name { get; set; }
+            public Dictionary<string, object> Data { get; }
             /// <summary>
-            /// The Path
+            /// Gets the name.
             /// </summary>
-            public string Path { get; set; }
+            public string Name { get; protected set; }
             /// <summary>
-            /// The Data
+            /// Gets the path.
             /// </summary>
-            public Dictionary<string, object> Data { get; set; }
+            public string Path { get; protected set; }
 
             /// <summary>
             /// Edition
@@ -917,8 +919,7 @@ namespace GameX
             /// <exception cref="ArgumentNullException"></exception>
             public Edition(string id, JsonElement elem)
             {
-                Id = id;
-                Name = _value(elem, "name") ?? id;
+                Id = Name = id;
                 Data = Parse(elem);
             }
 
@@ -930,8 +931,9 @@ namespace GameX
             public virtual Dictionary<string, object> Parse(JsonElement elem)
                => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
                {
+                   "name" => Name = x.Value.GetString(),
+                   "path" => Path = x.Value.GetString(),
                    "key" => _method(elem, "key", CreateKey),
-                   "path" => Path = _value(elem, "path"),
                    _ => _valueV(x.Value)
                });
         }
@@ -942,21 +944,21 @@ namespace GameX
         public class DownloadableContent
         {
             /// <summary>
-            /// The identifier
+            /// Gets the identifier.
             /// </summary>
-            public string Id { get; set; }
+            public string Id { get; }
             /// <summary>
-            /// The name
+            /// Gets the data.
             /// </summary>
-            public string Name { get; set; }
+            public Dictionary<string, object> Data { get; }
             /// <summary>
-            /// The Path
+            /// Gets the name.
             /// </summary>
-            public string Path { get; set; }
+            public string Name { get; protected set; }
             /// <summary>
-            /// The Data
+            /// Gets the path.
             /// </summary>
-            public Dictionary<string, object> Data { get; set; }
+            public string Path { get; protected set; }
 
             /// <summary>
             /// DownloadableContent
@@ -966,8 +968,7 @@ namespace GameX
             /// <exception cref="ArgumentNullException"></exception>
             public DownloadableContent(string id, JsonElement elem)
             {
-                Id = id;
-                Name = _value(elem, "name") ?? id;
+                Id = Name = id;
                 Data = Parse(elem);
             }
 
@@ -979,8 +980,9 @@ namespace GameX
             public virtual Dictionary<string, object> Parse(JsonElement elem)
                => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
                {
+                   "name" => Name = x.Value.GetString(),
+                   "path" => Path = x.Value.GetString(),
                    "key" => _method(elem, "key", CreateKey),
-                   "path" => Path = _value(elem, "path"),
                    _ => _valueV(x.Value)
                });
         }
@@ -991,17 +993,17 @@ namespace GameX
         public class Locale
         {
             /// <summary>
-            /// The identifier
+            /// Gets the identifier.
             /// </summary>
-            public string Id { get; set; }
+            public string Id { get; }
             /// <summary>
-            /// The name
+            /// Gets the data.
             /// </summary>
-            public string Name { get; set; }
+            public Dictionary<string, object> Data { get;}
             /// <summary>
-            /// The Data
+            /// Gets the name.
             /// </summary>
-            public Dictionary<string, object> Data { get; set; }
+            public string Name { get; protected set; }
 
             /// <summary>
             /// Locale
@@ -1011,8 +1013,7 @@ namespace GameX
             /// <exception cref="ArgumentNullException"></exception>
             public Locale(string id, JsonElement elem)
             {
-                Id = id;
-                Name = _value(elem, "name") ?? id;
+                Id = Name = id;
                 Data = Parse(elem);
             }
 
@@ -1024,6 +1025,7 @@ namespace GameX
             public virtual Dictionary<string, object> Parse(JsonElement elem)
                => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
                {
+                   "name" => Name = x.Value.GetString(),
                    "key" => _method(elem, "key", CreateKey),
                    _ => _valueV(x.Value)
                });
@@ -1310,14 +1312,15 @@ namespace GameX
         /// <returns></returns>
         public IEnumerable<(string root, string[] paths)> FindPaths(IFileSystem fileSystem, Edition edition, DownloadableContent dlc, string searchPattern)
         {
-            var gameIgnores = Family.FileManager.Ignores.TryGetValue(Id, out var z) ? z : null;
-            var paths0 = edition == null && edition.Path == null ? new[] { "" } : Paths ?? new[] { "" };
-            var paths = dlc != null ? new[] { "" } : Paths ?? new[] { "" };
+            var ignores = Family.FileManager.Ignores.TryGetValue(Id, out var z) ? z : null;
+            var paths = dlc != null ? new[] { "" }
+                : edition != null ? new[] { edition.Path ?? "" }
+                : Paths ?? new[] { "" };
             foreach (var path in paths)
             {
                 var searchPath = dlc?.Path != null ? Path.Join(path, dlc.Path) : path;
                 var fileSearch = fileSystem.FindPaths(searchPath, searchPattern);
-                if (gameIgnores != null) fileSearch = fileSearch.Where(x => !gameIgnores.Contains(Path.GetFileName(x)));
+                if (ignores != null) fileSearch = fileSearch.Where(x => !ignores.Contains(Path.GetFileName(x)));
                 yield return (path, fileSearch.ToArray());
             }
         }

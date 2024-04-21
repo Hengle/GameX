@@ -341,6 +341,28 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Lucas", "Lucas\GameX.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Lucas.Platform", "Lucas\GameX.Lucas.Platform\GameX.Lucas.Platform.csproj", "{CC0E6F8A-201B-42BA-9EE2-E9481AA323D1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bullfrog", "Bullfrog", "{5AF9DE0E-F59A-49A8-B406-06C8718D5988}"
+	ProjectSection(SolutionItems) = preProject
+		..\python\gamex\Specs\BullfrogFamily.json = ..\python\gamex\Specs\BullfrogFamily.json
+		..\python\gamex\Specs\BullfrogFamily.Sample.json = ..\python\gamex\Specs\BullfrogFamily.Sample.json
+		..\docs\Families\Bullfrog\Readme.md = ..\docs\Families\Bullfrog\Readme.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Volition", "Volition", "{2CDC86F9-BF29-4329-BB90-D7CC1026BE25}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\Families\Volition\Readme.md = ..\docs\Families\Volition\Readme.md
+		..\python\gamex\Specs\VolitionFamily.json = ..\python\gamex\Specs\VolitionFamily.json
+		..\python\gamex\Specs\VolitionFamily.Sample.json = ..\python\gamex\Specs\VolitionFamily.Sample.json
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Volition", "Volition\GameX.Volition\GameX.Volition.csproj", "{2DE28B37-CD0A-4135-9B14-2BD41F6BB95B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Volition.Platform", "Volition\GameX.Volition.Platform\GameX.Volition.Platform.csproj", "{A7B2668C-CBDC-4461-832B-D72AD878646C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Bullfrog", "Bullfrog\GameX.Bullfrog\GameX.Bullfrog.csproj", "{F9A180BB-AB55-4558-903C-95D72E2BAB57}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Bullfrog.Platform", "Bullfrog\GameX.Bullfrog.Platform\GameX.Bullfrog.Platform.csproj", "{0D77AF10-E8F7-4C5A-9A8C-F110967AC9FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -626,6 +648,22 @@ Global
 		{CC0E6F8A-201B-42BA-9EE2-E9481AA323D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC0E6F8A-201B-42BA-9EE2-E9481AA323D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC0E6F8A-201B-42BA-9EE2-E9481AA323D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DE28B37-CD0A-4135-9B14-2BD41F6BB95B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DE28B37-CD0A-4135-9B14-2BD41F6BB95B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DE28B37-CD0A-4135-9B14-2BD41F6BB95B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DE28B37-CD0A-4135-9B14-2BD41F6BB95B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7B2668C-CBDC-4461-832B-D72AD878646C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7B2668C-CBDC-4461-832B-D72AD878646C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7B2668C-CBDC-4461-832B-D72AD878646C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7B2668C-CBDC-4461-832B-D72AD878646C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9A180BB-AB55-4558-903C-95D72E2BAB57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9A180BB-AB55-4558-903C-95D72E2BAB57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9A180BB-AB55-4558-903C-95D72E2BAB57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9A180BB-AB55-4558-903C-95D72E2BAB57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D77AF10-E8F7-4C5A-9A8C-F110967AC9FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D77AF10-E8F7-4C5A-9A8C-F110967AC9FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D77AF10-E8F7-4C5A-9A8C-F110967AC9FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D77AF10-E8F7-4C5A-9A8C-F110967AC9FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -705,6 +743,10 @@ Global
 		{9F942D13-67C4-447F-BF8C-8B245AE5F1D4} = {6D2DEF34-0211-49A7-B0CE-8AF7AE738D8A}
 		{D36AB841-A08A-403A-8930-F143BA7D86B8} = {233F86E3-D4A5-4F18-B422-6D81F342A46C}
 		{CC0E6F8A-201B-42BA-9EE2-E9481AA323D1} = {233F86E3-D4A5-4F18-B422-6D81F342A46C}
+		{2DE28B37-CD0A-4135-9B14-2BD41F6BB95B} = {2CDC86F9-BF29-4329-BB90-D7CC1026BE25}
+		{A7B2668C-CBDC-4461-832B-D72AD878646C} = {2CDC86F9-BF29-4329-BB90-D7CC1026BE25}
+		{F9A180BB-AB55-4558-903C-95D72E2BAB57} = {5AF9DE0E-F59A-49A8-B406-06C8718D5988}
+		{0D77AF10-E8F7-4C5A-9A8C-F110967AC9FE} = {5AF9DE0E-F59A-49A8-B406-06C8718D5988}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9F1BB93-CFBC-4E41-A865-325B22465054}

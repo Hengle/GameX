@@ -282,7 +282,18 @@
         "https://en.wikipedia.org/wiki/Zak_McKracken_and_the_Alien_Mindbenders"
       ],
       "date": "October 1, 1988",
+      "searchBy": "Pak",
       "pakExt": "00.lfl",
+      "editions": {
+        "": {
+          "name": "Original",
+          "path": "FDD"
+        },
+        "enhanced": {
+          "name": "Enhanced",
+          "path": "enhanced"
+        }
+      },
       "detectors": {
         "scumm": {
           "variants": {

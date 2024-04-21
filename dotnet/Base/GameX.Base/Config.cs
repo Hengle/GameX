@@ -3,6 +3,7 @@
 //#define Bioware
 //#define Black
 //#define Blizzard
+//#define Bullfrog
 //#define Capcom
 //#define Cig
 //#define Cryptic
@@ -13,13 +14,14 @@
 //#define Frontier
 //#define Id
 //#define IW
-#define Lucas
+//#define Lucas
 //#define Monolith
 //#define Origin
 //#define Red
 //#define Ubisoft
 //#define Unity
 //#define Valve
+#define Volition
 //#define WbB
 
 namespace GameX
@@ -329,15 +331,16 @@ namespace GameX
 
         public static DefaultOptions AppDefaultOptions = new DefaultOptions
         {
-            //ForceOpen = true,
+            //Edition = "enhanced",
+            ForceOpen = true,
             ForcePath = "sample:0",
             Family = "Lucas",
             //Game = "PP", // PHM Pegasus
-            Game = "MM", // Maniac Mansion
+            //Game = "MM", // Maniac Mansion - Scumm
             //Game = "SF", // Strike Fleet
             //Game = "B1942", // Battlehawks 1942
-            //Game = "ZMatAM", // Zak McKracken and the Alien Mindbenders
-            //Game = "IJatLC:TAG", // Indiana Jones and the Last Crusade: The Action Game
+            //Game = "ZMatAM", // Zak McKracken and the Alien Mindbenders - Scumm
+            Game = "IJatLC:TAG", // Indiana Jones and the Last Crusade: The Action Game
             //Game = "IJatLC", // Indiana Jones and the Last Crusade: The Graphic Adventure
             //Game = "TFH", // Their Finest Hour
             //Game = "TFM:V1", // Their Finest Missions: Volume One
@@ -510,6 +513,35 @@ namespace GameX
             //Game = "TheLab:TL", // The Lab: The Lab [!unity]
             //Game = "HL:Alyx", // Half-Life: Alyx [open, read, texture:GL, model:GL]
         };
+#elif Volition
+        static string[] FamilyKeys = new[] { "Volition", "Unknown" };
+
+        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        {
+            ForceOpen = true,
+            ForcePath = "sample:0",
+            Family = "Volition",
+            Game = "D", // Descent
+            //Game = "D2", // Descent II
+            //Game = "FS", // Descent: FreeSpace - The Great War
+            //Game = "FS2", // FreeSpace 2
+            //Game = "S", // Summoner
+            //Game = "RF", // Red Faction
+            //Game = "S2", // Summoner 2 [missing]
+            //Game = "RF2", // Red Faction II
+            //Game = "TP", // The Punisher [missing]
+            //Game = "SR06", // Saints Row [missing]
+            //Game = "SR2", // Saints Row 2
+            //Game = "RF:G", // Red Faction: Guerrilla
+            //Game = "RF:A", // Red Faction: Armageddon
+            //Game = "SR3", // Saints Row: The Third
+            //Game = "SR4", // Saints Row IV
+            //Game = "D3", // Saints Row 2
+            //Game = "SR:G", // Descent 3
+            //Game = "AoM", // Agents of Mayhem
+            //Game = "RF:GR", // Red Faction: Guerrilla Re-Mars-tered
+            //Game = "SR", // Saints Row
+        };
 #elif WbB
         static string[] FamilyKeys = new[] { "WbB", "Unknown" };
 
@@ -521,7 +553,7 @@ namespace GameX
             Game = "AC", // Asheron's Call [open, read, texture:GL]
         };
 #else
-        static string[] FamilyKeys = new[] { "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "Epic", "Frictional", "Frontier", "Id", "IW", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "WbB" };
+        static string[] FamilyKeys = new[] { "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "Epic", "Frictional", "Frontier", "Id", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WbB" };
 
         public static DefaultOptions AppDefaultOptions = new DefaultOptions
         {

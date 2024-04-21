@@ -16,6 +16,8 @@
     <ProjectReference Include="..\..\Black\GameX.Black\GameX.Black.csproj" />
     <ProjectReference Include="..\..\Blizzard\GameX.Blizzard.Platform\GameX.Blizzard.Platform.csproj" />
     <ProjectReference Include="..\..\Blizzard\GameX.Blizzard\GameX.Blizzard.csproj" />
+    <ProjectReference Include="..\..\Bullfrog\GameX.Bullfrog.Platform\GameX.Bullfrog.Platform.csproj" />
+    <ProjectReference Include="..\..\Bullfrog\GameX.Bullfrog\GameX.Bullfrog.csproj" />
     <ProjectReference Include="..\..\Capcom\GameX.Capcom.Platform\GameX.Capcom.Platform.csproj" />
     <ProjectReference Include="..\..\Capcom\GameX.Capcom\GameX.Capcom.csproj" />
     <ProjectReference Include="..\..\Cig\GameX.Cig.Platform\GameX.Cig.Platform.csproj" />
@@ -50,7 +52,9 @@
     <ProjectReference Include="..\..\Unity\GameX.Unity\GameX.Unity.csproj" />
     <ProjectReference Include="..\..\Valve\GameX.Valve.Platform\GameX.Valve.Platform.csproj" />
     <ProjectReference Include="..\..\Valve\GameX.Valve\GameX.Valve.csproj" />
-    <ProjectReference Include="..\..\WbB\GameX.WbB.Platform\GameX.WbB.Platform.csproj" />
+	<ProjectReference Include="..\..\Volition\GameX.Volition.Platform\GameX.Volition.Platform.csproj" />
+    <ProjectReference Include="..\..\Volition\GameX.Volition\GameX.Volition.csproj" />
+	<ProjectReference Include="..\..\WbB\GameX.WbB.Platform\GameX.WbB.Platform.csproj" />
     <ProjectReference Include="..\..\WbB\GameX.WbB\GameX.WbB.csproj" />
   </ItemGroup>
 

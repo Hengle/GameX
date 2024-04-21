@@ -178,7 +178,7 @@ class StandardFileSystem(IFileSystem):
     def __init__(self, root: str): self.root = root; self.skip = len(root)
     def glob(self, path: str, searchPattern: str) -> list[str]:
         g = pathlib.Path(os.path.join(self.root, path)).glob(searchPattern if searchPattern else '**/*')
-        return [str(x)[self.skip:] for x in g]
+        return [str(x)[self.skip:] for x in g if x.is_file()]
     def fileExists(self, path: str) -> bool: return os.path.exists(os.path.join(self.root, path))
     def fileInfo(self, path: str) -> (str, int): return (path, os.stat(path).st_size) if os.path.exists(path := os.path.join(self.root, path)) else (None, 0)
     def openReader(self, path: str, mode: str = 'rb') -> Reader: return Reader(open(os.path.join(self.root, path), mode))
