@@ -521,8 +521,8 @@ namespace GameX
             ForceOpen = true,
             ForcePath = "sample:0",
             Family = "Volition",
-            Game = "D", // Descent
-            //Game = "D2", // Descent II
+            //Game = "D", // Descent
+            Game = "D2", // Descent II
             //Game = "FS", // Descent: FreeSpace - The Great War
             //Game = "FS2", // FreeSpace 2
             //Game = "S", // Summoner

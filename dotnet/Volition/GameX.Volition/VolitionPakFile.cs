@@ -1,6 +1,7 @@
 ﻿using GameX.Formats;
 using GameX.Formats.Unknown;
 using GameX.Volition.Formats;
+using GameX.Volition.Formats.Descent;
 using GameX.Volition.Transforms;
 using System;
 using System.Collections.Concurrent;
@@ -42,6 +43,9 @@ namespace GameX.Volition
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
+                ".256" => (0, Binary_Pal.Factory_3),
+                ".bmp" => (0, Binary_Bmp.Factory),
+                ".wav" => (0, Binary_Snd.Factory),
                 ".pcx" => (0, Binary_Pcx.Factory),
                 _ => (0, null),
             };

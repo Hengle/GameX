@@ -1,5 +1,6 @@
 using GameX.Formats;
 using GameX.Meta;
+using GameX.Origin.Games.U9;
 using GameX.Platforms;
 using OpenStack.Graphics;
 using System;
@@ -15,38 +16,6 @@ using ZstdNet;
 // https://wiki.ultimacodex.com/wiki/Ultima_IX_internal_formats#FLX_Format
 namespace GameX.Origin.Formats.U9
 {
-    #region Binary_Palette
-
-    public unsafe class Binary_Palette : IHaveMetaInfo
-    {
-        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Palette(r));
-        public static Binary_Palette Instance;
-
-        #region Records
-
-        public byte[][] Records;
-
-        #endregion
-
-        // file: static/ankh.pal
-        public Binary_Palette(BinaryReader r)
-        {
-            Records = r.ReadTArray<uint>(sizeof(uint), 256).Select(s => BitConverter.GetBytes(s)).ToArray();
-            Instance = this;
-        }
-
-        // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-            => new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "Pallet File" }),
-                new MetaInfo("Pallet", items: new List<MetaInfo> {
-                    new MetaInfo($"Records: {Records.Length}"),
-                })
-            };
-    }
-
-    #endregion
-
     #region Binary_Music
 
     public unsafe class Binary_Music : IHaveMetaInfo
@@ -289,7 +258,7 @@ namespace GameX.Origin.Formats.U9
             if (BytesPerPixel == 1)
             {
                 s.Game.Ensure();
-                palette = Binary_Palette.Instance?.Records ?? throw new NotImplementedException();
+                palette = Database.Palette?.Records ?? throw new NotImplementedException();
             }
 
             // read header
@@ -479,7 +448,7 @@ namespace GameX.Origin.Formats.U9
             if (BytesPerPixel == 1)
             {
                 s.Game.Ensure();
-                palette = Binary_Palette.Instance?.Records ?? throw new NotImplementedException();
+                palette = Database.Palette?.Records ?? throw new NotImplementedException();
             }
 
             // read header

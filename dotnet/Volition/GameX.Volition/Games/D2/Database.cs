@@ -1,7 +1,7 @@
 using GameX.Formats;
 using System;
 
-namespace GameX.Origin.Games.U9
+namespace GameX.Volition.Games.D2
 {
     public static class Database
     {
@@ -10,8 +10,8 @@ namespace GameX.Origin.Games.U9
 
         internal static FamilyGame Ensure(FamilyGame game)
         {
-            PakFile = game.Family.OpenPakFile(new Uri("game:/#U9"));
-            Palette = PakFile.LoadFileObject<Binary_Pal>("static/ankh.pal").Result;
+            PakFile = game.Family.OpenPakFile(new Uri("game:/#D2"));
+            Palette = PakFile.LoadFileObject<Binary_Pal>("groupa.256").Result.ConvertVgaPalette();
             return game;
         }
     }

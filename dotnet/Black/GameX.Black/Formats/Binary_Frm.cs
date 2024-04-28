@@ -47,7 +47,7 @@ namespace GameX.Black.Formats
 
         #endregion
 
-        static Binary_Pal DefaultPallet;
+        static Binary_Pal2 DefaultPallet;
 
         public FrmHeader Header;
         public (FrmFrame f, byte[] b)[] Frames;
@@ -83,14 +83,14 @@ namespace GameX.Black.Formats
             FrameSelect(0);
         }
 
-        async Task<Binary_Pal> GetPalletObjAsync(string path, BinaryPakFile s)
+        async Task<Binary_Pal2> GetPalletObjAsync(string path, BinaryPakFile s)
         {
             var palletPath = $"{path[..^4]}.PAL";
             if (s.Contains(palletPath))
-                return await s.LoadFileObject<Binary_Pal>(palletPath);
+                return await s.LoadFileObject<Binary_Pal2>(palletPath);
             if (DefaultPallet == null && s.Contains("COLOR.PAL"))
             {
-                DefaultPallet ??= await s.LoadFileObject<Binary_Pal>("COLOR.PAL");
+                DefaultPallet ??= await s.LoadFileObject<Binary_Pal2>("COLOR.PAL");
                 DefaultPallet.SetColors();
             }
             return DefaultPallet;

@@ -52,7 +52,7 @@ namespace GameX.Cig.Formats
                 var metadata = new FileSource
                 {
                     Path = entry.Name.Replace('\\', '/'),
-                    Crypted = entry.IsCrypted,
+                    Flags = entry.Flags,
                     PackedSize = entry.CompressedSize,
                     FileSize = entry.Size,
                     Tag = entry,

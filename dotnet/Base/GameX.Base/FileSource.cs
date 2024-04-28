@@ -14,17 +14,16 @@ namespace GameX
         // common
         public int Id;
         public string Path;
-        public int Compressed;
         public long Offset;
         public long FileSize;
         public long PackedSize;
-        public bool Crypted;
+        public int Compressed;
+        public int Flags;
         public ulong Hash;
         public BinaryPakFile Pak;
         public IList<FileSource> Parts;
         public object Tag;
         // extra
-        public object FileInfo;
         public byte[] Extra;
         public object ExtraArgs;
         // cached

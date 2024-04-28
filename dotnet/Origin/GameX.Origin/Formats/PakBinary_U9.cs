@@ -1,4 +1,5 @@
-﻿using GameX.Origin.Formats.U9;
+﻿using GameX.Formats;
+using GameX.Origin.Formats.U9;
 using System;
 using System.IO;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace GameX.Origin.Formats
                 //"abc" => (0, Binary_Palette.Factory),
                 _ => Path.GetExtension(source.Path).ToLowerInvariant() switch
                 {
-                    ".pal" => (0, Binary_Palette.Factory),
+                    ".pal" => (0, Binary_Pal.Factory_4),
                     ".sfm" => (0, Binary_Music.Factory),
                     ".sfx" => (0, Binary_Sfx.Factory),
                     ".spk" => (0, Binary_Speech.Factory),

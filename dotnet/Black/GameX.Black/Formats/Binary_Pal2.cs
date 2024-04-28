@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace GameX.Black.Formats
 {
-    public unsafe class Binary_Pal : IHaveMetaInfo
+    public unsafe class Binary_Pal2 : IHaveMetaInfo
     {
-        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pal(r, f));
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pal2(r, f));
 
         public uint[] Rgba32 = new uint[256];
 
-        public Binary_Pal(BinaryReader r, FileSource f)
+        public Binary_Pal2(BinaryReader r, FileSource f)
         {
             var rgb = r.ReadBytes(256 * 3);
             fixed (byte* s = rgb)
@@ -36,7 +36,7 @@ namespace GameX.Black.Formats
         // IHaveMetaInfo
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
             new MetaInfo(null, new MetaContent { Type = "Null", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Pal)}", items: new List<MetaInfo> {
+            new MetaInfo($"{nameof(Binary_Pal2)}", items: new List<MetaInfo> {
             })
         };
     }

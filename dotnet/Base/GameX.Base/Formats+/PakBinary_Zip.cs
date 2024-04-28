@@ -54,7 +54,7 @@ namespace GameX.Formats
                 source.Files = pak.Cast<ZipEntry>().Where(x => x.IsFile).Select(s => new FileSource
                 {
                     Path = s.Name.Replace('\\', '/'),
-                    Crypted = s.IsCrypted,
+                    Flags = s.IsCrypted ? 1 : 0,
                     PackedSize = s.CompressedSize,
                     FileSize = s.Size,
                     Tag = s,

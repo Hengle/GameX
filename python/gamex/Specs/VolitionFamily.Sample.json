@@ -3,12 +3,16 @@
         "name": "Descent",
         "files": [
             {
+                "path": "descent.pig:bmps/rbot010.bmp",
+                "type": "Image"
+            },
+            {
                 "path": "descent.hog:descent.pcx",
                 "type": "Image"
             },
             {
-                "path": "descent.pig:descent.pcx",
-                "type": "Image"
+                "path": "descent.pig:snds/apdoor.wav",
+                "type": "Sound"
             }
         ]
     },

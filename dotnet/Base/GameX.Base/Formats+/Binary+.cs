@@ -7,11 +7,75 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace GameX.Formats
 {
+    #region Binary_Pal
+
+    public unsafe class Binary_Pal : IHaveMetaInfo
+    {
+        public static Task<object> Factory_3(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pal(r, 3));
+        public static Task<object> Factory_4(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pal(r, 4));
+
+        #region Palette
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        struct RGB
+        {
+            public static (string, int) Struct = ("<3x", sizeof(RGB));
+            public byte R;
+            public byte G;
+            public byte B;
+        }
+
+        public byte Bpp;
+        public byte[][] Records;
+
+        public Binary_Pal ConvertVgaPalette()
+        {
+            switch (Bpp)
+            {
+                case 3:
+                    for (var i = 0; i < 256; i++)
+                    {
+                        var p = Records[i];
+                        p[0] = (byte)((p[0] << 2) | (p[0] >> 4));
+                        p[1] = (byte)((p[1] << 2) | (p[1] >> 4));
+                        p[2] = (byte)((p[2] << 2) | (p[2] >> 4));
+                    }
+                    break;
+            }
+            return this;
+        }
+
+        #endregion
+
+        public Binary_Pal(BinaryReader r, byte bpp)
+        {
+            Bpp = bpp;
+            Records = bpp switch
+            {
+                3 => r.ReadTArray<RGB>(sizeof(RGB), 256).Select(s => new[] { s.R, s.G, s.B, (byte)255 }).ToArray(),
+                4 => r.ReadTArray<uint>(sizeof(uint), 256).Select(s => BitConverter.GetBytes(s)).ToArray(),
+                _ => throw new ArgumentOutOfRangeException(nameof(bpp), $"{bpp}"),
+            };
+        }
+
+        // IHaveMetaInfo
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
+            => new List<MetaInfo> {
+                new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "Pallet" }),
+                new MetaInfo("Pallet", items: new List<MetaInfo> {
+                    new MetaInfo($"Records: {Records.Length}"),
+                })
+            };
+    }
+
+    #endregion
+
     #region Binary_Bik
 
     public class Binary_Bik : IHaveMetaInfo
@@ -115,9 +179,41 @@ namespace GameX.Formats
 
     #region Binary_Img
 
-    public class Binary_Img : IHaveMetaInfo, ITexture
+    public unsafe class Binary_Img : IHaveMetaInfo, ITexture
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Img(r, f));
+
+        #region BMP
+
+        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        public struct BmpHeader
+        {
+            public static (string, int) Struct = ("<H3i", sizeof(BmpHeader));
+            public ushort Type;             // 'BM'
+            public uint Size;               // File size in bytes
+            public uint Reserved;           // unused (=0)
+            public uint OffBits;            // Offset from beginning of file to the beginning of the bitmap data
+            public BmpInfoHeader Info;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        public struct BmpInfoHeader
+        {
+            public static (string, int) Struct = ("<3I2H6I", sizeof(BmpInfoHeader));
+            public uint Size;               // Size of InfoHeader =40 
+            public uint Width;              // Horizontal width of bitmap in pixels
+            public uint Height;             // Vertical height of bitmap in pixels
+            public ushort Planes;           // Number of Planes (=1)
+            public ushort BitCount;         // Bits per Pixel used to store palette entry information.
+            public uint Compression;        // Type of Compression: 0 = BI_RGB no compression, 1 = BI_RLE8 8bit RLE encoding, 2 = BI_RLE4 4bit RLE encoding
+            public uint SizeImage;          // (compressed) Size of Image - It is valid to set this =0 if Compression = 0
+            public uint XPixelsPerM;        // orizontal resolution: Pixels/meter
+            public uint YPixelsPerM;        // vertical resolution: Pixels/meter
+            public uint ColorsUsed;         // Number of actually used colors. For a 8-bit / pixel bitmap this will be 100h or 256.
+            public uint ColorsImportant;    // Number of important colors 
+        }
+
+        #endregion
 
         enum Formats { Bmp, Gif, Exif, Jpg, Png, Tiff }
 
@@ -289,10 +385,10 @@ namespace GameX.Formats
         /// <param name="pixels"></param>
         /// <param name="pos"></param>
         /// <param name="index"></param>
-        static void SetColorFromPalette(Span<byte> palette, byte[] pixels, int pos, int index)
+        static void SetPixel(Span<byte> palette, byte[] pixels, int pos, int index)
         {
             var start = index * 3;
-            pixels[pos] = palette[start];
+            pixels[pos + 0] = palette[start];
             pixels[pos + 1] = palette[start + 1];
             pixels[pos + 2] = palette[start + 2];
             pixels[pos + 3] = 255; // alpha channel
@@ -347,7 +443,7 @@ namespace GameX.Formats
                                     var bit = (val >> (7 - i)) & 1;
                                     temp[pos + i] |= (byte)(bit << p);
                                     // we have all planes: we may set color using the palette
-                                    if (p == Planes - 1) SetColorFromPalette(palette, pixels, (pos + i) * 4, temp[pos + i]);
+                                    if (p == Planes - 1) SetPixel(palette, pixels, (pos + i) * 4, temp[pos + i]);
                                 }
                                 pos += 8;
                             }
@@ -385,7 +481,7 @@ namespace GameX.Formats
                                     pixels[pos] = (byte)val;
                                     if (p == Planes - 1) pixels[pos + 1] = 255; // add alpha channel
                                 }
-                                else SetColorFromPalette(palette, pixels, pos, val);
+                                else SetPixel(palette, pixels, pos, val);
                                 pos += 4;
                             }
                         }
@@ -425,9 +521,48 @@ namespace GameX.Formats
 
     #region Binary_Snd
 
-    public class Binary_Snd : IHaveMetaInfo
+    public unsafe class Binary_Snd : IHaveMetaInfo
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Snd(r, (int)f.FileSize));
+
+        #region WAV
+
+        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        public struct WavHeader
+        {
+            public const int RIFF = 0x46464952;
+            public const int WAVE = 0x45564157;
+            public static (string, int) Struct = ("<3I", sizeof(WavHeader));
+            public uint ChunkId;                // 'RIFF'
+            public int ChunkSize;               // Size of the overall file - 8 bytes, in bytes (32-bit integer)
+            public uint Format;                 // 'WAVE'
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        public struct WavFmt
+        {
+            public const int FMT_ = 0x20746d66;
+            public static (string, int) Struct = ("<2I2H2I2H", sizeof(WavFmt));
+            public uint ChunkId;                // 'fmt '
+            public int ChunkSize;               // Length of format data (16)
+            public ushort AudioFormat;          // Type of format (1 is PCM)
+            public ushort NumChannels;          // Number of Channels
+            public uint SampleRate;             // Sample Rate
+            public uint ByteRate;               // (Sample Rate * BitsPerSample * Channels) / 8
+            public ushort BlockAlign;             // (BitsPerSample * Channels) / 8.1 - 8 bit mono2 - 8 bit stereo/16 bit mono4 - 16 bit stereo
+            public ushort BitsPerSample;          // Bits per sample
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        public struct WavData
+        {
+            public const int DATA = 0x61746164;
+            public static (string, int) Struct = ("<3I2H6I", sizeof(WavData));
+            public uint ChunkId;                // 'data'
+            public int ChunkSize;               // Size of the data section
+        }
+
+        #endregion
 
         public Binary_Snd(BinaryReader r, int fileSize) => Data = r.ReadBytes(fileSize);
 
@@ -670,5 +805,72 @@ namespace GameX.Formats
         };
     }
     */
+    #endregion
+
+    #region Binary_Xga
+
+    public unsafe class Binary_Xga : IHaveMetaInfo, ITexture
+    {
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Xga(r, s.Tag));
+
+        public Binary_Xga(BinaryReader r, object tag)
+        {
+            Format = (
+                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGBA32,
+                TextureUnrealFormat.Unknown);
+            Body = r.ReadToEnd();
+            Width = 64;
+            Height = 64;
+        }
+
+        int Type;
+        byte[] Body;
+        (object gl, object vulken, object unity, object unreal) Format;
+
+        public IDictionary<string, object> Data { get; } = null;
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth { get; } = 0;
+        public int MipMaps { get; } = 1;
+        public TextureFlags Flags { get; } = 0;
+
+        public void Select(int id) { }
+        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        {
+            byte[] Decode1()
+            {
+                return null;
+            }
+
+            var bytes = Type switch
+            {
+                1 => Decode1(),
+                _ => throw new FormatException($"Unsupported type: {Type}"),
+            };
+            format = (Platform.Type)platform switch
+            {
+                Platform.Type.OpenGL => Format.gl,
+                Platform.Type.Vulken => Format.vulken,
+                Platform.Type.Unity => Format.unity,
+                Platform.Type.Unreal => Format.unreal,
+                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
+            };
+            ranges = null;
+            return bytes;
+        }
+        public void End() { }
+
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
+            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new MetaInfo($"{nameof(Binary_Xga)}", items: new List<MetaInfo> {
+                new MetaInfo($"Type: {Type}"),
+                new MetaInfo($"Width: {Width}"),
+                new MetaInfo($"Height: {Height}"),
+            })
+        };
+    }
+
     #endregion
 }

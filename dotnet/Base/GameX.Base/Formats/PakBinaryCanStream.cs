@@ -56,7 +56,7 @@ namespace GameX.Formats
                                 {
                                     case 0: var args = line.Split(new[] { ':' }, 2); paramsx[args[0]] = args[1]; continue;
                                     case 1: if (files != null) files.First().Compressed = 1; continue;
-                                    case 2: if (files != null) files.First().Crypted = true; continue;
+                                    case 2: if (files != null) files.First().Flags = 1; continue;
                                 }
                             }
                         }
@@ -131,11 +131,10 @@ namespace GameX.Formats
                             w.Flush();
                         }
                         // crypted
-                        var numCrypted = files.Count(x => x.Crypted);
-                        if (numCrypted > 0)
+                        if (files.Any(x => x.Flags != 0))
                         {
                             w.Write(Encoding.ASCII.GetBytes("Crypted:\n"));
-                            foreach (var file in files.Where(x => x.Crypted))
+                            foreach (var file in files.Where(x => x.Flags != 0))
                             {
                                 w.Write(Encoding.ASCII.GetBytes(file.Path));
                                 w.Write((byte)'\n');

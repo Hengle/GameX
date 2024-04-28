@@ -40,7 +40,7 @@ namespace GameX.Black
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 var x when x.StartsWith(".fr") => (0, Binary_Frm.Factory),
-                ".pal" => (0, Binary_Pal.Factory),
+                ".pal" => (0, Binary_Pal2.Factory),
                 ".rix" => (0, Binary_Rix.Factory),
                 _ => (0, null),
             };

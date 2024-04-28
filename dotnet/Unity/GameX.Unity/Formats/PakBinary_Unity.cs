@@ -1180,7 +1180,7 @@ namespace GameX.Unity.Formats
                     }
                     if (doPadding)
                     {
-                        var paddingLen = 3 - (((int)(w.Position() & 3) - 1) & 3);
+                        var paddingLen = 3 - (((int)(w.Tell() & 3) - 1) & 3);
                         //if (paddingLen > 0)
                         //{
                         //    dwValueTmp = 0;
