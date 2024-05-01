@@ -36,9 +36,9 @@ namespace GameX.Formats
             {
                 ZipArchive pak;
                 source.Tag = pak = new ZipArchive(r.BaseStream, ZipArchiveMode.Read);
-                source.Files = pak.Entries.Select(s => new FileSource
+                source.Files = pak.Entries.Cast<ZipArchiveEntry>().Where(x => !x.FullName.EndsWith('/')).Select(s => new FileSource
                 {
-                    Path = s.Name.Replace('\\', '/'),
+                    Path = s.FullName.Replace('\\', '/'),
                     PackedSize = s.CompressedLength,
                     FileSize = s.Length,
                     Tag = s

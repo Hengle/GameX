@@ -30,7 +30,7 @@ namespace GameX.Cig.Formats
                 //Open();
             }
 
-            public async override Task Read(BinaryReader r, object tag)
+            public async override Task Read(object tag)
             {
                 var entry = (P4kEntry)Tag;
                 var stream = Pak.GetInputStream(entry.ZipFileIndex);

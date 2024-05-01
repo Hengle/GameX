@@ -207,7 +207,7 @@ namespace GameX
         {
             Status = PakStatus.Closing;
             Closing();
-            if (Tag is IDisposable disposableTag) disposableTag.Dispose();
+            if (Tag is IDisposable s) s.Dispose();
             Status = PakStatus.Closed;
             return this;
         }
@@ -383,9 +383,10 @@ namespace GameX
     public abstract class BinaryPakFile : PakFile
     {
         public readonly PakBinary PakBinary;
-        readonly ConcurrentDictionary<string, GenericPool<BinaryReader>> Readers = new ConcurrentDictionary<string, GenericPool<BinaryReader>>();
         // options
+        public int RetainInPool = 10;
         public bool UseReader = true;
+        public bool UseWriter = true;
         public bool UseFileId = false;
         // state
         public Func<string, string> FileMask;
@@ -394,7 +395,6 @@ namespace GameX
         public uint Version;
         // metadata/factory
         protected Dictionary<string, Func<MetaManager, BinaryPakFile, FileSource, Task<List<MetaInfo>>>> MetaInfos = new Dictionary<string, Func<MetaManager, BinaryPakFile, FileSource, Task<List<MetaInfo>>>>();
-        //internal protected Func<FileSource, FamilyGame, (FileOption option, Func<BinaryReader, FileSource, PakFile, Task<object>> factory)> ObjectFactoryFactoryMethod;
         public FuncObjectFactoryFactory ObjectFactoryFactoryMethod;
 
         // binary
@@ -419,29 +419,68 @@ namespace GameX
         /// </summary>
         public override bool Valid => Files != null;
 
+        #region Pool
+
+        readonly ConcurrentDictionary<string, GenericPool<BinaryReader>> Readers = new ConcurrentDictionary<string, GenericPool<BinaryReader>>();
+        readonly ConcurrentDictionary<string, GenericPool<BinaryWriter>> Writers = new ConcurrentDictionary<string, GenericPool<BinaryWriter>>();
+
         /// <summary>
         /// Gets the binary reader.
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public GenericPool<BinaryReader> GetReader(string path = default, int retainInPool = 10)
-            => Readers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryReader>(() => FileSystem.OpenReader(path), retainInPool) : default);
+        public GenericPool<BinaryReader> GetReader(string path = default)
+            => Readers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryReader>(() => FileSystem.OpenReader(path), RetainInPool) : default);
 
-        //protected void DoRead(Func<BinaryReader, object, Task> func)
-        //{
-        //    if (UseReader) GetReader()?.Action(async r => await func(r, null));
-        //    else func(null, null).GetAwaiter().GetResult();
-        //}
+        /// <summary>
+        /// Reader
+        /// </summary>
+        /// <param name="func">The func.</param>
+        /// <returns></returns>
+        public virtual Task Reader(Func<BinaryReader, Task> func)
+            => UseReader ? GetReader().ActionAsync(async r => await func(r)) : func(null);
+
+        /// <summary>
+        /// Reader
+        /// </summary>
+        /// <param name="func">The func.</param>
+        /// <returns></returns>
+        public virtual Task<TResult> Reader<TResult>(Func<BinaryReader, Task<TResult>> func)
+            => UseReader ? GetReader().FuncAsync(async r => await func(r)) : func(null);
+
+        /// <summary>
+        /// Gets the binary reader.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns></returns>
+        public GenericPool<BinaryWriter> GetWriter(string path = default)
+            => Writers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryWriter>(() => FileSystem.OpenWriter(path), RetainInPool) : default);
+
+        /// <summary>
+        /// Writer
+        /// </summary>
+        /// <param name="func">The func.</param>
+        /// <returns></returns>
+        public Task Writer(Func<BinaryWriter, Task> func)
+            => UseWriter ? GetWriter().ActionAsync(async w => await func(w)) : func(null);
+
+        /// <summary>
+        /// Writer
+        /// </summary>
+        /// <param name="func">The func.</param>
+        /// <returns></returns>
+        public Task<TResult> Writer<TResult>(Func<BinaryWriter, Task<TResult>> func)
+            => UseWriter ? GetWriter().FuncAsync(async w => await func(w)) : func(null);
+
+        #endregion
 
         /// <summary>
         /// Opens this instance.
         /// </summary>
-        public override void Opening()
+        public async override void Opening()
         {
-            //DoRead(Read);
-            if (UseReader) GetReader()?.Action(async r => await Read(r));
-            else Read(null).GetAwaiter().GetResult();
-            Process();
+            await Read();
+            await Process();
         }
 
         /// <summary>
@@ -547,9 +586,7 @@ namespace GameX
                 return p?.LoadFileData(f2, option, throwOnError);
             }
             var f = (FileSource)path;
-            return UseReader
-                ? GetReader().Func(r => ReadData(r, f, option))
-                : ReadData(null, f, option);
+            return ReadData(f, option);
         }
 
         /// <summary>
@@ -614,13 +651,17 @@ namespace GameX
         /// <summary>
         /// Processes this instance.
         /// </summary>
-        public virtual void Process()
+        public async virtual Task Process()
         {
             if (UseFileId) FilesById = Files.Where(x => x != null).ToLookup(x => x.Id);
             FilesByPath = Files.Where(x => x != null).ToLookup(x => x.Path, StringComparer.OrdinalIgnoreCase);
-            PakBinary?.Process(this);
+            if (PakBinary != null) await PakBinary.Process(this);
         }
 
+        /// <summary>
+        /// FindPath.
+        /// </summary>
+        /// <param name="path">The path.</param>
         (PakFile pak, string next) FindPath(string path)
         {
             var paths = path.Split(new[] { ':' }, 2);
@@ -628,21 +669,6 @@ namespace GameX
             var pak = FilesByPath[p]?.FirstOrDefault()?.Pak?.Open();
             return (pak, pak != null && paths.Length > 1 ? paths[1] : null);
         }
-
-        /// <summary>
-        /// Adds the raw file.
-        /// </summary>
-        /// <param name="file">The file.</param>
-        /// <param name="message">The message.</param>
-        //public void AddRawFile(FileSource file, string message)
-        //{
-        //    if (file == null) throw new ArgumentNullException(nameof(file));
-        //    lock (this)
-        //    {
-        //        FilesRawSet ??= new HashSet<string>();
-        //        FilesRawSet.Add(file.Path);
-        //    }
-        //}
 
         #region PakBinary
 
@@ -652,16 +678,15 @@ namespace GameX
         /// <param name="r">The r.</param>
         /// <param name="tag">The tag.</param>
         /// <returns></returns>
-        public virtual Task Read(BinaryReader r, object tag = default) => PakBinary.Read(this, r, tag);
+        public virtual Task Read(object tag = default) => Reader(r => PakBinary.Read(this, r, tag));
 
         /// <summary>
         /// Reads the file data asynchronous.
         /// </summary>
-        /// <param name="r">The r.</param>
         /// <param name="file">The file.</param>
         /// <param name="option">The option.</param>
         /// <returns></returns>
-        public virtual Task<Stream> ReadData(BinaryReader r, FileSource file, FileOption option = default) => PakBinary.ReadData(this, r, file, option);
+        public virtual Task<Stream> ReadData(FileSource file, FileOption option = default) => Reader(r => PakBinary.ReadData(this, r, file, option));
 
         /// <summary>
         /// Writes the asynchronous.
@@ -669,17 +694,16 @@ namespace GameX
         /// <param name="w">The w.</param>
         /// <param name="tag">The tag.</param>
         /// <returns></returns>
-        public virtual Task Write(BinaryWriter w, object tag = default) => PakBinary.Write(this, w, tag);
+        public virtual Task Write(object tag = default) => Writer(w => PakBinary.Write(this, w, tag));
 
         /// <summary>
         /// Writes the file data asynchronous.
         /// </summary>
-        /// <param name="w">The w.</param>
         /// <param name="file">The file.</param>
         /// <param name="data">The data.</param>
         /// <param name="option">The option.</param>
         /// <returns></returns>
-        public virtual Task WriteData(BinaryWriter w, FileSource file, Stream data, FileOption option = default) => PakBinary.WriteData(this, w, file, data, option);
+        public virtual Task WriteData(FileSource file, Stream data, FileOption option = default) => Writer(w => PakBinary.WriteData(this, w, file, data, option));
 
         #endregion
 
@@ -693,7 +717,7 @@ namespace GameX
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         public override Task<List<MetaInfo>> GetMetaInfos(MetaManager manager, MetaItem item)
-            => Valid ? MetaManager.GetMetaInfos(manager, this, item.Source as FileSource) : default;
+            => Valid ? MetaManager.GetMetaInfos(manager, this, item.Source as FileSource) : Task.FromResult(new List<MetaInfo>());
 
         /// <summary>
         /// Gets the explorer item nodes.
@@ -702,7 +726,7 @@ namespace GameX
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         public override List<MetaItem> GetMetaItems(MetaManager manager)
-            => Valid ? MetaManager.GetMetaItems(manager, this) : default;
+            => Valid ? MetaManager.GetMetaItems(manager, this) : new List<MetaItem>();
 
         #endregion
     }
@@ -741,10 +765,9 @@ namespace GameX
         /// <summary>
         /// Reads the asynchronous.
         /// </summary>
-        /// <param name="r">The r.</param>
         /// <param name="tag">The tag.</param>
         /// <returns></returns>
-        public override Task Read(BinaryReader r, object tag = default)
+        public override Task Read(object tag = default)
         {
             Files = Paths.Select(s => new FileSource
             {
@@ -755,9 +778,9 @@ namespace GameX
             return Task.CompletedTask;
         }
 
-        public override Task<Stream> ReadData(BinaryReader r, FileSource file, FileOption option = default)
+        public override Task<Stream> ReadData(FileSource file, FileOption option = default)
             => file.Pak != null
-                ? file.Pak.ReadData(r, file, option)
+                ? file.Pak.ReadData(file, option)
                 : Task.FromResult<Stream>(new MemoryStream(FileSystem.OpenReader(file.Path).ReadBytes((int)file.FileSize)));
 
         #endregion
@@ -975,7 +998,7 @@ namespace GameX
         /// </summary>
         /// <param name="source">The source.</param>
         /// <exception cref="NotSupportedException"></exception>
-        public virtual void Process(BinaryPakFile source) { }
+        public virtual Task Process(BinaryPakFile source) => Task.CompletedTask;
 
         /// <summary>
         /// handles an exception.
@@ -1003,23 +1026,23 @@ namespace GameX
         {
             FileSource File;
             BinaryPakFile Source;
+            BinaryReader R;
 
             public SubPakFile(BinaryPakFile source, FileSource file, string path, object tag = null, PakBinary instance = null) : base(new PakState(source.FileSystem, source.Game, source.Edition, path, tag), instance ?? Instance)
             {
                 File = file;
                 Source = source;
                 ObjectFactoryFactoryMethod = source.ObjectFactoryFactoryMethod;
-                UseReader = file == null;
                 //Open();
             }
 
-            public async override Task Read(BinaryReader r, object tag = null)
-            {
-                if (UseReader) { await base.Read(r, tag); return; }
-                using var r2 = await Source.GetReader().Func(async r => new BinaryReader(await ReadData(r, File)));
-                if (r2 == null) throw new NotImplementedException();
-                await PakBinary.Read(this, r2, tag);
-            }
+            public async override void Opening() { R = new BinaryReader(await Source.ReadData(File)); base.Opening(); }
+
+            public override void Closing() { R?.Dispose(); base.Closing(); }
+
+            public override Task Reader(Func<BinaryReader, Task> func) => func(R);
+
+            public override Task<TResult> Reader<TResult>(Func<BinaryReader, Task<TResult>> func) => func(R);
         }
     }
 

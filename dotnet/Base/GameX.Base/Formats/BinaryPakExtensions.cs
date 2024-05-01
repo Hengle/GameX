@@ -44,7 +44,7 @@ namespace GameX.Formats
             });
 
             // write pak-raw
-            if ((option & FileOption.Marker) != 0) await new StreamPakFile(source, new PakState(source.FileSystem, source.Game, source.Edition, filePath)).Write(null, null);
+            if ((option & FileOption.Marker) != 0) await new StreamPakFile(source, new PakState(source.FileSystem, source.Game, source.Edition, filePath)).Write(null);
         }
 
         static async Task ExportFileAsync(FileSource file, BinaryPakFile source, string newPath, FileOption option = default)
@@ -119,7 +119,7 @@ namespace GameX.Formats
                 try
                 {
                     await source.PakBinary.Write(source, w);
-                    using (var s = File.Open(newPath, FileMode.Open, FileAccess.Read, FileShare.Read)) await source.WriteData(w, file, s, option);
+                    using (var s = File.Open(newPath, FileMode.Open, FileAccess.Read, FileShare.Read)) await source.WriteData(file, s, option);
                     advance?.Invoke(file, index);
                 }
                 catch (Exception e) { PakBinary.HandleException(file, option, $"Exception: {e.Message}"); }

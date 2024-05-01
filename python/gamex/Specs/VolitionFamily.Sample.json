@@ -20,15 +20,15 @@
         "name": "Descent 2",
         "files": [
             {
-                "path": "groupa.pig",
+                "path": "intro-h.mvl",
                 "type": "Video"
             },
             {
-                "path": "groupa.pig",
+                "path": "descent2.hog:descent.pcx",
                 "type": "Image"
             },
             {
-                "path": "descent2.hog:descent.pcx",
+                "path": "groupa.pig",
                 "type": "Image"
             }
         ]

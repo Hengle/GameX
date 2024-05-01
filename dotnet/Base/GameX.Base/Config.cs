@@ -12,7 +12,7 @@
 //#define Epic
 //#define Frictional
 //#define Frontier
-//#define Id
+#define Id
 //#define IW
 //#define Lucas
 //#define Monolith
@@ -21,7 +21,7 @@
 //#define Ubisoft
 //#define Unity
 //#define Valve
-#define Volition
+//#define Volition
 //#define WbB
 
 namespace GameX
@@ -48,7 +48,7 @@ namespace GameX
             ForceOpen = true,
             ForcePath = "sample:0",
             Family = "Arkane",
-            Game = "AF", // Arx Fatalis [open, read, texture:GL]
+            //Game = "AF", // Arx Fatalis [open, read, texture:GL]
             //Game = "DOM", // Dark Messiah of Might and Magic [open, read]
             //Game = "D", // Dishonored [unreal]
             //Game = "D2", // Dishonored 2 [open, read]
@@ -289,9 +289,9 @@ namespace GameX
             ForceOpen = true,
             ForcePath = "sample:0",
             Family = "Id",
-            Game = "Q", // Quake
+            //Game = "Q", // Quake
             //Game = "Q2", // Quake II
-            //Game = "Q3:A", // Quake III Arena
+            Game = "Q3", // Quake III Arena
             //Game = "D3", // Doom 3
             //Game = "Q:L", // Quake Live
             //Game = "R", // Rage

@@ -131,8 +131,8 @@
       "url": [ "https://store.steampowered.com/app/2310", "https://en.wikipedia.org/wiki/Quake_(video_game)" ],
       "date": "1996-06-22",
       "editions": {
-        "q": { "name": "original" },
-        "qr": { "name": "rerelease", "path": "rerelease" }
+        "": { "name": "original" },
+        "r": { "name": "rerelease", "path": "rerelease" }
       },
       "searchBy": "Pak",
       "pakExt": [".pak", ".wad"],
@@ -168,19 +168,58 @@
       "name": "Quake II",
       "engine": "idTech2.5",
       "url": [ "https://store.steampowered.com/app/2320", "https://en.wikipedia.org/wiki/Quake_II" ],
-      "date": "1997-12-09"
+      "date": "1997-12-09",
+      "searchBy": "Pak",
+      "pakExt": [".pak", ".wad"],
+      "path": "baseq2",
+      "editions": {
+        "": { "name": "original" },
+        "r": { "name": "rerelease", "path": "rerelease" }
+      },
+      "dlcs": {
+        "xatrix": {
+          "name": "The Reckoning",
+          "url": "https://quake.fandom.com/wiki/Quake_II_Mission_Pack:_The_Reckoning",
+          "date": "May 27, 1998",
+          "path": "xatrix"
+        },
+        "rogue": {
+          "name": "Ground Zero",
+          "url": "https://quake.fandom.com/wiki/Quake_II_Mission_Pack:_Ground_Zero",
+          "date": "September 11, 1998",
+          "path": "rogue"
+        },
+        "ctf": {
+          "name": "Capture the Flag",
+          "path": "ctf"
+        }
+      }
     },
-    "Q3:A": {
+    "Q3": {
       "name": "Quake III Arena",
       "engine": "idTech3",
       "url": [ "https://store.steampowered.com/app/0", "https://en.wikipedia.org/wiki/Quake_III_Arena" ],
-      "date": "1999-12-05"
+      "date": "1999-12-05",
+      "searchBy": "Pak",
+      "pakExt": [".pk3", ".wad"],
+      "path": "baseq3",
+      "dlcs": {
+        "missionpack": {
+          "name": "Team Arena",
+          "url": "https://quake.fandom.com/wiki/Quake_III:_Team_Arena",
+          "date": "December 18, 2000",
+          "path": "missionpack"
+        }
+      }
     },
     "D3": {
       "name": "Doom 3",
       "engine": "idTech4",
       "url": [ "https://store.steampowered.com/app/9050", "https://en.wikipedia.org/wiki/Doom_3" ],
-      "date": "2004-08-09"
+      "date": "2004-08-09",
+      "searchBy": "Pak",
+      "pakExt": [".pk4", ".wad"],
+      "path": "base"
     },
     "D:RPG": {
       "n/a": true,
@@ -221,7 +260,10 @@
       "name": "Quake Live",
       "engine": "idTech3",
       "url": [ "https://store.steampowered.com/app/282440", "https://en.wikipedia.org/wiki/Quake_Live" ],
-      "date": "2010-08-06"
+      "date": "2010-08-06",
+      "searchBy_": "Pak",
+      "pakExt": [".pak", ".pk3", ".wad"],
+      "path_": "baseq3"
     },
     "R:MBT": {
       "n/a": true,
@@ -276,7 +318,7 @@
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2320",
         "dir": "Quake 2"
       },
-      "Q3:A": {
+      "Q3": {
         "key": [ "Steam:2200", "GOG:1441704920" ],
         "reg": [ "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2200", "GOG.com/Games/1441704920" ],
         "dir": "Quake III"

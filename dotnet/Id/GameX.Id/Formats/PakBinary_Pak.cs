@@ -1,4 +1,5 @@
-﻿using GameX.Id.Formats.Q;
+﻿using GameX.Formats;
+using GameX.Id.Formats.Q;
 using System;
 using System.IO;
 using System.Linq;
@@ -14,10 +15,13 @@ namespace GameX.Id.Formats
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
             => source.Path.ToLowerInvariant() switch
             {
-                //"abc" => (0, Binary_Palette.Factory),
                 _ => Path.GetExtension(source.Path).ToLowerInvariant() switch
                 {
-                    ".lmp" => (0, Binary_Lump.Factory),
+                    ".wav" => (0, Binary_Snd.Factory),
+                    var x when x == ".jpg" || x == ".tga" => (0, Binary_Img.Factory),
+                    //".tga" => (0, Binary_Tga.Factory),
+                    var x when x == ".tex" || x == ".lmp" => (0, Binary_Lump.Factory),
+                    ".pcx" => (0, Binary_Pcx.Factory),
                     ".bsp" => (0, Binary_Level.Factory),
                     ".mdl" => (0, Binary_Model.Factory),
                     ".spr" => (0, Binary_Sprite.Factory),
@@ -27,7 +31,6 @@ namespace GameX.Id.Formats
 
         #endregion
 
-        // Headers
         #region PAK
 
         const uint PAK_MAGIC = 0x4b434150; // PACK

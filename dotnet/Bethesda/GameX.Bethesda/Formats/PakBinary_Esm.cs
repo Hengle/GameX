@@ -114,7 +114,7 @@ namespace GameX.Bethesda.Formats
         Dictionary<uint, Tuple<WRLDRecord, RecordGroup[]>> WRLDsById;
         Dictionary<string, LTEXRecord> LTEXsByEid;
 
-        public override void Process(BinaryPakFile source)
+        public override Task Process(BinaryPakFile source)
         {
             if (Format == BethesdaFormat.TES3)
             {
@@ -128,11 +128,12 @@ namespace GameX.Bethesda.Formats
                 foreach (var cell in cells) cell.GridId = new Int3(cell.XCLC.Value.GridX, cell.XCLC.Value.GridY, !cell.IsInterior ? 0 : -1);
                 CELLsById = cells.Where(x => !x.IsInterior).ToDictionary(x => x.GridId);
                 CELLsByName = cells.Where(x => x.IsInterior).ToDictionary(x => x.EDID.Value);
-                return;
+                return Task.CompletedTask;
             }
             var wrldsByLabel = Groups["WRLD"].GroupsByLabel;
             WRLDsById = Groups["WRLD"].Load().Cast<WRLDRecord>().ToDictionary(x => x.Id, x => { wrldsByLabel.TryGetValue(BitConverter.GetBytes(x.Id), out var wrlds); return new Tuple<WRLDRecord, RecordGroup[]>(x, wrlds); });
             LTEXsByEid = Groups["LTEX"].Load().Cast<LTEXRecord>().ToDictionary(x => x.EDID.Value);
+            return Task.CompletedTask;
         }
     }
 }

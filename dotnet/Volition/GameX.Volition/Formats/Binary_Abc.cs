@@ -1,27 +1,22 @@
 using GameX.Formats;
 using GameX.Meta;
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace GameX.Volition.Formats
 {
     public class Binary_Abc : IHaveMetaInfo
     {
-        public Binary_Abc() { }
-        public Binary_Abc(BinaryReader r) => Read(r);
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Abc(r));
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-        {
-            var nodes = new List<MetaInfo> {
-                new MetaInfo("BinaryPak", items: new List<MetaInfo> {
-                    //new MetaInfo($"Type: {Type}"),
-                })
-            };
-            return nodes;
-        }
+        public Binary_Abc(BinaryReader r) { }
 
-        public unsafe void Read(BinaryReader r)
-            => throw new NotImplementedException();
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
+            new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = this }),
+            new MetaInfo($"{nameof(Binary_Abc)}", items: new List<MetaInfo> {
+                //new MetaInfo($"abc: {abc}"),
+            })
+        };
     }
 }

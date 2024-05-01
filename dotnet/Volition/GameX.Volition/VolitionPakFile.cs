@@ -47,6 +47,7 @@ namespace GameX.Volition
                 ".bmp" => (0, Binary_Bmp.Factory),
                 ".wav" => (0, Binary_Snd.Factory),
                 ".pcx" => (0, Binary_Pcx.Factory),
+                ".mvl" => (0, Binary_Mvl.Factory),
                 _ => (0, null),
             };
 

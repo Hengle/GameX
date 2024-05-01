@@ -112,7 +112,6 @@ namespace GameX.Meta
             var paths = path.Split(new[] { '\\', '/', ':' }, 2);
             var node = Items.FirstOrDefault(x => x.Name == paths[0]);
             (node?.Source as FileSource)?.Pak?.Open(node.Items, manager);
-            //node?.PakFile?.Open(node.Items, manager);
             return node == null || paths.Length == 1 ? node : node.FindByPath(paths[1], manager);
         }
 
@@ -121,7 +120,6 @@ namespace GameX.Meta
             var paths = path.Split(new[] { '\\', '/', ':' }, 2);
             var node = nodes.FirstOrDefault(x => x.Name == paths[0]);
             (node?.Source as FileSource)?.Pak?.Open(node.Items, manager);
-            //node?.PakFile?.Open(node.Items, manager);
             return node == null || paths.Length == 1 ? node : node.FindByPath(paths[1], manager);
         }
     }
@@ -216,6 +214,8 @@ namespace GameX.Meta
         /// <returns></returns>
         public static List<MetaItem> GetMetaItems(MetaManager manager, BinaryPakFile pakFile)
         {
+            if (manager == null) throw new ArgumentNullException(nameof(manager));
+
             var root = new List<MetaItem>();
             if (pakFile.Files == null || pakFile.Files.Count == 0) return root;
             string currentPath = null; List<MetaItem> currentFolder = null;

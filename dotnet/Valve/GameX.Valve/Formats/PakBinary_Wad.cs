@@ -20,7 +20,7 @@ namespace GameX.Valve.Formats
         struct WAD_Header
         {
             public static (string, int) Struct = ("<3I", sizeof(WAD_Header));
-            public uint Signature;
+            public uint Magic;
             public uint LumpCount;
             public uint LumpOffset;
         }
@@ -55,7 +55,7 @@ namespace GameX.Valve.Formats
 
             // read file
             var header = r.ReadS<WAD_Header>();
-            if (header.Signature != WAD_MAGIC) throw new FormatException("BAD MAGIC");
+            if (header.Magic != WAD_MAGIC) throw new FormatException("BAD MAGIC");
             r.Seek(header.LumpOffset);
             var lumps = r.ReadTEach<WAD_Lump>(WAD_Lump.Struct.Item2, (int)header.LumpCount);
             foreach (var lump in lumps)

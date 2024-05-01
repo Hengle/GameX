@@ -8,7 +8,6 @@ namespace GameX.Id.Formats
 {
     public unsafe class PakBinary_Wad : PakBinary<PakBinary_Wad>
     {
-        // Headers
         #region WAD
 
         const uint WAD_MAGIC = 0x32444157; //: WAD2
