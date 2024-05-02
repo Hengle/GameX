@@ -34,7 +34,12 @@
   },
   "Q3": {
     "name": "Quake III Arena",
-    "files": []
+    "files": [
+      {
+        "path": "pak0.pk3:textures/skin/nibbles.tga",
+        "type": "Tga"
+      }
+    ]
   },
   "D3": {
     "name": "Doom 3",

@@ -18,8 +18,8 @@ namespace GameX.Id.Formats
                 _ => Path.GetExtension(source.Path).ToLowerInvariant() switch
                 {
                     ".wav" => (0, Binary_Snd.Factory),
-                    var x when x == ".jpg" || x == ".tga" => (0, Binary_Img.Factory),
-                    //".tga" => (0, Binary_Tga.Factory),
+                    var x when x == ".jpg" => (0, Binary_Img.Factory),
+                    ".tga" => (0, Binary_Tga.Factory),
                     var x when x == ".tex" || x == ".lmp" => (0, Binary_Lump.Factory),
                     ".pcx" => (0, Binary_Pcx.Factory),
                     ".bsp" => (0, Binary_Level.Factory),
