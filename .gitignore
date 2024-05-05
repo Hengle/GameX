@@ -28,5 +28,6 @@ bin/
 obj/
 Temp/
 ipch/
+out/
 TestResults/
 __pycache__/
