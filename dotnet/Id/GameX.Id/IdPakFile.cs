@@ -29,7 +29,7 @@ namespace GameX.Id
              => Path.GetExtension(filePath).ToLowerInvariant() switch
              {
                  "" => null,
-                 var x when x == ".pk3" || x == ".zip" => PakBinary_Zip.GetPakBinary(game),
+                 var x when x == ".pk3" || x == ".pk4" || x == ".zip" => PakBinary_Zip.GetPakBinary(game),
                  ".pak" => PakBinary_Pak.Instance,
                  ".wad" => PakBinary_Wad.Instance,
                  _ => throw new ArgumentOutOfRangeException(),
@@ -38,8 +38,8 @@ namespace GameX.Id
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
             => game.Id switch
             {
-                var x when x == "Q" || x == "Q2" || x == "Q3" => PakBinary_Pak.ObjectFactoryFactory(source, game),
-                _ => throw new ArgumentOutOfRangeException(),
+                //var x when x == "Q" || x == "Q2" || x == "Q3" || x == "D3" || x == "Q:L" => PakBinary_Pak.ObjectFactoryFactory(source, game),
+                _ => PakBinary_Pak.ObjectFactoryFactory(source, game) // throw new ArgumentOutOfRangeException(),
             };
         //=> Path.GetExtension(source.Path).ToLowerInvariant() switch
         //{

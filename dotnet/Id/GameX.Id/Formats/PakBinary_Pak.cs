@@ -21,6 +21,7 @@ namespace GameX.Id.Formats
                     var x when x == ".jpg" => (0, Binary_Img.Factory),
                     ".tga" => (0, Binary_Tga.Factory),
                     var x when x == ".tex" || x == ".lmp" => (0, Binary_Lump.Factory),
+                    ".dds" => (0, Binary_Dds.Factory),
                     ".pcx" => (0, Binary_Pcx.Factory),
                     ".bsp" => (0, Binary_Level.Factory),
                     ".mdl" => (0, Binary_Model.Factory),

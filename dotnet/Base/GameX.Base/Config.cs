@@ -3,16 +3,17 @@
 //#define Bioware
 //#define Black
 //#define Blizzard
-//#define Bullfrog
+#define Bullfrog
 //#define Capcom
 //#define Cig
 //#define Cryptic
 //#define Crytek
 //#define Cyanide
+//#define EA
 //#define Epic
 //#define Frictional
 //#define Frontier
-#define Id
+//#define Id
 //#define IW
 //#define Lucas
 //#define Monolith
@@ -139,6 +140,27 @@ namespace GameX
             //Game = "OW2", // Overwatch 2
             //Missing: Game = "D4", // Diablo IV
         };
+#elif Bullfrog
+        static string[] FamilyKeys = new[] { "Bullfrog", "Unknown" };
+
+        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        {
+            ForceOpen = true,
+            ForcePath = "sample:*",
+            Family = "Bullfrog",
+            //Game = "SC", // StarCraft
+            //Game = "D2R", // Diablo II: Resurrected
+            //Missing: Game = "W3", // Warcraft III: Reign of Chaos
+            //Game = "WOW", // World of Warcraft
+            //Missing: Game = "WOWC", // World of Warcraft: Classic
+            //Game = "SC2", // StarCraft II: Wings of Liberty
+            //Game = "D3", // Diablo III
+            //Game = "HS", // Hearthstone
+            //Game = "HOTS", // Heroes of the Storm
+            //Game = "DI", // Diablo Immortal
+            //Game = "OW2", // Overwatch 2
+            //Missing: Game = "D4", // Diablo IV
+        };
 #elif Capcom
         static string[] FamilyKeys = new[] { "Capcom", "Unknown" };
 
@@ -240,6 +262,16 @@ namespace GameX
             //Game = "Council", // Council
             //Game = "Werewolf:TA", // Werewolf: The Apocalypse - Earthblood
         };
+#elif EA
+        static string[] FamilyKeys = new[] { "EA", "Unknown" };
+
+        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        {
+            ForceOpen = true,
+            ForcePath = "sample:*",
+            Family = "EA",
+            Game = "xx", // xx
+        };
 #elif Epic
         static string[] FamilyKeys = new[] { "Epic", "Unknown" };
 
@@ -291,15 +323,15 @@ namespace GameX
             Family = "Id",
             //Game = "Q", // Quake
             //Game = "Q2", // Quake II
-            Game = "Q3", // Quake III Arena
+            //Game = "Q3", // Quake III Arena
             //Game = "D3", // Doom 3
             //Game = "Q:L", // Quake Live
-            //Game = "R", // Rage
-            //Game = "D", // Doom
+            //Game = "R", // Rage (buy)
+            //Game = "D", // Doom (buy)
             //Game = "D:VFR", // Doom VFR
-            //Game = "R2", // Rage 2
-            //Game = "D:E", // Doom Eternal
-            //Game = "Q:C", // Quake Champions
+            //Game = "R2", // Rage 2 (buy)
+            //Game = "D:E", // Doom Eternal (buy)
+            Game = "Q:C", // Quake Champions
         };
 #elif IW
         static string[] FamilyKeys = new[] { "IW", "Unknown" };
@@ -553,7 +585,7 @@ namespace GameX
             Game = "AC", // Asheron's Call [open, read, texture:GL]
         };
 #else
-        static string[] FamilyKeys = new[] { "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "Epic", "Frictional", "Frontier", "Id", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WbB" };
+        static string[] FamilyKeys = new[] { "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "Id", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WbB" };
 
         public static DefaultOptions AppDefaultOptions = new DefaultOptions
         {

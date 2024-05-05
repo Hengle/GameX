@@ -1,0 +1,89 @@
+﻿{
+  "id": "Beamdog",
+  "name": "Beamdog",
+  "studio": "Beamdog",
+  "description": "",
+  "url": "https://en.wikipedia.org/wiki/Beamdog",
+  "samples": [
+    "BeamdogFamily.Sample.json"
+  ],
+  "games": {
+    "*": {
+      "pakFileType": "GameX.Beamdog.BeamdogPakFile, GameX.Beamdog"
+    },
+    "MDK2:W": {
+      "n/a": true,
+      "name": "MDK2 (wii)",
+      "url": "https://en.wikipedia.org/wiki/MDK2#Wii_port_and_MDK2_HD",
+      "date": "May 9, 2011"
+    },
+    "MDK2:HD": {
+      "name": "MDK2 HD",
+      "url": "https://en.wikipedia.org/wiki/MDK2#Wii_port_and_MDK2_HD",
+      "date": "October 1, 2011",
+      "searchBy": "AllDir",
+      "pakExt": ".dat"
+    },
+    "P:T": {
+      "name": "Baldur's Gate: Enhanced Edition",
+      "url": [
+        "https://en.wikipedia.org/wiki/Planescape:_Torment",
+        "https://store.steampowered.com/app/466300"
+      ],
+      "date": "1999-12-10",
+      "pakExt": ".x"
+    },
+    "ID": {
+      "name": "Baldur's Gate II: Enhanced Edition",
+      "url": [
+        "https://en.wikipedia.org/wiki/Icewind_Dale",
+        "https://store.steampowered.com/app/321800"
+      ],
+      "date": "2000-06-29",
+      "pakExt": ".x"
+    },
+    "ID:HoW": {
+      "name": "Icewind Dale: Heart of Winter",
+      "url": "https://en.wikipedia.org/wiki/Icewind_Dale:_Heart_of_Winter",
+      "date": "2001-02-21",
+      "pakExt": ".x"
+    },
+    "ID2": {
+      "name": "Icewind Dale II",
+      "url": "https://en.wikipedia.org/wiki/Icewind_Dale_II",
+      "date": "2002-08-27",
+      "pakExt": ".x"
+    },
+    "BG:DA2": {
+      "name": "Baldur's Gate: Dark Alliance II",
+      "url": "https://en.wikipedia.org/wiki/Baldur%27s_Gate:_Dark_Alliance_II",
+      "date": "2004-01-20",
+      "pakExt": ".x"
+    }
+  },
+  "fileManager": {
+    "application": {
+      "Fallout": {
+        "key": "Steam:38400",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 38400",
+        "dir": "Fallout"
+      },
+      "Fallout2": {
+        "key": [
+          "Steam:38410",
+          "GOG:1440151285"
+        ],
+        "reg": [
+          "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 38410",
+          "GOG.com/Games/1440151285"
+        ],
+        "dir": "Fallout 2"
+      }
+    },
+    "ignores": {
+      "Fallout2": {
+        "path": "unins000.dat"
+      }
+    }
+  }
+}

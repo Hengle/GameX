@@ -38,6 +38,8 @@
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\CrytekFamily.Sample.json" Link="Specs\CrytekFamily.Sample.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\CyanideFamily.json" Link="Specs\CyanideFamily.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\CyanideFamily.Sample.json" Link="Specs\CyanideFamily.Sample.json" />
+	<EmbeddedResource Include="..\..\..\python\gamex\Specs\EAFamily.json" Link="Specs\EAFamily.json" />
+    <EmbeddedResource Include="..\..\..\python\gamex\Specs\EAFamily.Sample.json" Link="Specs\EAFamily.Sample.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\EpicFamily.json" Link="Specs\EpicFamily.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\EpicFamily.Sample.json" Link="Specs\EpicFamily.Sample.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\FrictionalFamily.json" Link="Specs\FrictionalFamily.json" />

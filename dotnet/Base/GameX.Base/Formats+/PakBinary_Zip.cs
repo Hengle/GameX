@@ -36,7 +36,7 @@ namespace GameX.Formats
             {
                 ZipArchive pak;
                 source.Tag = pak = new ZipArchive(r.BaseStream, ZipArchiveMode.Read);
-                source.Files = pak.Entries.Cast<ZipArchiveEntry>().Where(x => !x.FullName.EndsWith('/')).Select(s => new FileSource
+                source.Files = pak.Entries.Cast<ZipArchiveEntry>().Where(s => !s.FullName.EndsWith('/')).Select(s => new FileSource
                 {
                     Path = s.FullName.Replace('\\', '/'),
                     PackedSize = s.CompressedLength,
@@ -51,7 +51,7 @@ namespace GameX.Formats
                 if (Key == null) { }
                 else if (Key is string s) pak.Password = s;
                 else if (Key is byte[] z) ZipFile_KeyProperty.SetValue(pak, z);
-                source.Files = pak.Cast<ZipEntry>().Where(x => x.IsFile).Select(s => new FileSource
+                source.Files = pak.Cast<ZipEntry>().Where(s => s.IsFile).Select(s => new FileSource
                 {
                     Path = s.Name.Replace('\\', '/'),
                     Flags = s.IsCrypted ? 1 : 0,
@@ -65,18 +65,18 @@ namespace GameX.Formats
 
         public override Task<Stream> ReadData(BinaryPakFile source, BinaryReader r, FileSource file, FileOption option = default)
         {
-            try
-            {
-                using var input = UseSystem
-                    ? ((ZipArchiveEntry)file.Tag).Open()
-                    : ((ZipFile)source.Tag).GetInputStream((ZipEntry)file.Tag);
-                if (!input.CanRead) { HandleException(file, option, $"Unable to read stream for file: {file.Path}"); return Task.FromResult(System.IO.Stream.Null); }
-                var s = new MemoryStream();
-                input.CopyTo(s);
-                s.Position = 0;
-                return Task.FromResult((Stream)s);
-            }
-            catch (Exception e) { HandleException(file, option, $"{file.Path} - Exception: {e.Message}"); return Task.FromResult(System.IO.Stream.Null); }
+            //try
+            //{
+            using var input = UseSystem
+                ? ((ZipArchiveEntry)file.Tag).Open()
+                : ((ZipFile)source.Tag).GetInputStream((ZipEntry)file.Tag);
+            if (!input.CanRead) { HandleException(file, option, $"Unable to read stream for file: {file.Path}"); return Task.FromResult(System.IO.Stream.Null); }
+            var s = new MemoryStream();
+            input.CopyTo(s);
+            s.Position = 0;
+            return Task.FromResult((Stream)s);
+            //}
+            //catch (Exception e) { HandleException(file, option, $"{file.Path} - Exception: {e.Message}"); return Task.FromResult(System.IO.Stream.Null); }
         }
 
         //public override Task WriteAsync(BinaryPakFile source, BinaryWriter w, object tag)

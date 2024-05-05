@@ -261,9 +261,9 @@
       "engine": "idTech3",
       "url": [ "https://store.steampowered.com/app/282440", "https://en.wikipedia.org/wiki/Quake_Live" ],
       "date": "2010-08-06",
-      "searchBy_": "Pak",
-      "pakExt": [".pak", ".pk3", ".wad"],
-      "path_": "baseq3"
+      "searchBy": "Pak",
+      "pakExt": [".pk3", ".wad"],
+      "path": "baseq3"
     },
     "R:MBT": {
       "n/a": true,
@@ -275,8 +275,11 @@
     "R": {
       "name": "Rage",
       "engine": "idTech5",
-      "url": [ "https://store.steampowered.com/app/0", "https://en.wikipedia.org/wiki/Rage_(video_game)" ],
-      "date": "2011-10-04"
+      "url": [ "https://store.steampowered.com/app/9200", "https://en.wikipedia.org/wiki/Rage_(video_game)" ],
+      "date": "2011-10-04",
+      "searchBy_": "Pak",
+      "pakExt": [".pk3", ".wad"],
+      "path": "baseq3"
     },
     "D": {
       "name": "Doom (2016)",
@@ -291,7 +294,7 @@
     },
     "R2": {
       "name": "Rage 2",
-      "url": [ "https://store.steampowered.com/app/0", "https://en.wikipedia.org/wiki/Rage_2" ],
+      "url": [ "https://store.steampowered.com/app/548570", "https://en.wikipedia.org/wiki/Rage_2" ],
       "date": "2019-05-14"
     },
     "D:E": {
@@ -334,8 +337,8 @@
         "dir": "Quake Live"
       },
       "R": {
-        "key": "Steam:0",
-        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 0",
+        "key": "Steam:9200",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 9200",
         "dir": "Rage"
       },
       "D": {
@@ -349,7 +352,7 @@
         "dir": "DOOM VFR"
       },
       "R2": {
-        "key": "Steam:0",
+        "key": "Steam:548570",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 0",
         "dir": "Rage 2"
       },

@@ -28,6 +28,8 @@
     <ProjectReference Include="..\..\Crytek\GameX.Crytek\GameX.Crytek.csproj" />
     <ProjectReference Include="..\..\Cyanide\GameX.Cyanide.Platform\GameX.Cyanide.Platform.csproj" />
     <ProjectReference Include="..\..\Cyanide\GameX.Cyanide\GameX.Cyanide.csproj" />
+    <ProjectReference Include="..\..\EA\GameX.EA.Platform\GameX.EA.Platform.csproj" />
+    <ProjectReference Include="..\..\EA\GameX.EA\GameX.EA.csproj" />
     <ProjectReference Include="..\..\Epic\GameX.Epic.Platform\GameX.Epic.Platform.csproj" />
     <ProjectReference Include="..\..\Epic\GameX.Epic\GameX.Epic.csproj" />
     <ProjectReference Include="..\..\Frictional\GameX.Frictional.Platform\GameX.Frictional.Platform.csproj" />
