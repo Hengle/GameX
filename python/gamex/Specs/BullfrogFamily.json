@@ -26,7 +26,8 @@
       "name": "Populous",
       "url": "https://en.wikipedia.org/wiki/Populous_(video_game)",
       "date": "April 1, 1989",
-      "pakExt": "dir.vpk"
+      "pakExt": "dir.vpk",
+      "path": "DATA"
     },
     "Flood": {
       "n/a": true,
@@ -51,7 +52,8 @@
       "name": "Populous II: Trials of the Olympian Gods",
       "url": "https://en.wikipedia.org/wiki/Populous_II:_Trials_of_the_Olympian_Gods",
       "date": "November 1, 1991",
-      "pakExt": "dir.vpk"
+      "pakExt": "dir.vpk",
+      "path": ["DATA", "SOUND"]
     },
     "PS": {
       "n/a": true,
@@ -117,12 +119,14 @@
     "DK": {
       "name": "Dungeon Keeper",
       "url": "https://en.wikipedia.org/wiki/Magic_Carpet_2",
-      "date": "1995-01-01"
+      "date": "1995-01-01",
+      "pakExt": ".datx"
     },
     "P3": {
       "name": "Populous: The Beginning",
       "url": "https://en.wikipedia.org/wiki/Populous:_The_Beginning",
-      "date": "November 30, 1998"
+      "date": "November 30, 1998",
+      "pakExt": [".dat", ".spr"]
     },
     "T:A": {
       "n/a": true,
@@ -133,7 +137,8 @@
     "DK2": {
       "name": "Dungeon Keeper 2",
       "url": "https://en.wikipedia.org/wiki/Dungeon_Keeper_2",
-      "date": "July 7, 1999"
+      "date": "July 7, 1999",
+      "pakExt": [".dat", ".spr"]
     },
     "TP:W": {
       "n/a": true,

@@ -1,2 +1,28 @@
 ﻿{
+  "P3": {
+    "name": "Populous: The Beginning",
+    "files": [
+      {
+        "path": "data/hfx0-0.dat",
+        "type": "SpriteBank"
+      },
+      {
+        "path": "data/fenew/Fepointe.spr",
+        "type": "SpriteBank"
+      },
+      {
+        "path": "data/HSPRO-0.DAT",
+        "type": "SpriteBank"
+      }
+    ]
+  },
+  "DK": {
+    "name": "Dungeon Keeper",
+    "files": [
+      {
+        "path": "data/TMAPA000.DAT",
+        "type": "Texture"
+      }
+    ]
+  }
 }

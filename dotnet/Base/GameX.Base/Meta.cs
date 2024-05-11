@@ -226,6 +226,7 @@ namespace GameX.Meta
                 // next path, skip empty
                 var path = file.Path[pakFile.PathSkip..];
                 if (string.IsNullOrEmpty(path)) continue;
+
                 // folder
                 var fileFolder = Path.GetDirectoryName(path);
                 if (currentPath != fileFolder)
@@ -239,12 +240,13 @@ namespace GameX.Meta
                             if (found != null) currentFolder = found.Items;
                             else
                             {
-                                found = new MetaItem(file, folder, manager.FolderIcon);
+                                found = new MetaItem(null, folder, manager.FolderIcon);
                                 currentFolder.Add(found);
                                 currentFolder = found.Items;
                             }
                         }
                 }
+
                 // pakfile
                 if (file.Pak != null)
                 {

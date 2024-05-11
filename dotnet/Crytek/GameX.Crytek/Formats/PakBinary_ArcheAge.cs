@@ -14,7 +14,6 @@ namespace GameX.Crytek.Formats
 
         public PakBinary_ArcheAge(byte[] key) => Key = key;
 
-        // Header
         #region Header
 
         const uint AA_MAGIC = 0x4f424957; // Magic for Archeage, the literal string "WIBO".
