@@ -118,9 +118,9 @@
     },
     "DK": {
       "name": "Dungeon Keeper",
-      "url": "https://en.wikipedia.org/wiki/Magic_Carpet_2",
-      "date": "1995-01-01",
-      "pakExt": ".datx"
+      "url": "https://en.wikipedia.org/wiki/Dungeon_Keeper",
+      "datex": "",
+      "pakExt": [".dat", ".tab"]
     },
     "P3": {
       "name": "Populous: The Beginning",
