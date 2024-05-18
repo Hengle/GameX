@@ -13,6 +13,7 @@
   },
   "games": {
     "*": {
+      "gameType": "GameX.Bullfrog.BullfrogGame, GameX.Bullfrog",
       "pakFileType": "GameX.Bullfrog.BullfrogPakFile, GameX.Bullfrog"
     },
     "Fusion": {

@@ -1,9 +1,8 @@
-﻿using GameX.Formats;
+﻿using GameX.Bullfrog.Formats.Keeper;
+using GameX.Formats;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace GameX.Bullfrog.Formats
@@ -17,7 +16,8 @@ namespace GameX.Bullfrog.Formats
             {
                 _ => Path.GetExtension(source.Path).ToLowerInvariant() switch
                 {
-                    //".dat" => (0, Binary_Dat.Factory),
+                    ".pal" => (0, Binary_Pal.Factory_3),
+                    var x when x == ".bmp" || x == ".raw" => (0, Binary_Bmp.Factory),
                     _ => (0, null),
                 }
             };
@@ -36,18 +36,18 @@ namespace GameX.Bullfrog.Formats
             var files = source.Files = new List<FileSource>();
             var fileName = Path.GetFileName(source.PakPath);
             if (fileName.StartsWith("TMAPA"))
-                for (int i = 0, o = 0; i < TEXTURE_BLOCKS_STAT_COUNT_A; i++, o += TextureBlockSize)
+                for (int i = 1, o = 0; i < TEXTURE_BLOCKS_STAT_COUNT_A; i++, o += TextureBlockSize)
                     files.Add(new FileSource
                     {
-                        Path = $"texs/{i}.tex",
+                        Path = $"texs/{i:000}.bmp",
                         Offset = o,
                         FileSize = TextureBlockSize,
                     });
             else if (fileName.StartsWith("TMAPB"))
-                for (int i = 0, o = 0; i < TEXTURE_BLOCKS_STAT_COUNT_B; i++, o += TextureBlockSize)
+                for (int i = 1, o = 0; i < TEXTURE_BLOCKS_STAT_COUNT_B; i++, o += TextureBlockSize)
                     files.Add(new FileSource
                     {
-                        Path = $"texs/{i}.tex",
+                        Path = $"texs/{i:000}.bmp",
                         Offset = o,
                         FileSize = TextureBlockSize,
                     });

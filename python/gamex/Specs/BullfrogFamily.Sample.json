@@ -20,7 +20,7 @@
     "name": "Dungeon Keeper",
     "files": [
       {
-        "path": "DATA/TMAPA000.DAT",
+        "path": "DATA/TMAPA000.DAT:texs/001.bmp",
         "type": "Texture"
       }
     ]
