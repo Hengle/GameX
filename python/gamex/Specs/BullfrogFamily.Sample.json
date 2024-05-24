@@ -1,4 +1,22 @@
 ﻿{
+  "P": {
+    "name": "Populous",
+    "files": [
+      {
+        "path": "VGASPR0.DAT",
+        "type": "SpriteBank"
+      }
+    ]
+  },
+  "P2": {
+    "name": "Populous II: Trials of the Olympian Gods",
+    "files": [
+      {
+        "path": "MTITLE.DAT",
+        "type": "SpriteBank"
+      }
+    ]
+  },
   "P3": {
     "name": "Populous: The Beginning",
     "files": [
