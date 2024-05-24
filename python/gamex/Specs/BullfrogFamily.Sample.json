@@ -20,8 +20,56 @@
     "name": "Dungeon Keeper",
     "files": [
       {
-        "path": "DATA/TMAPA000.DAT:texs/001.bmp",
+        "path": "DATA/CREATURE.JTY:001.tex",
+        "type": "Creature"
+      },
+      {
+        "path": "DATA/GUI.DAT:gui/001.tex",
+        "type": "Image"
+      },
+      {
+        "path": "SOUND/SOUND.DAT",
+        "type": "Sound"
+      },
+      {
+        "path": "SOUND/SPEECH.DAT",
+        "type": "Sound"
+      },
+      {
+        "path": "SOUND/ATMOS1.SBK",
+        "type": "SoundBank"
+      },
+      {
+        "path": "SOUND/ATMOS2.SBK",
+        "type": "SoundBank"
+      },
+      {
+        "path": "SOUND/BULLFROG.SBK",
+        "type": "SoundBank"
+      },
+      {
+        "path": "DATA/TMAPA000.DAT:texs/001.tex",
         "type": "Texture"
+      },
+      {
+        "path": "ldata/DKMAP00.RAW",
+        "type": "Image"
+      },
+      {
+        "path": "DATA/FRONTEND.RAW",
+        "type": "Image"
+      },
+      {
+        "path": "DATA/GMAP.RAW",
+        "type": "Image"
+      },
+      {
+        "path": "DATA/GMAPHI.RAW",
+        "type": "Image"
+      },
+      {
+        "path": "DATA/LEGAL.RAW",
+        "type": "Image"
       }
     ]
   }

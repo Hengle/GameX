@@ -10,7 +10,7 @@ namespace GameX.Bullfrog.Formats
     {
         #region Header
 
-        const uint RNC_MAGIC = 0x01434e52;
+        public const uint RNC_MAGIC = 0x01434e52;
 
         [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
         struct RNC_Header
@@ -117,11 +117,12 @@ namespace GameX.Bullfrog.Formats
 
         #endregion
 
-        public static byte[] Unpack(BinaryReader r)
+        public static byte[] Read(BinaryReader r)
         {
             var header = r.ReadS<RNC_Header>();
-            if (header.Signature != RNC_MAGIC) throw new FormatException("BAD MAGIC");
-            return header.Unpack(r);
+            if (header.Signature == RNC_MAGIC) return header.Unpack(r);
+            r.BaseStream.Position = 0;
+            return r.ReadToEnd();
         }
 
         static byte[] Unpack(byte[] input, int unpackedSize)

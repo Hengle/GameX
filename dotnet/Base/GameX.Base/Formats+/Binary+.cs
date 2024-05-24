@@ -529,7 +529,8 @@ namespace GameX.Formats
 
     public unsafe class Binary_Snd : IHaveMetaInfo
     {
-        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Snd(r, (int)f.FileSize));
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Snd(r, (int)f.FileSize, null));
+        public static Task<object> Factory_Wav(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Snd(r, (int)f.FileSize, ".wav"));
 
         #region WAV
 
@@ -570,12 +571,17 @@ namespace GameX.Formats
 
         #endregion
 
-        public Binary_Snd(BinaryReader r, int fileSize) => Data = r.ReadBytes(fileSize);
+        public Binary_Snd(BinaryReader r, int fileSize, object tag)
+        {
+            Data = r.ReadBytes(fileSize);
+            Tag = tag;
+        }
 
         public byte[] Data;
+        public object Tag;
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "AudioPlayer", Name = Path.GetFileName(file.Path), Value = new MemoryStream(Data), Tag = Path.GetExtension(file.Path) }),
+            new MetaInfo(null, new MetaContent { Type = "AudioPlayer", Name = Path.GetFileName(file.Path), Value = new MemoryStream(Data), Tag = Tag ?? Path.GetExtension(file.Path) }),
         };
     }
 

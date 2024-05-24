@@ -44,6 +44,8 @@ namespace GameX.App.Explorer.Controls1
             set => SetValue(SourceProperty, value);
         }
 
+        const int Factor = 1;
+
         protected override void HandleResize()
         {
             var source = Source is ITexture z ? z
@@ -51,7 +53,7 @@ namespace GameX.App.Explorer.Controls1
                 : null;
             if (source == null) return;
             if (source.Width > 1024 || source.Height > 1024 || false) { base.HandleResize(); return; }
-            Camera.SetViewportSize(source.Width, source.Height);
+            Camera.SetViewportSize(source.Width << Factor, source.Height << Factor);
             RecalculatePositions();
         }
 

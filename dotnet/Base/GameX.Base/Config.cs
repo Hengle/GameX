@@ -148,7 +148,7 @@ namespace GameX
             ForceOpen = true,
             ForcePath = "sample:0",
             Family = "Bullfrog",
-            //Game = "P", // Populous
+            Game = "P", // Populous
             //Game = "P2", // Populous II: Trials of the Olympian Gods
             //Game = "S", // Syndicate
             //Game = "MC", // Magic Carpet
@@ -156,7 +156,7 @@ namespace GameX
             //Game = "MC2", // Magic Carpet 2
             //Game = "S2", // Syndicate Wars
             //Game = "TH", // Theme Hospital
-            Game = "DK", // Dungeon Keeper
+            //Game = "DK", // Dungeon Keeper
             //Game = "P3", // Populous: The Beginning
             //Game = "DK2", // Dungeon Keeper 2
         };

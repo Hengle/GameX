@@ -436,17 +436,19 @@ namespace GameX
         /// Reader
         /// </summary>
         /// <param name="func">The func.</param>
+        /// <param name="path">The path.</param>
         /// <returns></returns>
-        public virtual Task Reader(Func<BinaryReader, Task> func)
-            => UseReader ? GetReader().ActionAsync(async r => await func(r)) : func(null);
+        public virtual Task Reader(Func<BinaryReader, Task> func, string path = default)
+            => UseReader ? GetReader(path).ActionAsync(async r => await func(r)) : func(null);
 
         /// <summary>
         /// Reader
         /// </summary>
         /// <param name="func">The func.</param>
+        /// <param name="path">The path.</param>
         /// <returns></returns>
-        public virtual Task<TResult> Reader<TResult>(Func<BinaryReader, Task<TResult>> func)
-            => UseReader ? GetReader().FuncAsync(async r => await func(r)) : func(null);
+        public virtual Task<TResult> Reader<TResult>(Func<BinaryReader, Task<TResult>> func, string path = default)
+            => UseReader ? GetReader(path).FuncAsync(async r => await func(r)) : func(null);
 
         /// <summary>
         /// Gets the binary reader.
@@ -460,17 +462,19 @@ namespace GameX
         /// Writer
         /// </summary>
         /// <param name="func">The func.</param>
+        /// <param name="path">The path.</param>
         /// <returns></returns>
-        public Task Writer(Func<BinaryWriter, Task> func)
-            => UseWriter ? GetWriter().ActionAsync(async w => await func(w)) : func(null);
+        public Task Writer(Func<BinaryWriter, Task> func, string path = default)
+            => UseWriter ? GetWriter(path).ActionAsync(async w => await func(w)) : func(null);
 
         /// <summary>
         /// Writer
         /// </summary>
         /// <param name="func">The func.</param>
+        /// <param name="path">The path.</param>
         /// <returns></returns>
-        public Task<TResult> Writer<TResult>(Func<BinaryWriter, Task<TResult>> func)
-            => UseWriter ? GetWriter().FuncAsync(async w => await func(w)) : func(null);
+        public Task<TResult> Writer<TResult>(Func<BinaryWriter, Task<TResult>> func, string path = default)
+            => UseWriter ? GetWriter(path).FuncAsync(async w => await func(w)) : func(null);
 
         #endregion
 
@@ -1040,9 +1044,9 @@ namespace GameX
 
             public override void Closing() { R?.Dispose(); base.Closing(); }
 
-            public override Task Reader(Func<BinaryReader, Task> func) => func(R);
+            public override Task Reader(Func<BinaryReader, Task> func, string path = null) => func(R);
 
-            public override Task<TResult> Reader<TResult>(Func<BinaryReader, Task<TResult>> func) => func(R);
+            public override Task<TResult> Reader<TResult>(Func<BinaryReader, Task<TResult>> func, string path = null) => func(R);
         }
     }
 
