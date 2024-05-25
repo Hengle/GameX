@@ -16,7 +16,17 @@ namespace GameX.Volition.Formats.Descent
 
         public Binary_Bmp(BinaryReader r, FamilyGame game, object tag)
         {
+            Format = (
+                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGBA32,
+                TextureUnrealFormat.Unknown);
+            
+            // get body
             game.Ensure();
+            Body = r.ReadToEnd();
+
+            // parse tag
             if (tag is ValueTuple<PIG_Flags, short, short> b)
             {
                 PigFlags = b.Item1;
@@ -25,19 +35,13 @@ namespace GameX.Volition.Formats.Descent
             }
             else throw new ArgumentOutOfRangeException(nameof(tag), tag.ToString());
 
+            // get palette
             Palette = game.Id switch
             {
                 "D" => Games.D.Database.Palette.Records,
                 "D2" => Games.D2.Database.Palette.Records,
                 _ => throw new ArgumentOutOfRangeException(nameof(game.Id), game.Id),
             };
-
-            Format = (
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGBA32,
-                TextureUnrealFormat.Unknown);
-            Body = r.ReadToEnd();
         }
 
         PIG_Flags PigFlags;
