@@ -19,7 +19,7 @@ namespace GameX.Lucas.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Xga(r, f));
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_Header
         {
             public static (string, int) Struct = ("<4B6H48c2B4H54c", sizeof(X_Header));

@@ -15,7 +15,7 @@ namespace GameX.Monolith.Formats
 
         const uint CRLF = 0x0d0a;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_FileMainHeader
         {
             public ushort CrLf1;            // \r\n
@@ -43,7 +43,7 @@ namespace GameX.Monolith.Formats
             DirectoryEntry = 1
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_FileDirEntryDirHeader
         {
             public uint Pos;                // File positon of dir entry
@@ -52,7 +52,7 @@ namespace GameX.Monolith.Formats
             //public string Name;           // Name of this directory
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_FileDirEntryRezHeader
         {
             public uint Pos;                // File positon of dir entry
@@ -80,7 +80,7 @@ namespace GameX.Monolith.Formats
 
         const uint MAGIC = 0x5241544c;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct Header
         {
             public const int SizeOf = 0x30;
@@ -93,7 +93,7 @@ namespace GameX.Monolith.Formats
             fixed byte Unknown2[0x1c];              // Unknown
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct HeaderFile
         {
             public int StringAt;                    // StringAt
@@ -103,7 +103,7 @@ namespace GameX.Monolith.Formats
             fixed byte Unknown2[0x10];              // Unknown
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct HeaderDirectory
         {
             public int StringAt;                    // StringAt

@@ -38,7 +38,7 @@ namespace GameX.Origin.Formats
         #region Headers
         // http://wiki.ultimacodex.com/wiki/Ultima_IX_Internal_Formats#FLX_Format
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct FlxRecord
         {
             public static (string, int) Struct = ("<2I", sizeof(FlxRecord));

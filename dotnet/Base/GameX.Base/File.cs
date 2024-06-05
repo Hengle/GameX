@@ -260,6 +260,7 @@ namespace GameX
         {
             var matcher = new Matcher();
             matcher.AddIncludePatterns(new[] { string.IsNullOrEmpty(searchPattern) ? "**/*" : searchPattern });
+            //var skip = Skip + path.Length + 1;
             return matcher.GetResultsInFullPath(Path.Combine(Root, path)).Select(x => x[Skip..]);
         }
         public bool FileExists(string path) => File.Exists(Path.Combine(Root, path));

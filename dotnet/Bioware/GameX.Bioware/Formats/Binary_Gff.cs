@@ -19,7 +19,7 @@ namespace GameX.Bioware.Formats
         const uint GFF_VERSION3_2 = 0x322e3356; // literal string "V3.2".
         const uint GFF_VERSION3_3 = 0x332e3356; // literal string "V3.3".
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct GFF_Header
         {
             public uint Version;            // Version ("V3.3")
@@ -37,7 +37,7 @@ namespace GameX.Bioware.Formats
             public uint ListIndicesSize;    // Number of bytes in List Indices array
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct GFF_Struct
         {
             public uint Id;                 // Programmer-defined integer ID.
@@ -46,7 +46,7 @@ namespace GameX.Bioware.Formats
             public uint FieldCount;         // Number of fields in this Struct.
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct GFF_Field
         {
             public uint Type;               // Data type
@@ -55,7 +55,7 @@ namespace GameX.Bioware.Formats
                                             // If Type is a complex data type, then this is a byte offset into the Field Data block.
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct GFF_Label
         {
             public fixed byte Name[0x10];     // Label

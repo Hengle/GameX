@@ -44,7 +44,7 @@ namespace GameX.Bethesda.Formats
         const uint OB_BSAFILE_SIZEMASK = 0x3fffffff; // Bit mask with OB_HeaderFile:SizeFlags to get the compression status
         const uint OB_BSAFILE_SIZECOMPRESS = 0xC0000000; // Bit mask with OB_HeaderFile:SizeFlags to get the compression status
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct OB_Header
         {
             public static (string, int) Struct = ("<IIIIIIII", sizeof(OB_Header));
@@ -58,7 +58,7 @@ namespace GameX.Bethesda.Formats
             public uint FileFlags;          // File flags
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct OB_Folder
         {
             public static (string, int) Struct = ("<QII", sizeof(OB_Folder));
@@ -67,7 +67,7 @@ namespace GameX.Bethesda.Formats
             public uint Offset;             // The offset
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct OB_FolderSSE
         {
             public static (string, int) Struct = ("<QIIQ", sizeof(OB_Folder));
@@ -77,7 +77,7 @@ namespace GameX.Bethesda.Formats
             public ulong Offset;            // The offset
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct OB_File
         {
             public static (string, int) Struct = ("<QII", sizeof(OB_Folder));
@@ -95,7 +95,7 @@ namespace GameX.Bethesda.Formats
         // Default header data
         const uint MW_BSAHEADER_FILEID = 0x00000100; // Magic for Morrowind BSA
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct MW_Header
         {
             public static (string, int) Struct = ("<II", sizeof(MW_Header));
@@ -103,7 +103,7 @@ namespace GameX.Bethesda.Formats
             public uint FileCount;          // Number of files in the archive
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct MW_File
         {
             public static (string, int) Struct = ("<II", sizeof(MW_File));

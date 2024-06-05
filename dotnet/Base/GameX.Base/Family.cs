@@ -90,7 +90,7 @@ namespace GameX
             => Families.TryGetValue(id, out var family) ? family
             : throwOnError ? throw new ArgumentOutOfRangeException(nameof(id), id) : (Family)default;
 
-        #region Parse
+        #region Factory
 
         /// <summary>
         /// Create Key.
@@ -231,17 +231,18 @@ namespace GameX
         /// Creates the file system.
         /// </summary>
         /// <param name="fileSystemType">The fileSystemType.</param>
-        /// <param name="root">The root.</param>
+        /// <param name="path">The path.</param>
+        /// <param name="subPath">The subPath.</param>
         /// <param name="host">The host.</param>
         /// <returns></returns>
-        internal static IFileSystem CreateFileSystem(Type fileSystemType, PathItem path, Uri host = null)
+        internal static IFileSystem CreateFileSystem(Type fileSystemType, PathItem path, string subPath, Uri host = null)
             => host != null ? new HostFileSystem(host)
             : fileSystemType != null ? (IFileSystem)Activator.CreateInstance(fileSystemType, path)
             : path.Type switch
             {
-                null => new StandardFileSystem(Path.Combine(path.Root, path.Paths.SingleOrDefault() ?? string.Empty)),
-                "zip" => new ZipFileSystem(path.Root, path.Paths.SingleOrDefault()),
-                "zip:iso" => new ZipIsoFileSystem(path.Root, path.Paths.SingleOrDefault()),
+                null => new StandardFileSystem(Path.Combine(path.Root, subPath ?? "", path.Paths.SingleOrDefault() ?? string.Empty)),
+                "zip" => new ZipFileSystem(Path.Combine(path.Root, subPath ?? ""), path.Paths.SingleOrDefault()),
+                "zip:iso" => new ZipIsoFileSystem(Path.Combine(path.Root, subPath ?? ""), path.Paths.SingleOrDefault()),
                 _ => throw new ArgumentOutOfRangeException(nameof(path.Type), $"Unknown {path.Type}")
             };
 
@@ -618,11 +619,12 @@ namespace GameX
             var game = GetGame(uri.Fragment[1..], out var edition);
             var searchPattern = uri.IsFile ? null : uri.LocalPath[1..];
             var paths = FileManager.Paths;
+            var subPath = edition?.Path;
             var fileSystemType = game.FileSystemType;
             var fileSystem =
-                string.Equals(uri.Scheme, "game", StringComparison.OrdinalIgnoreCase) ? paths.TryGetValue(game.Id, out var z) ? CreateFileSystem(fileSystemType, z) : default
-                : uri.IsFile ? !string.IsNullOrEmpty(uri.LocalPath) ? CreateFileSystem(fileSystemType, new PathItem(uri.LocalPath, default)) : default
-                : uri.Scheme.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? !string.IsNullOrEmpty(uri.Host) ? CreateFileSystem(fileSystemType, null, uri) : default
+                string.Equals(uri.Scheme, "game", StringComparison.OrdinalIgnoreCase) ? paths.TryGetValue(game.Id, out var z) ? CreateFileSystem(fileSystemType, z, subPath) : default
+                : uri.IsFile ? !string.IsNullOrEmpty(uri.LocalPath) ? CreateFileSystem(fileSystemType, new PathItem(uri.LocalPath, default), subPath) : default
+                : uri.Scheme.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? !string.IsNullOrEmpty(uri.Host) ? CreateFileSystem(fileSystemType, null, subPath, uri) : default
                 : default;
             if (fileSystem == null)
                 if (throwOnError) throw new ArgumentOutOfRangeException(nameof(uri), $"{game.Id}: unable to resources");
@@ -907,9 +909,13 @@ namespace GameX
             /// </summary>
             public string Name { get; protected set; }
             /// <summary>
-            /// Gets the path.
+            /// Gets the paths.
             /// </summary>
             public string Path { get; protected set; }
+            /// <summary>
+            /// Gets the ignores.
+            /// </summary>
+            public string[] Ignores { get; protected set; }
 
             /// <summary>
             /// Edition
@@ -933,6 +939,7 @@ namespace GameX
                {
                    "name" => Name = x.Value.GetString(),
                    "path" => Path = x.Value.GetString(),
+                   "ignore" => Ignores = _list(elem, "ignore"),
                    "key" => _method(elem, "key", CreateKey),
                    _ => _valueV(x.Value)
                });
@@ -999,7 +1006,7 @@ namespace GameX
             /// <summary>
             /// Gets the data.
             /// </summary>
-            public Dictionary<string, object> Data { get;}
+            public Dictionary<string, object> Data { get; }
             /// <summary>
             /// Gets the name.
             /// </summary>
@@ -1229,6 +1236,27 @@ namespace GameX
         }
 
         /// <summary>
+        /// Creates the search patterns.
+        /// </summary>
+        /// <param name="searchPattern">The search pattern.</param>
+        /// <returns></returns>
+        public string CreateSearchPatterns(string searchPattern)
+        {
+            if (!string.IsNullOrEmpty(searchPattern)) return searchPattern;
+            return SearchBy switch
+            {
+                SearchBy.Default => "",
+                SearchBy.Pak => PakExts == null || PakExts.Length == 0 ? ""
+                    : PakExts.Length == 1 ? $"*{PakExts[0]}" : $"(*{string.Join(":*", PakExts)})",
+                SearchBy.TopDir => "*",
+                SearchBy.TwoDir => "*/*",
+                SearchBy.DirDown => "**/*",
+                SearchBy.AllDir => "**/*",
+                _ => throw new ArgumentOutOfRangeException(nameof(SearchBy), $"{SearchBy}"),
+            };
+        }
+
+        /// <summary>
         /// Create pak file.
         /// </summary>
         /// <param name="fileSystem">The fileSystem.</param>
@@ -1280,7 +1308,7 @@ namespace GameX
                     CreatePakFileType(new PakState(fileSystem, this, edition, null, tag)),
                     new PakState(fileSystem, this, edition, null, tag),
                     s.Item1.Length > 0 ? s.Item1 : "Many", s.Item2,
-                    pathSkip: s.Item1.Length > 0 ? s.Item1.Length + 1 : 0),
+                    pathSkip: 0), //s.Item1.Length > 0 ? s.Item1.Length + 1 : 0),
             IList<PakFile> s => s.Count == 1
                 ? s[0]
                 : new MultiPakFile(new PakState(fileSystem, this, edition, null, tag), "Multi", s),
@@ -1313,38 +1341,16 @@ namespace GameX
         public IEnumerable<(string root, string[] paths)> FindPaths(IFileSystem fileSystem, Edition edition, DownloadableContent dlc, string searchPattern)
         {
             var ignores = Family.FileManager.Ignores.TryGetValue(Id, out var z) ? z : null;
-            var paths = dlc != null ? new[] { "" }
-                : edition != null ? new[] { edition.Path ?? "" }
-                : Paths ?? new[] { "" };
-            foreach (var path in paths)
+            foreach (var path in Paths ?? new[] { "" })
             {
-                var searchPath = dlc?.Path != null ? Path.Join(path, dlc.Path) : path;
+                var searchPath = dlc != null && dlc.Path != null ? Path.Join(path, dlc.Path) : path;
                 var fileSearch = fileSystem.FindPaths(searchPath, searchPattern);
                 if (ignores != null) fileSearch = fileSearch.Where(x => !ignores.Contains(Path.GetFileName(x)));
                 yield return (path, fileSearch.ToArray());
             }
         }
 
-        /// <summary>
-        /// Creates the search patterns.
-        /// </summary>
-        /// <param name="searchPattern">The search pattern.</param>
-        /// <returns></returns>
-        public string CreateSearchPatterns(string searchPattern)
-        {
-            if (!string.IsNullOrEmpty(searchPattern)) return searchPattern;
-            return SearchBy switch
-            {
-                SearchBy.Default => "",
-                SearchBy.Pak => PakExts == null || PakExts.Length == 0 ? ""
-                    : PakExts.Length == 1 ? $"*{PakExts[0]}" : $"(*{string.Join(":*", PakExts)})",
-                SearchBy.TopDir => "*",
-                SearchBy.TwoDir => "*/*",
-                SearchBy.DirDown => "**/*",
-                SearchBy.AllDir => "**/*",
-                _ => throw new ArgumentOutOfRangeException(nameof(SearchBy), $"{SearchBy}"),
-            };
-        }
+
 
         #endregion
     }

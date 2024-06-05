@@ -17,7 +17,7 @@ namespace GameX.Black.Formats
 
         const uint F1_HEADER_FILEID = 0x000000001;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F1_Header
         {
             //public static string Map = "B4B4B4B4";
@@ -28,7 +28,7 @@ namespace GameX.Black.Formats
             public uint Unknown3; // Could be some kind of checksum, but Fallout seems to work fine with any value.
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F1_Directory
         {
             //public static string Map = "B4B4B4B4";
@@ -39,7 +39,7 @@ namespace GameX.Black.Formats
             public uint Unknown3; // See (Unknown3).
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F1_File
         {
             //public static string Map = "B4B4B4B4";
@@ -58,7 +58,7 @@ namespace GameX.Black.Formats
 
         const uint F2_HEADER_FILEID = 0x000000011;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F2_Header
         {
             public static (string, int) Struct = ("<2I", sizeof(F2_Header));
@@ -66,7 +66,7 @@ namespace GameX.Black.Formats
             public uint DataSize;               // Full size of the archive in bytes
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F2_File
         {
             public static (string, int) Struct = ("<B3I", sizeof(F2_File));

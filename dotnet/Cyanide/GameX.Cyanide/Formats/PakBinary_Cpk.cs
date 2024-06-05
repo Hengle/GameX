@@ -13,14 +13,14 @@ namespace GameX.Cyanide.Formats
 
         const uint CPK_MAGIC = 0x01439855;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct CPK_Header
         {
             public uint NumFiles;               // Number of files
             public fixed byte Root[512];        // Root name
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct CPK_HeaderFile
         {
             public uint FileSize;               // File size

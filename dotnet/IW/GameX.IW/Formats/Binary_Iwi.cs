@@ -150,7 +150,7 @@ namespace GameX.IW.Formats
         /// <summary>
         /// Describes a IWI file header.
         /// </summary>
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public unsafe struct HEADER
         {
             /// <summary>

@@ -149,8 +149,8 @@ namespace GameX
             ForcePath = "sample:0",
             Family = "Bullfrog",
             //Game = "P", // Populous
-            Game = "P2", // Populous II: Trials of the Olympian Gods
-            //Game = "S", // Syndicate
+            //Game = "P2", // Populous II: Trials of the Olympian Gods
+            Game = "S", // Syndicate
             //Game = "MC", // Magic Carpet
             //Game = "TP", // Theme Park
             //Game = "MC2", // Magic Carpet 2

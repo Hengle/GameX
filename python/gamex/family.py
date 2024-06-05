@@ -90,16 +90,16 @@ def createFileManager(elem: dict[str, object]) -> FileManager:
 
 # create FileSystem
 @staticmethod
-def createFileSystem(fileSystemType: str, path: FileManager.PathItem, host: str = None) -> IFileSystem:
+def createFileSystem(fileSystemType: str, path: FileManager.PathItem, subPath: str, host: str = None) -> IFileSystem:
     x = HostFileSystem(host) if host else \
         findType(fileSystemType)(root) if fileSystemType else \
         None
     if x: return x
     firstPath = next(iter(path.paths), None)
     match path.type:
-        case None: return StandardFileSystem(os.path.join(path.root, firstPath or ''))
-        case 'zip': return ZipFileSystem(path.root, firstPath)
-        case 'zip:iso': return ZipIsoFileSystem(path.root, firstPath)
+        case None: return StandardFileSystem(os.path.join(path.root, subPath or '', firstPath or ''))
+        case 'zip': return ZipFileSystem(os.path.join(path.root, subPath or ''), firstPath)
+        case 'zip:iso': return ZipIsoFileSystem(os.path.join(path.root, subPath or ''), firstPath)
         case _: raise Exception(f'Unknown {path.type}')
 
 # tag::Detector[]
@@ -199,11 +199,12 @@ fileManager: {self.fileManager if self.fileManager else None}'''
         game, edition = self.getGame(uri.fragment)
         searchPattern = '' if uri.scheme == 'file' else uri.path[1:]
         paths = self.fileManager.paths
+        subPath = edition.path if edition else None
         fileSystemType = game.fileSystemType
         fileSystem = \
-            (createFileSystem(fileSystemType, paths[game.id]) if game.id in paths and paths[game.id] else None) if uri.scheme == 'game' else \
-            (createFileSystem(fileSystemType, FileManager.PathItem(uri.path, None)) if uri.path else None) if uri.scheme == 'file' else \
-            (createFileSystem(fileSystemType, None, uri) if uri.netloc else None) if uri.scheme.startswith('http') else None
+            (createFileSystem(fileSystemType, subPath, paths[game.id]) if game.id in paths and paths[game.id] else None) if uri.scheme == 'game' else \
+            (createFileSystem(fileSystemType, subPath, FileManager.PathItem(uri.path, None)) if uri.path else None) if uri.scheme == 'file' else \
+            (createFileSystem(fileSystemType, subPath, None, uri) if uri.netloc else None) if uri.scheme.startswith('http') else None
         if not fileSystem:
             if throwOnError: raise Exception(f'Not located: {game.id}')
             else: return None
@@ -285,12 +286,15 @@ class FamilyGame:
     class Edition:
         def __init__(self, id: str, elem: dict[str, object]):
             self.id = self.name = id
+            self.path = None
+            self.ignores = None
             self.data = self.parse(elem)
         def parse(self, elem: dict[str, object]) -> dict[str, object]:
             def switch(k,v):
                 match k:
                     case 'name': self.name = v; return v
                     case 'path': self.path = v; return v
+                    case 'ignore': self.ignores = _list(elem, 'ignore'); return v
                     case 'key': return _method(elem, 'key', createKey)
                     case _: return v
             return { k:switch(k,v) for k,v in elem.items() }
@@ -298,9 +302,8 @@ class FamilyGame:
         
     class DownloadableContent:
         def __init__(self, id: str, elem: dict[str, object]):
-            self.id = id
-            self.name = _value(elem, 'name') or id
-            self.path = _value(elem, 'path')
+            self.id = self.name = id
+            self.path = None
             self.data = self.parse(elem)
         def parse(self, elem: dict[str, object]) -> dict[str, object]:
             def switch(k,v):
@@ -444,10 +447,7 @@ class FamilyGame:
     # find Paths
     def findPaths(self, fileSystem: IFileSystem, edition: Edition, dlc: DownloadableContent, searchPattern: str):
         ignores = _value(self.family.fileManager.ignores, self.id)
-        paths = [''] if dlc else \
-            [edition.path or ''] if edition else \
-            self.paths or ['']
-        for path in paths:
+        for path in self.paths or ['']:
             searchPath = os.path.join(path, dlc.path) if dlc and dlc.path else path
             fileSearch = fileSystem.findPaths(searchPath, searchPattern)
             if ignores: fileSearch = [x for x in fileSearch if not os.path.basename(x) in ignores]

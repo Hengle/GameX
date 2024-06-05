@@ -87,7 +87,7 @@ namespace GameX.IW.Formats
 
         const uint IPAK_MAGIC = 0x12345678;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct IPAK_Header
         {
             public static (string, int) Struct = ("<?", sizeof(IPAK_Header));
@@ -97,7 +97,7 @@ namespace GameX.IW.Formats
             public uint SegmentCount;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct IPAK_Segment
         {
             public static (string, int) Struct = ("<?", sizeof(IPAK_Segment));
@@ -107,7 +107,7 @@ namespace GameX.IW.Formats
             public uint EntryCount;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct IPAK_DataHeader
         {
             public static (string, int) Struct = ("<?", sizeof(IPAK_DataHeader));
@@ -117,7 +117,7 @@ namespace GameX.IW.Formats
             public byte Count => (byte)(OffsetCount & 0xFF);
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct IPAK_Entry
         {
             public static (string, int) Struct = ("<?", sizeof(IPAK_Entry));
@@ -133,7 +133,7 @@ namespace GameX.IW.Formats
 
         const uint XPAK_MAGIC = 0x4950414b;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct XPAK_Header //: BO3XPakHeader, VGXPAKHeader
         {
             public static (string, int) Struct = ("<?", sizeof(XPAK_Body));
@@ -147,7 +147,7 @@ namespace GameX.IW.Formats
             //public ulong FileCount;     /*24*/
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct XPAK_Body //: BO3XPakHeader, VGXPAKHeader
         {
             public static (string, int) Struct = ("<?", sizeof(XPAK_Body));
@@ -164,7 +164,7 @@ namespace GameX.IW.Formats
             public ulong IndexSize;     /*80*/
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct XPAK_HeaderVG //: VGXPAKHeader
         {
             public static (string, int) Struct = ("<?", sizeof(XPAK_HeaderVG));
@@ -190,7 +190,7 @@ namespace GameX.IW.Formats
             public ulong IndexSize;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct XPAK_HashEntry //: BO3XPakHashEntry
         {
             public static (string, int) Struct = ("<?", sizeof(XPAK_HashEntry));
@@ -199,7 +199,7 @@ namespace GameX.IW.Formats
             public ulong Size;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct XPAK_HashEntryVG //: VGXPAKHashEntry
         {
             public static (string, int) Struct = ("<?", sizeof(XPAK_HashEntryVG));
@@ -207,7 +207,7 @@ namespace GameX.IW.Formats
             public ulong PackedInfo;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct XPAK_DataHeader //: BO3XPakDataHeader
         {
             public static (string, int) Struct = ("<?", sizeof(XPAK_DataHeader));
@@ -223,7 +223,7 @@ namespace GameX.IW.Formats
 
         const uint WWII_MAGIC = 0x12345678;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct WWII_Header
         {
             public static (string, int) Struct = ("<?", sizeof(WWII_Header));
@@ -232,7 +232,7 @@ namespace GameX.IW.Formats
             public uint EntriesCount;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct WWII_Segment
         {
             public static (string, int) Struct = ("<?", sizeof(WWII_Segment));

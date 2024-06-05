@@ -16,14 +16,14 @@ namespace GameX.Capcom.Formats
 
         const uint K_MAGIC = 0x00435241;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct K_Header
         {
             public ushort Version;
             public ushort NumFiles;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct K_File
         {
             public fixed byte Path[0x40];

@@ -14,7 +14,7 @@ namespace GameX.Volition.Formats.Descent
 
         #region Headers
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_Header
         {
             public static (string, int) Struct = ("<3I", sizeof(X_Header));
@@ -24,7 +24,7 @@ namespace GameX.Volition.Formats.Descent
 
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_Geo
         {
             public static (string, int) Struct = ("<2H", sizeof(X_Geo));

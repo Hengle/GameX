@@ -19,6 +19,9 @@ namespace GameX.Bullfrog
             switch (Id)
             {
                 case "DK": Games.DK.Database.Ensure(this); return this;
+                case "DK2": Games.DK2.Database.Ensure(this); return this;
+                case "P2": Games.P2.Database.Ensure(this); return this;
+                case "S": Games.S.Database.Ensure(this); return this;
                 default: return this;
             }
         }

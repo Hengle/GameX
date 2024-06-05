@@ -24,7 +24,7 @@ namespace GameX.Volition.Formats
             RLEBIG = 32,       // for bitmaps that RLE to > 255 per row (i.e. cockpits)
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         internal struct PIG_Bitmap
         {
             public static (string, int) Struct = ("<13s5bi", sizeof(PIG_Bitmap));
@@ -37,7 +37,7 @@ namespace GameX.Volition.Formats
             public int Offset;              // offset
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         internal struct PIG_Bitmap2
         {
             public static (string, int) Struct = ("<8s6bi", sizeof(PIG_Bitmap2));
@@ -51,7 +51,7 @@ namespace GameX.Volition.Formats
             public int Offset;              // offset
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         internal struct PIG_Sound
         {
             public static (string, int) Struct = ("<8s3i", sizeof(PIG_Sound));
@@ -61,7 +61,7 @@ namespace GameX.Volition.Formats
             public int Offset;              // offset
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct DHF_Record
         {
             public static (string, int) Struct = ("<13si", sizeof(DHF_Record));
@@ -69,7 +69,7 @@ namespace GameX.Volition.Formats
             public int FileSize;            // filesize in bytes
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct HOG2_Header
         {
             public static (string, int) Struct = ("<13s2i56x", sizeof(HOG2_Header));
@@ -78,7 +78,7 @@ namespace GameX.Volition.Formats
             public fixed byte Padding[56];  // filled with FF
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct HOG2_Record
         {
             public static (string, int) Struct = ("<36s3i", sizeof(HOG2_Record));
@@ -250,7 +250,7 @@ namespace GameX.Volition.Formats
         //        !header.loadV2(r, files, gameId)) throw new FormatException("BAD MAGIC");
         //}
 
-        //[StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        //[StructLayout(LayoutKind.Sequential, Pack = 1)]
         //struct PIG_Header
         //{
         //    public static (string, int) Struct = ("<2i", sizeof(PIG_Header));

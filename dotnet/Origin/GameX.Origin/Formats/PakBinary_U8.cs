@@ -23,7 +23,7 @@ namespace GameX.Origin.Formats
 
         const uint MAGIC = 0x00001a1aU;
 
-        //[StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        //[StructLayout(LayoutKind.Sequential, Pack = 1)]
         //struct FLX_Header
         //{
         //    public static (string, int) Struct = ("<81cb5I", sizeof(FLX_Header));
@@ -37,7 +37,7 @@ namespace GameX.Origin.Formats
         //    public fixed byte Reserved2[26];
         //}
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct FLX_Header
         {
             public static (string, int) Struct = ("<803I", sizeof(FLX_Header));
@@ -47,7 +47,7 @@ namespace GameX.Origin.Formats
             public uint Version;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct FLX_Record
         {
             public static (string, int) Struct = ("<2I", sizeof(FLX_Record));

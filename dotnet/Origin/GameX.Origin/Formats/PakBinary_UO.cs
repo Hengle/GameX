@@ -53,7 +53,7 @@ namespace GameX.Origin.Formats
 
         #region Headers
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct IdxFile
         {
             public static (string, int) Struct = ("<3i", sizeof(IdxFile));
@@ -62,7 +62,7 @@ namespace GameX.Origin.Formats
             public int Extra;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct UopHeader
         {
             public static (string, int) Struct = ("<i2q2i", sizeof(UopHeader));
@@ -73,7 +73,7 @@ namespace GameX.Origin.Formats
             public int Count;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct UopRecord
         {
             public static (string, int) Struct = ("<q3iQIh", sizeof(UopRecord));

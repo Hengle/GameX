@@ -14,7 +14,7 @@ namespace GameX.Bioware.Formats
 
         const uint MYP_MAGIC = 0x0050594d;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct MYP_Header
         {
             public uint Magic;              // "MYP\0"
@@ -35,7 +35,7 @@ namespace GameX.Bioware.Formats
             }
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct MYP_HeaderFile
         {
             public ulong Offset;            //

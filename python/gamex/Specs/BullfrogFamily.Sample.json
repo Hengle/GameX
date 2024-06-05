@@ -4,7 +4,7 @@
     "files": [
       {
         "path": "VGASPR0.DAT",
-        "type": "SpriteBank"
+        "type": "Image"
       }
     ]
   },
@@ -12,25 +12,169 @@
     "name": "Populous II: Trials of the Olympian Gods",
     "files": [
       {
-        "path": "MTITLE.DAT",
-        "type": "SpriteBank"
+        "path": "DATA/EMSSPR-0.DAT:sprs/001.raw",
+        "type": "Image"
+      },
+      {
+        "path": "DATA/MJUDGE.DAT",
+        "type": "Image"
+      },
+      {
+        "path": "DATA/MENDGAME.DAT",
+        "type": "Image"
+      },
+      {
+        "path": "DATA/MTITLE.DAT",
+        "type": "Image"
+      },
+      {
+        "path": "DATA/INTRO.DAT",
+        "type": "Video"
       }
     ]
   },
-  "P3": {
-    "name": "Populous: The Beginning",
+  "S": {
+    "name": "Syndicate",
     "files": [
       {
-        "path": "data/hfx0-0.dat",
-        "type": "SpriteBank"
+        "path": "DATA/INTRO.XMI",
+        "type": "Music"
       },
       {
-        "path": "data/fenew/Fepointe.spr",
-        "type": "SpriteBank"
+        "path": "DATA/SYNGAME.XMI",
+        "type": "Music"
       },
       {
-        "path": "data/HSPRO-0.DAT",
-        "type": "SpriteBank"
+        "path": "DATA/HPAL01.DAT",
+        "type": "Palette"
+      },
+      {
+        "path": "DATA/HFNT01.DAT",
+        "type": "Font"
+      },
+      {
+        "path": "DATA/HREQ.DAT",
+        "type": "Req"
+      },
+      {
+        "path": "MAP00.DAT",
+        "type": "MapData"
+      },
+      {
+        "path": "MAP00.DAT",
+        "type": "MapData"
+      },
+      {
+        "path": "COL01.DAT",
+        "type": "MapColumn"
+      },
+      {
+        "path": "HBLK01.DAT",
+        "type": "MapTile"
+      },
+      {
+        "path": "HSTA-0.ANI",
+        "type": "SpriteAnim"
+      },
+      {
+        "path": "HFRA-0.ANI",
+        "type": "SpriteFrame"
+      },
+      {
+        "path": "HELE-0.ANI",
+        "type": "SpriteElement"
+      },
+      {
+        "path": "HSPR-0.TAB",
+        "type": "SpriteTab"
+      },
+      {
+        "path": "HSPR-0.DAT",
+        "type": "SpriteData"
+      },
+      {
+        "path": "MISS00.DAT",
+        "type": "Mission"
+      },
+      {
+        "path": "GAME00.DAT",
+        "type": "Game"
+      },
+      {
+        "path": "Pedestrian.DAT",
+        "type": "Common"
+      },
+      {
+        "path": "Vehicles.DAT",
+        "type": "Common"
+      },
+      {
+        "path": "Objects.DAT",
+        "type": "Common"
+      },
+      {
+        "path": "Weapons.DAT",
+        "type": "Common"
+      },
+      {
+        "path": "Sfx.DAT",
+        "type": "Sfx"
+      },
+      {
+        "path": "Scenarios.DAT",
+        "type": "Scenarios"
+      },
+      {
+        "path": "Mapinfos.DAT",
+        "type": "Mapinfos"
+      },
+      {
+        "path": "Objectives.DAT",
+        "type": "Objectives"
+      },
+      {
+        "path": "INTRO.DAT",
+        "type": "Fli"
+      },
+      {
+        "path": "MCONSCR.DAT",
+        "type": "Raw"
+      }
+    ]
+  },
+  "MC": {
+    "name": "Magic Carpet",
+    "files": [
+      {
+        "path": "VGASPR0.DAT",
+        "type": "Image"
+      }
+    ]
+  },
+  "TP": {
+    "name": "Theme Park",
+    "files": [
+      {
+        "path": "VGASPR0.DAT",
+        "type": "Image"
+      }
+    ]
+  },
+  "MC2": {
+    "name": "Magic Carpet 2",
+    "files": [
+      {
+        "path": "VGASPR0.DAT",
+        "type": "Image"
+      }
+    ]
+  },
+  "S2": {
+    "name": "Syndicate Wars",
+    "files": [
+      {
+        "path": "VGASPR0.DAT",
+        "type": "Image"
       }
     ]
   },
@@ -46,11 +190,11 @@
         "type": "Image"
       },
       {
-        "path": "SOUND/SOUND.DAT",
+        "path": "SOUND/SOUND.DAT:ALARM.WAV",
         "type": "Sound"
       },
       {
-        "path": "SOUND/SPEECH.DAT",
+        "path": "SOUND/SPEECH.DAT:DEFAULT.WAV",
         "type": "Sound"
       },
       {
@@ -88,6 +232,32 @@
       {
         "path": "DATA/LEGAL.RAW",
         "type": "Image"
+      }
+    ]
+  },
+  "P3": {
+    "name": "Populous: The Beginning",
+    "files": [
+      {
+        "path": "data/fenew/Fepointe.spr",
+        "type": "Image"
+      },
+      {
+        "path": "data/hfx0-0.dat",
+        "type": "Image"
+      },
+      {
+        "path": "data/HSPRO-0.DAT",
+        "type": "Image"
+      }
+    ]
+  },
+  "DK2": {
+    "name": "Dungeon Keeper 2",
+    "files": [
+      {
+        "path": "DATA/CREATURE.JTY:001.tex",
+        "type": "Creature"
       }
     ]
   }

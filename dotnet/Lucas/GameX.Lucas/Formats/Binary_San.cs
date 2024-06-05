@@ -14,7 +14,7 @@ namespace GameX.Lucas.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_San(r, (int)f.FileSize));
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct X_Header
         {
             public static (string, int) Struct = (">2I", sizeof(X_Header)); //: BE
@@ -22,7 +22,7 @@ namespace GameX.Lucas.Formats
             public uint ChunkSize;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct X_AHeader
         {
             public static (string, int) Struct = (">2I3H", sizeof(X_AHeader));
@@ -43,7 +43,7 @@ namespace GameX.Lucas.Formats
             //    _palDirtyMax = max;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct X_Chunk
         {
             public static (string, int) Struct = (">2I", sizeof(X_Chunk));
@@ -52,7 +52,7 @@ namespace GameX.Lucas.Formats
             public readonly uint Size => ChunkSize + ((ChunkSize & 1) != 0 ? 1U : 0U);
         }
 
-        //[StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        //[StructLayout(LayoutKind.Sequential, Pack = 1)]
         //unsafe struct X_Chunk_FOBJ
         //{
         //    public static (string, int) Struct = (">2I", sizeof(X_Chunk_FOBJ));
@@ -60,7 +60,7 @@ namespace GameX.Lucas.Formats
         //    public uint ChunkSize;
         //}
 
-        //[StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        //[StructLayout(LayoutKind.Sequential, Pack = 1)]
         //unsafe struct X_Chunk_IACT
         //{
         //    public static (string, int) Struct = (">2I", sizeof(X_Chunk_IACT));
@@ -68,7 +68,7 @@ namespace GameX.Lucas.Formats
         //    public uint ChunkSize;
         //}
 
-        //[StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        //[StructLayout(LayoutKind.Sequential, Pack = 1)]
         //unsafe struct X_Chunk_PSAD
         //{
         //    public static (string, int) Struct = (">2I", sizeof(X_Chunk_PSAD));

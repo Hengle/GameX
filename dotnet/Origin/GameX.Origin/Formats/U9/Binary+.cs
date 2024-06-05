@@ -105,7 +105,7 @@ namespace GameX.Origin.Formats.U9
 
         #region Records
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct AnimHeader
         {
             public static (string, int) Struct = ("<IQIQ", sizeof(AnimHeader));
@@ -123,7 +123,7 @@ namespace GameX.Origin.Formats.U9
             public override string ToString() => $"{Id:000}: {Name}";
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct AnimFrame
         {
             public static (string, int) Struct = ("<5HI", sizeof(AnimFrame));
@@ -193,7 +193,7 @@ namespace GameX.Origin.Formats.U9
             }
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct BmpHeader
         {
             public static (string, int) Struct = ("<5HI", sizeof(BmpHeader));
@@ -205,7 +205,7 @@ namespace GameX.Origin.Formats.U9
             public uint Reserved;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct BmpFrameOffset
         {
             public static (string, int) Struct = ("<2I", sizeof(BmpFrameOffset));
@@ -213,7 +213,7 @@ namespace GameX.Origin.Formats.U9
             public uint Size;       // Length of the frame in bytes.
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct BmpFrame
         {
             public static (string, int) Struct = ("<2H4I", sizeof(BmpFrame));

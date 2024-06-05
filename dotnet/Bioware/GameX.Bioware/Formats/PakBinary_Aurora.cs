@@ -21,7 +21,7 @@ namespace GameX.Bioware.Formats
         const uint BIFF_MAGIC = 0x46464942;
         const uint BIFF_VERSION = 0x20203156;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct KEY_Header
         {
             public uint Version;            // Version ("V1  ")
@@ -34,7 +34,7 @@ namespace GameX.Bioware.Formats
             public fixed byte NotUsed02[32]; // Not used
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct KEY_HeaderFile
         {
             public uint FileSize;           // BIF Filesize
@@ -43,13 +43,13 @@ namespace GameX.Bioware.Formats
             public ushort Drives;           // A number that represents which drives the BIF file is located in
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct KEY_HeaderFileName
         {
             public fixed byte Name[0x10];   // Null-padded string Resource Name (sans extension).
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct KEY_HeaderKey
         {
             public fixed byte Name[0x10];   // Null-padded string Resource Name (sans extension).
@@ -57,7 +57,7 @@ namespace GameX.Bioware.Formats
             public uint Id;                 // Resource ID
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct BIFF_Header
         {
             public uint Version;            // Version ("V1  ")
@@ -66,7 +66,7 @@ namespace GameX.Bioware.Formats
             public uint FilesOffset;        // Offset to FILETABLE
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct BIFF_HeaderFile
         {
             public uint FileId;             // File ID

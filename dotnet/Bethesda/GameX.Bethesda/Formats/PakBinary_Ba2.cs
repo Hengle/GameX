@@ -27,7 +27,7 @@ namespace GameX.Bethesda.Formats
             Unknown,
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F4_Header
         {
             public static (string, int) Struct = ("<IIIQ", sizeof(F4_Header));
@@ -37,7 +37,7 @@ namespace GameX.Bethesda.Formats
             public ulong NameTableOffset;   // 10 - relative to start of file
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F4_File
         {
             public static (string, int) Struct = ("<I4sIIQIII", sizeof(F4_File));
@@ -51,7 +51,7 @@ namespace GameX.Bethesda.Formats
             public uint Align;              // 20 - BAADF00D
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F4_Texture
         {
             public static (string, int) Struct = ("<I4sIBBHHHBBBB", sizeof(F4_Texture));
@@ -69,7 +69,7 @@ namespace GameX.Bethesda.Formats
             public byte TileMode;           // 17
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F4_GNMF
         {
             public static (string, int) Struct = ("<I4sIBBH32sQIIII", sizeof(F4_GNMF));
@@ -87,7 +87,7 @@ namespace GameX.Bethesda.Formats
             public uint Align;              // 44
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F4_TextureChunk
         {
             public static (string, int) Struct = ("<QIIHHI", sizeof(F4_TextureChunk));

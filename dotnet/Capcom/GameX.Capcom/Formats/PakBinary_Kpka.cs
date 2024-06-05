@@ -16,7 +16,7 @@ namespace GameX.Capcom.Formats
 
         const uint K_MAGIC = 0x414b504b;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct K_Header
         {
             public byte MajorVersion;
@@ -26,7 +26,7 @@ namespace GameX.Capcom.Formats
             public uint Hash;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct K_FileV2
         {
             public long Offset;
@@ -34,7 +34,7 @@ namespace GameX.Capcom.Formats
             public ulong HashName;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct K_FileV4
         {
             public ulong HashName;

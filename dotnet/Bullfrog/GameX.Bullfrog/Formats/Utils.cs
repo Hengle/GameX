@@ -12,7 +12,7 @@ namespace GameX.Bullfrog.Formats
 
         public const uint RNC_MAGIC = 0x01434e52;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct RNC_Header
         {
             public static (string, int) Struct = (">4x2I3H", sizeof(RNC_Header));
@@ -23,13 +23,70 @@ namespace GameX.Bullfrog.Formats
             public ushort PackedCrc32;
             public ushort Unknown;
 
-            public byte[] Unpack(BinaryReader r)
+            internal byte[] Unpack(BinaryReader r)
             {
                 if ((UnpackedSize > (1 << 30)) || (PackedSize > (1 << 30))) throw new FormatException("Bad Size");
                 var input = r.ReadBytes((int)PackedSize);
                 if (RncCrc16.Compute(input) != PackedCrc32) throw new FormatException("Bad CRC");
-                var output = Rnc.Unpack(input, (int)UnpackedSize);
+                var output = Unpack(input, (int)UnpackedSize);
                 if (RncCrc16.Compute(output) != UnpackedCrc32) throw new FormatException("Bad CRC");
+                return output;
+            }
+
+            static byte[] Unpack(byte[] input, int unpackedSize)
+            {
+                var output = new byte[unpackedSize];
+
+                var bs = new BitStream(input);
+                bs.Advance(2); // discard first two bits
+
+                int o = 0;
+                int oend = output.Length;
+
+                // Process chunks
+                var raw = new HufTable();
+                var dist = new HufTable();
+                var len = new HufTable();
+                while (o < oend)
+                {
+                    uint chCount;
+                    if (bs.Remain < 6) throw new Exception();
+
+                    raw.ReadTable(bs);
+                    dist.ReadTable(bs);
+                    len.ReadTable(bs);
+                    chCount = bs.Read(0xFFFF, 16);
+
+                    while (true)
+                    {
+                        var length = raw.Read(bs);
+                        if (length == -1) throw new Exception();
+                        else if (length != 0)
+                        {
+                            while (length-- != 0)
+                            {
+                                //if (bs.Remain <= 0 || (o >= oend)) throw new Exception();
+                                output[o++] = bs.ReadByte();
+                            }
+                            bs.Fix();
+                        }
+                        if (--chCount <= 0) break;
+
+                        var posn = dist.Read(bs);
+                        if (posn == -1) throw new Exception();
+                        length = len.Read(bs);
+                        if (length == -1) throw new Exception();
+
+                        posn += 1;
+                        length += 2;
+                        while (length-- != 0)
+                        {
+                            //if (((o - posn) > oend) || (o > oend)) throw new Exception();
+                            output[o] = output[o - posn];
+                            o++;
+                        }
+                    }
+                }
                 return output;
             }
         }
@@ -117,111 +174,54 @@ namespace GameX.Bullfrog.Formats
 
         #endregion
 
+        #region RncCrc16
+
+        public unsafe static class RncCrc16
+        {
+            static ushort[] crctab = makeCrcTable();
+
+            static ushort[] makeCrcTable()
+            {
+                ushort val;
+                var r = new ushort[256];
+                for (ushort i = 0; i < 256; i++)
+                {
+                    val = i;
+                    for (var j = 0; j < 8; j++)
+                        val = (val & 1) != 0
+                            ? (ushort)((val >> 1) ^ 0xA001)
+                            : (ushort)(val >> 1);
+                    r[i] = val;
+                }
+                return r;
+            }
+
+            // Calculate a CRC, the RNC way
+            public static int Compute(byte[] data)
+            {
+                var len = data.Length;
+                fixed (byte* _ = data)
+                {
+                    var p = _;
+                    ushort val = 0;
+                    while (len-- != 0)
+                    {
+                        val ^= *p++;
+                        val = (ushort)((val >> 8) ^ crctab[val & 0xFF]);
+                    }
+                    return val;
+                }
+            }
+        }
+
+        #endregion
+
         public static byte[] Read(BinaryReader r)
         {
             var header = r.ReadS<RNC_Header>();
             if (header.Signature == RNC_MAGIC) return header.Unpack(r);
             r.BaseStream.Position = 0;
             return r.ReadToEnd();
-        }
-
-        static byte[] Unpack(byte[] input, int unpackedSize)
-        {
-            var output = new byte[unpackedSize];
-
-            var bs = new BitStream(input);
-            bs.Advance(2); // discard first two bits
-
-            int o = 0;
-            int oend = output.Length;
-
-            // Process chunks
-            var raw = new HufTable();
-            var dist = new HufTable();
-            var len = new HufTable();
-            while (o < oend)
-            {
-                uint chCount;
-                if (bs.Remain < 6) throw new Exception();
-
-                raw.ReadTable(bs);
-                dist.ReadTable(bs);
-                len.ReadTable(bs);
-                chCount = bs.Read(0xFFFF, 16);
-
-                while (true)
-                {
-                    var length = raw.Read(bs);
-                    if (length == -1) throw new Exception();
-                    else if (length != 0)
-                    {
-                        while (length-- != 0)
-                        {
-                            //if (bs.Remain <= 0 || (o >= oend)) throw new Exception();
-                            output[o++] = bs.ReadByte();
-                        }
-                        bs.Fix();
-                    }
-                    if (--chCount <= 0) break;
-
-                    var posn = dist.Read(bs);
-                    if (posn == -1) throw new Exception();
-                    length = len.Read(bs);
-                    if (length == -1) throw new Exception();
-
-                    posn += 1;
-                    length += 2;
-                    while (length-- != 0)
-                    {
-                        //if (((o - posn) > oend) || (o > oend)) throw new Exception();
-                        output[o] = output[o - posn];
-                        o++;
-                    }
-                }
-            }
-            return output;
-        }
-    }
-
-    #endregion
-
-    #region RncCrc16
-
-    public unsafe static class RncCrc16
-    {
-        static ushort[] crctab = makeCrcTable();
-
-        static ushort[] makeCrcTable()
-        {
-            ushort val;
-            var r = new ushort[256];
-            for (ushort i = 0; i < 256; i++)
-            {
-                val = i;
-                for (var j = 0; j < 8; j++)
-                    val = (val & 1) != 0
-                        ? (ushort)((val >> 1) ^ 0xA001)
-                        : (ushort)(val >> 1);
-                r[i] = val;
-            }
-            return r;
-        }
-
-        // Calculate a CRC, the RNC way
-        public static int Compute(byte[] data)
-        {
-            var len = data.Length;
-            fixed (byte* _ = data)
-            {
-                var p = _;
-                ushort val = 0;
-                while (len-- != 0)
-                {
-                    val ^= *p++;
-                    val = (ushort)((val >> 8) ^ crctab[val & 0xFF]);
-                }
-                return val;
-            }
         }
     }
 

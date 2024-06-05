@@ -18,7 +18,7 @@ namespace GameX.Black.Formats
         #region Header
         // https://falloutmods.fandom.com/wiki/RIX_File_Format
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct Header
         {
             public uint Magic;                      // RIX3 - the file signature 

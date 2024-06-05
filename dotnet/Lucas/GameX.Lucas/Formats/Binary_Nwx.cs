@@ -17,7 +17,7 @@ namespace GameX.Lucas.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Nwx(r, f, s));
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct X_Header
         {
             public static (string, int) Struct = ("<3I2F3I", sizeof(X_Header));
@@ -31,7 +31,7 @@ namespace GameX.Lucas.Formats
             public uint ChoreographyTableOffset;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct X_CellHeader
         {
             public static (string, int) Struct = ("<3I", sizeof(X_CellHeader));
@@ -40,7 +40,7 @@ namespace GameX.Lucas.Formats
             public uint TableSize;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct X_Cell
         {
             public static (string, int) Struct = ("<5I", sizeof(X_Cell));

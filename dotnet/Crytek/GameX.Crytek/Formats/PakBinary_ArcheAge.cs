@@ -18,7 +18,7 @@ namespace GameX.Crytek.Formats
 
         const uint AA_MAGIC = 0x4f424957; // Magic for Archeage, the literal string "WIBO".
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct AA_Header
         {
             public uint Magic;

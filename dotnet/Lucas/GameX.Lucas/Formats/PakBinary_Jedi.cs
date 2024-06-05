@@ -10,7 +10,7 @@ namespace GameX.Lucas.Formats
     {
         #region GOB
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct GOB_Header
         {
             public static (string, int) Struct = ("<2I", sizeof(GOB_Header));
@@ -18,7 +18,7 @@ namespace GameX.Lucas.Formats
             public uint EntryOffset;        // Offset to GOB_Entry
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct GOB_Entry
         {
             public static (string, int) Struct = ("<2I13s", sizeof(GOB_Entry));
@@ -31,7 +31,7 @@ namespace GameX.Lucas.Formats
 
         #region LFD
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct LFD_Entry
         {
             public static (string, int) Struct = ("<I8sI", sizeof(LFD_Entry));
@@ -44,7 +44,7 @@ namespace GameX.Lucas.Formats
 
         #region LAB
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct LAB_Header
         {
             public static (string, int) Struct = ("<4I", sizeof(LAB_Header));
@@ -54,7 +54,7 @@ namespace GameX.Lucas.Formats
             public uint NameTableLength;    // Length including null bytes of the filename list/string
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct LAB_Entry
         {
             public static (string, int) Struct = ("<4I", sizeof(LAB_Entry));

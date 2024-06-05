@@ -18,7 +18,7 @@ namespace GameX.Black.Formats
         #region Header
         // https://falloutmods.fandom.com/wiki/FRM_File_Format
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public unsafe struct FrmHeader
         {
             //internal static string Endian = "B4B2B2B2B2B2B2B2B2B2B2B2B2B2B2B2B4B4B4B4B4B4B4";
@@ -33,7 +33,7 @@ namespace GameX.Black.Formats
             public uint SizeOfFrame;                        // Size of frame data
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public unsafe struct FrmFrame
         {
             //internal static string Endian = "B2B2B4B2B2";

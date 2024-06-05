@@ -27,7 +27,7 @@
       "name": "Populous",
       "url": "https://en.wikipedia.org/wiki/Populous_(video_game)",
       "date": "April 1, 1989",
-      "pakExt": "dir.vpk",
+      "pakExt": ".dat",
       "path": "DATA"
     },
     "Flood": {
@@ -53,8 +53,11 @@
       "name": "Populous II: Trials of the Olympian Gods",
       "url": "https://en.wikipedia.org/wiki/Populous_II:_Trials_of_the_Olympian_Gods",
       "date": "November 1, 1991",
-      "pakExt": "dir.vpk",
-      "path": ["DATA", "SOUND"]
+      "pakExt": ".dat",
+      "pathx": [
+        "DATA",
+        "SOUND"
+      ]
     },
     "PS": {
       "n/a": true,
@@ -67,7 +70,16 @@
       "name": "Syndicate",
       "url": "https://en.wikipedia.org/wiki/Syndicate_(1993_video_game)",
       "date": "June 6, 1993",
-      "pakExt": ".xyz"
+      "pakExtx": ".xyz",
+      "editions": {
+        "": {
+          "name": "Original",
+          "path": "SYNDICAT"
+        },
+        "plus": {
+          "name": "Plus"
+        }
+      }
     },
     "MC": {
       "name": "Magic Carpet",
@@ -112,7 +124,7 @@
       "date": "October 31, 1996",
       "pakExt": ".xyz"
     },
-    "T:H": {
+    "TH": {
       "name": "Theme Hospital",
       "url": "https://en.wikipedia.org/wiki/Theme_Hospital",
       "date": "March 28, 1997"
@@ -121,15 +133,21 @@
       "name": "Dungeon Keeper",
       "url": "https://en.wikipedia.org/wiki/Dungeon_Keeper",
       "date": "26 June 1997",
-      "pakExt": [".dat", ".jty"]
+      "pakExt": [
+        ".dat",
+        ".jty"
+      ]
     },
     "P3": {
       "name": "Populous: The Beginning",
       "url": "https://en.wikipedia.org/wiki/Populous:_The_Beginning",
       "date": "November 30, 1998",
-      "pakExt": [".dat", ".spr"]
+      "pakExt": [
+        ".dat",
+        ".spr"
+      ]
     },
-    "T:A": {
+    "TA": {
       "n/a": true,
       "name": "Theme Aquarium",
       "url": "https://en.wikipedia.org/wiki/Theme_Aquarium",
@@ -139,7 +157,10 @@
       "name": "Dungeon Keeper 2",
       "url": "https://en.wikipedia.org/wiki/Dungeon_Keeper_2",
       "date": "July 7, 1999",
-      "pakExt": [".dat", ".spr"]
+      "pakExt": [
+        ".dat",
+        ".spr"
+      ]
     },
     "TP:W": {
       "n/a": true,
@@ -167,38 +188,47 @@
         "dir": "Populous 2"
       },
       "S": {
-        "key": "GOG:0",
-        "reg": "GOG.com/Games/0",
-        "dir": "Syndicate"
+        "key": "GOG:1207658992",
+        "reg": "GOG.com/Games/1207658992",
+        "dir": "Syndicate Plus"
       },
       "MC": {
-        "key": "GOG:0",
-        "reg": "GOG.com/Games/0",
-        "dir": "Magic Carpet"
+        "key": "GOG:1207658935",
+        "reg": "GOG.com/Games/1207658935",
+        "dir": "Magic Carpet Plus",
+        "path": "CARPET.CD"
       },
       "TP": {
-        "key": "GOG:0",
-        "reg": "GOG.com/Games/0",
+        "key": "GOG:1207660423",
+        "reg": "GOG.com/Games/1207660423",
         "dir": "Theme Park"
       },
       "MC2": {
-        "key": "GOG:0",
-        "reg": "GOG.com/Games/0",
-        "dir": "Magic Carpet 2"
+        "key": "GOG:1207659187",
+        "reg": "GOG.com/Games/1207659187",
+        "dir": "Magic Carpet 2",
+        "path": "GAME/NETHERW"
       },
       "S2": {
-        "key": "GOG:0",
-        "reg": "GOG.com/Games/0",
-        "dir": "Syndicate Wars"
+        "key": "GOG:1207659193",
+        "reg": "GOG.com/Games/1207659193",
+        "dir": "Syndicate Wars",
+        "path": "SWARS"
       },
-      "T:H": {
-        "key": "GOG:0",
-        "reg": "GOG.com/Games/0",
+      "TH": {
+        "key": "GOG:1207659026",
+        "reg": "GOG.com/Games/1207659026",
         "dir": "Theme Hospital"
       },
       "DK": {
-        "key": "Steam:1996630",
-        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 1996630",
+        "key": [
+          "Steam:1996630",
+          "GOG:1207658934"
+        ],
+        "reg": [
+          "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 1996630",
+          "GOG.com/Games/1207658934"
+        ],
         "dir": "Dungeon Keeper"
       },
       "P3": {

@@ -22,18 +22,6 @@ namespace GameX
                 yield break;
             }
             foreach (var file in fileSystem.Glob(path, searchPattern)) yield return file;
-            //// folder
-            //var directoryPattern = Path.GetDirectoryName(searchPattern);
-            //if (directoryPattern.Contains('*'))
-            //{
-            //    foreach (var directory in fileSystem.GetDirectories(path, directoryPattern, directoryPattern.Contains("**")))
-            //        foreach (var found in fileSystem.FindPaths(directory, Path.GetFileName(directoryPattern)))
-            //            yield return found;
-            //    searchPattern = Path.GetFileName(searchPattern);
-            //}
-            //// file
-            //if (!searchPattern.Contains('*')) yield return fileSystem.GetFile(Path.Combine(path, searchPattern));
-            //else foreach (var file in fileSystem.GetFiles(path, searchPattern)) yield return file;
         }
     }
 }

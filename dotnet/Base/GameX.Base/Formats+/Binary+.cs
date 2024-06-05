@@ -1,5 +1,7 @@
 using GameX.Meta;
 using GameX.Platforms;
+using MathNet.Numerics.Distributions;
+using MathNet.Numerics.LinearAlgebra.Factorization;
 using OpenStack.Graphics;
 using OpenStack.Graphics.DirectX;
 using System;
@@ -8,14 +10,12 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
-using static Compression.Doboz.DobozDecoder;
-using static GameX.Formats.Unknown.IUnknownTexture;
-using static OpenStack.Graphics.GXColor;
+using static GameX.Formats.Binary_Iif;
+using static OpenStack.Debug;
 
 namespace GameX.Formats
 {
@@ -191,7 +191,7 @@ namespace GameX.Formats
 
         #region BMP
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct BmpHeader
         {
             public static (string, int) Struct = ("<H3i", sizeof(BmpHeader));
@@ -202,7 +202,7 @@ namespace GameX.Formats
             public BmpInfoHeader Info;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct BmpInfoHeader
         {
             public static (string, int) Struct = ("<3I2H6I", sizeof(BmpInfoHeader));
@@ -320,7 +320,7 @@ namespace GameX.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pcx(r, f));
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_Header
         {
             public static (string, int) Struct = ("<4B6H48c2B4H54c", sizeof(X_Header));
@@ -532,9 +532,9 @@ namespace GameX.Formats
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Snd(r, (int)f.FileSize, null));
         public static Task<object> Factory_Wav(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Snd(r, (int)f.FileSize, ".wav"));
 
-        #region WAV
+        #region Header
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct WavHeader
         {
             public const int RIFF = 0x46464952;
@@ -545,7 +545,7 @@ namespace GameX.Formats
             public uint Format;                 // 'WAVE'
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct WavFmt
         {
             public const int FMT_ = 0x20746d66;
@@ -560,7 +560,7 @@ namespace GameX.Formats
             public ushort BitsPerSample;          // Bits per sample
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct WavData
         {
             public const int DATA = 0x61746164;
@@ -661,7 +661,7 @@ namespace GameX.Formats
             public byte[] Pixels;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_Header
         {
             public static (string, int) Struct = ("<3x2Hx4H2x", sizeof(X_Header));
@@ -1031,6 +1031,451 @@ namespace GameX.Formats
                 new MetaInfo($"Height: {Height}"),
             })
         };
+    }
+
+    #endregion
+
+    #region Binary_Raw
+
+    public class Binary_Raw : IHaveMetaInfo, ITexture
+    {
+        public static Func<BinaryReader, FileSource, PakFile, Task<object>> FactoryMethod(Action<Binary_Raw, BinaryReader, FileSource> action, Func<string, string, Binary_Pal> palleteFunc)
+            => (BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Raw(r, s.Game, f, action, palleteFunc));
+
+        public struct Tag
+        {
+            public string Palette;
+            public int Width;
+            public int Height;
+        }
+
+        public Binary_Raw(BinaryReader r, FamilyGame game, FileSource source, Action<Binary_Raw, BinaryReader, FileSource> action, Func<string, string, Binary_Pal> palleteFunc)
+        {
+            game.Ensure();
+            Format = (
+                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGBA32,
+                TextureUnrealFormat.Unknown);
+            action(this, r, source);
+            Body ??= r.ReadToEnd();
+            if (source.Tag is Tag c)
+            {
+                Palette = c.Palette;
+                Width = c.Width;
+                Height = c.Height;
+            }
+            PaletteData = palleteFunc(game.Id, Palette).Records;
+        }
+
+        public byte[] Body;
+        byte[][] PaletteData;
+        public string Palette;
+        (object gl, object vulken, object unity, object unreal) Format;
+
+        public IDictionary<string, object> Data { get; } = null;
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int Depth { get; } = 0;
+        public int MipMaps { get; } = 1;
+        public TextureFlags Flags { get; } = 0;
+
+        /// <summary>
+        /// Set a color using palette index
+        /// </summary>
+        /// <param name="palette"></param>
+        /// <param name="pixels"></param>
+        /// <param name="pixel"></param>
+        /// <param name="color"></param>
+        //static void SetPixel(byte[][] palette, byte[] pixels, ref int pixel, int color)
+        //{
+        //    var record = palette[color];
+        //    pixels[pixel + 0] = record[0];
+        //    pixels[pixel + 1] = record[1];
+        //    pixels[pixel + 2] = record[2];
+        //    pixels[pixel + 3] = 255; // alpha channel
+        //    pixel += 4;
+        //}
+
+        public void Select(int id) { }
+        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        {
+            byte[] DecodeRaw() => Body.SelectMany(s => PaletteData[s]).ToArray();
+
+            var bytes = DecodeRaw();
+            format = (Platform.Type)platform switch
+            {
+                Platform.Type.OpenGL => Format.gl,
+                Platform.Type.Vulken => Format.vulken,
+                Platform.Type.Unity => Format.unity,
+                Platform.Type.Unreal => Format.unreal,
+                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
+            };
+            ranges = null;
+            return bytes;
+        }
+        public void End() { }
+
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
+            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new MetaInfo($"{nameof(Binary_Raw)}", items: new List<MetaInfo> {
+                new MetaInfo($"Palette: {Palette}"),
+                new MetaInfo($"Width: {Width}"),
+                new MetaInfo($"Height: {Height}"),
+            })
+        };
+    }
+
+    #endregion
+
+    #region Binary_Iif
+
+    // https://en.wikipedia.org/wiki/Interchange_File_Format
+    public unsafe class Binary_Iif : IHaveMetaInfo
+    {
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Iif(r, (int)f.FileSize));
+
+        #region Header
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct Chunk
+        {
+            public const uint FORM = 0x4d524f46;
+            public const uint CAT_ = 0x20544143;
+            public const uint XDIR = 0x52494458;
+            public const uint XMID = 0x44494d58;
+            public const uint INFO = 0x4f464e49;
+            public const uint TIMB = 0x424d4954;
+            public const uint EVNT = 0x544e5645;
+            public static (string, int) Struct = (">4xI", sizeof(Chunk));
+            public uint Id;        // 'FORM' | 'CAT '
+            public int Size;      // Size of the chunk
+            public int ActualSize => Size + (Size & 1);
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct TIMB
+        {
+            public static (string, int) Struct = ("<2x", sizeof(TIMB));
+            public byte PatchNumber;
+            public byte TimbreBank;
+        }
+
+        public class MidiEvent
+        {
+            public int Time;
+            public byte Status;
+            public byte Data0;
+            public byte Data1;
+            public int Length;
+            public byte[] Stream;
+            public MidiEvent Next;
+            public MidiEvent(int time) => Time = time;
+        }
+
+        public enum EV : byte
+        {
+            NOTE_OFF = 0x80,
+            NOTE_ON = 0x90,
+            POLY_PRESS = 0xa0,
+            CONTROL = 0xb0,
+            PROGRAM = 0xc0,
+            CHAN_PRESS = 0xd0,
+            PITCH = 0xe0,
+            SYSEX = 0xf0,
+            ESC = 0xf7, // SysEx event continuation
+            META = 0xff  // MetaEvent
+        }
+
+        enum EVT : byte
+        {
+            OUTPUT_CABLE = 0x21,
+            EOT = 0x2f, TRACK_END = EOT,
+            TEMPO = 0x51, SET_TEMPO = TEMPO,
+            TIME_SIG = 0x58,
+            KEYSIG = 0x59
+        }
+
+        #endregion
+
+        public Binary_Iif(BinaryReader r, int fileSize) => Read(r, fileSize);
+
+        public int Tracks;
+        public MidiEvent[] Events;
+        public short[] Timing;
+        public TIMB[][] Timbres;
+        public MidiEvent TheList;
+        int CurTrack; // used during load of multi-track XMI's (e.g. syngame.xmi)
+        MidiEvent CurEvent;
+        MidiEvent CurEventList;
+
+        public byte[] Data;
+
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
+            new MetaInfo(null, new MetaContent { Type = "AudioPlayer", Name = Path.GetFileName(file.Path), Value = new MemoryStream(Data), Tag = ".wav" }),
+        };
+
+        #region Read
+
+        void AllocData()
+        {
+            if (Events != null) return;
+            Events = new MidiEvent[Tracks];
+            Timing = new short[Tracks];
+            Timbres = new TIMB[Tracks][];
+        }
+
+        bool Read(BinaryReader r, int fileSize)
+        {
+            Tracks = 1; // default to 1 track, in case there is no XDIR chunk
+            do
+            {
+                var chunk = r.ReadS<Chunk>();
+                var position = r.BaseStream.Position;
+                var result = chunk.Id switch
+                {
+                    Chunk.FORM => HandleChunkFORM(r, chunk.Size),
+                    Chunk.CAT_ => HandleChunkCAT(r, chunk.Size),
+                    _ => false,
+                };
+                if (!result) return false; // something failed
+
+                // seek
+                var newPosition = position + chunk.ActualSize;
+                if (r.BaseStream.Position != newPosition) r.Seek(position + chunk.ActualSize);
+            } while (r.BaseStream.Position < fileSize);
+            return true;
+        }
+
+        bool HandleChunkFORM(BinaryReader r, int chunkSize)
+            => r.ReadUInt32() switch
+            {
+                Chunk.XDIR => HandleChunkXDIR(r, chunkSize - 4),
+                Chunk.XMID => HandleChunkXMID(r, chunkSize - 4),
+                _ => false,
+            };
+
+        bool HandleChunkCAT(BinaryReader r, int chunkSize)
+        {
+            var basePosition = r.BaseStream.Position;
+            do
+            {
+                var chunk = r.ReadS<Chunk>();
+                var position = r.BaseStream.Position;
+                if (chunk.Id == Chunk.XMID)
+                {
+                    r.Skip(-4); position -= 4;
+                    chunk.Size = (int)(chunkSize - (position - basePosition));
+                }
+                var result = chunk.Id switch
+                {
+                    Chunk.FORM => HandleChunkFORM(r, chunk.Size),
+                    Chunk.XMID => HandleChunkXMID(r, chunk.Size),
+                    _ => false,
+                };
+                if (!result) return false; // something failed
+
+                // seek
+                var newPosition = position + chunk.ActualSize;
+                if (r.BaseStream.Position != newPosition) r.Seek(position + chunk.ActualSize);
+            } while (r.BaseStream.Position < chunkSize);
+            return true;
+        }
+
+        bool HandleChunkXDIR(BinaryReader r, int chunkSize)
+        {
+            if (chunkSize != 10) return false;
+            var chunk = r.ReadS<Chunk>();
+            if (chunk.Size == Chunk.INFO || chunk.Size != 2) return false;
+            Tracks = r.ReadUInt16();
+            AllocData();
+            return true;
+        }
+
+        bool HandleChunkXMID(BinaryReader r, int chunkSize)
+        {
+            do
+            {
+                var chunk = r.ReadS<Chunk>();
+                var position = r.BaseStream.Position;
+                var result = chunk.Id switch
+                {
+                    Chunk.FORM => HandleChunkFORM(r, chunk.Size),
+                    Chunk.TIMB => HandleChunkTIMB(r, chunk.Size),
+                    Chunk.EVNT => HandleChunkEVNT(r, chunk.Size),
+                    _ => false,
+                };
+                if (!result) return false; // something failed
+
+                // seek
+                var newPosition = position + chunk.ActualSize;
+                if (r.BaseStream.Position != newPosition) r.Seek(position + chunk.ActualSize);
+            } while (r.BaseStream.Position < chunkSize);
+            return true;
+        }
+
+        bool HandleChunkTIMB(BinaryReader r, int chunkSize)
+        {
+            var numTimbres = r.ReadUInt16();
+            if ((numTimbres << 1) + 2 != chunkSize) return false;
+            Timbres[CurTrack] = r.ReadSArray<TIMB>(numTimbres);
+            return true;
+        }
+
+        bool HandleChunkEVNT(BinaryReader r, int chunkSize)
+        {
+            AllocData(); // precaution, in case XDIR wasn't found
+            CurEventList = null;
+            var timing = ReadEventList(r);
+            if (timing != 0) { Console.WriteLine("Unable to convert data\n"); return false; }
+            Timing[CurTrack] = timing;
+            Events[CurTrack] = CurEventList;
+            CurTrack++;
+            return true; // Return how many tracks were converted
+        }
+
+        MidiEvent CreateNewEvent(int time)
+        {
+            if (CurEventList == null) return CurEvent = CurEventList = new MidiEvent(time);
+            if (CurEvent.Time > time) CurEvent = CurEventList;
+            while (CurEvent.Next != null)
+            {
+                if (CurEvent.Next.Time > time) return CurEvent = CurEvent.Next = new MidiEvent(time) { Next = CurEvent.Next };
+                CurEvent = CurEvent.Next;
+            }
+            CurEvent.Next = new MidiEvent(time);
+            return CurEvent = CurEvent.Next;
+        }
+
+        void ConvertEvent(BinaryReader r, int time, byte status, int size)
+        {
+            var current = CreateNewEvent(time);
+            current.Status = status;
+            current.Data0 = r.ReadByte(); if (size == 1) return;
+            current.Data1 = r.ReadByte(); if (size == 2) return;
+            // save old
+            var prev = current;
+            GetVariableLengthQuantity(r, out var delta);
+            current = CreateNewEvent(time + delta * 3);
+            current.Status = status;
+            current.Data0 = prev.Data0;
+            current.Data1 = 0;
+            CurEvent = prev; // restore old
+        }
+
+        void ConvertSystemMessage(BinaryReader r, int time, byte status)
+        {
+            var current = CreateNewEvent(time);
+            current.Status = status;
+            // handling of Meta events
+            if ((EV)current.Status == EV.META) CurEvent.Data0 = r.ReadByte();
+            GetVariableLengthQuantity(r, out CurEvent.Length);
+            if (CurEvent.Length == 0) return;
+            CurEvent.Stream = r.ReadBytes(CurEvent.Length);
+        }
+
+        short ReadEventList(BinaryReader r)
+        {
+            var time = 0;
+            var tempo = 500000;
+            var tempoSet = false;
+            while (true)
+            {
+                var status = r.ReadByte();
+                Log($"{status:x}");
+                switch ((EV)(status & 0xF0))
+                {
+                    // Note On/Off
+                    case EV.NOTE_OFF: Log("ERROR: Note off not valid in XMidiFile\n"); return 0;
+                    case EV.NOTE_ON: ConvertEvent(r, time, status, 3); break;
+                    // 2 byte data, Aftertouch, Controller and Pitch Wheel
+                    case EV.POLY_PRESS:
+                    case EV.CONTROL:
+                    case EV.PITCH: ConvertEvent(r, time, status, 2); break;
+                    // 1 byte data, Program Change and Channel Pressure
+                    case EV.PROGRAM:
+                    case EV.CHAN_PRESS: ConvertEvent(r, time, status, 1); break;
+                    // SysEx
+                    case EV.SYSEX:
+                        if ((EV)status == EV.META)
+                        {
+                            var evt = (EVT)r.ReadByte();
+                            switch (evt)
+                            {
+                                case EVT.OUTPUT_CABLE: break;
+                                case EVT.TRACK_END: return (short)((tempo * 9) / 25000); ; // End Of Track
+                                case EVT.SET_TEMPO: if (!tempoSet) { tempoSet = true; r.Skip(1); tempo = r.ReadByte() << 16 | r.ReadByte() << 8 | r.ReadByte(); r.Skip(-4); } break; // Tempo. Need it for PPQN
+                                case EVT.TIME_SIG: break;
+                                case EVT.KEYSIG: break;
+                                default: break;
+                            }
+                            r.Skip(-1);
+                        }
+                        ConvertSystemMessage(r, time, status);
+                        break;
+                    default: // Delta T, also known as interval count
+                        r.Skip(-1);
+                        GetVariableLengthQuantity2(r, out var delta);
+                        time += delta * 3;
+                        break;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Write
+
+        #endregion
+
+        #region Utils
+
+        // Get the MIDI variable-length quantity. A string of 7-bits/byte, terminated by a byte not having MSB set
+        static void GetVariableLengthQuantity(BinaryReader r, out int value)
+        {
+            value = 0;
+            byte b;
+            for (var i = 0; i < 4; i++)
+            {
+                value <<= 7;
+                value |= (b = r.ReadByte()) & 0x7F;
+                if ((b & 0x80) == 0) break;
+            }
+        }
+
+        // Instead of treating consecutive delta/interval counts as separate counts, just sum them up until we hit a MIDI event.
+        static void GetVariableLengthQuantity2(BinaryReader r, out int value)
+        {
+            value = 0;
+            byte b;
+            for (var i = 0; i < 4 && ((b = r.ReadByte()) & 0x80) == 0; i++) value += b;
+            r.Skip(-1);
+        }
+
+        // Write a MIDI variable-length quantity (see getVlc) into 'stream'.
+        // Returns # of bytes used to store 'value'.
+        // Note: stream can be NULL (useful to count how much space a value would need)
+        static int PutVariableLengthQuantity(BinaryWriter w, int value)
+        {
+            var i = 1;
+            var buffer = value & 0x7F;
+            while ((value >>= 7) != 0)
+            {
+                buffer <<= 8;
+                buffer |= (value & 0x7F) | 0x80;
+                i++;
+            }
+            if (w == null) return i;
+            while (true)
+            {
+                w.Write(buffer & 0xFF);
+                if ((buffer & 0x80) != 0) buffer >>= 8;
+                else break;
+            }
+            return i;
+        }
+
+        #endregion
     }
 
     #endregion

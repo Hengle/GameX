@@ -12,7 +12,7 @@ namespace GameX.Arkane.Formats
     {
         #region Headers
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct V_File
         {
             //public static string Map = "B8B4B4B4B4B2";

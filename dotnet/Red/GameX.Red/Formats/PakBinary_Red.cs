@@ -35,7 +35,7 @@ namespace GameX.Red.Formats
         const uint BIFF_MAGIC = 0x46464942;
         const uint BIFF_VERSION = 0x312e3156;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct KEY_Header
         {
             public static (string, int) Struct = ("<8i32c", sizeof(KEY_Header));
@@ -50,7 +50,7 @@ namespace GameX.Red.Formats
             public fixed byte NotUsed02[32]; // Not used
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct KEY_HeaderFile
         {
             public static (string, int) Struct = ("<3i", sizeof(KEY_HeaderFile));
@@ -59,7 +59,7 @@ namespace GameX.Red.Formats
             public uint FileNameSize;       // Size of BIF name
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct KEY_HeaderKey
         {
             public static (string, int) Struct = ("<16sH2I", sizeof(KEY_HeaderKey));
@@ -70,7 +70,7 @@ namespace GameX.Red.Formats
             public uint Id => (Flags & 0xFFF00000) >> 20; // BIF index
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct BIFF_Header
         {
             public static (string, int) Struct = ("<4I", sizeof(BIFF_Header));
@@ -80,7 +80,7 @@ namespace GameX.Red.Formats
             public uint FilesOffset;        // Offset to RESOURCETABLE (0x14000000).
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct BIFF_HeaderFile
         {
             public static (string, int) Struct = ("<4I2H", sizeof(BIFF_HeaderFile));
@@ -231,7 +231,7 @@ namespace GameX.Red.Formats
         const uint DZIP_MAGIC = 0x50495a44;
         const uint DZIP_VERSION = 0x50495a44;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct DZIP_Header
         {
             public static (string, int) Struct = ("<3I2Q", sizeof(DZIP_Header));
@@ -242,7 +242,7 @@ namespace GameX.Red.Formats
             public ulong Hash;              //
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct DZIP_HeaderFile
         {
             public static (string, int) Struct = ("<4Q", sizeof(DZIP_HeaderFile));
@@ -260,7 +260,7 @@ namespace GameX.Red.Formats
 
         const uint BUNDLE_MAGIC = 0x41544f50; const uint BUNDLE_MAGIC2 = 0x30374f54; // POTATO70
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct BUNDLE_Header
         {
             public static (string, int) Struct = ("<3I", sizeof(BUNDLE_Header));
@@ -270,7 +270,7 @@ namespace GameX.Red.Formats
             public int NumFiles => (int)(DataPosition / sizeof(BUNDLE_HeaderFile));
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct BUNDLE_HeaderFile
         {
             public static (string, int) Struct = ("<256s16s4IQ16c2I", sizeof(BUNDLE_Header));
@@ -292,7 +292,7 @@ namespace GameX.Red.Formats
         #region Headers : CACHE:Texture
         // https://github.com/hhrhhr/Lua-utils-for-Witcher-3
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct CACHE_TEX_Header
         {
             public static (string, int) Struct = ("<5I", sizeof(CACHE_TEX_Header));
@@ -303,7 +303,7 @@ namespace GameX.Red.Formats
             public uint Unk2;               // const 6
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct CACHE_TEX_HeaderFile
         {
             public static (string, int) Struct = ("<6I4H4I2cH", sizeof(CACHE_TEX_Header));
@@ -335,7 +335,7 @@ namespace GameX.Red.Formats
 
         const uint CS3W_MAGIC = 0x57335343;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct CACHE_CS3W_Header
         {
             public static (string, int) Struct = ("<5Q", sizeof(CACHE_CS3W_Header));
@@ -346,7 +346,7 @@ namespace GameX.Red.Formats
             public ulong NameSize;          // Size of to Names
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct CACHE_CS3W_HeaderV1
         {
             public static (string, int) Struct = ("<Q4I", sizeof(CACHE_CS3W_HeaderV1));
@@ -366,7 +366,7 @@ namespace GameX.Red.Formats
             };
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct CS3W_HeaderFileV1
         {
             public static (string, int) Struct = ("<3I", sizeof(CS3W_HeaderFileV1));
@@ -375,7 +375,7 @@ namespace GameX.Red.Formats
             public uint Size;               // 
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct CS3W_HeaderFileV2
         {
             public static (string, int) Struct = ("<3Q", sizeof(CS3W_HeaderFileV2));
@@ -391,7 +391,7 @@ namespace GameX.Red.Formats
 
         const uint RDAR_MAGIC = 0x52414452; // RDAR
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct RDAR_Header
         {
             public static (string, int) Struct = ("<I4Q", sizeof(RDAR_Header));
@@ -402,7 +402,7 @@ namespace GameX.Red.Formats
             public ulong FileSize;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct RDAR_HeaderTable
         {
             public static (string, int) Struct = ("<2IQ3I", sizeof(RDAR_HeaderTable));
@@ -414,7 +414,7 @@ namespace GameX.Red.Formats
             public uint Table3Count;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct RDAR_HeaderFile
         {
             public static (string, int) Struct = ("<Qq5I20c", sizeof(RDAR_HeaderFile));
@@ -429,7 +429,7 @@ namespace GameX.Red.Formats
             public DateTime DateTimeConvert => System.DateTime.FromFileTime(DateTime);
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct RDAR_HeaderOffset
         {
             public static (string, int) Struct = ("<Q2I", sizeof(RDAR_HeaderOffset));
