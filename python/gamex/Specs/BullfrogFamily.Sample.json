@@ -41,6 +41,10 @@
         "type": "Music"
       },
       {
+        "path": "DATA/INTRO.XMI",
+        "type": "Music"
+      },
+      {
         "path": "DATA/SYNGAME.XMI",
         "type": "Music"
       },

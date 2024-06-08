@@ -1145,11 +1145,11 @@ namespace GameX.Unity.Formats
                             case ValueType.Int16:
                             case ValueType.UInt16: w.Write((ushort)MathX.SwapEndian((uint)(Value.AsInt() & 0xffff << 16), endian)); break;
                             case ValueType.Int32:
-                            case ValueType.UInt32: w.WriteE((uint)Value.AsInt(), endian); break;
+                            case ValueType.UInt32: w.WriteX((uint)Value.AsInt(), endian); break;
                             case ValueType.Int64:
-                            case ValueType.UInt64: w.WriteE((ulong)Value.AsInt64(), endian); break;
-                            case ValueType.Float: w.WriteE(Value.AsFloat(), endian); break;
-                            case ValueType.Double: w.WriteE(Value.AsDouble(), endian); break;
+                            case ValueType.UInt64: w.WriteX((ulong)Value.AsInt64(), endian); break;
+                            case ValueType.Float: w.WriteX(Value.AsFloat(), endian); break;
+                            case ValueType.Double: w.WriteX(Value.AsDouble(), endian); break;
                         }
                     else if (Value != null && Value.Type == ValueType.String)
                     {
@@ -1163,13 +1163,13 @@ namespace GameX.Unity.Formats
                         if (Value.Type == ValueType.ByteArray)
                         {
                             var bytes = Value.AsByteArray();
-                            w.WriteE(bytes.Length, endian);
+                            w.WriteX(bytes.Length, endian);
                             w.Write(bytes);
                         }
                         else
                         {
                             var curArrLen = Value.AsArray().Size;
-                            w.WriteE(curArrLen, endian);
+                            w.WriteX(curArrLen, endian);
                             for (var i = 0; i < curArrLen; i++) Children[i].Write(w, endian);
                         }
                         if (TemplateField.Children.Length == 1 && TemplateField.Children[0].Align) doPadding = true; //For special case: String overwritten with ByteArray value.
@@ -1647,17 +1647,17 @@ namespace GameX.Unity.Formats
                     w.WriteE(DecompressedSize);
                     w.WriteE((uint)Flags);
                     if (Signature == "UnityWeb" || Signature == "UnityRaw") w.Write((byte)0);
-                    if (FileVersion >= 7) w.WriteAlign(16);
+                    if (FileVersion >= 7) w.Align(16);
                 }
                 else if (FileVersion == 3)
                 {
                     w.WriteE(DataOffs);
                     w.WriteE(NumberOfAssetsToDownload);
-                    w.WriteL32EArray(Blocks3, (_, b, v) =>
+                    w.WriteL32FArray(Blocks3, (_, v) =>
                     {
                         _.WriteE(v.CompressedSize);
                         _.WriteE(v.DecompressedSize);
-                    });
+                    }, true);
                     if (FileVersion >= 2) w.WriteE((uint)FileSize);
                     if (FileVersion >= 3) w.WriteE(Unknown2);
                     w.WriteE(Unknown3);

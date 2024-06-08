@@ -6,6 +6,7 @@ using OpenStack.Graphics;
 using OpenStack.Graphics.DirectX;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -13,6 +14,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 using System.Threading.Tasks;
 using static GameX.Formats.Binary_Iif;
 using static OpenStack.Debug;
@@ -1225,13 +1227,20 @@ namespace GameX.Formats
             Timbres = new TIMB[Tracks][];
         }
 
+        StreamWriter F;
+        FileStream F2;
+
+        static string Str(uint v) => Encoding.ASCII.GetString(BitConverter.GetBytes(v));
+
         bool Read(BinaryReader r, int fileSize)
         {
+            F = File.CreateText("C:\\T_\\FROG\\Proj2.txt");
             Tracks = 1; // default to 1 track, in case there is no XDIR chunk
             do
             {
                 var chunk = r.ReadS<Chunk>();
                 var position = r.BaseStream.Position;
+                F.Write($"\nCHUNK: {Str(chunk.Id)}\n");
                 var result = chunk.Id switch
                 {
                     Chunk.FORM => HandleChunkFORM(r, chunk.Size),
@@ -1244,20 +1253,28 @@ namespace GameX.Formats
                 var newPosition = position + chunk.ActualSize;
                 if (r.BaseStream.Position != newPosition) r.Seek(position + chunk.ActualSize);
             } while (r.BaseStream.Position < fileSize);
+            F.Close();
+            
+            WriteAll();
+            Environment.Exit(0);
             return true;
         }
 
         bool HandleChunkFORM(BinaryReader r, int chunkSize)
-            => r.ReadUInt32() switch
+        {
+            F.Write($" FORM: {r.Peek(_ => Str(_.ReadUInt32()))}\n");
+            return r.ReadUInt32() switch
             {
                 Chunk.XDIR => HandleChunkXDIR(r, chunkSize - 4),
                 Chunk.XMID => HandleChunkXMID(r, chunkSize - 4),
                 _ => false,
             };
+        }
 
         bool HandleChunkCAT(BinaryReader r, int chunkSize)
         {
             var basePosition = r.BaseStream.Position;
+            var endPosition = r.BaseStream.Position + chunkSize;
             do
             {
                 var chunk = r.ReadS<Chunk>();
@@ -1267,6 +1284,7 @@ namespace GameX.Formats
                     r.Skip(-4); position -= 4;
                     chunk.Size = (int)(chunkSize - (position - basePosition));
                 }
+                F.Write($" CAT_: {Str(chunk.Id)}\n");
                 var result = chunk.Id switch
                 {
                     Chunk.FORM => HandleChunkFORM(r, chunk.Size),
@@ -1278,7 +1296,7 @@ namespace GameX.Formats
                 // seek
                 var newPosition = position + chunk.ActualSize;
                 if (r.BaseStream.Position != newPosition) r.Seek(position + chunk.ActualSize);
-            } while (r.BaseStream.Position < chunkSize);
+            } while (r.BaseStream.Position < endPosition);
             return true;
         }
 
@@ -1286,6 +1304,7 @@ namespace GameX.Formats
         {
             if (chunkSize != 10) return false;
             var chunk = r.ReadS<Chunk>();
+            F.Write($" XDIR: {Str(chunk.Id)}\n");
             if (chunk.Size == Chunk.INFO || chunk.Size != 2) return false;
             Tracks = r.ReadUInt16();
             AllocData();
@@ -1294,10 +1313,12 @@ namespace GameX.Formats
 
         bool HandleChunkXMID(BinaryReader r, int chunkSize)
         {
+            var endPosition = r.BaseStream.Position + chunkSize;
             do
             {
                 var chunk = r.ReadS<Chunk>();
                 var position = r.BaseStream.Position;
+                F.Write($" XMID: {Str(chunk.Id)}\n");
                 var result = chunk.Id switch
                 {
                     Chunk.FORM => HandleChunkFORM(r, chunk.Size),
@@ -1310,7 +1331,7 @@ namespace GameX.Formats
                 // seek
                 var newPosition = position + chunk.ActualSize;
                 if (r.BaseStream.Position != newPosition) r.Seek(position + chunk.ActualSize);
-            } while (r.BaseStream.Position < chunkSize);
+            } while (r.BaseStream.Position < endPosition);
             return true;
         }
 
@@ -1327,7 +1348,7 @@ namespace GameX.Formats
             AllocData(); // precaution, in case XDIR wasn't found
             CurEventList = null;
             var timing = ReadEventList(r);
-            if (timing != 0) { Console.WriteLine("Unable to convert data\n"); return false; }
+            if (timing == 0) { Log("Unable to convert data\n"); return false; }
             Timing[CurTrack] = timing;
             Events[CurTrack] = CurEventList;
             CurTrack++;
@@ -1382,7 +1403,7 @@ namespace GameX.Formats
             while (true)
             {
                 var status = r.ReadByte();
-                Log($"{status:x}");
+                F.Write($"  {status:x}\n");
                 switch ((EV)(status & 0xF0))
                 {
                     // Note On/Off
@@ -1425,6 +1446,86 @@ namespace GameX.Formats
         #endregion
 
         #region Write
+
+        public void WriteAll()
+        {
+            for (var i = 0; i < Tracks; i++)
+            {
+                F2 = File.Create($"C:\\T_\\FROG\\INTRO2-{i}.mid");
+                var w = new BinaryWriter(F2);
+                WriteMidi(w, i);
+                F2.Close();
+            }
+        }
+
+        bool WriteMidi(BinaryWriter w, int track)
+        {
+            const uint MIDI_MThd = 0x6468544d;
+            if (Events == null || track > Tracks) return false;
+
+            // write header
+            w.Write(MIDI_MThd);
+            w.WriteE(6);
+            w.WriteE((short)0);
+            w.WriteE((short)1);
+            w.Write(Timing[track]);
+
+            // write tracks
+            return WriteMidiMTrk(w, Events[track]);
+        }
+
+        bool WriteMidiMTrk(BinaryWriter w, MidiEvent evnts)
+        {
+            const uint MIDI_MTrk = 0x6b72544d;
+            const byte XMIDI_CONTROLLER_NEXT_BREAK = 117;
+
+            int delta, time = 0;
+            byte lastStatus = 0;
+
+            // This is set true to make the song end when an XMidiFile break is hit.
+            var sshockBreak = false;
+            w.Write(MIDI_MTrk);
+            for (var evnt = evnts; evnt != null; evnt = evnt.Next)
+            {
+                // If sshock_break is set, the delta is only 0
+                delta = sshockBreak ? 0 : evnt.Time - time;
+                time = evnt.Time;
+
+                // write delta
+                PutVariableLengthQuantity(w, delta);
+
+                // write status
+                if ((evnt.Status != lastStatus) || (evnt.Status >= (byte)EV.SYSEX)) w.Write(evnt.Status);
+
+                // write event
+                lastStatus = evnt.Status;
+                switch ((EV)(evnt.Status & 0xF0))
+                {
+                    // 2 bytes data, Note off, Note on, Aftertouch and Pitch Wheel
+                    case EV.NOTE_OFF: // invalid in XMID
+                    case EV.NOTE_ON:
+                    case EV.POLY_PRESS:
+                    case EV.PITCH: w.Write(evnt.Data0); w.Write(evnt.Data1); break;
+                    // Controller, we need to catch XMIXI Breaks
+                    case EV.CONTROL:
+                        w.Write(evnt.Data0); w.Write(evnt.Data1);
+                        if (evnt.Data0 == XMIDI_CONTROLLER_NEXT_BREAK) sshockBreak = true; // XMidiFile Break
+                        break;
+                    // 1 bytes data, Program Change and Channel Pressure
+                    case EV.PROGRAM:
+                    case EV.CHAN_PRESS: w.Write(evnt.Data0); break;
+                    // Variable length, SysEx
+                    case EV.SYSEX:
+                        if (evnt.Status == (byte)EV.META) w.Write(evnt.Data0);
+                        PutVariableLengthQuantity(w, evnt.Length);
+                        if (evnt.Length != 0) w.Write(evnt.Stream);
+                        break;
+                    // Never occur
+                    default: Log("Not supposed to see this"); break;
+                }
+            }
+            return true;
+        }
 
         #endregion
 
