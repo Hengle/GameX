@@ -41,7 +41,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "FEAR": {
         "key": "Steam:21090",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 21090",

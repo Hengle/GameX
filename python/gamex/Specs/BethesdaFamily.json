@@ -133,7 +133,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "Morrowind": {
         "key": "Steam:22320",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 22320",

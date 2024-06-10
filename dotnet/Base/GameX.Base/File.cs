@@ -2,6 +2,7 @@
 using GameX.Platforms;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Win32;
+using SevenZip.Compression.LZMA;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,6 +70,11 @@ namespace GameX
         public readonly IDictionary<string, HashSet<string>> Ignores = new Dictionary<string, HashSet<string>>();
 
         /// <summary>
+        /// The virtuals
+        /// </summary>
+        public readonly IDictionary<string, IDictionary<string, byte[]>> Virtuals = new Dictionary<string, IDictionary<string, byte[]>>();
+
+        /// <summary>
         /// The filters
         /// </summary>
         public readonly IDictionary<string, IDictionary<string, string>> Filters = new Dictionary<string, IDictionary<string, string>>();
@@ -87,12 +93,12 @@ namespace GameX
         public FileManager(JsonElement elem)
         {
             // applications
-            if (elem.TryGetProperty("application", out var z))
+            if (elem.TryGetProperty("applications", out var z))
                 foreach (var prop in z.EnumerateObject())
                     if (!Paths.ContainsKey(prop.Name))
                         AddApplication(prop.Name, prop.Value);
             // direct
-            if (elem.TryGetProperty("direct", out z))
+            if (elem.TryGetProperty("directs", out z))
                 foreach (var prop in z.EnumerateObject())
                     if (prop.Value.TryGetProperty("path", out z))
                         foreach (var path in _listV(z))
@@ -101,6 +107,10 @@ namespace GameX
             if (elem.TryGetProperty("ignores", out z))
                 foreach (var prop in z.EnumerateObject())
                     AddIgnore(prop.Name, _list(prop.Value, "path"));
+            // virtuals
+            if (elem.TryGetProperty("virtuals", out z))
+                foreach (var prop in z.EnumerateObject())
+                    AddVirtual(prop.Name, prop.Value);
             // filters
             if (elem.TryGetProperty("filters", out z))
                 foreach (var prop in z.EnumerateObject())
@@ -115,7 +125,27 @@ namespace GameX
         {
             foreach (var s in source.Paths) Paths.Add(s.Key, s.Value);
             foreach (var s in source.Ignores) Ignores.Add(s.Key, s.Value);
+            foreach (var s in source.Virtuals) Virtuals.Add(s.Key, s.Value);
             foreach (var s in source.Filters) Filters.Add(s.Key, s.Value);
+        }
+
+        public static Func<string, bool> CreateMatcher(string searchPattern)
+        {
+            if (string.IsNullOrEmpty(searchPattern)) return x => true;
+            var wildcardCount = searchPattern.Count(x => x.Equals('*'));
+            if (wildcardCount <= 0) return x => x.Equals(searchPattern, StringComparison.CurrentCultureIgnoreCase);
+            else if (wildcardCount == 1)
+            {
+                var newPattern = searchPattern.Replace("*", "");
+                if (searchPattern.StartsWith("*")) return x => x.EndsWith(newPattern, StringComparison.CurrentCultureIgnoreCase);
+                else if (searchPattern.EndsWith("*")) return x => x.StartsWith(newPattern, StringComparison.CurrentCultureIgnoreCase);
+            }
+            var regexPattern = $"^{Regex.Escape(searchPattern).Replace("\\*", ".*")}$";
+            return x =>
+            {
+                try { return Regex.IsMatch(x, regexPattern); }
+                catch { return false; }
+            };
         }
 
         #region Parse File-Manager
@@ -148,6 +178,13 @@ namespace GameX
         {
             if (!Ignores.TryGetValue(id, out var z2)) Ignores.Add(id, z2 = new HashSet<string>());
             foreach (var v in paths) z2.Add(v);
+        }
+
+        protected void AddVirtual(string id, JsonElement elem)
+        {
+            if (!Virtuals.TryGetValue(id, out var z2)) Virtuals.Add(id, z2 = new Dictionary<string, byte[]>());
+            foreach (var z in elem.EnumerateObject())
+                z2.Add(z.Name, z.Value.ValueKind == JsonValueKind.String ? Convert.FromBase64String(z.Value.GetString()) : null);
         }
 
         protected void AddPath(string id, JsonElement elem, string path)
@@ -246,118 +283,6 @@ namespace GameX
 
     #endregion
 
-    #region StandardFileSystem
-
-    /// <summary>
-    /// StandardFileSystem
-    /// </summary>
-    internal class StandardFileSystem : IFileSystem
-    {
-        readonly string Root;
-        readonly int Skip;
-        public StandardFileSystem(string root) { Root = root; Skip = Root.Length + 1; }
-        public IEnumerable<string> Glob(string path, string searchPattern)
-        {
-            var matcher = new Matcher();
-            matcher.AddIncludePatterns(new[] { string.IsNullOrEmpty(searchPattern) ? "**/*" : searchPattern });
-            //var skip = Skip + path.Length + 1;
-            return matcher.GetResultsInFullPath(Path.Combine(Root, path)).Select(x => x[Skip..]);
-        }
-        public bool FileExists(string path) => File.Exists(Path.Combine(Root, path));
-        public (string path, long length) FileInfo(string path) => File.Exists(path = Path.Combine(Root, path)) ? (path[Skip..], new FileInfo(Path.Combine(Root, path)).Length) : (null, 0);
-        public BinaryReader OpenReader(string path) => new BinaryReader(File.Open(Path.Combine(Root, path), FileMode.Open, FileAccess.Read, FileShare.Read));
-        public BinaryWriter OpenWriter(string path) => new BinaryWriter(File.Open(Path.Combine(Root, path), FileMode.Open, FileAccess.Write, FileShare.Write));
-
-        public static Func<string, bool> CreateMatcher(string searchPattern)
-        {
-            if (string.IsNullOrEmpty(searchPattern)) return x => true;
-            var wildcardCount = searchPattern.Count(x => x.Equals('*'));
-            if (wildcardCount <= 0) return x => x.Equals(searchPattern, StringComparison.CurrentCultureIgnoreCase);
-            else if (wildcardCount == 1)
-            {
-                var newPattern = searchPattern.Replace("*", "");
-                if (searchPattern.StartsWith("*")) return x => x.EndsWith(newPattern, StringComparison.CurrentCultureIgnoreCase);
-                else if (searchPattern.EndsWith("*")) return x => x.StartsWith(newPattern, StringComparison.CurrentCultureIgnoreCase);
-            }
-            var regexPattern = string.Concat("^", Regex.Escape(searchPattern).Replace("\\*", ".*"), "$");
-            return x =>
-            {
-                try { return Regex.IsMatch(x, regexPattern); }
-                catch { return false; }
-            };
-        }
-    }
-
-    #endregion
-
-    #region ZipFileSystem
-
-    /// <summary>
-    /// ZipFileSystem
-    /// </summary>
-    internal class ZipFileSystem : IFileSystem
-    {
-        readonly ZipArchive Pak;
-        readonly string Root;
-        public ZipFileSystem(string root, string path)
-        {
-            Pak = ZipFile.Open(root, ZipArchiveMode.Read);
-            Root = string.IsNullOrEmpty(path) ? string.Empty : $"{path}{Path.AltDirectorySeparatorChar}";
-        }
-        public IEnumerable<string> Glob(string path, string searchPattern)
-        {
-            var root = Path.Combine(Root, path);
-            var skip = root.Length;
-            var matcher = StandardFileSystem.CreateMatcher(searchPattern);
-            return Pak.Entries.Where(x =>
-            {
-                var fn = x.FullName;
-                return fn.Length > skip && fn.StartsWith(root) && matcher(fn[skip..]);
-            }).Select(x => x.FullName[skip..]);
-        }
-        public bool FileExists(string path) => Pak.GetEntry(Path.Combine(Root, path)) != null;
-        public (string path, long length) FileInfo(string path) { var e = Pak.GetEntry(Path.Combine(Root, path)); return e != null ? (e.Name, e.Length) : (null, 0); }
-        public BinaryReader OpenReader(string path) => new BinaryReader(Pak.GetEntry(Path.Combine(Root, path)).Open());
-        public BinaryWriter OpenWriter(string path) => throw new NotSupportedException();
-    }
-
-    //public static Func<string, bool> CreateMatcher(string root, string searchPattern)
-    //{
-    //    if (string.IsNullOrEmpty(root)) return CreateMatcher(searchPattern);
-    //    var matcher = CreateMatcher(searchPattern);
-    //    var skip = root.Length;
-    //    return x => x.StartsWith(root) && matcher(x[skip..]);
-    //}
-
-    #endregion
-
-    #region ZipIsoFileSystem
-
-    /// <summary>
-    /// ZipIsoFileSystem
-    /// </summary>
-    internal class ZipIsoFileSystem : IFileSystem
-    {
-        readonly ZipArchive Pak;
-        readonly string Path;
-        public ZipIsoFileSystem(string root, string path)
-        {
-            Pak = ZipFile.Open(root, ZipArchiveMode.Read);
-            Path = path;
-        }
-        public IEnumerable<string> Glob(string path, string searchPattern)
-        {
-            var matcher = StandardFileSystem.CreateMatcher(searchPattern);
-            return Pak.Entries.Where(x => matcher(x.Name)).Select(x => x.Name);
-        }
-        public bool FileExists(string path) => Pak.GetEntry(path) != null;
-        public (string path, long length) FileInfo(string path) { var e = Pak.GetEntry(path); return e != null ? (e.Name, e.Length) : (null, 0); }
-        public BinaryReader OpenReader(string path) => new BinaryReader(Pak.GetEntry(path).Open());
-        public BinaryWriter OpenWriter(string path) => throw new NotSupportedException();
-    }
-
-    #endregion
-
     #region HostFileSystem
 
     /// <summary>
@@ -397,6 +322,118 @@ namespace GameX
         public (string path, long length) FileInfo(string path) => File.Exists(path) ? (path, 0) : (null, 0);
         public BinaryReader OpenReader(string path) => null;
         public BinaryWriter OpenWriter(string path) => null;
+    }
+
+    #endregion
+
+    #region StandardFileSystem
+
+    /// <summary>
+    /// StandardFileSystem
+    /// </summary>
+    internal class StandardFileSystem : IFileSystem
+    {
+        readonly string Root;
+        readonly int Skip;
+        public StandardFileSystem(string root) { Root = root; Skip = Root.Length + 1; }
+        public IEnumerable<string> Glob(string path, string searchPattern)
+        {
+            var matcher = new Matcher();
+            matcher.AddIncludePatterns(new[] { string.IsNullOrEmpty(searchPattern) ? "**/*" : searchPattern });
+            //var skip = Skip + path.Length + 1;
+            return matcher.GetResultsInFullPath(Path.Combine(Root, path)).Select(x => x[Skip..]);
+        }
+        public bool FileExists(string path) => File.Exists(Path.Combine(Root, path));
+        public (string path, long length) FileInfo(string path) => File.Exists(path = Path.Combine(Root, path)) ? (path[Skip..], new FileInfo(Path.Combine(Root, path)).Length) : (null, 0);
+        public BinaryReader OpenReader(string path) => new BinaryReader(File.Open(Path.Combine(Root, path), FileMode.Open, FileAccess.Read, FileShare.Read));
+        public BinaryWriter OpenWriter(string path) => new BinaryWriter(File.Open(Path.Combine(Root, path), FileMode.Open, FileAccess.Write, FileShare.Write));
+    }
+
+    #endregion
+
+    #region VirtualFileSystem
+
+    /// <summary>
+    /// VirtualFileSystem
+    /// </summary>
+    internal class VirtualFileSystem : IFileSystem
+    {
+        readonly IFileSystem Base;
+        readonly IDictionary<string, byte[]> Virtuals;
+        public VirtualFileSystem(IFileSystem @base, IDictionary<string, byte[]> virtuals)
+        {
+            Base = @base;
+            Virtuals = virtuals;
+        }
+        public IEnumerable<string> Glob(string path, string searchPattern)
+        {
+            var matcher = FileManager.CreateMatcher(searchPattern);
+            return Virtuals.Keys.Where(matcher).Concat(Base.Glob(path, searchPattern));
+        }
+        public bool FileExists(string path) => Virtuals.ContainsKey(path) || Base.FileExists(path);
+        public (string path, long length) FileInfo(string path) => Virtuals.TryGetValue(path, out var z) ? (path, z != null ? z.Length : 0) : Base.FileInfo(path);
+        public BinaryReader OpenReader(string path) => Virtuals.TryGetValue(path, out var z) ? new BinaryReader(z != null ? new MemoryStream(z) : new MemoryStream()) : Base.OpenReader(path);
+        public BinaryWriter OpenWriter(string path) => throw new NotSupportedException();
+    }
+
+    #endregion
+
+    #region ZipFileSystem
+
+    /// <summary>
+    /// ZipFileSystem
+    /// </summary>
+    internal class ZipFileSystem : IFileSystem
+    {
+        readonly ZipArchive Pak;
+        readonly string Root;
+        public ZipFileSystem(string root, string path)
+        {
+            Pak = ZipFile.Open(root, ZipArchiveMode.Read);
+            Root = string.IsNullOrEmpty(path) ? string.Empty : $"{path}{Path.AltDirectorySeparatorChar}";
+        }
+        public IEnumerable<string> Glob(string path, string searchPattern)
+        {
+            var root = Path.Combine(Root, path);
+            var skip = root.Length;
+            var matcher = FileManager.CreateMatcher(searchPattern);
+            return Pak.Entries.Where(x =>
+            {
+                var fn = x.FullName;
+                return fn.Length > skip && fn.StartsWith(root) && matcher(fn[skip..]);
+            }).Select(x => x.FullName[skip..]);
+        }
+        public bool FileExists(string path) => Pak.GetEntry(Path.Combine(Root, path)) != null;
+        public (string path, long length) FileInfo(string path) { var e = Pak.GetEntry(Path.Combine(Root, path)); return e != null ? (e.Name, e.Length) : (null, 0); }
+        public BinaryReader OpenReader(string path) => new BinaryReader(Pak.GetEntry(Path.Combine(Root, path)).Open());
+        public BinaryWriter OpenWriter(string path) => throw new NotSupportedException();
+    }
+
+    #endregion
+
+    #region ZipIsoFileSystem
+
+    /// <summary>
+    /// ZipIsoFileSystem
+    /// </summary>
+    internal class ZipIsoFileSystem : IFileSystem
+    {
+        readonly ZipArchive Pak;
+        readonly string Path;
+        public ZipIsoFileSystem(string root, string path)
+        {
+            Pak = ZipFile.Open(root, ZipArchiveMode.Read);
+            Path = path;
+        }
+        public IEnumerable<string> Glob(string path, string searchPattern)
+        {
+            var matcher = FileManager.CreateMatcher(searchPattern);
+            return Pak.Entries.Where(x => matcher(x.Name)).Select(x => x.Name);
+        }
+        public bool FileExists(string path) => Pak.GetEntry(path) != null;
+        public (string path, long length) FileInfo(string path) { var e = Pak.GetEntry(path); return e != null ? (e.Name, e.Length) : (null, 0); }
+        public BinaryReader OpenReader(string path) => new BinaryReader(Pak.GetEntry(path).Open());
+        public BinaryWriter OpenWriter(string path) => throw new NotSupportedException();
     }
 
     #endregion

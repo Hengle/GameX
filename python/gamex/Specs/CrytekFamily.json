@@ -65,7 +65,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "ArcheAge": {
         "key": "Steam:304030",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 304030",

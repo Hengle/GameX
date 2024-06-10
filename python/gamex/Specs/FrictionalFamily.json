@@ -62,7 +62,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "P:O": {
         "key": "Steam:22180",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 22180",

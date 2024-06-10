@@ -909,7 +909,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "RE7:BH": {
         "key": "Steam:418370",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 418370",

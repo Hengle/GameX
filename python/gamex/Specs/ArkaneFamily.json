@@ -103,7 +103,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "AF": {
         "key": "GOG:1207658680",
         "reg": "GOG.com/Games/1207658680",

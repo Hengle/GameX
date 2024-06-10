@@ -18,7 +18,7 @@
     }
   },
   "fileManager": {
-    "direct": {
+    "directs": {
       "APP": {
         "path": "%AppPath%"
       },
@@ -26,6 +26,6 @@
         "path": "%AppPath%/catalogs"
       }
     },
-    "application": {}
+    "applications": {}
   }
 }

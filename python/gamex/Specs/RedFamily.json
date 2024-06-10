@@ -59,7 +59,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "Witcher": {
         "key": "GOG:1207658924",
         "reg": [

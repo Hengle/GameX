@@ -266,7 +266,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "LW": {
         "key": "Steam:447780",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 447780",

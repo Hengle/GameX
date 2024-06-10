@@ -636,7 +636,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "Okami:HD": {
         "key": "Steam:587620",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 587620",

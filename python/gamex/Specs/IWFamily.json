@@ -181,7 +181,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "COD": {
         "key": [
           "Steam:2620",

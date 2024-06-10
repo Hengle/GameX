@@ -557,7 +557,7 @@ namespace GameX
                         var files = FilesByPath[s.Replace('\\', '/')].ToArray();
                         if (files.Length == 1) return (this, files[0]);
                         Log($"ERROR.LoadFileData: {s} @ {files.Length}");
-                        if (throwOnError) throw new FileNotFoundException(files.Length == 0 ? s : $"More then one file found for {s}");
+                        if (throwOnError) throw new FileNotFoundException(files.Length == 0 ? $"File not found: {s}" : $"More then one file found: {s}");
                         return (null, null);
                     }
                 case int i:
@@ -565,7 +565,7 @@ namespace GameX
                         var files = FilesById[i].ToArray();
                         if (files.Length == 1) return (this, files[0]);
                         Log($"ERROR.LoadFileData: {i} @ {files.Length}");
-                        if (throwOnError) throw new FileNotFoundException(files.Length == 0 ? $"{i}" : $"More then one file found for {i}");
+                        if (throwOnError) throw new FileNotFoundException(files.Length == 0 ? $"File not found: {i}" : $"More then one file found: {i}");
                         return (null, null);
                     }
                 default: throw new ArgumentOutOfRangeException(nameof(path));

@@ -63,7 +63,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "Fallout": {
         "key": "Steam:38400",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 38400",

@@ -70,7 +70,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "AC": {
         "key": "Unknown:AC",
         "reg": "Thwargle Games/ThwargLauncher",

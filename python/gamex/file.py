@@ -1,4 +1,5 @@
-import os, pathlib, platform, psutil, winreg
+import os, re, pathlib, platform, psutil, winreg
+from typing import Callable
 from zipfile import ZipFile
 from openstk.poly import Reader, findType
 from . import store
@@ -26,6 +27,7 @@ class FileManager:
     filters: dict[str, object] = {}
     paths: dict[str, PathItem] = {}
     ignores: dict[str, object] = {}
+    virtuals: dict[str, object] = {}
 
     # get locale games
     gameRoots = [os.path.join(x.mountpoint, GAMESPATH) for x in psutil.disk_partitions()]
@@ -34,13 +36,13 @@ class FileManager:
 
     def __init__(self, elem: dict[str, object]):
         # applications
-        if 'application' in elem:
-            for k,v in elem['application'].items():
+        if 'applications' in elem:
+            for k,v in elem['applications'].items():
                 if not k in self.paths:
                     self.addApplication(k, v)
-        # direct
-        if 'direct' in elem:
-            for k,v in elem['direct'].items():
+        # directs
+        if 'directs' in elem:
+            for k,v in elem['directs'].items():
                 if 'path' in v:
                     for path in _list(v, 'path'):
                         self.addPath(k, elem, path)
@@ -49,18 +51,39 @@ class FileManager:
             for k,v in elem['ignores'].items():
                 self.addIgnore(k, _list(v, 'path'))
         # filters
+        if 'virtuals' in elem:
+            for k,v in elem['virtuals'].items():
+                self.addVirtual(k, v)
+        # filters
         if 'filters' in elem:
             for k,v in elem['filters'].items():
                 self.addFilter(k, v)
     def __repr__(self): return f'''
 - paths: {list(self.paths.keys()) if self.paths else None}
 - ignores: {list(self.ignores.keys()) if self.ignores else None}
+- virtuals: {list(self.virtuals.keys()) if self.virtuals else None}
 - filters: {list(self.filters.keys()) if self.filters else None}'''
 
     def merge(self, source: FileManager) -> None:
         self.paths.update(source.paths)
         self.ignores.update(source.ignores)
+        self.virtuals.update(source.virtuals)
         self.filters.update(source.filters)
+
+    @staticmethod
+    def createMatcher(searchPattern: str) -> Callable:
+        if not searchPattern: return lambda x: True
+        wildcardCount = searchPattern.count('*')
+        if wildcardCount <= 0: return lambda x: x.casefold() == searchPattern.casefold()
+        elif wildcardCount == 1:
+            newPattern = searchPattern.replace('*', '')
+            if searchPattern.startswith('*'): return lambda x: x.casefold().endswith(newPattern)
+            elif searchPattern.endswith('*'): return lambda x: x.casefold().startswith(newPattern)
+        regexPattern = f'^{re.escape(searchPattern).replace('\\*', '.*')}$'
+        def lambdaX(x: str):
+            try: return re.match(x, regexPattern)
+            except: return False
+        return lambdaX
 
     def addApplication(self, id: str, elem: dict[str, object]) -> None:
         if platform.system() == 'Windows' and 'reg' in elem:
@@ -86,6 +109,12 @@ class FileManager:
         if not id in self.ignores: self.ignores[id] = set()
         z2 = self.ignores[id]
         for v in paths: z2.add(v)
+
+    def addVirtual(self, id, elem: dict[str, object]) -> None:
+        if not id in self.virtuals: self.virtuals[id] = {}
+        z2 = self.virtuals[id]
+        for k, v in elem.items():
+            z2[k] = v
 
     def addPath(self, id: str, elem: dict[str, object], path: str) -> None:
         if not path: raise Exception('Require Path')
@@ -173,6 +202,14 @@ class IFileSystem:
             return
         for path in self.glob(path, searchPattern): yield path
 
+# HostFileSystem
+class HostFileSystem(IFileSystem):
+    def __init__(self, uri: str): self.uri = uri
+    def glob(self, path: str, searchPattern: str) -> list[str]: raise NotImplementedError()
+    def fileExists(self, path: str) -> bool: raise NotImplementedError()
+    def fileInfo(self, path: str) -> (str, int): raise NotImplementedError()
+    def openReader(self, path: str, mode: str = 'rb') -> Reader: raise NotImplementedError()
+
 # StandardFileSystem
 class StandardFileSystem(IFileSystem):
     def __init__(self, root: str): self.root = root; self.skip = len(root)
@@ -182,6 +219,18 @@ class StandardFileSystem(IFileSystem):
     def fileExists(self, path: str) -> bool: return os.path.exists(os.path.join(self.root, path))
     def fileInfo(self, path: str) -> (str, int): return (path, os.stat(path).st_size) if os.path.exists(path := os.path.join(self.root, path)) else (None, 0)
     def openReader(self, path: str, mode: str = 'rb') -> Reader: return Reader(open(os.path.join(self.root, path), mode))
+
+# VirtualFileSystem
+class VirtualFileSystem(IFileSystem):
+    def __init__(self, base: IFileSystem, virtuals: dict[str, object]):
+        self.base = base
+        self.virtuals = virtuals
+    def glob(self, path: str, searchPattern: str) -> list[str]:
+        matcher = FileManager.createMatcher(searchPattern)
+        return [x for x in self.virtuals.keys() if matcher(x)] + self.base.glob(path, searchPattern)
+    def fileExists(self, path: str) -> bool: return path in self.virtuals or self.base.fileExists(path)
+    def fileInfo(self, path: str) -> (str, int): return (path, x.size() if (x := self.virtuals[path]) else 0) if path in self.virtuals else self.base.fileInfo(path)
+    def openReader(self, path: str, mode: str = 'rb') -> Reader: return Reader(x if (x := self.virtuals[path]) else []) if path in self.virtuals else self.base.openReader(path)
 
 # ZipFileSystem
 class ZipFileSystem(IFileSystem):
@@ -208,13 +257,5 @@ class ZipIsoFileSystem(IFileSystem):
     def fileExists(self, path: str) -> bool: return self.pak.read(path) != None
     def fileInfo(self, path: str) -> (str, int): e = self.pak.read(path); return (e.name, e.length) if e else (None, 0)
     def openReader(self, path: str, mode: str = 'rb') -> Reader: return Reader(self.pak.read(path))
-
-# HostFileSystem
-class HostFileSystem(IFileSystem):
-    def __init__(self, uri: str): self.uri = uri
-    def glob(self, path: str, searchPattern: str) -> list[str]: raise NotImplementedError()
-    def fileExists(self, path: str) -> bool: raise NotImplementedError()
-    def fileInfo(self, path: str) -> (str, int): raise NotImplementedError()
-    def openReader(self, path: str, mode: str = 'rb') -> Reader: raise NotImplementedError()
 
 # end::FileSystem[]

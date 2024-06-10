@@ -310,7 +310,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "Q": {
         "key": "Steam:2310",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2310",

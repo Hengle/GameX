@@ -505,7 +505,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "SF:30AC": {
         "key": "Steam:586200",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 586200",

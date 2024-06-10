@@ -30,7 +30,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "TC": {
         "key": [
           "Steam:287630",

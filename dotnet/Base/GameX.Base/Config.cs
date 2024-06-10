@@ -138,7 +138,7 @@ namespace GameX
             //Game = "HOTS", // Heroes of the Storm
             //Game = "DI", // Diablo Immortal
             //Game = "OW2", // Overwatch 2
-            //Missing: Game = "D4", // Diablo IV
+            //Game = "D4", // Diablo IV
         };
 #elif Bullfrog
         static string[] FamilyKeys = new[] { "Bullfrog", "Unknown" };
@@ -352,7 +352,6 @@ namespace GameX
             //Game = "COD:BO3", // Call of Duty: Black Ops III - XPAC,FF
             //Game = "MW3", // Call of Duty: Modern Warfare 3
             //Game = "WWII", // Call of Duty: WWII
-
             Game = "BO4", // Call of Duty Black Ops 4
             //Game = "BOCW", // Call of Duty Black Ops Cold War
             //Game = "Vanguard", // Call of Duty Vanguard

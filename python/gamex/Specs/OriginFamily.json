@@ -449,7 +449,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "U8": {
         "key": "GOG:1207659015",
         "reg": "GOG.com/Games/1207659015",

@@ -233,18 +233,23 @@ namespace GameX
         /// <param name="fileSystemType">The fileSystemType.</param>
         /// <param name="path">The path.</param>
         /// <param name="subPath">The subPath.</param>
+        /// <param name="virtuals">The virtuals.</param>
         /// <param name="host">The host.</param>
         /// <returns></returns>
-        internal static IFileSystem CreateFileSystem(Type fileSystemType, PathItem path, string subPath, Uri host = null)
-            => host != null ? new HostFileSystem(host)
-            : fileSystemType != null ? (IFileSystem)Activator.CreateInstance(fileSystemType, path)
-            : path.Type switch
-            {
-                null => new StandardFileSystem(Path.Combine(path.Root, subPath ?? "", path.Paths.SingleOrDefault() ?? string.Empty)),
-                "zip" => new ZipFileSystem(Path.Combine(path.Root, subPath ?? ""), path.Paths.SingleOrDefault()),
-                "zip:iso" => new ZipIsoFileSystem(Path.Combine(path.Root, subPath ?? ""), path.Paths.SingleOrDefault()),
-                _ => throw new ArgumentOutOfRangeException(nameof(path.Type), $"Unknown {path.Type}")
-            };
+        internal static IFileSystem CreateFileSystem(Type fileSystemType, PathItem path, string subPath, IDictionary<string, byte[]> virtuals, Uri host = null)
+        {
+            var firstPath = path?.Paths.FirstOrDefault();
+            var system = host != null ? new HostFileSystem(host)
+                : fileSystemType != null ? (IFileSystem)Activator.CreateInstance(fileSystemType, path)
+                : path.Type switch
+                {
+                    null => new StandardFileSystem(Path.Combine(path.Root, subPath ?? "", firstPath ?? "")),
+                    "zip" => new ZipFileSystem(Path.Combine(path.Root, subPath ?? ""), firstPath),
+                    "zip:iso" => new ZipIsoFileSystem(Path.Combine(path.Root, subPath ?? ""), firstPath),
+                    _ => throw new ArgumentOutOfRangeException(nameof(path.Type), $"Unknown {path.Type}")
+                };
+            return virtuals == null ? system : new VirtualFileSystem(system, virtuals);
+        }
 
         #endregion
     }
@@ -618,13 +623,14 @@ namespace GameX
             if (uri == null || string.IsNullOrEmpty(uri.Fragment)) return new Resource { Game = new FamilyGame() };
             var game = GetGame(uri.Fragment[1..], out var edition);
             var searchPattern = uri.IsFile ? null : uri.LocalPath[1..];
+            var virtuals = FileManager.Virtuals.TryGetValue(game.Id, out var y) ? y : null;
             var paths = FileManager.Paths;
             var subPath = edition?.Path;
             var fileSystemType = game.FileSystemType;
             var fileSystem =
-                string.Equals(uri.Scheme, "game", StringComparison.OrdinalIgnoreCase) ? paths.TryGetValue(game.Id, out var z) ? CreateFileSystem(fileSystemType, z, subPath) : default
-                : uri.IsFile ? !string.IsNullOrEmpty(uri.LocalPath) ? CreateFileSystem(fileSystemType, new PathItem(uri.LocalPath, default), subPath) : default
-                : uri.Scheme.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? !string.IsNullOrEmpty(uri.Host) ? CreateFileSystem(fileSystemType, null, subPath, uri) : default
+                string.Equals(uri.Scheme, "game", StringComparison.OrdinalIgnoreCase) ? paths.TryGetValue(game.Id, out var z) ? CreateFileSystem(fileSystemType, z, subPath, virtuals) : default
+                : uri.IsFile ? !string.IsNullOrEmpty(uri.LocalPath) ? CreateFileSystem(fileSystemType, new PathItem(uri.LocalPath, default), subPath, virtuals) : default
+                : uri.Scheme.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? !string.IsNullOrEmpty(uri.Host) ? CreateFileSystem(fileSystemType, null, subPath, virtuals, uri) : default
                 : default;
             if (fileSystem == null)
                 if (throwOnError) throw new ArgumentOutOfRangeException(nameof(uri), $"{game.Id}: unable to resources");

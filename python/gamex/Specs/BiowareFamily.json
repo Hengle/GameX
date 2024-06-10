@@ -180,7 +180,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "SS": {
         "key": "GOG:1207658669",
         "reg": "GOG.com/Games/1207658669",

@@ -221,7 +221,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "CAS": {
         "key": "Steam:1515950",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 1515950",

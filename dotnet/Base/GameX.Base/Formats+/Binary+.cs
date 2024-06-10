@@ -1211,10 +1211,8 @@ namespace GameX.Formats
         MidiEvent CurEvent;
         MidiEvent CurEventList;
 
-        public byte[] Data;
-
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "AudioPlayer", Name = Path.GetFileName(file.Path), Value = new MemoryStream(Data), Tag = ".wav" }),
+            new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = this }),
         };
 
         #region Read
@@ -1227,20 +1225,19 @@ namespace GameX.Formats
             Timbres = new TIMB[Tracks][];
         }
 
-        StreamWriter F;
-        FileStream F2;
-
-        static string Str(uint v) => Encoding.ASCII.GetString(BitConverter.GetBytes(v));
+        //StreamWriter F;
+        //FileStream F2;
+        //static string Str(uint v) => Encoding.ASCII.GetString(BitConverter.GetBytes(v));
 
         bool Read(BinaryReader r, int fileSize)
         {
-            F = File.CreateText("C:\\T_\\FROG\\Proj2.txt");
+            //F = File.CreateText("C:\\T_\\FROG\\Proj2.txt");
             Tracks = 1; // default to 1 track, in case there is no XDIR chunk
             do
             {
                 var chunk = r.ReadS<Chunk>();
                 var position = r.BaseStream.Position;
-                F.Write($"\nCHUNK: {Str(chunk.Id)}\n");
+                //F.Write($"\nCHUNK: {Str(chunk.Id)}\n");
                 var result = chunk.Id switch
                 {
                     Chunk.FORM => HandleChunkFORM(r, chunk.Size),
@@ -1253,16 +1250,16 @@ namespace GameX.Formats
                 var newPosition = position + chunk.ActualSize;
                 if (r.BaseStream.Position != newPosition) r.Seek(position + chunk.ActualSize);
             } while (r.BaseStream.Position < fileSize);
-            F.Close();
-            
-            WriteAll();
-            Environment.Exit(0);
+            //F.Close();
+
+            //WriteAll();
+            //Environment.Exit(0);
             return true;
         }
 
         bool HandleChunkFORM(BinaryReader r, int chunkSize)
         {
-            F.Write($" FORM: {r.Peek(_ => Str(_.ReadUInt32()))}\n");
+            //F.Write($" FORM: {r.Peek(_ => Str(_.ReadUInt32()))}\n");
             return r.ReadUInt32() switch
             {
                 Chunk.XDIR => HandleChunkXDIR(r, chunkSize - 4),
@@ -1284,7 +1281,7 @@ namespace GameX.Formats
                     r.Skip(-4); position -= 4;
                     chunk.Size = (int)(chunkSize - (position - basePosition));
                 }
-                F.Write($" CAT_: {Str(chunk.Id)}\n");
+                //F.Write($" CAT_: {Str(chunk.Id)}\n");
                 var result = chunk.Id switch
                 {
                     Chunk.FORM => HandleChunkFORM(r, chunk.Size),
@@ -1304,7 +1301,7 @@ namespace GameX.Formats
         {
             if (chunkSize != 10) return false;
             var chunk = r.ReadS<Chunk>();
-            F.Write($" XDIR: {Str(chunk.Id)}\n");
+            //F.Write($" XDIR: {Str(chunk.Id)}\n");
             if (chunk.Size == Chunk.INFO || chunk.Size != 2) return false;
             Tracks = r.ReadUInt16();
             AllocData();
@@ -1318,7 +1315,7 @@ namespace GameX.Formats
             {
                 var chunk = r.ReadS<Chunk>();
                 var position = r.BaseStream.Position;
-                F.Write($" XMID: {Str(chunk.Id)}\n");
+                //F.Write($" XMID: {Str(chunk.Id)}\n");
                 var result = chunk.Id switch
                 {
                     Chunk.FORM => HandleChunkFORM(r, chunk.Size),
@@ -1403,7 +1400,7 @@ namespace GameX.Formats
             while (true)
             {
                 var status = r.ReadByte();
-                F.Write($"  {status:x}\n");
+                //F.Write($"  {status:x}\n");
                 switch ((EV)(status & 0xF0))
                 {
                     // Note On/Off
@@ -1451,10 +1448,10 @@ namespace GameX.Formats
         {
             for (var i = 0; i < Tracks; i++)
             {
-                F2 = File.Create($"C:\\T_\\FROG\\INTRO2-{i}.mid");
-                var w = new BinaryWriter(F2);
-                WriteMidi(w, i);
-                F2.Close();
+                //F2 = File.Create($"C:\\T_\\FROG\\SYNGAME2-{i}.mid");
+                //var w = new BinaryWriter(F2);
+                //WriteMidi(w, i);
+                //F2.Close();
             }
         }
 
@@ -1468,7 +1465,7 @@ namespace GameX.Formats
             w.WriteE(6);
             w.WriteE((short)0);
             w.WriteE((short)1);
-            w.Write(Timing[track]);
+            w.WriteE(Timing[track]);
 
             // write tracks
             return WriteMidiMTrk(w, Events[track]);
@@ -1485,6 +1482,8 @@ namespace GameX.Formats
             // This is set true to make the song end when an XMidiFile break is hit.
             var sshockBreak = false;
             w.Write(MIDI_MTrk);
+            var sizePosition = w.BaseStream.Position;
+            w.Write(0);
             for (var evnt = evnts; evnt != null; evnt = evnt.Next)
             {
                 // If sshock_break is set, the delta is only 0
@@ -1524,6 +1523,13 @@ namespace GameX.Formats
                     default: Log("Not supposed to see this"); break;
                 }
             }
+
+            // write size
+            var position = w.BaseStream.Position;
+            var size = position - sizePosition;
+            w.Seek(sizePosition);
+            w.WriteE((uint)size);
+            w.Seek(position);
             return true;
         }
 
@@ -1556,24 +1562,20 @@ namespace GameX.Formats
         // Write a MIDI variable-length quantity (see getVlc) into 'stream'.
         // Returns # of bytes used to store 'value'.
         // Note: stream can be NULL (useful to count how much space a value would need)
-        static int PutVariableLengthQuantity(BinaryWriter w, int value)
+        static void PutVariableLengthQuantity(BinaryWriter w, int value)
         {
-            var i = 1;
             var buffer = value & 0x7F;
             while ((value >>= 7) != 0)
             {
                 buffer <<= 8;
                 buffer |= (value & 0x7F) | 0x80;
-                i++;
             }
-            if (w == null) return i;
             while (true)
             {
-                w.Write(buffer & 0xFF);
+                w.Write((byte)(buffer & 0xFF));
                 if ((buffer & 0x80) != 0) buffer >>= 8;
                 else break;
             }
-            return i;
         }
 
         #endregion

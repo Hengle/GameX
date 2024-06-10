@@ -2326,7 +2326,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "PP": {
         "download": "https://www.myabandonware.com/download/hq-phm-pegasus",
         "type": "zip",

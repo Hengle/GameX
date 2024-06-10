@@ -155,13 +155,13 @@ class BinaryPakFile(PakFile):
                 files = self.filesByPath[s] if self.filesByPath and (s := s.replace('\\', '/')) in self.filesByPath else []
                 if len(files) == 1: return (self, files[0])
                 print(f'ERROR.LoadFileData: {s} @ {len(files)}')
-                if throwOnError: raise Exception(s if len(files) == 0 else f'More then one file found for {s}')
+                if throwOnError: raise Exception(f'File not found: {s}' if len(files) == 0 else f'More then one file found: {s}')
                 return (None, None)
             case i if isinstance(path, int):
                 files = self.filesById[i] if self.filesById and i in self.filesById else []
                 if len(files) == 1: return (self, files[0])
                 print(f'ERROR.LoadFileData: {i} @ {len(files)}')
-                if throwOnError: raise Exception(s if len(files) == 0 else f'More then one file found for {s}')
+                if throwOnError: raise Exception(f'File not found: {i}' if len(files) == 0 else f'More then one file found: {i}')
                 return (None, None)
             case _: raise Exception(f'Unknown: {path}')
 
@@ -210,8 +210,7 @@ class BinaryPakFile(PakFile):
     def _findPath(self, path: str) -> (object, str):
         paths = path.split(':', 2)
         p = paths[0].replace('\\', '/')
-        files = self.filesByPath[p] if self.filesByPath and p in self.filesByPath else None
-        first = next(iter(files), None)
+        first = next(iter(self.filesByPath[p]), None) if self.filesByPath and p in self.filesByPath else None
         pak = first.pak if first else None
         if pak: pak.open()
         return pak, (paths[1] if pak and len(paths) > 1 else None)
@@ -250,7 +249,6 @@ class ManyPakFile(BinaryPakFile):
             for s in self.paths]
 
     def readData(self, r: Reader, file: FileSource) -> BytesIO:
-        print(file.pak)
         return file.pak.readData(r, file) if file.pak else \
             BytesIO(self.fileSystem.openReader(file.path).read(file.fileSize))
     #endregion

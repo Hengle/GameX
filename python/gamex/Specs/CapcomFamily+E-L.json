@@ -516,7 +516,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "Flock": {
         "key": "Steam:21640",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 21640",

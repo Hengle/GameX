@@ -121,7 +121,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "UE1": {
         "key": "Unknown:UE1",
         "reg": "1234",

@@ -303,7 +303,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "SC": {
         "key": "Blizzard:s1",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/StarCraft",

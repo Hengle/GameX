@@ -5,7 +5,7 @@ from importlib import resources
 from openstk.poly import findType
 from gamex import familyKeys
 from gamex.pak import PakState, ManyPakFile, MultiPakFile
-from gamex.file import FileManager, StandardFileSystem, HostFileSystem
+from gamex.file import FileManager, HostFileSystem, StandardFileSystem, VirtualFileSystem
 from gamex.platform import Platform
 from .util import _throw, _value, _list, _method, _related, _dictTrim
 
@@ -90,17 +90,18 @@ def createFileManager(elem: dict[str, object]) -> FileManager:
 
 # create FileSystem
 @staticmethod
-def createFileSystem(fileSystemType: str, path: FileManager.PathItem, subPath: str, host: str = None) -> IFileSystem:
-    x = HostFileSystem(host) if host else \
+def createFileSystem(fileSystemType: str, path: FileManager.PathItem, subPath: str, virtuals: dict[str, object], host: str = None) -> IFileSystem:
+    firstPath = next(iter(path.paths), None) if path else None
+    system = HostFileSystem(host) if host else \
         findType(fileSystemType)(root) if fileSystemType else \
         None
-    if x: return x
-    firstPath = next(iter(path.paths), None)
-    match path.type:
-        case None: return StandardFileSystem(os.path.join(path.root, subPath or '', firstPath or ''))
-        case 'zip': return ZipFileSystem(os.path.join(path.root, subPath or ''), firstPath)
-        case 'zip:iso': return ZipIsoFileSystem(os.path.join(path.root, subPath or ''), firstPath)
-        case _: raise Exception(f'Unknown {path.type}')
+    if not system:
+        match path.type:
+            case None: system = StandardFileSystem(os.path.join(path.root, subPath or '', firstPath or ''))
+            case 'zip': system = ZipFileSystem(os.path.join(path.root, subPath or ''), firstPath)
+            case 'zip:iso': system = ZipIsoFileSystem(os.path.join(path.root, subPath or ''), firstPath)
+            case _: raise Exception(f'Unknown {path.type}')
+    return system if not virtuals else VirtualFileSystem(system, virtuals)
 
 # tag::Detector[]
 class Detector:
@@ -188,7 +189,7 @@ fileManager: {self.fileManager if self.fileManager else None}'''
         ids = id.rsplit('.', 1)
         gid = ids[0]; eid = ids[1] if len(ids) > 1 else ''
         game = _value(self.games, gid) or (throwOnError and _throw(f'Unknown game: {id}'))
-        edition = _value(self.games.editions, eid) if len(ids) > 1 else None
+        edition = _value(game.editions, eid)
         return (game, edition)
 
     # tag::Family.parseResource[]
@@ -198,13 +199,14 @@ fileManager: {self.fileManager if self.fileManager else None}'''
             return Resource(Game = FamilyGame(self, None, None, None))
         game, edition = self.getGame(uri.fragment)
         searchPattern = '' if uri.scheme == 'file' else uri.path[1:]
+        virtuals = self.fileManager.virtuals[game.id] if game.id in self.fileManager.virtuals else None
         paths = self.fileManager.paths
         subPath = edition.path if edition else None
         fileSystemType = game.fileSystemType
         fileSystem = \
-            (createFileSystem(fileSystemType, subPath, paths[game.id]) if game.id in paths and paths[game.id] else None) if uri.scheme == 'game' else \
-            (createFileSystem(fileSystemType, subPath, FileManager.PathItem(uri.path, None)) if uri.path else None) if uri.scheme == 'file' else \
-            (createFileSystem(fileSystemType, subPath, None, uri) if uri.netloc else None) if uri.scheme.startswith('http') else None
+            (createFileSystem(fileSystemType, paths[game.id], subPath, virtuals) if game.id in paths and paths[game.id] else None) if uri.scheme == 'game' else \
+            (createFileSystem(fileSystemType, FileManager.PathItem(uri.path, None), subPath, virtuals) if uri.path else None) if uri.scheme == 'file' else \
+            (createFileSystem(fileSystemType, None, subPath, virtuals, uri) if uri.netloc else None) if uri.scheme.startswith('http') else None
         if not fileSystem:
             if throwOnError: raise Exception(f'Not located: {game.id}')
             else: return None

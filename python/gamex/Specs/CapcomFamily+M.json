@@ -686,7 +686,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "MVC:I": {
         "key": "Steam:493840",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 493840",

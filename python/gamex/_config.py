@@ -1,5 +1,6 @@
 __title__ = "gamex"
 __version__ = "0.0.1"
+__current__ = "Bullfrog"
 
 class DefaultOptions:
     def __init__(self, Family:str=None, Game:str=None, Edition:str=None, ForcePath:str=None, ForceOpen:bool=False):
@@ -9,7 +10,7 @@ class DefaultOptions:
         self.ForcePath = ForcePath
         self.ForceOpen = ForceOpen
 
-match 'Arkane':
+match __current__:
     case 'Arkane':
         familyKeys = [ "Arkane", "Unknown" ]
 
@@ -46,7 +47,7 @@ match 'Arkane':
             # Game = "Fallout4VR", # Fallout 4 VR
             # Game = "SkyrimVR", # The Elder Scrolls V: Skyrim VR
             # Game = "Fallout76", # Fallout 76
-            # Game = "Starfield", # Starfield (future)
+            # Game = "Starfield", # Starfield
         )
     case 'Bioware':
         familyKeys = [ "Bioware", "Unknown" ]
@@ -102,7 +103,26 @@ match 'Arkane':
             # Game = "HOTS", # Heroes of the Storm
             # Game = "DI", # Diablo Immortal
             # Game = "OW2", # Overwatch 2
-            #Missing: Game = "D4", # Diablo IV
+            # Game = "D4", # Diablo IV
+        )
+    case 'Bullfrog':
+        familyKeys = [ "Bullfrog", "Unknown" ]
+
+        appDefaultOptions = DefaultOptions(
+            ForceOpen = True,
+            ForcePath = "sample:*",
+            Family = "Bullfrog",
+            # Game = "P", # Populous
+            # Game = "P2", # Populous II: Trials of the Olympian Gods
+            Game = "S", # Syndicate
+            # Game = "MC", # Magic Carpet
+            # Game = "TP", # Theme Park
+            # Game = "MC2", # Magic Carpet 2
+            # Game = "S2", # Syndicate Wars
+            # Game = "TH", # Theme Hospital
+            # Game = "DK", # Dungeon Keeper
+            # Game = "P3", # Populous: The Beginning
+            # Game = "DK2", # Dungeon Keeper 2
         )
     case 'Capcom':
         familyKeys = [ "Capcom", "Unknown" ]
@@ -112,6 +132,42 @@ match 'Arkane':
             ForcePath = "sample:*",
             Family = "Capcom",
             Game = "CAS", # [Kpka] Capcom Arcade Stadium
+            # Game = "Fighting:C", # [] Capcom Fighting Collection
+            # Game = "GNG:R", # Ghosts 'n Goblins Resurrection
+            # Game = "MM:LC", # Mega Man Legacy Collection
+            # Game = "MM:LC2", # Mega Man Legacy Collection 2
+            # Game = "MM:XD", # Mega Man X DiVE [Unity]
+            # Game = "MMZX:LC", # Mega Man Zero/ZX Legacy Collection
+            # Game = "MHR", # Monster Hunter Rise
+            # Game = "MH:S2", # Monster Hunter Stories 2: Wings of Ruin
+
+            # Game = "PWAA:T", # Phoenix Wright: Ace Attorney Trilogy
+            # Game = "RDR2", # Red Dead Redemption 2
+            # Game = "RER", # Resident Evil Resistance
+            # Game = "RE:RV", # Resident Evil Re:Verse
+
+            # Game = "Disney:AC", # The Disney Afternoon Collection
+            # Game = "TGAA:C", # The Great Ace Attorney Chronicles
+            # Game = "USF4", # Ultra Street Fighter IV
+
+            # Game = "BionicCommando", # Bionic Commando (2009 video game)
+            # Game = "BionicCommando:R", # Bionic Commando Rearmed
+            # Game = "Arcade:S", # Capcom Arcade 2nd Stadium
+            # Game = "BEU:B", # Capcom Beat 'Em Up Bundle
+            # Game = "DV", # Dark Void
+            # Game = "DV:Z", # Dark Void Zero
+            # Game = "DR", # Dead Rising
+            # Game = "DR2", # Dead Rising 2
+            # Game = "DR2:OtR", # Dead Rising 2: Off the Record
+            # Game = "DR3", # Dead Rising 3
+            # Game = "DR4", # Dead Rising 4
+            # Game = "DMC3:S", # XX
+            # Game = "DMC4:S", # XX
+            # Game = "DMC5", # XX
+            # Game = "DMC:HD", # XX
+            # Game = "DMC:DMC", # XX
+            # Game = "Dragon", # XX
+            # Game = "DT:R", # XX
         )
     case 'Cig':
         familyKeys = [ "Cig", "Unknown" ]
@@ -163,6 +219,15 @@ match 'Arkane':
             Family = "Cyanide",
             # Game = "Council", # Council
             # Game = "Werewolf:TA", # Werewolf: The Apocalypse - Earthblood
+        )
+    case 'EA':
+        familyKeys = [ "EA", "Unknown" ]
+
+        appDefaultOptions = DefaultOptions(
+            ForceOpen = True,
+            ForcePath = "sample:*",
+            Family = "EA",
+            # Game = "xx", # xx
         )
     case 'Epic':
         familyKeys = [ "Epic", "Unknown" ]
@@ -240,10 +305,94 @@ match 'Arkane':
             # Game = "COD:BO3", # Call of Duty: Black Ops III - XPAC,FF
             # Game = "MW3", # Call of Duty: Modern Warfare 3
             # Game = "WWII", # Call of Duty: WWII
-
             Game = "BO4", # Call of Duty Black Ops 4
             # Game = "BOCW", # Call of Duty Black Ops Cold War
             # Game = "Vanguard", # Call of Duty Vanguard
+        )
+    case 'Lucas':
+        familyKeys = [ "Lucas", "Unknown" ]
+
+        appDefaultOptions = DefaultOptions(
+            ForceOpen = True,
+            ForcePath = "sample:*",
+            Family = "Lucas",
+            # Game = "PP", # PHM Pegasus
+            # Game = "MM", # Maniac Mansion - Scumm
+            # Game = "SF", # Strike Fleet
+            # Game = "B1942", # Battlehawks 1942
+            # Game = "ZMatAM", # Zak McKracken and the Alien Mindbenders - Scumm
+            Game = "IJatLC:TAG", # Indiana Jones and the Last Crusade: The Action Game
+            # Game = "IJatLC", # Indiana Jones and the Last Crusade: The Graphic Adventure
+            # Game = "TFH", # Their Finest Hour
+            # Game = "TFM:V1", # Their Finest Missions: Volume One
+            # Game = "L", # Loom
+            # Game = "M", # Masterblazer
+            # Game = "NS", # Night Shift
+            # Game = "SWotL", # Secret Weapons of the Luftwaffe
+            # Game = "MI2:LR", # Monkey Island 2: LeChuck's Revenge
+            # Game = "IJatFoA", # Indiana Jones and the Fate of Atlantis
+            # Game = "SW:XW", # Star Wars: X-Wing
+            # Game = "DotT", # Day of the Tentacle - Missing
+            # Game = "ZAMN", # Zombies Ate My Neighbors
+            # Game = "SaMHtR", # Sam & Max Hit the Road
+            # Game = "SWC", # Star Wars Chess
+            # Game = "SW:TF", # Star Wars: TIE Fighter
+            # Game = "GP", # Ghoul Patrol
+            # Game = "SW:DF", # Star Wars: Dark Forces
+            # Game = "FT", # Full Throttle
+            # Game = "TD", # The Dig
+            # Game = "SW:RA2", # Star Wars: Rebel Assault II: The Hidden Empire
+            # Game = "IJaHDA", # Indiana Jones and His Desktop Adventures
+            # Game = "A", # Afterlife
+            # Game = "MatRotM", # Mortimer and the Riddles of the Medallion
+            # Game = "SW:SotE", # Star Wars: Shadows of the Empire
+            # Game = "SW:YS", # Star Wars: Yoda Stories
+            # Game = "O", # Outlaws
+            # Game = "SW:XvT", # Star Wars: X-Wing vs. TIE Fighter
+            # Game = "SWJK:DF2", # Star Wars Jedi Knight: Dark Forces II
+            # Game = "MSW", # Monopoly Star Wars
+            # Game = "TCoMI", # The Curse of Monkey Island
+            # Game = "SWJK:MotS", # Star Wars Jedi Knight: Mysteries of the Sith
+            # Game = "SW:R", # Star Wars: Rebellion
+            # Game = "SW:BtM", # Star Wars: Behind the Magic
+            # Game = "SW:DW", # Star Wars: DroidWorks
+            # Game = "GF", # Grim Fandango
+            # Game = "SW:RS", # Star Wars: Rogue Squadron
+            # Game = "SW:XA", # Star Wars: X-Wing Alliance
+            # Game = "SW1:TPM", # Star Wars Episode I: The Phantom Menace
+            # Game = "SW1:R", # Star Wars Episode I: Racer
+            # Game = "SW1:TGF", # Star Wars Episode I: The Gungan Frontier
+            # Game = "SW:YCAC", # Star Wars: Yoda's Challenge Activity Center
+            # Game = "SW:PD", # Star Wars: Pit Droids
+            # Game = "IJatIM", # Indiana Jones and the Infernal Machine
+            # Game = "SW:FC", # Star Wars: Force Commander
+            # Game = "EfMI", # Escape from Monkey Island
+            # Game = "SW:S", # Star Wars: Starfighter
+            # Game = "SWGB", # Star Wars: Galactic Battlegrounds
+            # Game = "SWJK2:JO", # Star Wars Jedi Knight II: Jedi Outcast
+            # Game = "IJatET", # Indiana Jones and the Emperor's Tomb
+            # Game = "SWG", # Star Wars Galaxies (closed)
+            # Game = "SW:KotOR", # Star Wars: Knights of the Old Republic
+            # Game = "SWJK:JA", # Star Wars Jedi Knight: Jedi Academy
+            # Game = "AaD", # Armed and Dangerous
+            # Game = "SW:B", # Star Wars: Battlefront
+            # Game = "SW:KotOR2", # Star Wars Knights of the Old Republic II: The Sith Lord
+            # Game = "SW:RC", # Star Wars: Republic Commando
+            # Game = "SW:B2", # Star Wars: Battlefront II
+            # Game = "SW:EaW", # Star Wars: Empire at War
+            # Game = "T:OtR", # Thrillville: Off the Rails
+            # Game = "LSW:TCS", # Lego Star Wars: The Complete Saga
+            # Game = "LIJ:TOA", # Lego Indiana Jones: The Original Adventures
+            # Game = "SW:TFU", # Star Wars: The Force Unleashed
+            # Game = "ToMI", # Tales of Monkey Island
+            # Game = "TSoMI:SE", # The Secret of Monkey Island: Special Edition
+            # Game = "SWTCW:RH", # Star Wars: The Clone Wars - Republic Heroes
+            # Game = "LU", # Lucidity
+            # Game = "LIJ2:TAC", # Lego Indiana Jones 2: The Adventure Continues
+            # Game = "MI2SE:LCR", # Monkey Island 2 Special Edition: LeChuck's Revenge
+            # Game = "SW:TFU2", # Star Wars: The Force Unleashed II
+            # Game = "LS3:TCW", # Lego Star Wars III: The Clone Wars
+            # Game = "SW:TOR", # Star Wars: The Old Republic
         )
     case 'Monolith':
         familyKeys = [ "Monolith", "Unknown" ]
@@ -339,6 +488,34 @@ match 'Arkane':
             # Game = "TheLab:TL", # The Lab: The Lab [!unity]
             # Game = "HL:Alyx", # Half-Life: Alyx [open, read, texture:GL, model:GL]
         )
+    case 'Volition':
+        familyKeys = [ "Volition", "Unknown" ]
+
+        appDefaultOptions = DefaultOptions(
+            ForceOpen = True,
+            ForcePath = "sample:*",
+            Family = "Volition",
+            # Game = "D", # Descent
+            Game = "D2", # Descent II
+            # Game = "FS", # Descent: FreeSpace - The Great War
+            # Game = "FS2", # FreeSpace 2
+            # Game = "S", # Summoner
+            # Game = "RF", # Red Faction
+            # Game = "S2", # Summoner 2 [missing]
+            # Game = "RF2", # Red Faction II
+            # Game = "TP", # The Punisher [missing]
+            # Game = "SR06", # Saints Row [missing]
+            # Game = "SR2", # Saints Row 2
+            # Game = "RF:G", # Red Faction: Guerrilla
+            # Game = "RF:A", # Red Faction: Armageddon
+            # Game = "SR3", # Saints Row: The Third
+            # Game = "SR4", # Saints Row IV
+            # Game = "D3", # Saints Row 2
+            # Game = "SR:G", # Descent 3
+            # Game = "AoM", # Agents of Mayhem
+            # Game = "RF:GR", # Red Faction: Guerrilla Re-Mars-tered
+            # Game = "SR", # Saints Row
+        )
     case 'WbB':
         familyKeys = [ "WbB", "Unknown" ]
 
@@ -349,7 +526,7 @@ match 'Arkane':
             Game = "AC", # Asheron's Call [open, read, texture:GL]
         )
     case _:
-        familyKeys = [ "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "Epic", "Frictional", "Frontier", "Id", "IW", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "WbB" ]
+        familyKeys = [ "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "Id", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WbB" ]
 
         appDefaultOptions = DefaultOptions(
         )

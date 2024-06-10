@@ -34,7 +34,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "AmongUs": {
         "key": "Steam:945360",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 945360",

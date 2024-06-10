@@ -417,7 +417,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "HL": {
         "key": "Steam:70",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 70",

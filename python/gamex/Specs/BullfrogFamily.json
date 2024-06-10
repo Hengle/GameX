@@ -70,7 +70,7 @@
       "name": "Syndicate",
       "url": "https://en.wikipedia.org/wiki/Syndicate_(1993_video_game)",
       "date": "June 6, 1993",
-      "pakExtx": ".xyz",
+      "pakExtx": ".vir",
       "editions": {
         "": {
           "name": "Original",
@@ -176,7 +176,7 @@
     }
   },
   "fileManager": {
-    "application": {
+    "applications": {
       "P": {
         "key": "Steam:2203860",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2203860",
@@ -240,6 +240,11 @@
         "key": "Steam:2616460",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2616460",
         "dir": "Dungeon Keeper 2"
+      }
+    },
+    "virtuals": {
+      "S": {
+        "MAIN.vir": null
       }
     }
   }
