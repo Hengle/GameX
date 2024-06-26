@@ -37,8 +37,12 @@
     "name": "Syndicate",
     "files": [
       {
-        "path": "DATA/SYNGAME.XMI",
-        "type": "Music"
+        "path": "DATA/ISNDS-0.TAB",
+        "type": "Sound"
+      },
+      {
+        "path": "DATA/SOUND-0.TAB",
+        "type": "Sound"
       },
       {
         "path": "DATA/INTRO.XMI",
@@ -61,87 +65,43 @@
         "type": "Req"
       },
       {
-        "path": "MAP00.DAT",
+        "path": "DATA/MAP01.DAT",
         "type": "MapData"
       },
       {
-        "path": "MAP00.DAT",
-        "type": "MapData"
-      },
-      {
-        "path": "COL01.DAT",
-        "type": "MapColumn"
-      },
-      {
-        "path": "HBLK01.DAT",
+        "path": "DATA/HBLK01.DAT",
         "type": "MapTile"
       },
       {
-        "path": "HSTA-0.ANI",
-        "type": "SpriteAnim"
-      },
-      {
-        "path": "HFRA-0.ANI",
-        "type": "SpriteFrame"
-      },
-      {
-        "path": "HELE-0.ANI",
-        "type": "SpriteElement"
-      },
-      {
-        "path": "HSPR-0.TAB",
+        "path": "DATA/HSPR-0.TAB",
         "type": "SpriteTab"
       },
       {
-        "path": "HSPR-0.DAT",
-        "type": "SpriteData"
+        "path": "DATA/HELE-0.ANI",
+        "type": "SpriteElement"
       },
       {
-        "path": "MISS00.DAT",
+        "path": "DATA/HFRA-0.ANI",
+        "type": "SpriteFrame"
+      },
+      {
+        "path": "DATA/HSTA-0.ANI",
+        "type": "SpriteAnim"
+      },
+      {
+        "path": "DATA/MISS01.DAT",
         "type": "Mission"
       },
       {
-        "path": "GAME00.DAT",
+        "path": "DATA/GAME01.DAT",
         "type": "Game"
       },
       {
-        "path": "Pedestrian.DAT",
-        "type": "Common"
-      },
-      {
-        "path": "Vehicles.DAT",
-        "type": "Common"
-      },
-      {
-        "path": "Objects.DAT",
-        "type": "Common"
-      },
-      {
-        "path": "Weapons.DAT",
-        "type": "Common"
-      },
-      {
-        "path": "Sfx.DAT",
-        "type": "Sfx"
-      },
-      {
-        "path": "Scenarios.DAT",
-        "type": "Scenarios"
-      },
-      {
-        "path": "Mapinfos.DAT",
-        "type": "Mapinfos"
-      },
-      {
-        "path": "Objectives.DAT",
-        "type": "Objectives"
-      },
-      {
-        "path": "INTRO.DAT",
+        "path": "DATA/INTRO.DAT",
         "type": "Fli"
       },
       {
-        "path": "MCONSCR.DAT",
+        "path": "DATA/MCONSCR.DAT",
         "type": "Raw"
       }
     ]

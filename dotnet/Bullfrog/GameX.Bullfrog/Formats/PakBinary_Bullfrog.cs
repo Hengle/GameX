@@ -134,17 +134,17 @@ namespace GameX.Bullfrog.Formats
 
         public override async Task Read(BinaryPakFile source, BinaryReader r, object tag)
         {
-            Data = Rnc.Read(r);
+            //Data = Rnc.Read(r);
             List<FileSource> files;
             source.Files = files = new List<FileSource>();
-            var tabPath = $"{source.PakPath[..^4]}.TAB";
-            var fileName = Path.GetFileName(source.PakPath);
-            if (fileName.StartsWith("CREATURE")) await source.Reader(s => ParseCreature(s, files), tabPath);
-            else if (fileName.StartsWith("GUI")) ParseGui(r, files);
-            else if (fileName.StartsWith("SOUND")) ParseSound(r, files, 2);
-            else if (fileName.StartsWith("SPEECH")) ParseSound(r, files, 2);
-            else if (fileName.StartsWith("TMAPA")) ParseTexure(files, TEXTURE_BLOCKSA);
-            else if (fileName.StartsWith("TMAPB")) ParseTexure(files, TEXTURE_BLOCKSB);
+            //var tabPath = $"{source.PakPath[..^4]}.TAB";
+            //var fileName = Path.GetFileName(source.PakPath);
+            //if (fileName.StartsWith("CREATURE")) await source.Reader(s => ParseCreature(s, files), tabPath);
+            //else if (fileName.StartsWith("GUI")) ParseGui(r, files);
+            //else if (fileName.StartsWith("SOUND")) ParseSound(r, files, 2);
+            //else if (fileName.StartsWith("SPEECH")) ParseSound(r, files, 2);
+            //else if (fileName.StartsWith("TMAPA")) ParseTexure(files, TEXTURE_BLOCKSA);
+            //else if (fileName.StartsWith("TMAPB")) ParseTexure(files, TEXTURE_BLOCKSB);
             //return Task.CompletedTask;
         }
 

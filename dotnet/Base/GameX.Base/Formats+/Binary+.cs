@@ -1,22 +1,16 @@
 using GameX.Meta;
 using GameX.Platforms;
-using MathNet.Numerics.Distributions;
-using MathNet.Numerics.LinearAlgebra.Factorization;
 using OpenStack.Graphics;
 using OpenStack.Graphics.DirectX;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 using System.Threading.Tasks;
-using static GameX.Formats.Binary_Iif;
 using static OpenStack.Debug;
 
 namespace GameX.Formats

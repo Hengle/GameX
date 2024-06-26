@@ -2,7 +2,6 @@
 using GameX.Platforms;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Win32;
-using SevenZip.Compression.LZMA;
 using System;
 using System.Collections.Generic;
 using System.IO;

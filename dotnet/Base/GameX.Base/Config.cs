@@ -146,7 +146,7 @@ namespace GameX
         public static DefaultOptions AppDefaultOptions = new DefaultOptions
         {
             ForceOpen = true,
-            ForcePath = "sample:0",
+            ForcePath = "sample:14",
             Family = "Bullfrog",
             //Game = "P", // Populous
             //Game = "P2", // Populous II: Trials of the Olympian Gods
