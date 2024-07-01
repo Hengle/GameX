@@ -33,9 +33,9 @@ namespace GameX.Platforms
         public IMaterialManager<GLRenderMaterial, int> MaterialManager => _materialManager;
         public IObjectManager<object, GLRenderMaterial, int> ObjectManager => _objectManager;
         public IShaderManager<Shader> ShaderManager => _shaderManager;
-        public int LoadTexture(string path, out IDictionary<string, object> data, Range? rng = null) => _textureManager.LoadTexture(path, out data, rng);
+        public int LoadTexture(string path, out object tag, Range? rng = null) => _textureManager.LoadTexture(path, out tag, rng);
         public void PreloadTexture(string path) => _textureManager.PreloadTexture(path);
-        public object CreateObject(string path, out IDictionary<string, object> data) => _objectManager.CreateObject(path, out data);
+        public object CreateObject(string path, out object tag) => _objectManager.CreateObject(path, out tag);
         public void PreloadObject(string path) => _objectManager.PreloadObject(path);
         public Shader LoadShader(string path, IDictionary<string, bool> args = null) => _shaderManager.LoadShader(path, args);
         public Task<T> LoadFileObject<T>(string path) => _source.LoadFileObject<T>(path);

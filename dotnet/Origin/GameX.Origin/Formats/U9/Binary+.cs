@@ -462,7 +462,6 @@ namespace GameX.Origin.Formats.U9
             Pixels = BytesPerPixel == 1 ? data.SelectMany(x => palette[x]).ToArray() : data;
         }
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;

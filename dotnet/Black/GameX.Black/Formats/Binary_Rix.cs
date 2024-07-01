@@ -64,7 +64,6 @@ namespace GameX.Black.Formats
         }
 
         // ITexture
-        public IDictionary<string, object> Data => null;
         public int Width { get; }
         public int Height { get; }
         public int Depth => 0;

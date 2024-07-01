@@ -245,7 +245,6 @@ namespace GameX.IW.Formats
         byte[] Bytes;
         (FORMAT type, object gl, object vulken, object unity, object unreal) Format;
 
-        public IDictionary<string, object> Data => null;
         public int Width => Header.Width;
         public int Height => Header.Height;
         public int Depth => 0;

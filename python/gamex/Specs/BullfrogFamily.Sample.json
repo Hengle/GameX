@@ -37,6 +37,10 @@
     "name": "Syndicate",
     "files": [
       {
+        "path": "DATA/INTRO.DAT",
+        "type": "Fli"
+      },
+      {
         "path": "DATA/ISNDS-0.TAB",
         "type": "Sound"
       },
@@ -97,12 +101,8 @@
         "type": "Game"
       },
       {
-        "path": "DATA/INTRO.DAT",
-        "type": "Fli"
-      },
-      {
         "path": "DATA/MCONSCR.DAT",
-        "type": "Raw"
+        "type": "Raw:15"
       }
     ]
   },

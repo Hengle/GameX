@@ -127,7 +127,6 @@ namespace GameX.Formats
 
         (object gl, object vulken, object unity, object unreal) Format;
 
-        public IDictionary<string, object> Data => null;
         public int Width => width;
         public int Height => height;
         public int Depth => 0;

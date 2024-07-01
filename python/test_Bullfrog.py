@@ -16,5 +16,9 @@ sample = pakFile.game.getSample(file[1][7:]).path if file[1].startswith('sample'
 print(f'pak: {pakFile}, {sample}')
 
 # get file
-data = pakFile.loadFileData(sample)
-print(f'dat: {data}')
+# data = pakFile.loadFileData(sample)
+# print(f'dat: {data}')
+
+# get file
+obj = pakFile.loadFileObject(object, sample)
+print(f'obj: {obj}')

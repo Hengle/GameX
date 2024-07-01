@@ -12,13 +12,17 @@ namespace GameX.Bullfrog.Formats
     {
         #region Factories
 
-        static readonly string[] SYND_FLIFILES = new[] { "INTRO.DAT", "MBRIEF.DAT", "MBRIEOUT.DAT", "MCONFOUT.DAT", "MCONFUP.DAT", "MCONSCR.DAT", "MDEBRIEF.DAT", "MDEOUT.DAT", "MENDLOSE.DAT", "MENDWIN.DAT", "MGAMEWIN.DAT", "MLOSA.DAT", "MLOSAOUT.DAT", "MLOSEGAM.DAT", "MMAP.DAT", "MMAPOUT.DAT", "MOPTION.DAT", "MOPTOUT.DAT", "MRESOUT.DAT", "MRESRCH.DAT", "MSCRENUP.DAT", "MSELECT.DAT", "MSELOUT.DAT", "MTITLE.DAT", "MMULTI.DAT", "MMULTOUT.DAT" };
+        static readonly string[] S_FLIFILES = new[] { "INTRO.DAT", "MBRIEF.DAT", "MBRIEOUT.DAT", "MCONFOUT.DAT", "MCONFUP.DAT", "MDEBRIEF.DAT", "MDEOUT.DAT", "MENDLOSE.DAT", "MENDWIN.DAT", "MGAMEWIN.DAT", "MLOSA.DAT", "MLOSAOUT.DAT", "MLOSEGAM.DAT", "MMAP.DAT", "MMAPOUT.DAT", "MOPTION.DAT", "MOPTOUT.DAT", "MRESOUT.DAT", "MRESRCH.DAT", "MSCRENUP.DAT", "MSELECT.DAT", "MSELOUT.DAT", "MTITLE.DAT", "MMULTI.DAT", "MMULTOUT.DAT" };
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
          => game.Id switch
          {
              "S" => Path.GetFileName(source.Path).ToUpperInvariant() switch
              {
-                 var x when SYND_FLIFILES.Contains(x) => (0, Binary_Syndicate.Factory_Fli),
+                 var x when S_FLIFILES.Contains(x) => (0, Binary_Fli.Factory),
+                 //"MCONSCR.DAT" => (0, Binary_Raw.FactoryMethod()),
+                 //"MLOGOS.DAT" => (0, Binary_Raw.FactoryMethod()),
+                 //"MMAPBLK.DAT" => (0, Binary_Raw.FactoryMethod()),
+                 //"MMINLOGO.DAT" => (0, Binary_Raw.FactoryMethod()),
                  "HFNT01.DAT" => (0, Binary_Syndicate.Factory_Font),
                  var x when x.StartsWith("GAME") && x.EndsWith(".DAT") => (0, Binary_Syndicate.Factory_Game),
                  "COL01.DAT" => (0, Binary_Syndicate.Factory_MapColumn),

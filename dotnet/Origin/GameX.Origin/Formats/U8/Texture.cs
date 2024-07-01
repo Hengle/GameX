@@ -54,7 +54,6 @@ namespace GameX.Origin.Formats.U8
 
         //(SurfacePixelFormat type, object gl, object vulken, object unity, object unreal) Format;
 
-        public IDictionary<string, object> Data => null;
         public int Width { get; }
         public int Height { get; }
         public int Depth => 0;

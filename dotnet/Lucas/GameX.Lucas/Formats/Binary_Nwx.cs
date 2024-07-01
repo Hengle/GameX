@@ -142,7 +142,6 @@ namespace GameX.Lucas.Formats
         bool Flip;
         byte[] CellData;
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; set; }
         public int Height { get; set; }
         public int Depth { get; } = 0;

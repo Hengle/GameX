@@ -125,7 +125,6 @@ namespace GameX.Formats
         byte[] Bytes;
         Range[] Mips;
 
-        public IDictionary<string, object> Data => null;
         public int Width => (int)Header.dwWidth;
         public int Height => (int)Header.dwHeight;
         public int Depth => 0;
@@ -245,7 +244,6 @@ namespace GameX.Formats
         Bitmap Image;
         (Formats type, object gl, object vulken, object unity, object unreal) Format;
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
@@ -361,7 +359,6 @@ namespace GameX.Formats
         byte[] Body;
         (object gl, object vulken, object unity, object unreal) Format;
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
@@ -758,8 +755,6 @@ namespace GameX.Formats
 
         public Binary_Tga(BinaryReader r, FileSource f)
         {
-
-
             Header = r.ReadS<X_Header>();
             Header.Check();
             r.Skip(Header.IdLength);
@@ -800,7 +795,6 @@ namespace GameX.Formats
         MemoryStream Body;
         (object gl, object vulken, object unity, object unreal) Format;
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
@@ -986,7 +980,6 @@ namespace GameX.Formats
         byte[] Body;
         (object gl, object vulken, object unity, object unreal) Format;
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
@@ -1069,7 +1062,6 @@ namespace GameX.Formats
         public string Palette;
         (object gl, object vulken, object unity, object unreal) Format;
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; set; }
         public int Height { get; set; }
         public int Depth { get; } = 0;

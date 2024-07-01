@@ -19,9 +19,7 @@ namespace GameX.Bullfrog
         /// </summary>
         /// <param name="state">The state.</param>
         public BullfrogPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
-        {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
-        }
+            => ObjectFactoryFactoryMethod = ObjectFactoryFactory;
 
         #region Factories
 

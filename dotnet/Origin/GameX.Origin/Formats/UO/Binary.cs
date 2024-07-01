@@ -834,7 +834,6 @@ namespace GameX.Origin.Formats.UO
             }
         }
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int Depth { get; } = 0;
@@ -1056,7 +1055,6 @@ namespace GameX.Origin.Formats.UO
             }
         }
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; } = 44;
         public int Height { get; } = 44;
         public int Depth { get; } = 0;
@@ -1140,7 +1138,6 @@ namespace GameX.Origin.Formats.UO
             }
         }
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int Depth { get; } = 0;
@@ -1339,7 +1336,6 @@ namespace GameX.Origin.Formats.UO
             }
         }
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
@@ -1808,7 +1804,6 @@ namespace GameX.Origin.Formats.UO
             }
         }
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;

@@ -35,7 +35,7 @@ namespace GameX.Platforms
     {
         readonly PakFile PakFile;
         readonly TextureBuilderBase<Texture> Builder;
-        readonly Dictionary<object, (Texture texture, IDictionary<string, object> data)> CachedTextures = new Dictionary<object, (Texture texture, IDictionary<string, object> data)>();
+        readonly Dictionary<object, (Texture texture, object tag)> CachedTextures = new Dictionary<object, (Texture texture, object tag)>();
         readonly Dictionary<object, Task<ITexture>> PreloadTasks = new Dictionary<object, Task<ITexture>>();
 
         public TextureManager(PakFile pakFile, TextureBuilderBase<Texture> builder)
@@ -50,14 +50,14 @@ namespace GameX.Platforms
 
         public Texture DefaultTexture => Builder.DefaultTexture;
 
-        public Texture LoadTexture(object key, out IDictionary<string, object> data, Range? rng = null)
+        public Texture LoadTexture(object key, out object tag, Range? rng = null)
         {
-            if (CachedTextures.TryGetValue(key, out var cache)) { data = cache.data; return cache.texture; }
+            if (CachedTextures.TryGetValue(key, out var cache)) { tag = cache.tag; return cache.texture; }
             // Load & cache the texture.
             var info = key is ITexture z ? z : LoadTexture(key);
             var texture = info != null ? Builder.BuildTexture(info, rng) : Builder.DefaultTexture;
-            data = info?.Data;
-            CachedTextures[key] = (texture, data);
+            tag = null; // info;
+            CachedTextures[key] = (texture, info);
             return texture;
         }
 
@@ -153,9 +153,9 @@ namespace GameX.Platforms
             _builder = builder;
         }
 
-        public Object CreateObject(string path, out IDictionary<string, object> data)
+        public Object CreateObject(string path, out object tag)
         {
-            data = null;
+            tag = null;
             _builder.EnsurePrefabContainerExists();
             // Load & cache the NIF prefab.
             if (!_cachedPrefabs.TryGetValue(path, out var prefab)) prefab = _cachedPrefabs[path] = LoadPrefabDontAddToPrefabCache(path);

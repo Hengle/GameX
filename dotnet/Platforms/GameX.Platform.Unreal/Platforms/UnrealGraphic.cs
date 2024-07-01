@@ -24,9 +24,9 @@ namespace GameX.Platforms
         public IMaterialManager<object, Texture2D> MaterialManager => throw new NotImplementedException();
         public IObjectManager<object, object, Texture2D> ObjectManager => throw new NotImplementedException();
         public IShaderManager<object> ShaderManager => throw new NotImplementedException();
-        public Texture2D LoadTexture(string path, out IDictionary<string, object> data, Range? range = null) => _textureManager.LoadTexture(path, out data, range);
+        public Texture2D LoadTexture(string path, out object tag, Range? range = null) => _textureManager.LoadTexture(path, out tag, range);
         public void PreloadTexture(string path) => throw new NotImplementedException();
-        public object CreateObject(string path, out IDictionary<string, object> data) => throw new NotImplementedException();
+        public object CreateObject(string path, out object tag) => throw new NotImplementedException();
         public void PreloadObject(string path) => throw new NotImplementedException();
         public object LoadShader(string path, IDictionary<string, bool> args = null) => throw new NotImplementedException();
 

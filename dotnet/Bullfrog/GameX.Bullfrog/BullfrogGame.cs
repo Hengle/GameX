@@ -14,16 +14,13 @@ namespace GameX.Bullfrog
         /// Ensures this instance.
         /// </summary>
         /// <returns></returns>
-        public override FamilyGame Ensure()
+        public override FamilyGame Ensure() => Id switch
         {
-            switch (Id)
-            {
-                case "DK": Games.DK.Database.Ensure(this); return this;
-                case "DK2": Games.DK2.Database.Ensure(this); return this;
-                case "P2": Games.P2.Database.Ensure(this); return this;
-                case "S": Games.S.Database.Ensure(this); return this;
-                default: return this;
-            }
-        }
+            "DK" => Games.DK.Database.Ensure(this),
+            "DK2" => Games.DK2.Database.Ensure(this),
+            "P2" => Games.P2.Database.Ensure(this),
+            "S" => Games.S.Database.Ensure(this),
+            _ => this,
+        };
     }
 }

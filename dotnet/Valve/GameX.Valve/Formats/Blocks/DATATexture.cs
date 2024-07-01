@@ -95,7 +95,6 @@ namespace GameX.Valve.Formats.Blocks
         byte[] Bytes;
         Range[] Mips;
 
-        IDictionary<string, object> ITexture.Data => null;
         int ITexture.Width => Width;
         int ITexture.Height => Height;
         int ITexture.Depth => Depth;

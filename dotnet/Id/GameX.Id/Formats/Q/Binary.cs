@@ -60,7 +60,6 @@ namespace GameX.Id.Formats.Q
             }
         }
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;

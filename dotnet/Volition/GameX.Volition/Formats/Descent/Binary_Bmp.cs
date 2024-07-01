@@ -49,7 +49,6 @@ namespace GameX.Volition.Formats.Descent
         byte[][] Palette;
         (object gl, object vulken, object unity, object unreal) Format;
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;

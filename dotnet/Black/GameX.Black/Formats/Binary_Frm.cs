@@ -98,7 +98,6 @@ namespace GameX.Black.Formats
 
         // ITexture
         (object gl, object vulken, object unity, object unreal) Format;
-        public IDictionary<string, object> Data => null;
         public int Width { get; internal set; }
         public int Height { get; internal set; }
         public int Depth => 0;
