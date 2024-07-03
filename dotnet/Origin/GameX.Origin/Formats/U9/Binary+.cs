@@ -282,14 +282,12 @@ namespace GameX.Origin.Formats.U9
             }).ToArray();
         }
 
-        public IDictionary<string, object> Data { get; } = null;
         public int Width => Current.Width;
         public int Height => Current.Height;
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] ranges)
         {
             format = (Platform.Type)platform switch
@@ -468,7 +466,6 @@ namespace GameX.Origin.Formats.U9
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] ranges)
         {
             format = (Platform.Type)platform switch

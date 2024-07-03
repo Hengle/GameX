@@ -101,7 +101,6 @@ namespace GameX.Valve.Formats.Blocks
         int ITexture.MipMaps => NumMipMaps;
         TextureFlags ITexture.Flags => (TextureFlags)Flags;
 
-        void ITexture.Select(int id) { }
         byte[] ITexture.Begin(int platform, out object format, out Range[] mips)
         {
             Reader.BaseStream.Position = Offset + Size;

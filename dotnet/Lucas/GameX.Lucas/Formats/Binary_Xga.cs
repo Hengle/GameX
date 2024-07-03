@@ -66,7 +66,6 @@ namespace GameX.Lucas.Formats
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] ranges)
         {
             //var bytes = Header.Bpp switch

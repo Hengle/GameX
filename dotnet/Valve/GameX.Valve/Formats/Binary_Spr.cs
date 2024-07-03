@@ -133,7 +133,6 @@ namespace GameX.Formats
         public int MipMaps => pixels.Length;
         public TextureFlags Flags => 0;
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] ranges)
         {
             static void FlattenPalette(Span<byte> data, byte[] source, byte[] palette)

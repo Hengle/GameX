@@ -1,16 +1,18 @@
 ﻿using GameX.Meta;
+using GameX.Platforms;
+using OpenStack.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using static GameX.Platforms.Platform;
 using static OpenStack.Debug;
 
 namespace GameX.Bullfrog.Formats
 {
-    public unsafe class Binary_Fli : IDisposable, IHaveMetaInfo
+    public unsafe class Binary_Fli : IDisposable, ITextureVideo, IHaveMetaInfo
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Fli(r, f));
 
@@ -18,6 +20,7 @@ namespace GameX.Bullfrog.Formats
         static StreamWriter F;
         static void FO(string x) { F = File.CreateText("C:\\T_\\FROG\\Fli2.txt"); }
         static void FW(string x) { F.Write(x); F.Flush(); }
+        //FO("C:\\T_\\FROG\\Fli2.txt");
 
         #region Headers
 
@@ -28,7 +31,7 @@ namespace GameX.Bullfrog.Formats
             public static (string, int) Struct = ("<I4H", sizeof(X_Header));
             public uint Size;
             public ushort Type;
-            public ushort NumFrames;
+            public ushort Frames;
             public ushort Width;
             public ushort Height;
         }
@@ -71,67 +74,76 @@ namespace GameX.Bullfrog.Formats
 
         #endregion
 
-        public BinaryReader R;
-        public byte[] Palette = new byte[256 * 3];
-        public byte[] Pixels;
-        public int Width;
-        public int Height;
-        public int NumFrames;
-        public int Fps;
-        public int CurFrame;
-
         public Binary_Fli(BinaryReader r, FileSource f)
         {
-            FO("C:\\T_\\FROG\\Fli2.txt");
-
             // read header
             var header = r.ReadS<X_Header>();
             if (header.Type != X_Header.MAGIC) throw new FormatException("BAD MAGIC");
+            Format = (
+                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGB24,
+                TextureUnrealFormat.Unknown);
             Width = header.Width;
             Height = header.Height;
-            NumFrames = header.NumFrames;
+            Frames = NumFrames = header.Frames;
 
             // set values
             R = r;
             Fps = Path.GetFileNameWithoutExtension(f.Path).ToLowerInvariant() == "intro" ? 10 : 15;
             Pixels = new byte[Width * Height];
-
-            // play
-            Play(R);
         }
 
         public void Dispose() => R.Close();
 
+        public BinaryReader R;
+        public byte[][] Palette = new byte[256][];
+        public byte[] Pixels;
+        public int NumFrames;
+
+        (object gl, object vulken, object unity, object unreal) Format;
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth => 0;
+        public int MipMaps => 0;
+        public TextureFlags Flags => 0;
+        public int Frames { get; }
+        public int Fps { get; }
+
+        public byte[] Begin(int platform, out object format, out Range[] mips)
+        {
+            format = (Platform.Type)platform switch
+            {
+                Platform.Type.OpenGL => Format.gl,
+                Platform.Type.Unity => Format.unity,
+                Platform.Type.Unreal => Format.unreal,
+                Platform.Type.Vulken => Format.vulken,
+                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
+            };
+            mips = default;
+            return Palette[0] != null ? Pixels.SelectMany(x => Palette[x]).ToArray() : null;
+        }
+        public void End() { }
+
         public bool HasFrames => NumFrames > 0;
 
-        public void Play(BinaryReader r)
+        public bool DecodeFrame()
         {
-            while (HasFrames)
-            {
-                if (!DecodeFrame(r)) break;
-                CopyCurrentFrameToScreen();
-                CurFrame++;
-            }
-        }
-
-        bool DecodeFrame(BinaryReader r)
-        {
+            var r = R;
             X_FrameHeader frameHeader;
             var header = r.ReadS<X_ChunkHeader>();
             do
             {
-                var pos = r.BaseStream.Position;
-                //FW($"{pos:x5}> {header.Type} - {header.Size}\n");
                 var nextPosition = r.BaseStream.Position + (header.Size - 6);
                 switch (header.Type)
                 {
-                    case ChunkType.COLOR_256: SetPalette(r); break; //g_System.setPalette8b3(palette_);
+                    case ChunkType.COLOR_256: SetPalette(r); break;
                     case ChunkType.DELTA_FLC: DecodeDeltaFLC(r); break;
                     case ChunkType.BYTE_RUN: DecodeByteRun(r); break;
                     case ChunkType.FRAME:
                         frameHeader = r.ReadS<X_FrameHeader>();
                         NumFrames--;
-                        Log($"Frames Remaining: {NumFrames}, Chunks: {frameHeader.NumChunks}");
+                        //Log($"Frames Remaining: {NumFrames}, Chunks: {frameHeader.NumChunks}");
                         break;
                     default:
                         Log($"Unknown Type: {header.Type}");
@@ -152,17 +164,25 @@ namespace GameX.Bullfrog.Formats
             if (r.ReadUInt16() == 0) // special case
             {
                 var data = r.ReadBytes(256 * 3);
-                for (var i = 0; i < data.Length; i++) Palette[i] = (byte)((data[i] << 2) | (data[i] & 3));
+                for (int i = 0, j = 0; i < data.Length; i += 3, j++)
+                    Palette[j] = new[] {
+                        (byte)((data[i + 0] << 2) | (data[i + 0] & 3)),
+                        (byte)((data[i + 1] << 2) | (data[i + 1] & 3)),
+                        (byte)((data[i + 2] << 2) | (data[i + 2] & 3)) };
                 return;
             }
             r.Skip(-2);
-            int palPos = 0, palPos3;
+            var palPos = 0;
             while (numPackets-- != 0)
             {
-                palPos += r.ReadByte(); palPos3 = palPos * 3;
+                palPos += r.ReadByte();
                 var change = r.ReadByte();
                 var data = r.ReadBytes(change * 3);
-                for (var i = 0; i < data.Length; i++) Palette[palPos3 + i] = (byte)((data[i] << 2) | (data[i] & 3));
+                for (int i = 0, j = 0; i < data.Length; i += 3, j++)
+                    Palette[palPos + j] = new[] {
+                        (byte)((data[i + 0] << 2) | (data[i + 0] & 3)),
+                        (byte)((data[i + 1] << 2) | (data[i + 1] & 3)),
+                        (byte)((data[i + 2] << 2) | (data[i + 2] & 3)) };
                 palPos += change;
             }
         }
@@ -244,21 +264,16 @@ namespace GameX.Bullfrog.Formats
             }
         }
 
-        void CopyCurrentFrameToScreen()
-        {
-            //g_System.updateScreen();
-            //g_System.delay(1000 / Fps);
-        }
-
         // IHaveMetaInfo
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
         {
             return new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "FLI" }),
-                new MetaInfo("Video (FLI)", items: new List<MetaInfo> {
+                new MetaInfo(null, new MetaContent { Type = "TextureVideo", Name = Path.GetFileName(file.Path), Value = this }),
+                new MetaInfo("Video", items: new List<MetaInfo> {
                     new MetaInfo($"Width: {Width}"),
                     new MetaInfo($"Height: {Height}"),
-                    new MetaInfo($"NumFrames: {NumFrames}"),
+                    new MetaInfo($"Frames: {Frames}"),
+                    new MetaInfo($"Mipmaps: {MipMaps}"),
                 })
             };
         }

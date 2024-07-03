@@ -11,7 +11,6 @@ using System.Windows;
 
 namespace GameX.App.Explorer.Controls1
 {
-    //was:Renderer/GLMaterialViewer
     public class GLMaterialViewer : GLViewerControl
     {
         public GLMaterialViewer()

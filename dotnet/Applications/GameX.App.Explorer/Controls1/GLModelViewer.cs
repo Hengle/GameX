@@ -9,7 +9,6 @@ using System.Linq;
 
 namespace GameX.App.Explorer.Controls1
 {
-    //was:Renderer/GLModelViewer
     public class GLModelViewer : GLSceneViewer
     {
         //ComboBox _animationComboBox;

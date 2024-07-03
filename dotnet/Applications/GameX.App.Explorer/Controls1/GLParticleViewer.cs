@@ -12,7 +12,6 @@ using System.Windows;
 
 namespace GameX.App.Explorer.Controls1
 {
-    //was:Renderer/GLParticleViewer
     public class GLParticleViewer : GLViewerControl
     {
         ParticleGridRenderer particleGrid;

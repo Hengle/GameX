@@ -14,9 +14,9 @@ using Key = OpenTK.Input.Key;
 
 namespace GameX.App.Explorer.Controls1
 {
-    public class GLTextureViewer : GLViewerControl
+    public class GLTextureVideoViewer : GLViewerControl
     {
-        public GLTextureViewer()
+        public GLTextureVideoViewer()
         {
             GLPaint += OnPaint;
             Unloaded += (s, e) => { GLPaint -= OnPaint; };
@@ -25,8 +25,8 @@ namespace GameX.App.Explorer.Controls1
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Graphic), typeof(object), typeof(GLTextureViewer),
-            new PropertyMetadata((d, e) => (d as GLTextureViewer).OnProperty()));
+        public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Graphic), typeof(object), typeof(GLTextureVideoViewer),
+            new PropertyMetadata((d, e) => (d as GLTextureVideoViewer).OnProperty()));
 
         public IOpenGraphic Graphic
         {
@@ -34,16 +34,16 @@ namespace GameX.App.Explorer.Controls1
             set => SetValue(GraphicProperty, value);
         }
 
-        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(GLTextureViewer),
-            new PropertyMetadata((d, e) => (d as GLTextureViewer).OnProperty()));
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(GLTextureVideoViewer),
+            new PropertyMetadata((d, e) => (d as GLTextureVideoViewer).OnProperty()));
 
         public object Source
         {
             get => GetValue(SourceProperty);
             set => SetValue(SourceProperty, value);
         }
-        
-        public ITexture Obj;
+
+        public ITextureVideo Obj;
 
         const int Factor = 1;
 
@@ -59,8 +59,8 @@ namespace GameX.App.Explorer.Controls1
         {
             if (Graphic == null || Source == null) return;
             var graphic = Graphic as IOpenGLGraphic;
-            Obj = Source is ITexture z ? z
-                : Source is IRedirected<ITexture> y ? y.Value
+            Obj = Source is ITextureVideo z ? z
+                : Source is IRedirected<ITextureVideo> y ? y.Value
                 : null;
             if (Obj == null) return;
             if (Obj is ITextureSelect z2) z2.Select(Id);
@@ -70,14 +70,29 @@ namespace GameX.App.Explorer.Controls1
             Camera.LookAt(new Vector3(0));
 
             graphic.TextureManager.DeleteTexture(Obj);
-            var texture = graphic.TextureManager.LoadTexture(Obj, out _, rng);
+            Texture = graphic.TextureManager.LoadTexture(Obj, out _, Rng);
             Renderers.Clear();
-            Renderers.Add(new TextureRenderer(graphic, texture) { Background = background });
+            Renderers.Add(new TextureRenderer(graphic, Texture) { Background = Background });
         }
 
-        bool background;
-        Range rng = 0..;
-        readonly HashSet<TextureRenderer> Renderers = new();
+        int Texture;
+        bool Background;
+        Range Rng = 0..;
+        readonly HashSet<TextureRenderer> Renderers = [];
+        int FrameDelay;
+
+        public override void OnTick(int elapsedMs)
+        {
+            if (Graphic == null || Obj == null || !Obj.HasFrames) return;
+            var graphic = Graphic as IOpenGLGraphic;
+            FrameDelay += elapsedMs;
+            if (FrameDelay <= Obj.Fps || !Obj.DecodeFrame()) return;
+            FrameDelay = 0; // Reset delay between frames
+            graphic.TextureManager.DeleteTexture(Obj);
+            Texture = graphic.TextureManager.LoadTexture(Obj, out _, Rng);
+            Draw();
+            //addDirtyRect(0, 0, 1, 1); // Add a dirty rect just to start the render routine
+        }
 
         void OnPaint(object sender, RenderEventArgs e)
         {
@@ -85,7 +100,7 @@ namespace GameX.App.Explorer.Controls1
             foreach (var renderer in Renderers) renderer.Render(e.Camera, RenderPass.Both);
         }
 
-        Key[] Keys = [Key.Q, Key.W, Key.A, Key.Z, Key.Space, Key.Tilde];
+        Key[] Keys = [Key.Escape, Key.Space];
         HashSet<Key> KeyDowns = [];
         int Id = 0;
 
@@ -99,26 +114,13 @@ namespace GameX.App.Explorer.Controls1
                     KeyDowns.Remove(key);
                     switch (key)
                     {
-                        case Key.W: Select(++Id); break;
-                        case Key.Q: Select(--Id); break;
-                        case Key.A: MovePrev(); break;
-                        case Key.Z: MoveNext(); ; break;
-                        case Key.Space: MoveReset(); break;
-                        case Key.Tilde: ToggleBackground(); break;
+                        case Key.Escape: Reset(); ; break;
+                        case Key.Space: Toggle(); break;
                     }
                 }
         }
 
-        void Select(int id)
-        {
-            if (Obj == null) return;
-            if (Obj is ITextureSelect z2) z2.Select(Id);
-            OnProperty();
-            Views.FileExplorer.Instance.OnInfoUpdated();
-        }
-        void MoveReset() { Id = 0; rng = 0..; OnProperty(); }
-        void MoveNext() { if (rng.Start.Value < 10) rng = new(rng.Start.Value + 1, rng.End); OnProperty(); }
-        void MovePrev() { if (rng.Start.Value > 0) rng = new(rng.Start.Value - 1, rng.End); OnProperty(); }
-        void ToggleBackground() { background = !background; OnProperty(); }
+        void Reset() { Id = 0; Rng = 0..; OnProperty(); }
+        void Toggle() { OnProperty(); }
     }
 }

@@ -72,7 +72,6 @@ namespace GameX.Volition.Formats.Descent
             pixel += 4;
         }
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] ranges)
         {
             byte[] DecodeRLE()

@@ -14,7 +14,6 @@ using System.Windows;
 
 namespace GameX.App.Explorer.Controls1
 {
-    //was:Renderer/GLSceneViewer
     public abstract class GLSceneViewer : GLViewerControl
     {
         public Scene Scene { get; private set; }

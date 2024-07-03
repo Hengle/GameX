@@ -97,7 +97,7 @@ namespace GameX.Platforms
             }
             else throw new NotImplementedException();
 
-            if (info is IDisposable disposable) disposable.Dispose();
+            //if (info is IDisposable disposable) disposable.Dispose();
             info.End();
 
             if (MaxTextureMaxAnisotropy >= 4)

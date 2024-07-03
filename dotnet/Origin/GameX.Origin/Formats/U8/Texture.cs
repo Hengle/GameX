@@ -60,7 +60,6 @@ namespace GameX.Origin.Formats.U8
         public int MipMaps => 1;
         public TextureFlags Flags => 0;
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] mips)
         {
             //byte[] Expand()

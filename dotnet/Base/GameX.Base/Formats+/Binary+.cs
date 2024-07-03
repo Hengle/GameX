@@ -131,7 +131,6 @@ namespace GameX.Formats
         public int MipMaps => (int)Header.dwMipMapCount;
         public TextureFlags Flags => 0;
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] mips)
         {
             format = (Platform.Type)platform switch
@@ -250,7 +249,6 @@ namespace GameX.Formats
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] ranges)
         {
             unsafe byte[] BmpToBytes()
@@ -409,7 +407,6 @@ namespace GameX.Formats
         /// <returns></returns>
         static int RleLength(byte[] body, int offset) => body[offset] & 63;
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] ranges)
         {
             // Decodes 4bpp pixel data
@@ -812,7 +809,6 @@ namespace GameX.Formats
             Buffer.BlockCopy(map.Pixels, map.BytesPerEntry * index, dest, offset, map.BytesPerEntry);
         }
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] ranges)
         {
             // DecodeRle
@@ -986,7 +982,6 @@ namespace GameX.Formats
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] ranges)
         {
             byte[] Decode1()
@@ -1085,7 +1080,6 @@ namespace GameX.Formats
         //    pixel += 4;
         //}
 
-        public void Select(int id) { }
         public byte[] Begin(int platform, out object format, out Range[] ranges)
         {
             byte[] DecodeRaw() => Body.SelectMany(s => PaletteData[s]).ToArray();
