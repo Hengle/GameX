@@ -1,13 +1,12 @@
 ﻿using OpenStack.Graphics;
 using OpenStack.Graphics.OpenGL.Renderer1;
-using OpenStack.Graphics.Renderer1;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GameX.Platforms
 {
-    public interface IVulkenGraphic : IOpenGraphic<object, GLRenderMaterial, int, Shader> { }
+    public interface IVulkenGraphic : IOpenGraphicAny<object, GLRenderMaterial, int, Shader> { }
 
     public class VulkenGraphic : IVulkenGraphic
     {

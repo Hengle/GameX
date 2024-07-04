@@ -1,13 +1,13 @@
-﻿using GameX.Platforms;
-using OpenStack.Graphics;
+﻿using OpenStack.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using Shader = UnityEngine.Shader;
 
 namespace GameX.Platforms
 {
-    public interface IUnityGraphic : IOpenGraphic<GameObject, Material, Texture2D, Shader> { }
+    public interface IUnityGraphic : IOpenGraphicAny<GameObject, Material, Texture2D, Shader> { }
 
     public class UnityGraphic : IUnityGraphic
     {

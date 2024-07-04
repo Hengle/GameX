@@ -1,4 +1,4 @@
-using OpenStack.Graphics.Renderer1.Animations;
+using OpenStack.Graphics.Animate;
 using System;
 
 namespace GameX.Valve.Formats.Animations.SegmentDecoders

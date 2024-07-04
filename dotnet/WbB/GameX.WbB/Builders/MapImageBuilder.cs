@@ -1,5 +1,5 @@
 ﻿using GameX.WbB.Formats.FileTypes;
-using OpenStack.Graphics.Imaging;
+using OpenStack.Graphics;
 using System;
 using System.Drawing;
 using System.Linq;

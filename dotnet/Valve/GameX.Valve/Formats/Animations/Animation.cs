@@ -1,5 +1,5 @@
 using GameX.Valve.Formats.Animations.SegmentDecoders;
-using OpenStack.Graphics.Renderer1.Animations;
+using OpenStack.Graphics.Animate;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -119,21 +119,20 @@ namespace GameX.Valve.Formats.Animations
         /// <summary>
         /// Get the animation matrix for each bone.
         /// </summary>
-        public Matrix4x4[] GetAnimationMatrices(FrameCache frameCache, int frameIndex, ISkeleton skeleton)
-        {
-            // Get bone transformations
-            var frame = frameCache.GetFrame(this, frameIndex);
-
-            return GetAnimationMatrices(frame, skeleton);
-        }
+        //public Matrix4x4[] GetAnimationMatrices(FrameCache frameCache, int frameIndex, ISkeleton skeleton)
+        //{
+        //    // Get bone transformations
+        //    var frame = frameCache.GetFrame(this, frameIndex);
+        //    return GetAnimationMatrices(frame, skeleton);
+        //}
 
         /// <summary>
         /// Get the animation matrix for each bone.
         /// </summary>
-        public Matrix4x4[] GetAnimationMatrices(FrameCache frameCache, float time, ISkeleton skeleton)
+        public Matrix4x4[] GetAnimationMatrices(FrameCache frameCache, object index, ISkeleton skeleton)
         {
             // Get bone transformations
-            var frame = FrameCount != 0 ? frameCache.GetFrame(this, time) : null;
+            var frame = FrameCount != 0 ? frameCache.GetFrame(this, index) : null;
             return GetAnimationMatrices(frame, skeleton);
         }
 

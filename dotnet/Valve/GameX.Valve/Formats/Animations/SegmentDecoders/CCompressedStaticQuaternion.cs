@@ -1,8 +1,7 @@
+using OpenStack.Graphics.Animate;
 using System;
-using System.IO;
 using System.Linq;
 using System.Numerics;
-using OpenStack.Graphics.Renderer1.Animations;
 
 namespace GameX.Valve.Formats.Animations.SegmentDecoders
 {

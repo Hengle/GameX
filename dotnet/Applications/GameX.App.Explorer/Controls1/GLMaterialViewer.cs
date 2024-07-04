@@ -2,7 +2,6 @@ using OpenStack;
 using OpenStack.Graphics;
 using OpenStack.Graphics.Controls;
 using OpenStack.Graphics.OpenGL.Renderer1.Renderers;
-using OpenStack.Graphics.Renderer1;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

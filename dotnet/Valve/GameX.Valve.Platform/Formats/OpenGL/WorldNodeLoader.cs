@@ -2,7 +2,7 @@ using GameX.Scenes;
 using GameX.Valve.Formats.Blocks;
 using GameX.Valve.Graphics.OpenGL.Scenes;
 using OpenStack;
-using OpenStack.Graphics.Renderer1;
+using OpenStack.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Numerics;

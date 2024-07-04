@@ -20,7 +20,7 @@ namespace GameX.Platforms
                 if (unityFormat == TextureUnityFormat.DXT3_POLYFILL)
                 {
                     unityFormat = TextureUnityFormat.DXT5;
-                    DxtUtil2.ConvertDxt3ToDtx5(bytes, info.Width, info.Height, info.MipMaps);
+                    DDS_HEADER.ConvertDxt3ToDtx5(bytes, info.Width, info.Height, info.MipMaps);
                 }
                 var textureFormat = (TextureFormat)unityFormat;
                 var tex = new Texture2D(info.Width, info.Height, textureFormat, info.MipMaps, false);

@@ -3,10 +3,11 @@ using StereoKit;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Shader = StereoKit.Shader;
 
 namespace GameX.Platforms
 {
-    public interface IStereoKitGraphic : IOpenGraphic<object, Material, Tex, Shader> { }
+    public interface IStereoKitGraphic : IOpenGraphicAny<object, Material, Tex, Shader> { }
 
     public class StereoKitGraphic : IStereoKitGraphic
     {

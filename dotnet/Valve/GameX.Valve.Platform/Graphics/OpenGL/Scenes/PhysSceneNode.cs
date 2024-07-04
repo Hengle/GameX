@@ -1,13 +1,12 @@
 using GameX.Valve.Formats.Blocks;
 using OpenStack;
-using OpenStack.Graphics.Renderer1;
+using OpenStack.Graphics;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using OpenStack.Graphics;
 
 namespace GameX.Valve.Graphics.OpenGL.Scenes
 {

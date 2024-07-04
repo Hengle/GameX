@@ -6,7 +6,7 @@ using UnrealEngine.Framework;
 
 namespace GameX.Platforms
 {
-    public interface IUnrealGraphic : IOpenGraphic<object, object, Texture2D, object> { }
+    public interface IUnrealGraphic : IOpenGraphicAny<object, object, Texture2D, object> { }
 
     public class UnrealGraphic : IUnrealGraphic
     {

@@ -2,6 +2,7 @@ using OpenStack.Graphics;
 using System;
 using UnityEngine;
 using ur = UnityEngine.Rendering;
+using Shader = UnityEngine.Shader;
 
 namespace GameX.Platforms
 {

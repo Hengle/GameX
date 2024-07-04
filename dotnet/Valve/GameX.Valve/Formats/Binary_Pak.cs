@@ -1,14 +1,12 @@
 using GameX.Meta;
-using GameX.Formats;
 using GameX.Valve.Formats.Blocks;
+using GameX.Valve.Formats.Extras;
 using OpenStack.Graphics;
-using OpenStack.Graphics.Renderer1;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using GameX.Valve.Formats.Extras;
 using static GameX.Valve.Formats.Blocks.DATA;
 using static GameX.Valve.Formats.Blocks.DATATexture;
 

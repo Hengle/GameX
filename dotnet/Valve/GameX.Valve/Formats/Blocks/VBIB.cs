@@ -1,12 +1,12 @@
+using OpenStack.Graphics;
 using OpenStack.Graphics.Algorithms;
 using OpenStack.Graphics.DirectX;
-using OpenStack.Graphics.Renderer1;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using static OpenStack.Graphics.Renderer1.OnDiskBufferData;
+using static OpenStack.Graphics.OnDiskBufferData;
 
 namespace GameX.Valve.Formats.Blocks
 {

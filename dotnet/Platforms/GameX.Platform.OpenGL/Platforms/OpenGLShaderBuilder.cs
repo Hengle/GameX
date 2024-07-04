@@ -1,5 +1,5 @@
+using OpenStack.Graphics;
 using OpenStack.Graphics.OpenGL;
-using OpenStack.Graphics.Renderer1;
 using System.Collections.Generic;
 
 namespace GameX.Platforms
