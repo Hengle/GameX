@@ -1,6 +1,6 @@
-using GameX.WbB.Formats.Props;
-using GameX.Formats;
 using GameX.Meta;
+using GameX.Platforms;
+using GameX.WbB.Formats.Props;
 using OpenStack.Graphics;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using static GameX.WbB.Formats.Props.SurfacePixelFormat;
-using GameX.Platforms;
 
 namespace GameX.WbB.Formats.FileTypes
 {
@@ -66,7 +65,7 @@ namespace GameX.WbB.Formats.FileTypes
         public int MipMaps => 1;
         public TextureFlags Flags => 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] mips)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             byte[] Expand()
             {
@@ -172,7 +171,7 @@ namespace GameX.WbB.Formats.FileTypes
                 }
             }
 
-            format = (Platform.Type)platform switch
+            return (Expand(), (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Unity => Format.unity,
@@ -180,10 +179,7 @@ namespace GameX.WbB.Formats.FileTypes
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            var bytes = Expand();
-            mips = new[] { Range.All };
-            return bytes;
+            }, new[] { Range.All });
         }
         public void End() { }
 

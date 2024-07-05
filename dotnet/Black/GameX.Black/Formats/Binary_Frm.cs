@@ -1,4 +1,3 @@
-using GameX.Formats;
 using GameX.Meta;
 using GameX.Platforms;
 using OpenStack.Graphics;
@@ -104,9 +103,8 @@ namespace GameX.Black.Formats
         public int MipMaps => 1;
         public TextureFlags Flags => 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
-        {
-            format = (Platform.Type)platform switch
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+            => (Bytes, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Unity => Format.unity,
@@ -114,10 +112,7 @@ namespace GameX.Black.Formats
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return Bytes;
-        }
+            }, null);
         public void End() { }
 
         // ITextureMultiple

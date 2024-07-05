@@ -98,7 +98,7 @@ namespace GameX.Formats
     #region Binary_Dds
 
     // https://github.com/paroj/nv_dds/blob/master/nv_dds.cpp
-    public class Binary_Dds : ITexture, IHaveMetaInfo
+    public class Binary_Dds : IHaveMetaInfo, ITexture
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Dds(r));
 
@@ -131,9 +131,8 @@ namespace GameX.Formats
         public int MipMaps => (int)Header.dwMipMapCount;
         public TextureFlags Flags => 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] mips)
-        {
-            format = (Platform.Type)platform switch
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+            => (Bytes, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Unity => Format.unity,
@@ -141,10 +140,7 @@ namespace GameX.Formats
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            mips = Mips;
-            return Bytes;
-        }
+            }, Mips);
         public void End() { }
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
@@ -249,7 +245,7 @@ namespace GameX.Formats
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             unsafe byte[] BmpToBytes()
             {
@@ -260,18 +256,14 @@ namespace GameX.Formats
                 Image.UnlockBits(data);
                 return d;
             }
-
-            Bytes = BmpToBytes();
-            format = (Platform.Type)platform switch
+            return (BmpToBytes(), (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return Bytes;
+            }, null);
         }
         public void End() { }
 
@@ -407,7 +399,7 @@ namespace GameX.Formats
         /// <returns></returns>
         static int RleLength(byte[] body, int offset) => body[offset] & 63;
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             // Decodes 4bpp pixel data
             byte[] Decode4bpp()
@@ -485,22 +477,19 @@ namespace GameX.Formats
                 return pixels;
             }
 
-            var bytes = Header.Bpp switch
+            return (Header.Bpp switch
             {
                 8 => Decode8bpp(),
                 1 => Decode4bpp(),
                 _ => throw new FormatException($"Unsupported bpp: {Header.Bpp}"),
-            };
-            format = (Platform.Type)platform switch
+            }, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return bytes;
+            }, null);
         }
         public void End() { }
 
@@ -809,7 +798,7 @@ namespace GameX.Formats
             Buffer.BlockCopy(map.Pixels, map.BytesPerEntry * index, dest, offset, map.BytesPerEntry);
         }
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             // DecodeRle
             void DecodeRle(byte[] data)
@@ -884,16 +873,14 @@ namespace GameX.Formats
             if (flipH) FlipH(bytes);
             if (flipV) FlipV(bytes);
 
-            format = (Platform.Type)platform switch
+            return (bytes, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return bytes;
+            }, null);
         }
         public void End() { }
 
@@ -982,28 +969,24 @@ namespace GameX.Formats
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             byte[] Decode1()
             {
                 return null;
             }
-
-            var bytes = Type switch
+            return (Type switch
             {
                 1 => Decode1(),
                 _ => throw new FormatException($"Unsupported type: {Type}"),
-            };
-            format = (Platform.Type)platform switch
+            }, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return bytes;
+            }, null);
         }
         public void End() { }
 
@@ -1080,21 +1063,18 @@ namespace GameX.Formats
         //    pixel += 4;
         //}
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             byte[] DecodeRaw() => Body.SelectMany(s => PaletteData[s]).ToArray();
 
-            var bytes = DecodeRaw();
-            format = (Platform.Type)platform switch
+            return (DecodeRaw(), (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return bytes;
+            }, null);
         }
         public void End() { }
 

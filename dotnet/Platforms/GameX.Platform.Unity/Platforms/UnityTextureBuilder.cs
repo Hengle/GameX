@@ -14,7 +14,7 @@ namespace GameX.Platforms
 
         public override Texture2D BuildTexture(ITexture info, Range? range = null)
         {
-            var bytes = info.Begin((int)Platform.Type.Unity, out var format, out _);
+            var (bytes, format, _) = info.Begin((int)Platform.Type.Unity);
             if (format is TextureUnityFormat unityFormat)
             {
                 if (unityFormat == TextureUnityFormat.DXT3_POLYFILL)

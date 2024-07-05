@@ -1,11 +1,8 @@
 using GameX.Meta;
 using GameX.Platforms;
 using OpenStack.Graphics;
-using OpenStack.Graphics.DirectX;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -66,7 +63,7 @@ namespace GameX.Lucas.Formats
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             //var bytes = Header.Bpp switch
             //{
@@ -74,16 +71,14 @@ namespace GameX.Lucas.Formats
             //    //1 => Decode4bpp(),
             //    _ => throw new FormatException($"Unsupported bpp: {Header.Bpp}"),
             //};
-            format = (Platform.Type)platform switch
+            return (null, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return null; // bytes;
+            }, null); // bytes;
         }
         public void End() { }
 

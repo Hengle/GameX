@@ -1,8 +1,6 @@
-using GameX.Formats;
 using GameX.Meta;
 using GameX.Platforms;
 using OpenStack.Graphics;
-using OpenStack.Graphics.DirectX;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +17,8 @@ namespace GameX.IW.Formats
     public class Binary_Iwi : ITexture, IHaveMetaInfo
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Iwi(r));
+
+        #region Headers
 
         public enum VERSION : byte
         {
@@ -235,6 +235,8 @@ namespace GameX.IW.Formats
             }
         }
 
+        #endregion
+
         public Binary_Iwi(BinaryReader r)
         {
             Bytes = HEADER.Read(r, out Header, out Mips, out Format);
@@ -251,9 +253,8 @@ namespace GameX.IW.Formats
         public int MipMaps => Mips.Length;
         public TextureFlags Flags => (Header.Flags & FLAGS.CUBEMAP) != 0 ? TextureFlags.CUBE_TEXTURE : 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
-        {
-            format = (Platform.Type)platform switch
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+            => (Bytes, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Unity => Format.unity,
@@ -261,10 +262,7 @@ namespace GameX.IW.Formats
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = Mips;
-            return Bytes;
-        }
+            }, Mips);
         public void End() { }
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {

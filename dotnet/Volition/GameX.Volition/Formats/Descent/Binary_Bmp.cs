@@ -21,7 +21,7 @@ namespace GameX.Volition.Formats.Descent
                 (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
                 TextureUnityFormat.RGBA32,
                 TextureUnrealFormat.Unknown);
-            
+
             // get body
             game.Ensure();
             Body = r.ReadToEnd();
@@ -72,7 +72,7 @@ namespace GameX.Volition.Formats.Descent
             pixel += 4;
         }
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             byte[] DecodeRLE()
             {
@@ -101,19 +101,16 @@ namespace GameX.Volition.Formats.Descent
 
             byte[] DecodeRaw() => Body.SelectMany(s => Palette[s]).ToArray();
 
-            var bytes = (PigFlags & (PIG_Flags.RLE | PIG_Flags.RLEBIG)) != 0
+            return ((PigFlags & (PIG_Flags.RLE | PIG_Flags.RLEBIG)) != 0
                 ? DecodeRLE()
-                : DecodeRaw();
-            format = (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return bytes;
+                : DecodeRaw(), (Platform.Type)platform switch
+                {
+                    Platform.Type.OpenGL => Format.gl,
+                    Platform.Type.Vulken => Format.vulken,
+                    Platform.Type.Unity => Format.unity,
+                    Platform.Type.Unreal => Format.unreal,
+                    _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
+                }, null);
         }
         public void End() { }
 

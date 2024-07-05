@@ -1,4 +1,3 @@
-using GameX.Formats;
 using GameX.Meta;
 using OpenStack.Graphics;
 using System;
@@ -60,7 +59,7 @@ namespace GameX.Origin.Formats.U8
         public int MipMaps => 1;
         public TextureFlags Flags => 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] mips)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             //byte[] Expand()
             //{
@@ -176,9 +175,7 @@ namespace GameX.Origin.Formats.U8
             //var bytes = Expand();
             //mips = new[] { Range.All };
             //return bytes;
-            format = default;
-            mips = default;
-            return null;
+            return (null, null, null);
         }
         public void End() { }
 

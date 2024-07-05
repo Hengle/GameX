@@ -52,7 +52,7 @@ namespace GameX.Platforms
             GL.BindTexture(TextureTarget.Texture2D, id);
             if (levelStart > 0) GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, levelStart);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, levelEnd - levelStart);
-            var bytes = info.Begin((int)Platform.Type.OpenGL, out var fmt, out var spans);
+            var (bytes, fmt, spans) = info.Begin((int)Platform.Type.OpenGL);
             if (bytes == null) return DefaultTexture;
 
             bool CompressedTexImage2D(ITexture info, int i, InternalFormat internalFormat)

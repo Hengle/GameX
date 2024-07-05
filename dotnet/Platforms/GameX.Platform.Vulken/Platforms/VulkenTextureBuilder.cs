@@ -50,7 +50,7 @@ namespace GameX.Platforms
 
             GL.BindTexture(TextureTarget.Texture2D, id);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, levelEnd - levelStart);
-            var bytes = info.Begin((int)Platform.Type.Vulken, out var fmt, out var spans);
+            var (bytes, fmt, spans) = info.Begin((int)Platform.Type.Vulken);
 
             bool CompressedTexImage2D(ITexture info, int i, InternalFormat internalFormat)
             {

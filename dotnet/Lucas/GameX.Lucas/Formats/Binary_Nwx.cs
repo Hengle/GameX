@@ -13,9 +13,11 @@ using static OpenStack.Debug;
 
 namespace GameX.Lucas.Formats
 {
-    public class Binary_Nwx : IHaveMetaInfo, ITexture
+    public class Binary_Nwx : IHaveMetaInfo, ITextureSelect
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Nwx(r, f, s));
+
+        #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct X_Header
@@ -51,6 +53,10 @@ namespace GameX.Lucas.Formats
             public uint Flags;
         }
 
+        #endregion
+
+        #region Palette
+
         static readonly ConcurrentDictionary<string, (byte r, byte g, byte b)[]> Palettes = new ConcurrentDictionary<string, (byte r, byte g, byte b)[]>();
 
         static (byte r, byte g, byte b)[] PaletteBuilder(string path, PakFile pak)
@@ -64,6 +70,8 @@ namespace GameX.Lucas.Formats
                 b.Add((pal[(i * 3) + 0], pal[(i * 3) + 1], pal[(i * 3) + 2]));
             return b.ToArray();
         }
+
+        #endregion
 
         public Binary_Nwx(BinaryReader r, FileSource f, PakFile s)
         {
@@ -149,7 +157,7 @@ namespace GameX.Lucas.Formats
         public TextureFlags Flags { get; } = 0;
 
         public void Select(int id) => (Width, Height, Flip, CellData) = Cells[id % Cells.Count];
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             int width = Width, height = Height;
             var data = CellData;
@@ -182,16 +190,14 @@ namespace GameX.Lucas.Formats
                     }
             }
 
-            format = (Platform.Type)platform switch
+            return (bytes, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return bytes;
+            }, null);
         }
         public void End() { }
 

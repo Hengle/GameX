@@ -101,7 +101,7 @@ namespace GameX.Valve.Formats.Blocks
         int ITexture.MipMaps => NumMipMaps;
         TextureFlags ITexture.Flags => (TextureFlags)Flags;
 
-        byte[] ITexture.Begin(int platform, out object format, out Range[] mips)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             Reader.BaseStream.Position = Offset + Size;
 
@@ -118,7 +118,7 @@ namespace GameX.Valve.Formats.Blocks
                 Bytes = b.ToArray();
             }
 
-            format = (Platform.Type)platform switch
+            return (Bytes, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => TexFormat.gl,
                 Platform.Type.Unity => TexFormat.unity,
@@ -126,9 +126,7 @@ namespace GameX.Valve.Formats.Blocks
                 Platform.Type.Vulken => TexFormat.vulken,
                 Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            mips = Mips;
-            return Bytes;
+            }, Mips);
         }
         void ITexture.End() { }
 

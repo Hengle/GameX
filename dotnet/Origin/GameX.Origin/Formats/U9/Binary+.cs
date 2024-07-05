@@ -11,7 +11,6 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using ZstdNet;
 
 // https://wiki.ultimacodex.com/wiki/Ultima_IX_internal_formats#FLX_Format
 namespace GameX.Origin.Formats.U9
@@ -288,19 +287,15 @@ namespace GameX.Origin.Formats.U9
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
-        {
-            format = (Platform.Type)platform switch
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+            => (Current?.Pixels, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return Current?.Pixels;
-        }
+            }, null);
         public void End() { }
 
         // IHaveMetaInfo
@@ -466,19 +461,15 @@ namespace GameX.Origin.Formats.U9
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
-        {
-            format = (Platform.Type)platform switch
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+            => (Pixels, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return Pixels;
-        }
+            }, null);
         public void End() { }
 
         // IHaveMetaInfo

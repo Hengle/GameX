@@ -133,7 +133,7 @@ namespace GameX.Formats
         public int MipMaps => pixels.Length;
         public TextureFlags Flags => 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
             static void FlattenPalette(Span<byte> data, byte[] source, byte[] palette)
             {
@@ -149,7 +149,16 @@ namespace GameX.Formats
                     }
             }
 
-            format = (Platform.Type)platform switch
+            var bytes = new byte[pixels.Sum(x => x.Length) * 4];
+            var spans = new Range[pixels.Length];
+            byte[] p;
+            for (int index = 0, offset = 0; index < pixels.Length; index++, offset += p.Length * 4)
+            {
+                p = pixels[index];
+                var span = spans[index] = new Range(offset, offset + p.Length * 4);
+                FlattenPalette(bytes.AsSpan(span), p, palette);
+            }
+            return (bytes, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Unity => Format.unity,
@@ -157,17 +166,7 @@ namespace GameX.Formats
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            var bytes = new byte[pixels.Sum(x => x.Length) * 4];
-            ranges = new Range[pixels.Length];
-            byte[] p;
-            for (int index = 0, offset = 0; index < pixels.Length; index++, offset += p.Length * 4)
-            {
-                p = pixels[index];
-                var range = ranges[index] = new Range(offset, offset + p.Length * 4);
-                FlattenPalette(bytes.AsSpan(range), p, palette);
-            }
-            return bytes;
+            }, spans);
         }
         public void End() { }
 

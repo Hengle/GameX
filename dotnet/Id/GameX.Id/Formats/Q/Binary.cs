@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -66,19 +65,15 @@ namespace GameX.Id.Formats.Q
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
-        public byte[] Begin(int platform, out object format, out Range[] ranges)
-        {
-            format = (Platform.Type)platform switch
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+            => (Pixels, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            ranges = null;
-            return Pixels;
-        }
+            }, null);
         public void End() { }
 
         // IHaveMetaInfo

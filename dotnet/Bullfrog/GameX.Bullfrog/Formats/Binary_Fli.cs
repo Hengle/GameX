@@ -110,19 +110,15 @@ namespace GameX.Bullfrog.Formats
         public int Frames { get; }
         public int Fps { get; }
 
-        public byte[] Begin(int platform, out object format, out Range[] mips)
-        {
-            format = (Platform.Type)platform switch
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+            => (Palette[0] != null ? Pixels.SelectMany(x => Palette[x]).ToArray() : null, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Unity => Format.unity,
                 Platform.Type.Unreal => Format.unreal,
                 Platform.Type.Vulken => Format.vulken,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            };
-            mips = default;
-            return Palette[0] != null ? Pixels.SelectMany(x => Palette[x]).ToArray() : null;
-        }
+            }, null);
         public void End() { }
 
         public bool HasFrames => NumFrames > 0;
