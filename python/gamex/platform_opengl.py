@@ -57,40 +57,38 @@ class OpenGLTextureBuilder(TextureBuilderBase):
         0.0, 0.9, 0.0, 1.0,
         0.9, 0.2, 0.8, 1.0,
         0.0, 0.9, 0.0, 1.0,
-        0.9, 0.2, 0.8, 1.0
-        ])
+        0.9, 0.2, 0.8, 1.0])
 
-    def buildTexture(self, info: ITexture, rng: range = None) -> int:
+    def buildTexture(self, info: ITexture, span: range = None) -> int:
         return self.defaultTexture
-
         id = glGenTextures(1)
         numMipMaps = max(1, info.mipMaps)
-        start = rng[0] or 0 if rng else 0
-        end = numMipMaps - 1
+        levelStart = span[0] or 0 if span else 0
+        levelEnd = numMipMaps - 1
 
         glBindTexture(GL_TEXTURE_2D, id)
-        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, end - start)
-        bytes, fmt, ranges = info.begin(Platform.Type.OpenGL)
+        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, levelEnd - levelStart)
+        bytes, fmt, spans = info.begin(Platform.Type.OpenGL)
         pixels = []
 
         def compressedTexImage2D(info: ITexture, i: int, internalFormat: int) -> bool:
             nonlocal pixels
-            rng = ranges[i] if ranges else None
-            if rng and rng[0] == -1: return False
+            span = spans[i] if spans else None
+            if span and span[0] < 0: return False
             width = info.width >> i
             height = info.height >> i
-            pixels = bytes[rng[0]:rng[1]] if rng else bytes
+            pixels = bytes[span[0]:span[1]] if span else bytes
             arrayType = GLbyte * len(pixels)
             glCompressedTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, len(pixels), arrayType(*pixels))
             return True
 
         def texImage2D(info: ITexture, i: int, internalFormat: int, format: int, type: int) -> bool:
             nonlocal pixels
-            rng = ranges[i] if ranges else None
-            if rng and rng[0] == -1: return False
+            span = spans[i] if spans else None
+            if span and span[0] < 0: return False
             width = info.width >> i
             height = info.height >> i
-            pixels = bytes[rng[0]:rng[1]] if rng else bytes
+            pixels = bytes[span[0]:span[1]] if span else bytes
             arrayType = GLbyte * len(pixels)
             abc = glTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, format, type, arrayType(*pixels))
             return True
@@ -99,16 +97,16 @@ class OpenGLTextureBuilder(TextureBuilderBase):
             case glFormat if isinstance(fmt, TextureGLFormat):
                 internalFormat = glFormat.value
                 if not internalFormat: print('Unsupported texture, using default'); return self.defaultTexture
-                for i in range(start, end):
+                for i in range(levelStart, levelEnd):
                     if not compressedTexImage2D(info, i, internalFormat): return self.defaultTexture
             case glPixelFormat if isinstance(fmt, tuple):
                 internalFormat, format, type = glPixelFormat[0].value, glPixelFormat[1].value, glPixelFormat[2].value
                 if not internalFormat: print('Unsupported texture, using default'); return self.defaultTexture
-                for i in range(start, numMipMaps):
+                for i in range(levelStart, numMipMaps):
                     if not texImage2D(info, i, internalFormat, format, type): return self.defaultTexture
             case _: raise Exception(f'Uknown {fmt}')
 
-        if isinstance(info, IDisposable): info.dispose()
+        # if isinstance(info, IDisposable): info.dispose()
         info.end()
 
         if self.maxTextureMaxAnisotropy >= 4:
@@ -127,7 +125,7 @@ class OpenGLTextureBuilder(TextureBuilderBase):
         pixels = np.array(pixels, dtype = np.float32)
         id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, id)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, pixels)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, pixels.tobytes())
         # glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, (GLfloat * len(pixels))(*pixels))
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)

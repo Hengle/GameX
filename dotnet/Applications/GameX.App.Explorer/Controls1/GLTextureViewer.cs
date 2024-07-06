@@ -1,7 +1,6 @@
-using OpenStack;
 using OpenStack.Graphics;
 using OpenStack.Graphics.Controls;
-using OpenStack.Graphics.OpenGL.Renderer1.Renderers;
+using OpenStack.Graphics.OpenGL;
 using OpenTK.Input;
 using System;
 using System.Collections.Generic;
@@ -15,6 +14,12 @@ namespace GameX.App.Explorer.Controls1
 {
     public class GLTextureViewer : GLViewerControl
     {
+        const int FACTOR = 1;
+        bool background;
+        Range span = 0..;
+        readonly HashSet<TextureRenderer> Renderers = new();
+        public ITexture Obj;
+
         public GLTextureViewer()
         {
             GLPaint += OnPaint;
@@ -41,16 +46,12 @@ namespace GameX.App.Explorer.Controls1
             get => GetValue(SourceProperty);
             set => SetValue(SourceProperty, value);
         }
-        
-        public ITexture Obj;
-
-        const int Factor = 1;
 
         protected override void HandleResize()
         {
             if (Obj == null) return;
             if (Obj.Width > 1024 || Obj.Height > 1024 || false) { base.HandleResize(); return; }
-            Camera.SetViewportSize(Obj.Width << Factor, Obj.Height << Factor);
+            Camera.SetViewportSize(Obj.Width << FACTOR, Obj.Height << FACTOR);
             RecalculatePositions();
         }
 
@@ -69,14 +70,10 @@ namespace GameX.App.Explorer.Controls1
             Camera.LookAt(new Vector3(0));
 
             graphic.TextureManager.DeleteTexture(Obj);
-            var texture = graphic.TextureManager.LoadTexture(Obj, out _, rng);
+            var texture = graphic.TextureManager.LoadTexture(Obj, out _, span);
             Renderers.Clear();
-            Renderers.Add(new TextureRenderer(graphic, texture) { Background = background });
+            Renderers.Add(new TextureRenderer(graphic, texture, background));
         }
-
-        bool background;
-        Range rng = 0..;
-        readonly HashSet<TextureRenderer> Renderers = new();
 
         void OnPaint(object sender, RenderEventArgs e)
         {
@@ -115,9 +112,9 @@ namespace GameX.App.Explorer.Controls1
             OnProperty();
             Views.FileExplorer.Instance.OnInfoUpdated();
         }
-        void MoveReset() { Id = 0; rng = 0..; OnProperty(); }
-        void MoveNext() { if (rng.Start.Value < 10) rng = new(rng.Start.Value + 1, rng.End); OnProperty(); }
-        void MovePrev() { if (rng.Start.Value > 0) rng = new(rng.Start.Value - 1, rng.End); OnProperty(); }
+        void MoveReset() { Id = 0; span = 0..; OnProperty(); }
+        void MoveNext() { if (span.Start.Value < 10) span = new(span.Start.Value + 1, span.End); OnProperty(); }
+        void MovePrev() { if (span.Start.Value > 0) span = new(span.Start.Value - 1, span.End); OnProperty(); }
         void ToggleBackground() { background = !background; OnProperty(); }
     }
 }

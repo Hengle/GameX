@@ -1,7 +1,6 @@
 using GameX.Valve.Formats.Blocks;
-using OpenStack;
 using OpenStack.Graphics;
-using OpenStack.Graphics.OpenGL.Renderer1.Renderers;
+using OpenStack.Graphics.OpenGL;
 using System.Collections.Generic;
 
 namespace GameX.Valve.Graphics.OpenGL.Scenes

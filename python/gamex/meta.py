@@ -50,10 +50,9 @@ class MetaItem:
         self.items = items or []
 
     def findByPath(self, path: str, manager: MetaManager) -> MetaItem:
-        paths = re.split('\\\\|/|:', path)
+        paths = re.split('\\\\|/|:', path, 1)
         node = next(iter([x for x in self.items if x.name == paths[0]]), None)
         if node and isinstance(node.source, FileSource) and node.source.pak: node.source.pak.open(node.items, manager)
-        # if node and node.pakFile: node.pakFile.open(node.items, manager)
         return node if not node or len(paths) == 1 else node.findByPath(paths[1], manager)
 
     @staticmethod
@@ -61,7 +60,6 @@ class MetaItem:
         paths = re.split('\\\\|/|:', path, 1)
         node = next(iter([x for x in nodes if x.name == paths[0]]), None)
         if node and isinstance(node.source, FileSource) and node.source.pak: node.source.pak.open(node.items, manager)
-        # if node and node.pakFile: node.pakFile.open(node.items, manager)
         return node if not node or len(paths) == 1 else node.findByPath(paths[1], manager)
 
 # IHaveMetaInfo
@@ -113,6 +111,8 @@ class MetaManager:
 
     @staticmethod
     def getMetaItems(manager: MetaManager, pakFile: BinaryPakFile) -> list[MetaItem]:
+        if not manager: raise Exception('manager')
+
         root = []
         if not pakFile.files: return root
         currentPath = None; currentFolder = None
@@ -122,6 +122,7 @@ class MetaManager:
             # next path, skip empty
             path = file.path[pakFile.pathSkip:]
             if not path: continue
+
             # folder
             fileFolder = os.path.dirname(path)
             if currentPath != fileFolder:
@@ -132,7 +133,7 @@ class MetaManager:
                         found = next(iter([x for x in currentFolder if x.name == folder and not x.pakFile]), None)
                         if found: currentFolder = found.items
                         else:
-                            found = MetaItem(file, folder, manager.folderIcon)
+                            found = MetaItem(None, folder, manager.folderIcon)
                             currentFolder.append(found)
                             currentFolder = found.items
             # pakfile
@@ -140,6 +141,7 @@ class MetaManager:
                 items = MetaManager.getMetaItems(manager, file.pak)
                 currentFolder.append(MetaItem(file, os.path.basename(file.path), manager.packageIcon, pakFile = pakFile, items = items))
                 continue
+                
             # file
             fileName = os.path.basename(path)
             fileNameForIcon = pakFile.fileMask(fileName) or fileName if pakFile.fileMask else fileName

@@ -93,7 +93,7 @@ namespace GameX.Meta
         {
             // if node is a leaf
             if (Items == null || Items.Count == 0) return predicate(this) ? this : null;
-            // Otherwise if node is not a leaf
+            // otherwise if node is not a leaf
             else
             {
                 var results = Items.Select(i => i.Search(predicate)).Where(i => i != null).ToList();
@@ -254,6 +254,7 @@ namespace GameX.Meta
                     currentFolder.Add(new MetaItem(file, Path.GetFileName(file.Path), manager.PackageIcon, pakFile: pakFile, items: items));
                     continue;
                 }
+
                 // file
                 var fileName = Path.GetFileName(path);
                 var fileNameForIcon = pakFile.FileMask?.Invoke(fileName) ?? fileName;

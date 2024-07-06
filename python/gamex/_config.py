@@ -1,6 +1,7 @@
 __title__ = "gamex"
 __version__ = "0.0.1"
-__current__ = "Bullfrog"
+__current__ = "Arkane"
+# __current__ = "Bullfrog"
 
 class DefaultOptions:
     def __init__(self, Family:str=None, Game:str=None, Edition:str=None, ForcePath:str=None, ForceOpen:bool=False):
@@ -16,7 +17,7 @@ match __current__:
 
         appDefaultOptions = DefaultOptions(
             ForceOpen = True,
-            ForcePath = "sample:*",
+            ForcePath = "sample:1",
             Family = "Arkane",
             Game = "AF", # Arx Fatalis [open, read, texture:GL]
             # Game = "DOM", # Dark Messiah of Might and Magic [open, read]

@@ -1,6 +1,7 @@
 using OpenStack;
 using OpenStack.Graphics;
 using OpenStack.Graphics.Controls;
+using OpenStack.Graphics.OpenGL;
 using System;
 using System.ComponentModel;
 using System.Numerics;

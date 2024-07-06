@@ -10,14 +10,17 @@ from openstk.gfx_texture import ITexture
 from openstk.gl_view import OpenGLView
 from openstk.gl_renders import TextureRenderer
 
+FACTOR: int = 1
+
 # typedefs
 class IOpenGLGraphic: pass
 
 # TextureView
 class TextureView(OpenGLView):
     background: bool = False
-    rng: range = None
+    span: range = None
     renderers: list[TextureRenderer] = []
+    obj: obj = None
 
     def __init__(self, parent, tab):
         super().__init__()
@@ -29,33 +32,31 @@ class TextureView(OpenGLView):
         super().initializeGL()
         self.onProperty()
 
-    # def handleResize(self):
-    #     source = self.source if isinstance(self.source, ITexture) else None
-    #     if not source: return
-    #     if source.width > 1024 or source.height > 1024: super().handleResize(); return
-    #     self.camera.setViewportSize(source.width, source.height)
-    #     self.recalculatePositions()
+    def handleResize(self):
+        if not self.obj: return
+        if self.obj.width > 1024 or self.obj.height > 1024 or False: super().handleResize(); return
+        self.camera.setViewportSize(self.obj.width << FACTOR, self.obj.height << FACTOR)
+        self.recalculatePositions()
 
     def onProperty(self):
         if not self.graphic or not self.source: return
         graphic = self.graphic
-        source = self.source if isinstance(self.source, ITexture) else None
-        if not source: return
+        self.obj = self.source if isinstance(self.source, ITexture) else None
+        if not self.obj: return
 
         self.handleResize()
         self.camera.setLocation(np.array([200., 200., 200.]))
         self.camera.lookAt(np.zeros(3))
 
-        graphic.textureManager.deleteTexture(source)
-        texture, _ = graphic.textureManager.loadTexture(source, self.rng)
+        graphic.textureManager.deleteTexture(self.obj)
+        texture, _ = graphic.textureManager.loadTexture(self.obj, self.span)
         self.renderers.clear()
-        self.renderers.append(TextureRenderer(graphic, texture, background = self.background))
+        self.renderers.append(TextureRenderer(graphic, texture, self.background))
 
     def paintGL(self):
         super().paintGL()
         # self.handleInput(Keyboard.GetState())
-        for renderer in self.renderers:
-            renderer.render(self.camera, RenderPass.Both)
+        for renderer in self.renderers: renderer.render(self.camera, RenderPass.Both)
         self.update()
 
     # def keyPressed(key):

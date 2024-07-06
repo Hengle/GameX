@@ -24,7 +24,7 @@ class TextureBuilderBase:
 class TextureManager(ITextureManager):
     _pakFile: PakFile
     _builder: TextureBuilderBase
-    _cachedTextures: dict[object, (Texture, dict[str, object])] = {}
+    _cachedTextures: dict[object, (Texture, object)] = {}
     _preloadTasks: dict[object, ITexture] = {}
 
     def __init__(self, pakFile: PakFile, builder: TextureBuilderBase):
@@ -38,18 +38,18 @@ class TextureManager(ITextureManager):
     @property
     def defaultTexture(self) -> Texture: return self._builder.defaultTexture
 
-    def loadTexture(self, key: object, rng: range = None) -> (Texture, dict[str, object]):
+    def loadTexture(self, key: object, spans: range = None) -> (Texture, object):
         if key in self._cachedTextures: return self._cachedTextures[key]
-        # Load & cache the texture.
+        # load & cache the texture.
         info = key if isinstance(key, ITexture) else self.loadTexture(key)
-        texture = self._builder.buildTexture(info, rng) if info else self._builder.defaultTexture
-        data = info.data if info else None
-        self._cachedTextures[key] = (texture, data)
-        return (texture, data)
+        texture = self._builder.buildTexture(info, spans) if info else self._builder.defaultTexture
+        tag = None #info.data if info else None
+        self._cachedTextures[key] = (texture, tag)
+        return (texture, tag)
 
     def preloadTexture(self, path: str) -> None:
         if path in self._cachedTextures: return
-        # Start loading the texture file asynchronously if we haven't already started.
+        # start loading the texture file asynchronously if we haven't already started.
         if not path in self._preloadTasks: self._preloadTasks[path] = self._pakFile.loadFileObject(path)
 
     def deleteTexture(self, key: object) -> None:

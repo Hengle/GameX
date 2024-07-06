@@ -7,7 +7,7 @@ from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6 import QtCore, QtMultimedia
 from gamex import config
 from gamex.pak import PakFile
-# from gamex.util import x
+from gamex.filesrc import FileSource
 from gamex.meta import MetaItem, MetaInfo
 
 # https://doc.qt.io/qt-6/qtreeview.html
@@ -116,15 +116,15 @@ class FileExplorer(QWidget):
         MetaInfoToViewModel.toTreeNodes(self.infoModel, value)
         self.infoView.expandAll()
 
-    def filter_change(self, index):
-        pass
-
-    def node_change(self, newSelection, oldSelection):
-        index = next(iter(newSelection.indexes()), None)
-        value = self._selectedItem = index.data(Qt.ItemDataRole.UserRole)
+    @property
+    def selectedItem(self): return self._selectedItem
+    @nodes.setter
+    def selectedItem(self, value):
+        if self._selectedItem == value: return
+        self._selectedItem = value
         if not value: self.onInfo(); return
         try:
-            pak = value.source.pak
+            pak = value.source.pak if isinstance(value.source, FileSource) else None
             if pak:
                 if pak.status == PakFile.PakStatus.Opened: return
                 pak.open(value.items, self.resource)
@@ -135,9 +135,21 @@ class FileExplorer(QWidget):
             print(traceback.format_exc())
             self.onInfo([
                 MetaInfo(f'EXCEPTION: {sys.exc_info()[1]}'),
-                MetaInfo(traceback.format_exc())
-            ])
+                MetaInfo(traceback.format_exc())])
 
+    def setSelectedItem(self, node):
+        if not node: return
+        self.updateNodes()
+        index = self.nodeModel.indexFromItem(self.nodeModelMap[node])
+        self.nodeView.selectionModel().select(index, QItemSelectionModel.SelectionFlag.SelectCurrent)
+
+    def filter_change(self, index):
+        pass
+
+    def node_change(self, newSelection, oldSelection):
+        index = next(iter(newSelection.indexes()), None)
+        self.selectedItem = index.data(Qt.ItemDataRole.UserRole)
+        
     def onFilterKeyUp(self, a, b):
         pass
 
@@ -149,8 +161,6 @@ class FileExplorer(QWidget):
         if not config.ForcePath or config.ForcePath.startswith('app:'): return
         sample = pakFile.game.getSample(config.ForcePath[7:]) if config.ForcePath.startswith('sample:') else None
         forcePath = sample.path if sample else config.ForcePath
-        node = MetaItem.findByPathForNodes(self.pakNodes, forcePath, self.resource)
-        if not node: return
-        self.updateNodes()
-        index = self.nodeModel.indexFromItem(self.nodeModelMap[node])
-        self.nodeView.selectionModel().select(index, QItemSelectionModel.SelectionFlag.Select)
+        if not forcePath: return
+        abc = MetaItem.findByPathForNodes(self.pakNodes, forcePath, self.resource)
+        self.setSelectedItem(MetaItem.findByPathForNodes(self.pakNodes, forcePath, self.resource))

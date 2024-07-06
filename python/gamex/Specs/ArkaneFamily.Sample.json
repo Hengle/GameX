@@ -3,6 +3,10 @@
     "name": "Arx Fatalis",
     "files": [
       {
+        "path": "readme.txt",
+        "type": "Text"
+      },
+      {
         "path": "data.pak:GRAPH/particles/DEFAULT.jpg",
         "type": "Texture.jpg"
       },

@@ -1,10 +1,8 @@
 using GameX.Valve.Formats;
 using GameX.Valve.Formats.Animations;
 using GameX.Valve.Formats.Blocks;
-using OpenStack;
 using OpenStack.Graphics;
-using OpenStack.Graphics.Animate;
-using OpenStack.Graphics.OpenGL.Renderer1;
+using OpenStack.Graphics.OpenGL;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;

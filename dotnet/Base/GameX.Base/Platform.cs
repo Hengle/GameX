@@ -21,7 +21,7 @@ namespace GameX.Platforms
         }
 
         public abstract Texture DefaultTexture { get; }
-        public abstract Texture BuildTexture(ITexture info, Range? rng = null);
+        public abstract Texture BuildTexture(ITexture info, Range? spans = null);
         public abstract Texture BuildSolidTexture(int width, int height, float[] rgba);
         public abstract Texture BuildNormalMap(Texture source, float strength);
         public abstract void DeleteTexture(Texture texture);
@@ -50,21 +50,21 @@ namespace GameX.Platforms
 
         public Texture DefaultTexture => Builder.DefaultTexture;
 
-        public Texture LoadTexture(object key, out object tag, Range? rng = null)
+        public Texture LoadTexture(object key, out object tag, Range? spans = null)
         {
             if (CachedTextures.TryGetValue(key, out var cache)) { tag = cache.tag; return cache.texture; }
-            // Load & cache the texture.
+            // load & cache the texture.
             var info = key is ITexture z ? z : LoadTexture(key);
-            var texture = info != null ? Builder.BuildTexture(info, rng) : Builder.DefaultTexture;
+            var texture = info != null ? Builder.BuildTexture(info, spans) : Builder.DefaultTexture;
             tag = null; // info;
-            CachedTextures[key] = (texture, info);
+            CachedTextures[key] = (texture, tag);
             return texture;
         }
 
         public void PreloadTexture(string path)
         {
             if (CachedTextures.ContainsKey(path)) return;
-            // Start loading the texture file asynchronously if we haven't already started.
+            // start loading the texture file asynchronously if we haven't already started.
             if (!PreloadTasks.ContainsKey(path)) PreloadTasks[path] = PakFile.LoadFileObject<ITexture>(path);
         }
 

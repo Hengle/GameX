@@ -1,5 +1,5 @@
 using GameX.Valve.Formats.Animations.SegmentDecoders;
-using OpenStack.Graphics.Animate;
+using OpenStack.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
