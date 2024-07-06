@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using static GameX.Formats.Unknown.IUnknownFileObject;
 using static OpenStack.Debug;
 
 namespace GameX.Bullfrog.Formats
@@ -76,6 +77,9 @@ namespace GameX.Bullfrog.Formats
 
         public Binary_Fli(BinaryReader r, FileSource f)
         {
+            // read events
+            Events = S.GetEvents($"{Path.GetFileNameWithoutExtension(f.Path).ToLowerInvariant()}.evt");
+
             // read header
             var header = r.ReadS<X_Header>();
             if (header.Type != X_Header.MAGIC) throw new FormatException("BAD MAGIC");
@@ -90,7 +94,7 @@ namespace GameX.Bullfrog.Formats
 
             // set values
             R = r;
-            Fps = Path.GetFileNameWithoutExtension(f.Path).ToLowerInvariant() == "intro" ? 10 : 15;
+            Fps = Path.GetFileName(f.Path).ToLowerInvariant().StartsWith("mscren") ? 20 : 15;
             Pixels = new byte[Width * Height];
         }
 
@@ -99,6 +103,7 @@ namespace GameX.Bullfrog.Formats
         public BinaryReader R;
         public byte[][] Palette = new byte[256][];
         public byte[] Pixels;
+        public S.Event[] Events;
         public int NumFrames;
 
         (object gl, object vulken, object unity, object unreal) Format;
@@ -106,7 +111,7 @@ namespace GameX.Bullfrog.Formats
         public int Height { get; }
         public int Depth => 0;
         public int MipMaps => 0;
-        public TextureFlags Flags => 0;
+        public TextureFlags Flags => TextureFlags.NO_CACHE;
         public int Frames { get; }
         public int Fps { get; }
 

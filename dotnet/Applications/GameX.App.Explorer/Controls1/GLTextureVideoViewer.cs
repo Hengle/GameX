@@ -14,6 +14,15 @@ namespace GameX.App.Explorer.Controls1
 {
     public class GLTextureVideoViewer : GLViewerControl
     {
+        const int FACTOR = 1;
+        bool Background;
+        IOpenGLGraphic GraphicGL;
+        ITextureVideo Obj;
+        Range Level = 0..;
+        readonly HashSet<TextureRenderer> Renderers = [];
+        int Texture;
+        int FrameDelay;
+
         public GLTextureVideoViewer()
         {
             GLPaint += OnPaint;
@@ -41,22 +50,18 @@ namespace GameX.App.Explorer.Controls1
             set => SetValue(SourceProperty, value);
         }
 
-        public ITextureVideo Obj;
-
-        const int Factor = 1;
-
         protected override void HandleResize()
         {
             if (Obj == null) return;
             if (Obj.Width > 1024 || Obj.Height > 1024 || false) { base.HandleResize(); return; }
-            Camera.SetViewportSize(Obj.Width << Factor, Obj.Height << Factor);
+            Camera.SetViewportSize(Obj.Width << FACTOR, Obj.Height << FACTOR);
             RecalculatePositions();
         }
 
         void OnProperty()
         {
             if (Graphic == null || Source == null) return;
-            var graphic = Graphic as IOpenGLGraphic;
+            GraphicGL = Graphic as IOpenGLGraphic;
             Obj = Source is ITextureVideo z ? z
                 : Source is IRedirected<ITextureVideo> y ? y.Value
                 : null;
@@ -67,29 +72,21 @@ namespace GameX.App.Explorer.Controls1
             Camera.SetLocation(new Vector3(200));
             Camera.LookAt(new Vector3(0));
 
-            graphic.TextureManager.DeleteTexture(Obj);
-            Texture = graphic.TextureManager.LoadTexture(Obj, out _, Rng);
+            GraphicGL.TextureManager.DeleteTexture(Obj);
+            Texture = GraphicGL.TextureManager.LoadTexture(Obj, out _, Level);
             Renderers.Clear();
-            Renderers.Add(new TextureRenderer(graphic, Texture) { Background = Background });
+            Renderers.Add(new TextureRenderer(GraphicGL, Texture, Background));
         }
-
-        int Texture;
-        bool Background;
-        Range Rng = 0..;
-        readonly HashSet<TextureRenderer> Renderers = [];
-        int FrameDelay;
 
         public override void OnTick(int elapsedMs)
         {
-            if (Graphic == null || Obj == null || !Obj.HasFrames) return;
-            var graphic = Graphic as IOpenGLGraphic;
+            if (GraphicGL == null || Obj == null || !Obj.HasFrames) return;
             FrameDelay += elapsedMs;
             if (FrameDelay <= Obj.Fps || !Obj.DecodeFrame()) return;
-            FrameDelay = 0; // Reset delay between frames
-            graphic.TextureManager.DeleteTexture(Obj);
-            Texture = graphic.TextureManager.LoadTexture(Obj, out _, Rng);
+            FrameDelay = 0; // reset delay between frames
+            //GraphicGL.TextureManager.DeleteTexture(Obj);
+            GraphicGL.TextureManager.ReloadTexture(Obj, out _, Level);
             Draw();
-            //addDirtyRect(0, 0, 1, 1); // Add a dirty rect just to start the render routine
         }
 
         void OnPaint(object sender, RenderEventArgs e)
@@ -118,7 +115,7 @@ namespace GameX.App.Explorer.Controls1
                 }
         }
 
-        void Reset() { Id = 0; Rng = 0..; OnProperty(); }
+        void Reset() { Id = 0; Level = 0..; OnProperty(); }
         void Toggle() { OnProperty(); }
     }
 }

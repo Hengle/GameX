@@ -38,19 +38,19 @@ class TextureManager(ITextureManager):
     @property
     def defaultTexture(self) -> Texture: return self._builder.defaultTexture
 
-    def loadTexture(self, key: object, spans: range = None) -> (Texture, object):
+    def loadTexture(self, key: object, level: range = None) -> (Texture, object):
         if key in self._cachedTextures: return self._cachedTextures[key]
         # load & cache the texture.
         info = key if isinstance(key, ITexture) else self.loadTexture(key)
-        texture = self._builder.buildTexture(info, spans) if info else self._builder.defaultTexture
+        texture = self._builder.buildTexture(info, level) if info else self._builder.defaultTexture
         tag = None #info.data if info else None
         self._cachedTextures[key] = (texture, tag)
         return (texture, tag)
 
-    def preloadTexture(self, path: str) -> None:
-        if path in self._cachedTextures: return
+    def preloadTexture(self, key: object) -> None:
+        if key in self._cachedTextures: return
         # start loading the texture file asynchronously if we haven't already started.
-        if not path in self._preloadTasks: self._preloadTasks[path] = self._pakFile.loadFileObject(path)
+        if not key in self._preloadTasks: self._preloadTasks[key] = self._pakFile.loadFileObject(key)
 
     def deleteTexture(self, key: object) -> None:
         if not key in self._cachedTextures: return
@@ -111,15 +111,15 @@ class ObjectManager(IObjectManager):
     def createObject(self, path: str) -> (object, dict[str, object]):
         data = None
         self._builder.ensurePrefabContainerExists()
-        # Load & cache the NIF prefab.
+        # load & cache the prefab.
         if not path in self._cachedPrefabs: prefab = self._cachedPrefabs[path] = self.loadPrefabDontAddToPrefabCache(path)
         else: prefab = self._cachedPrefabs[path]
-        # Instantiate the prefab.
+        # instantiate the prefab.
         return self._builder.createObject(prefab)
  
     def preloadObject(self, path: str) -> None:
         if path in self._cachedPrefabs: return
-        # Start loading the object asynchronously if we haven't already started.
+        # start loading the object asynchronously if we haven't already started.
         if not path in self._preloadTasks: self._preloadTasks[path] = self._pakFile.loadFileObject(object, path)
 
     async def loadPrefabDontAddToPrefabCache(path: str) -> object:
@@ -142,7 +142,7 @@ class MaterialBuilderBase:
 class MaterialManager(IMaterialManager):
     _pakFile: PakFile
     _builder: MaterialBuilderBase
-    _cachedMaterials: dict[object, (Material, dict[str, object])] = {}
+    _cachedMaterials: dict[object, (Material, object)] = {}
     _preloadTasks: dict[object, IMaterial] = {}
 
     textureManager: ITextureManager
@@ -152,29 +152,26 @@ class MaterialManager(IMaterialManager):
         self._textureManager = textureManager
         self._builder = builder
 
-    def loadMaterial(self, key: object) -> (Material, dict[str, object]):
+    def loadMaterial(self, key: object) -> (Material, object):
         if key in self._cachedMaterials: return self._cachedMaterials[key]
-        # Load & cache the material.
-        info = key if isinstance(key, IMaterial) else self.loadMaterialInfo(key)
+        # load & cache the material.
+        info = key if isinstance(key, IMaterial) else self.loadMaterial(key)
         material = self._builder.buildMaterial(info) if info else self._builder.defaultMaterial
-        data = info.data if info else None
-        self._cachedMaterials[key] = (material, data)
+        tag = None #info.data if info else None
+        self._cachedMaterials[key] = (material, tag)
         return material
 
-    def preloadMaterial(self, path: str) -> None:
-        if path in self._cachedMaterials: return
-        # Start loading the material file asynchronously if we haven't already started.
-        if not path in self._preloadTasks: self._preloadTasks[path] = self._pakFile.loadFileObject(path)
+    def preloadMaterial(self, key: object) -> None:
+        if key in self._cachedMaterials: return
+        # start loading the material file asynchronously if we haven't already started.
+        if not key in self._preloadTasks: self._preloadTasks[key] = self._pakFile.loadFileObject(key)
 
-    async def loadMaterialInfo(self, key: object) -> IMaterial:
+    async def loadMaterial(self, key: object) -> IMaterial:
         assert(not key in self._cachedMaterials)
-        match key:
-            case path if isinstance(key, str):
-                self.preloadMaterial(path)
-                info = await self.preloadTasks[key]
-                self.preloadTasks.remove(key)
-                return info
-            case _: raise Exception(f'Unknown {key}')
+        self.preloadMaterial(key)
+        info = await self.preloadTasks[key]
+        self.preloadTasks.remove(key)
+        return info
 
 # typedefs
 # class Type(Enum): pass

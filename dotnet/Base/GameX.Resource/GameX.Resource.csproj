@@ -7,9 +7,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="..\..\..\python\gamex\Resources\Bioware\TOR.zst" Link="Bioware\TOR.zst" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\python\gamex\Resources\Bullfrog\S.zip" Link="Bullfrog\S.zip" />
     <EmbeddedResource Include="..\..\..\python\gamex\Resources\Capcom\RE.zip" Link="Capcom\RE.zip" />
     <EmbeddedResource Include="..\..\..\python\gamex\Resources\Red\CP77.zip" Link="Red\CP77.zip" />
   </ItemGroup>

@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Base\GameX.Base\GameX.Base.csproj" />
+    <ProjectReference Include="..\..\Base\GameX.Resource\GameX.Resource.csproj" />
   </ItemGroup>
 
 </Project>

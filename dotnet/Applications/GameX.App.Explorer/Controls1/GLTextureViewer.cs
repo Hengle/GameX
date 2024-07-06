@@ -15,10 +15,11 @@ namespace GameX.App.Explorer.Controls1
     public class GLTextureViewer : GLViewerControl
     {
         const int FACTOR = 1;
-        bool background;
-        Range span = 0..;
-        readonly HashSet<TextureRenderer> Renderers = new();
-        public ITexture Obj;
+        bool Background;
+        IOpenGLGraphic GraphicGL;
+        ITexture Obj;
+        Range Level = 0..;
+        readonly HashSet<TextureRenderer> Renderers = [];
 
         public GLTextureViewer()
         {
@@ -58,7 +59,7 @@ namespace GameX.App.Explorer.Controls1
         void OnProperty()
         {
             if (Graphic == null || Source == null) return;
-            var graphic = Graphic as IOpenGLGraphic;
+            GraphicGL = Graphic as IOpenGLGraphic;
             Obj = Source is ITexture z ? z
                 : Source is IRedirected<ITexture> y ? y.Value
                 : null;
@@ -69,10 +70,10 @@ namespace GameX.App.Explorer.Controls1
             Camera.SetLocation(new Vector3(200));
             Camera.LookAt(new Vector3(0));
 
-            graphic.TextureManager.DeleteTexture(Obj);
-            var texture = graphic.TextureManager.LoadTexture(Obj, out _, span);
+            GraphicGL.TextureManager.DeleteTexture(Obj);
+            var texture = GraphicGL.TextureManager.LoadTexture(Obj, out _, Level);
             Renderers.Clear();
-            Renderers.Add(new TextureRenderer(graphic, texture, background));
+            Renderers.Add(new TextureRenderer(GraphicGL, texture, Background));
         }
 
         void OnPaint(object sender, RenderEventArgs e)
@@ -112,9 +113,9 @@ namespace GameX.App.Explorer.Controls1
             OnProperty();
             Views.FileExplorer.Instance.OnInfoUpdated();
         }
-        void MoveReset() { Id = 0; span = 0..; OnProperty(); }
-        void MoveNext() { if (span.Start.Value < 10) span = new(span.Start.Value + 1, span.End); OnProperty(); }
-        void MovePrev() { if (span.Start.Value > 0) span = new(span.Start.Value - 1, span.End); OnProperty(); }
-        void ToggleBackground() { background = !background; OnProperty(); }
+        void MoveReset() { Id = 0; Level = 0..; OnProperty(); }
+        void MoveNext() { if (Level.Start.Value < 10) Level = new(Level.Start.Value + 1, Level.End); OnProperty(); }
+        void MovePrev() { if (Level.Start.Value > 0) Level = new(Level.Start.Value - 1, Level.End); OnProperty(); }
+        void ToggleBackground() { Background = !Background; OnProperty(); }
     }
 }

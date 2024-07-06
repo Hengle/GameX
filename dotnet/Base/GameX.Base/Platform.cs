@@ -21,7 +21,7 @@ namespace GameX.Platforms
         }
 
         public abstract Texture DefaultTexture { get; }
-        public abstract Texture BuildTexture(ITexture info, Range? spans = null);
+        public abstract Texture BuildTexture(ITexture info, Range? level = null);
         public abstract Texture BuildSolidTexture(int width, int height, float[] rgba);
         public abstract Texture BuildNormalMap(Texture source, float strength);
         public abstract void DeleteTexture(Texture texture);
@@ -50,22 +50,29 @@ namespace GameX.Platforms
 
         public Texture DefaultTexture => Builder.DefaultTexture;
 
-        public Texture LoadTexture(object key, out object tag, Range? spans = null)
+        public Texture LoadTexture(object key, out object tag, Range? level = null)
         {
             if (CachedTextures.TryGetValue(key, out var cache)) { tag = cache.tag; return cache.texture; }
             // load & cache the texture.
-            var info = key is ITexture z ? z : LoadTexture(key);
-            var texture = info != null ? Builder.BuildTexture(info, spans) : Builder.DefaultTexture;
+            var info = key is ITexture z ? z : LoadTexture(key).Result;
+            var texture = info != null ? Builder.BuildTexture(info, level) : Builder.DefaultTexture;
             tag = null; // info;
             CachedTextures[key] = (texture, tag);
             return texture;
         }
 
-        public void PreloadTexture(string path)
+        public Texture ReloadTexture(object key, out object tag, Range? level = null)
         {
-            if (CachedTextures.ContainsKey(path)) return;
+            if (!CachedTextures.TryGetValue(key, out var cache)) { tag = default; return default; }
+            tag = cache.tag;
+            return cache.texture;
+        }
+
+        public void PreloadTexture(object key)
+        {
+            if (CachedTextures.ContainsKey(key)) return;
             // start loading the texture file asynchronously if we haven't already started.
-            if (!PreloadTasks.ContainsKey(path)) PreloadTasks[path] = PakFile.LoadFileObject<ITexture>(path);
+            if (!PreloadTasks.ContainsKey(key)) PreloadTasks[key] = PakFile.LoadFileObject<ITexture>(key);
         }
 
         public void DeleteTexture(object key)
@@ -75,18 +82,13 @@ namespace GameX.Platforms
             CachedTextures.Remove(key);
         }
 
-        ITexture LoadTexture(object key)
+        async Task<ITexture> LoadTexture(object key)
         {
             Assert(!CachedTextures.ContainsKey(key));
-            switch (key)
-            {
-                case string path:
-                    PreloadTexture(path);
-                    var info = PreloadTasks[key].Result;
-                    PreloadTasks.Remove(key);
-                    return info;
-                default: throw new ArgumentOutOfRangeException(nameof(key), $"{key}");
-            }
+            PreloadTexture(key);
+            var info = await PreloadTasks[key];
+            PreloadTasks.Remove(key);
+            return info;
         }
     }
 
@@ -157,16 +159,16 @@ namespace GameX.Platforms
         {
             tag = null;
             _builder.EnsurePrefabContainerExists();
-            // Load & cache the NIF prefab.
+            // load & cache the prefab.
             if (!_cachedPrefabs.TryGetValue(path, out var prefab)) prefab = _cachedPrefabs[path] = LoadPrefabDontAddToPrefabCache(path);
-            // Instantiate the prefab.
+            // instantiate the prefab.
             return _builder.CreateObject(prefab);
         }
 
         public void PreloadObject(string path)
         {
             if (_cachedPrefabs.ContainsKey(path)) return;
-            // Start loading the object asynchronously if we haven't already started.
+            // start loading the object asynchronously if we haven't already started.
             if (!_preloadTasks.ContainsKey(path)) _preloadTasks[path] = _pakFile.LoadFileObject<object>(path);
         }
 
@@ -206,7 +208,7 @@ namespace GameX.Platforms
     {
         readonly PakFile PakFile;
         readonly MaterialBuilderBase<Material, Texture> Builder;
-        readonly Dictionary<object, (Material material, IDictionary<string, object> data)> CachedMaterials = new Dictionary<object, (Material material, IDictionary<string, object> data)>();
+        readonly Dictionary<object, (Material material, object tag)> CachedMaterials = new Dictionary<object, (Material material, object tag)>();
         readonly Dictionary<object, Task<IMaterial>> PreloadTasks = new Dictionary<object, Task<IMaterial>>();
 
         public ITextureManager<Texture> TextureManager { get; }
@@ -218,36 +220,31 @@ namespace GameX.Platforms
             Builder = builder;
         }
 
-        public Material LoadMaterial(object key, out IDictionary<string, object> data)
+        public Material LoadMaterial(object key, out object tag)
         {
-            if (CachedMaterials.TryGetValue(key, out var cache)) { data = cache.data; return cache.material; }
-            // Load & cache the material.
-            var info = key is IMaterial z ? z : LoadMaterialInfo(key);
+            if (CachedMaterials.TryGetValue(key, out var cache)) { tag = cache.tag; return cache.material; }
+            // load & cache the material.
+            var info = key is IMaterial z ? z : LoadMaterial(key).Result;
             var material = info != null ? Builder.BuildMaterial(info) : Builder.DefaultMaterial;
-            data = info?.Data;
-            CachedMaterials[key] = (material, data);
+            tag = null; // info?.Data;
+            CachedMaterials[key] = (material, tag);
             return material;
         }
 
-        public void PreloadMaterial(string path)
+        public void PreloadMaterial(object key)
         {
-            if (CachedMaterials.ContainsKey(path)) return;
-            // Start loading the material file asynchronously if we haven't already started.
-            if (!PreloadTasks.ContainsKey(path)) PreloadTasks[path] = PakFile.LoadFileObject<IMaterial>(path);
+            if (CachedMaterials.ContainsKey(key)) return;
+            // start loading the material file asynchronously if we haven't already started.
+            if (!PreloadTasks.ContainsKey(key)) PreloadTasks[key] = PakFile.LoadFileObject<IMaterial>(key);
         }
 
-        IMaterial LoadMaterialInfo(object key)
+        async Task<IMaterial> LoadMaterial(object key)
         {
             Assert(!CachedMaterials.ContainsKey(key));
-            switch (key)
-            {
-                case string path:
-                    PreloadMaterial(path);
-                    var info = PreloadTasks[key].Result;
-                    PreloadTasks.Remove(key);
-                    return info;
-                default: throw new ArgumentOutOfRangeException(nameof(key), $"{key}");
-            }
+            PreloadMaterial(key);
+            var info = await PreloadTasks[key];
+            PreloadTasks.Remove(key);
+            return info;
         }
     }
 

@@ -59,11 +59,11 @@ class OpenGLTextureBuilder(TextureBuilderBase):
         0.0, 0.9, 0.0, 1.0,
         0.9, 0.2, 0.8, 1.0])
 
-    def buildTexture(self, info: ITexture, span: range = None) -> int:
+    def buildTexture(self, info: ITexture, level: range = None) -> int:
         return self.defaultTexture
         id = glGenTextures(1)
         numMipMaps = max(1, info.mipMaps)
-        levelStart = span[0] or 0 if span else 0
+        levelStart = level[0] or 0 if level else 0
         levelEnd = numMipMaps - 1
 
         glBindTexture(GL_TEXTURE_2D, id)
