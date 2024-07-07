@@ -11,12 +11,6 @@ namespace GameX.App.Explorer.Controls1
 {
     public class GLMaterialViewer : GLViewerControl
     {
-        public GLMaterialViewer()
-        {
-            GLPaint += OnPaint;
-            Unloaded += (a, b) => { GLPaint -= OnPaint; };
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
@@ -46,15 +40,15 @@ namespace GameX.App.Explorer.Controls1
                 : Source is IRedirected<IMaterial> y ? y.Value
                 : null;
             if (source == null) return;
-            var material = graphic.MaterialManager.LoadMaterial(source, out var _);
+            var (material, _) = graphic.MaterialManager.CreateMaterial(source);
             Renderers.Add(new MaterialRenderer(graphic, material));
         }
 
-        readonly HashSet<MaterialRenderer> Renderers = new();
+        readonly HashSet<MaterialRenderer> Renderers = [];
 
-        void OnPaint(object sender, RenderEventArgs e)
+        protected override void Render(Camera camera, float frameTime)
         {
-            foreach (var renderer in Renderers) renderer.Render(e.Camera, RenderPass.Both);
+            foreach (var renderer in Renderers) renderer.Render(camera, RenderPass.Both);
         }
     }
 }

@@ -311,18 +311,18 @@ class MultiPakFile(PakFile):
                 return value.loadFileData(i, option)
             case _: raise Exception(f'Unknown: {path}')
 
-    def loadFileObject(self, path: FileSource | str | int) -> object:
+    def loadFileObject(self, type: type, path: FileSource | str | int) -> object:
         match path:
             case None: raise Exception('Null')
             case s if isinstance(path, str):
                 pakFiles, s2 = self._findPakFiles(s)
                 value = next(iter([x for x in pakFiles if x.valid() and x.contains(s2)]), None)
                 if not value: raise Exception(f'Could not find file {path}')
-                return value.loadFileObject(s2, option)
+                return value.loadFileObject(type, s2, option)
             case i if isinstance(path, int):
                 value = next(iter([x for x in self.pakFiles if x.valid() and x.contains(i)]), None)
                 if not value: raise Exception(f'Could not find file {path}')
-                return value.loadFileObject(i, option)
+                return value.loadFileObject(type, i, option)
             case _: raise Exception(f'Unknown: {path}')
 
     #region Metadata

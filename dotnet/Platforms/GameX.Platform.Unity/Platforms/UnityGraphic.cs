@@ -7,11 +7,12 @@ using Shader = UnityEngine.Shader;
 
 namespace GameX.Platforms
 {
-    public interface IUnityGraphic : IOpenGraphicAny<GameObject, Material, Texture2D, Shader> { }
+    public interface IUnityGraphic : IOpenGraphicAny<object, GameObject, Material, Texture2D, Shader> { }
 
     public class UnityGraphic : IUnityGraphic
     {
         readonly PakFile _source;
+        readonly IAudioManager<object> _audioManager;
         readonly ITextureManager<Texture2D> _textureManager;
         readonly IMaterialManager<Material, Texture2D> _materialManager;
         readonly IObjectManager<GameObject, Material, Texture2D> _objectManager;
@@ -20,6 +21,7 @@ namespace GameX.Platforms
         public UnityGraphic(PakFile source)
         {
             _source = source;
+            _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
             _textureManager = new TextureManager<Texture2D>(source, new UnityTextureBuilder());
             //switch (MaterialType.Default)
             //{
@@ -35,16 +37,18 @@ namespace GameX.Platforms
         }
 
         public PakFile Source => _source;
+        public IAudioManager<object> AudioManager => _audioManager;
         public ITextureManager<Texture2D> TextureManager => _textureManager;
         public IMaterialManager<Material, Texture2D> MaterialManager => _materialManager;
         public IObjectManager<GameObject, Material, Texture2D> ObjectManager => _objectManager;
         public IShaderManager<Shader> ShaderManager => _shaderManager;
-        public Texture2D LoadTexture(string path, out object tag, Range? range = null) => _textureManager.LoadTexture(path, out tag, range);
-        public void PreloadTexture(string path) => _textureManager.PreloadTexture(path);
-        public GameObject CreateObject(string path, out object tag) => _objectManager.CreateObject(path, out tag);
-        public void PreloadObject(string path) => _objectManager.PreloadObject(path);
-        public Shader LoadShader(string path, IDictionary<string, bool> args = null) => _shaderManager.LoadShader(path, args);
+        public object CreateAudio(object path) => _audioManager.CreateAudio(path).aud;
+        public Texture2D CreateTexture(object path, Range? level = null) => _textureManager.CreateTexture(path, level).tex;
+        public void PreloadTexture(object path) => _textureManager.PreloadTexture(path);
+        public GameObject CreateObject(object path) => _objectManager.CreateObject(path).obj;
+        public void PreloadObject(object path) => _objectManager.PreloadObject(path);
+        public Shader CreateShader(object path, IDictionary<string, bool> args = null) => _shaderManager.CreateShader(path, args).sha;
 
-        public Task<T> LoadFileObject<T>(string path) => _source.LoadFileObject<T>(path);
+        public Task<T> LoadFileObject<T>(object path) => _source.LoadFileObject<T>(path);
     }
 }

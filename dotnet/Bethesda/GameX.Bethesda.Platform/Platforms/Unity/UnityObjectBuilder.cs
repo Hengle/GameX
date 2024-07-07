@@ -16,7 +16,7 @@ namespace GameX.Bethesda.Platforms.Unity
             _markerLayer = markerLayer;
         }
 
-        public override void EnsurePrefabContainerExists()
+        public override void EnsurePrefab()
         {
             if (_prefabObject == null)
             {
@@ -25,9 +25,9 @@ namespace GameX.Bethesda.Platforms.Unity
             }
         }
 
-        public override GameObject CreateObject(GameObject prefab) => GameObject.Instantiate(prefab);
+        public override GameObject CreateNewObject(GameObject prefab) => GameObject.Instantiate(prefab);
 
-        public override GameObject BuildObject(object source, IMaterialManager<Material, Texture2D> materialManager)
+        public override GameObject CreateObject(object source, IMaterialManager<Material, Texture2D> materialManager)
         {
             var file = (NiFile)source;
             // Start pre-loading all the NIF's textures.

@@ -19,7 +19,7 @@ namespace GameSpecUnreal.Tests
             //World.GetFirstPlayerController().SetViewTarget(World.GetActor<Camera>("MainCamera"));
 
             //var texture = Texture2D.Load("/Game/Scenes/BasicTexture");
-            var texture = Graphic.TextureManager.LoadTexture(path, out var _);
+            var (texture, _) = Graphic.TextureManager.CreateTexture(path);
 
             var obj = new Actor();
             var mesh = new StaticMeshComponent(obj, setAsRoot: true);

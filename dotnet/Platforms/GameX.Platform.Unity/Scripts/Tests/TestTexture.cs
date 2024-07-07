@@ -43,10 +43,10 @@ namespace Tests
             var obj = GameObject.CreatePrimitive(PrimitiveType.Plane);
             obj.transform.rotation = Quaternion.Euler(-90f, 180f, -180f);
             var meshRenderer = obj.GetComponent<MeshRenderer>();
-            meshRenderer.material = Graphic.MaterialManager.LoadMaterial(new FixedMaterialInfo { MainFilePath = path }, out var _);
+            (meshRenderer.material, _) = Graphic.MaterialManager.CreateMaterial(new FixedMaterialInfo { MainFilePath = path });
             return obj;
         }
 
-        void MakeCursor(string path) => Cursor.SetCursor(Graphic.LoadTexture(path, out var _), Vector2.zero, CursorMode.Auto);
+        void MakeCursor(string path) => Cursor.SetCursor(Graphic.TextureManager.CreateTexture(path).tex, Vector2.zero, CursorMode.Auto);
     }
 }

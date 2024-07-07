@@ -189,7 +189,7 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
                 //Console.WriteLine($"Phys mesh verts {verts.Count} inds {inds.Count}");
             }
 
-            shader = (Scene.Graphic as IOpenGLGraphic).LoadShader("vrf.grid", new Dictionary<string, bool>());
+            (shader, _) = (Scene.Graphic as IOpenGLGraphic).ShaderManager.CreateShader("vrf.grid", new Dictionary<string, bool>());
             GL.UseProgram(shader.Program);
 
             vaoHandle = GL.GenVertexArray();
@@ -205,11 +205,11 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
             GL.BufferData(BufferTarget.ElementArrayBuffer, inds.Count * sizeof(int), inds.ToArray(), BufferUsageHint.StaticDraw);
 
             const int stride = sizeof(float) * 7;
-            var positionAttributeLocation = GL.GetAttribLocation(shader.Program, "aVertexPosition");
+            var positionAttributeLocation = shader.GetAttribLocation("aVertexPosition");
             GL.EnableVertexAttribArray(positionAttributeLocation);
             GL.VertexAttribPointer(positionAttributeLocation, 3, VertexAttribPointerType.Float, false, stride, 0);
 
-            var colorAttributeLocation = GL.GetAttribLocation(shader.Program, "aVertexColor");
+            var colorAttributeLocation = shader.GetAttribLocation("aVertexColor");
             GL.EnableVertexAttribArray(colorAttributeLocation);
             GL.VertexAttribPointer(colorAttributeLocation, 4, VertexAttribPointerType.Float, false, stride, sizeof(float) * 3);
 

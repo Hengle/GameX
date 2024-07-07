@@ -113,7 +113,10 @@ namespace GameX.Store
                 for (var i = startIndex; i < str.Length; i++)
                 {
                     if (str[i] == open) openItem++;
-                    if (str[i] == close) { closeItem++; if (closeItem > openItem) return i; }
+                    if (str[i] == close) {
+                        closeItem++;
+                        if (closeItem > openItem) return i;
+                    }
                 }
                 throw new Exception("Not enough closing characters!");
             }

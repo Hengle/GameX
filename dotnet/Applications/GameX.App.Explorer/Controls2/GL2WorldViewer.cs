@@ -1,4 +1,3 @@
-using OpenStack;
 using OpenStack.Graphics;
 using OpenStack.Graphics.Controls;
 using OpenStack.Graphics.OpenGL;
@@ -12,12 +11,6 @@ namespace GameX.App.Explorer.Controls2
 {
     public class GL2WorldViewer : GLViewerControl
     {
-        public GL2WorldViewer()
-        {
-            GLPaint += OnPaint;
-            Unloaded += (a, b) => { GLPaint -= OnPaint; };
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
@@ -52,8 +45,6 @@ namespace GameX.App.Explorer.Controls2
 
         }
 
-        void OnPaint(object sender, RenderEventArgs e)
-        {
-        }
+        protected override void Render(Camera camera, float frameTime) { }
     }
 }

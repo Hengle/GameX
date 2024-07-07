@@ -1,6 +1,7 @@
 ﻿using OpenStack;
 using OpenStack.Graphics;
 using OpenStack.Graphics.OpenGL;
+using OpenStack.Graphics.Vulken;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -10,24 +11,24 @@ using System.Threading.Tasks;
 namespace GameX.Platforms
 {
     /// <summary>
-    /// OpenGLExtensions
+    /// VulkenExtensions
     /// </summary>
-    public static class OpenGLExtensions { }
+    public static class VulkenExtensions { }
 
     /// <summary>
     /// OpenGLObjectBuilder
     /// </summary>
-    public class OpenGLObjectBuilder : ObjectBuilderBase<object, GLRenderMaterial, int>
+    public class VulkenObjectBuilder : ObjectBuilderBase<object, GLRenderMaterial, int>
     {
         public override void EnsurePrefab() { }
         public override object CreateNewObject(object prefab) => throw new NotImplementedException();
-        public override object CreateObject(object path, IMaterialManager<GLRenderMaterial, int> materialManager) => throw new NotImplementedException();
+        public override object CreateObject(object source, IMaterialManager<GLRenderMaterial, int> materialManager) => throw new NotImplementedException();
     }
 
     /// <summary>
-    /// OpenGLShaderBuilder
+    /// VulkenShaderBuilder
     /// </summary>
-    public class OpenGLShaderBuilder : ShaderBuilderBase<Shader>
+    public class VulkenShaderBuilder : ShaderBuilderBase<Shader>
     {
         static readonly ShaderLoader _loader = new ShaderDebugLoader();
         public override Shader CreateShader(object path, IDictionary<string, bool> args) => _loader.CreateShader(path, args);
@@ -35,16 +36,16 @@ namespace GameX.Platforms
     }
 
     /// <summary>
-    /// OpenGLTextureBuilder
+    /// VulkenTextureBuilder
     /// </summary>
-    public unsafe class OpenGLTextureBuilder : TextureBuilderBase<int>
+    public unsafe class VulkenTextureBuilder : TextureBuilderBase<int>
     {
         int _defaultTexture = -1;
         public override int DefaultTexture => _defaultTexture > -1 ? _defaultTexture : _defaultTexture = CreateDefaultTexture();
 
         public void Release()
         {
-            if (_defaultTexture > -1) { GL.DeleteTexture(_defaultTexture); _defaultTexture = -1; }
+            if (_defaultTexture > 0) { GL.DeleteTexture(_defaultTexture); _defaultTexture = -1; }
         }
 
         int CreateDefaultTexture() => CreateSolidTexture(4, 4, new[]
@@ -72,19 +73,18 @@ namespace GameX.Platforms
 
         public override int CreateTexture(int reuse, ITexture source, Range? level = null)
         {
-            var id = reuse != default ? reuse : GL.GenTexture();
+            //return DefaultTexture;
+            var id = GL.GenTexture();
             var numMipMaps = Math.Max(1, source.MipMaps);
             var levelStart = level?.Start.Value ?? 0;
             var levelEnd = numMipMaps - 1;
 
-            // bind
             GL.BindTexture(TextureTarget.Texture2D, id);
             if (levelStart > 0) GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, levelStart);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, levelEnd - levelStart);
             var (bytes, fmt, spans) = source.Begin((int)Platform.Type.OpenGL);
             if (bytes == null) return DefaultTexture;
 
-            // decode
             bool CompressedTexImage2D(ITexture source, int i, InternalFormat internalFormat)
             {
                 var span = spans != null ? spans[i] : Range.All;
@@ -95,6 +95,7 @@ namespace GameX.Platforms
                 fixed (byte* data = pixels) GL.CompressedTexImage2D(TextureTarget.Texture2D, i, internalFormat, width, height, 0, pixels.Length, (IntPtr)data);
                 return true;
             }
+
             bool TexImage2D(ITexture source, int i, PixelInternalFormat internalFormat, PixelFormat format, PixelType type)
             {
                 var span = spans != null ? spans[i] : Range.All;
@@ -105,12 +106,13 @@ namespace GameX.Platforms
                 fixed (byte* data = pixels) GL.TexImage2D(TextureTarget.Texture2D, i, internalFormat, width, height, 0, format, type, (IntPtr)data);
                 return true;
             }
+
             if (fmt is TextureGLFormat glFormat)
             {
                 //if (glFormat == TextureGLFormat.CompressedRgbaS3tcDxt3Ext)
                 //{
                 //    glFormat = TextureGLFormat.CompressedRgbaS3tcDxt5Ext;
-                //    DxtUtil2.ConvertDxt3ToDtx5(bytes, info.Width, info.Height, info.MipMaps);
+                //    DxtUtil2.ConvertDxt3ToDtx5(bytes, source.Width, source.Height, source.MipMaps);
                 //}
                 var internalFormat = (InternalFormat)glFormat;
                 if (internalFormat == 0) { Console.Error.WriteLine("Unsupported texture, using default"); return DefaultTexture; }
@@ -125,9 +127,9 @@ namespace GameX.Platforms
                 for (var i = levelStart; i < numMipMaps; i++) { if (!TexImage2D(source, i, internalFormat, format, type)) return DefaultTexture; }
             }
             else throw new NotImplementedException();
+
             source.End();
 
-            // texture
             if (MaxTextureMaxAnisotropy >= 4)
             {
                 GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, MaxTextureMaxAnisotropy);
@@ -165,16 +167,16 @@ namespace GameX.Platforms
     }
 
     /// <summary>
-    /// OpenGLMaterialBuilder
+    /// VulkenMaterialBuilder
     /// </summary>
-    public class OpenGLMaterialBuilder : MaterialBuilderBase<GLRenderMaterial, int>
+    public class VulkenMaterialBuilder : MaterialBuilderBase<GLRenderMaterial, int>
     {
+        public VulkenMaterialBuilder(TextureManager<int> textureManager) : base(textureManager) { }
+
         GLRenderMaterial _defaultMaterial;
-        public override GLRenderMaterial DefaultMaterial => _defaultMaterial ??= CreateDefaultMaterial(-1);
+        public override GLRenderMaterial DefaultMaterial => _defaultMaterial ??= BuildAutoMaterial(-1);
 
-        public OpenGLMaterialBuilder(TextureManager<int> textureManager) : base(textureManager) { }
-
-        GLRenderMaterial CreateDefaultMaterial(int type)
+        GLRenderMaterial BuildAutoMaterial(int type)
         {
             var m = new GLRenderMaterial(null);
             m.Textures["g_tColor"] = TextureManager.DefaultTexture;
@@ -224,7 +226,7 @@ namespace GameX.Platforms
     /// <summary>
     /// OpenGLGraphic
     /// </summary>
-    public class OpenGLGraphic : IOpenGLGraphic
+    public class VulkenGraphic : IVulkenGraphic
     {
         readonly PakFile _source;
         readonly AudioManager<object> _audioManager;
@@ -233,14 +235,14 @@ namespace GameX.Platforms
         readonly ObjectManager<object, GLRenderMaterial, int> _objectManager;
         readonly ShaderManager<Shader> _shaderManager;
 
-        public OpenGLGraphic(PakFile source)
+        public VulkenGraphic(PakFile source)
         {
             _source = source;
             _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
-            _textureManager = new TextureManager<int>(source, new OpenGLTextureBuilder());
-            _materialManager = new MaterialManager<GLRenderMaterial, int>(source, _textureManager, new OpenGLMaterialBuilder(_textureManager));
-            _objectManager = new ObjectManager<object, GLRenderMaterial, int>(source, _materialManager, new OpenGLObjectBuilder());
-            _shaderManager = new ShaderManager<Shader>(source, new OpenGLShaderBuilder());
+            _textureManager = new TextureManager<int>(source, new VulkenTextureBuilder());
+            _materialManager = new MaterialManager<GLRenderMaterial, int>(source, _textureManager, new VulkenMaterialBuilder(_textureManager));
+            _objectManager = new ObjectManager<object, GLRenderMaterial, int>(source, _materialManager, new VulkenObjectBuilder());
+            _shaderManager = new ShaderManager<Shader>(source, new VulkenShaderBuilder());
             MeshBufferCache = new GLMeshBufferCache();
         }
 
@@ -265,16 +267,16 @@ namespace GameX.Platforms
     }
 
     /// <summary>
-    /// OpenGLPlatform
+    /// VulkenPlatform
     /// </summary>
-    public static class OpenGLPlatform
+    public static class VulkenPlatform
     {
         public static unsafe bool Startup()
         {
             try
             {
-                Platform.PlatformType = Platform.Type.OpenGL;
-                Platform.GraphicFactory = source => new OpenGLGraphic(source);
+                Platform.PlatformType = Platform.Type.Vulken;
+                Platform.GraphicFactory = source => new VulkenGraphic(source);
                 Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
                 Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
                 Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);

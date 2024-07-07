@@ -9,7 +9,6 @@
             if (!string.IsNullOrEmpty(Test.Param1)) MakeObject(Test.Param1);
         }
 
-        void MakeObject(string path)
-            => Graphic.CreateObject(path, out var _);
+        void MakeObject(object path) => Graphic.ObjectManager.CreateObject(path);
     }
 }

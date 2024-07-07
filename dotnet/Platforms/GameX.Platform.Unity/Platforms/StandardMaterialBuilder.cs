@@ -24,7 +24,7 @@ namespace GameX.Platforms
 
         public override Material DefaultMaterial => _defaultMaterial;
 
-        public override Material BuildMaterial(object key)
+        public override Material CreateMaterial(object key)
         {
             switch (key)
             {
@@ -36,18 +36,18 @@ namespace GameX.Platforms
                     else material = BuildMaterial();
                     if (p.MainFilePath != null)
                     {
-                        material.mainTexture = TextureManager.LoadTexture(p.MainFilePath, out var _);
+                        (material.mainTexture, _) = TextureManager.CreateTexture(p.MainFilePath);
                         if (NormalGeneratorIntensity != null)
                         {
                             material.EnableKeyword("_NORMALMAP");
-                            material.SetTexture("_BumpMap", TextureManager.BuildNormalMap((Texture2D)material.mainTexture, NormalGeneratorIntensity.Value));
+                            material.SetTexture("_BumpMap", TextureManager.CreateNormalMap((Texture2D)material.mainTexture, NormalGeneratorIntensity.Value));
                         }
                     }
                     else material.DisableKeyword("_NORMALMAP");
                     if (p.BumpFilePath != null)
                     {
                         material.EnableKeyword("_NORMALMAP");
-                        material.SetTexture("_NORMALMAP", TextureManager.LoadTexture(p.BumpFilePath, out var _));
+                        material.SetTexture("_NORMALMAP", TextureManager.CreateTexture(p.BumpFilePath).tex);
                     }
                     return material;
                 case MaterialTerrain _: return BuildMaterialTerrain();

@@ -7,11 +7,12 @@ using Shader = StereoKit.Shader;
 
 namespace GameX.Platforms
 {
-    public interface IStereoKitGraphic : IOpenGraphicAny<object, Material, Tex, Shader> { }
+    public interface IStereoKitGraphic : IOpenGraphicAny<object, object, Material, Tex, Shader> { }
 
     public class StereoKitGraphic : IStereoKitGraphic
     {
         readonly PakFile _source;
+        readonly IAudioManager<object> _audioManager;
         readonly TextureManager<Tex> _textureManager;
         readonly MaterialManager<Material, Tex> _materialManager;
         readonly ObjectManager<object, Material, Tex> _objectManager;
@@ -20,6 +21,7 @@ namespace GameX.Platforms
         public StereoKitGraphic(PakFile source)
         {
             _source = source;
+            _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
             _textureManager = new TextureManager<Tex>(source, new StereoKitTextureBuilder());
             _materialManager = new MaterialManager<Material, Tex>(source, _textureManager, new StereoKitMaterialBuilder(_textureManager));
             _objectManager = new ObjectManager<object, Material, Tex>(source, _materialManager, new StereoKitObjectBuilder());
@@ -27,16 +29,18 @@ namespace GameX.Platforms
         }
 
         public PakFile Source => _source;
+        public IAudioManager<object> AudioManager => _audioManager;
         public ITextureManager<Tex> TextureManager => _textureManager;
         public IMaterialManager<Material, Tex> MaterialManager => _materialManager;
         public IObjectManager<object, Material, Tex> ObjectManager => _objectManager;
         public IShaderManager<Shader> ShaderManager => _shaderManager;
-        public Tex LoadTexture(string path, out object tag, Range? range = null) => _textureManager.LoadTexture(path, out tag, range);
-        public void PreloadTexture(string path) => _textureManager.PreloadTexture(path);
-        public object CreateObject(string path, out object tag) => _objectManager.CreateObject(path, out tag);
-        public void PreloadObject(string path) => _objectManager.PreloadObject(path);
-        public Shader LoadShader(string path, IDictionary<string, bool> args = null) => _shaderManager.LoadShader(path, args);
+        public object CreateAudio(object path) => _audioManager.CreateAudio(path).aud;
+        public Tex CreateTexture(object path, Range? level = null) => _textureManager.CreateTexture(path, level).tex;
+        public void PreloadTexture(object path) => _textureManager.PreloadTexture(path);
+        public object CreateObject(object path) => _objectManager.CreateObject(path).obj;
+        public void PreloadObject(object path) => _objectManager.PreloadObject(path);
+        public Shader CreateShader(object path, IDictionary<string, bool> args = null) => _shaderManager.CreateShader(path, args).sha;
 
-        public Task<T> LoadFileObject<T>(string path) => _source.LoadFileObject<T>(path);
+        public Task<T> LoadFileObject<T>(object path) => _source.LoadFileObject<T>(path);
     }
 }

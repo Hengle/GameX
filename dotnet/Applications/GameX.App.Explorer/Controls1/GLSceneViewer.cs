@@ -35,15 +35,11 @@ namespace GameX.App.Explorer.Controls1
         protected GLSceneViewer(Frustum cullFrustum = null)
         {
             CullFrustum = cullFrustum;
-
             InitializeControl();
-
             //AddCheckBox("Show Grid", ShowBaseGrid, (v) => ShowBaseGrid = v);
             //AddCheckBox("Show Static Octree", _showStaticOctree, (v) => _showStaticOctree = v);
             //AddCheckBox("Show Dynamic Octree", _showDynamicOctree, (v) => _showDynamicOctree = v);
             //AddCheckBox("Lock Cull Frustum", false, (v) => { _lockedCullFrustum = v ? Scene.MainCamera.ViewFrustum.Clone() : null; });
-
-            Unloaded += (a, b) => { GLPaint -= OnPaint; };
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -74,7 +70,7 @@ namespace GameX.App.Explorer.Controls1
             var graphic = Graphic as IOpenGLGraphic;
 
             Scene = new Scene(graphic, MeshBatchRenderer.Render);
-            BaseGrid = new ParticleGridRenderer(20, 5, graphic);
+            BaseGrid = new ParticleGridRenderer(graphic, 20, 5);
 
             Camera.SetViewportSize((int)ActualWidth, (int)ActualHeight); //: HandleResize()
             Camera.SetLocation(new Vector3(256));
@@ -101,38 +97,36 @@ namespace GameX.App.Explorer.Controls1
             //        .Distinct();
             //    SetAvailableRenderModes(supportedRenderModes);
             //}
-
-            GLPaint += OnPaint;
         }
 
         protected abstract void InitializeControl();
 
         protected abstract void LoadScene(object source);
 
-        void OnPaint(object sender, RenderEventArgs e)
+        protected override void Render(Camera camera, float frameTime)
         {
-            Scene.MainCamera = e.Camera;
-            Scene.Update(e.FrameTime);
+            Scene.MainCamera = camera;
+            Scene.Update(frameTime);
 
-            if (ShowBaseGrid) BaseGrid.Render(e.Camera, RenderPass.Both);
+            if (ShowBaseGrid) BaseGrid.Render(camera, RenderPass.Both);
 
             if (ShowSkybox && SkyboxScene != null)
             {
-                SkyboxCamera.CopyFrom(e.Camera);
-                SkyboxCamera.SetLocation(e.Camera.Location - SkyboxOrigin);
+                SkyboxCamera.CopyFrom(camera);
+                SkyboxCamera.SetLocation(camera.Location - SkyboxOrigin);
                 SkyboxCamera.SetScale(SkyboxScale);
 
                 SkyboxScene.MainCamera = SkyboxCamera;
-                SkyboxScene.Update(e.FrameTime);
+                SkyboxScene.Update(frameTime);
                 SkyboxScene.RenderWithCamera(SkyboxCamera);
 
                 GL.Clear(ClearBufferMask.DepthBufferBit);
             }
 
-            Scene.RenderWithCamera(e.Camera, CullFrustum);
+            Scene.RenderWithCamera(camera, CullFrustum);
 
-            if (ShowStaticOctree) StaticOctreeRenderer.Render(e.Camera, RenderPass.Both);
-            if (ShowDynamicOctree) DynamicOctreeRenderer.Render(e.Camera, RenderPass.Both);
+            if (ShowStaticOctree) StaticOctreeRenderer.Render(camera, RenderPass.Both);
+            if (ShowDynamicOctree) DynamicOctreeRenderer.Render(camera, RenderPass.Both);
         }
 
         protected void SetEnabledLayers(HashSet<string> layers)

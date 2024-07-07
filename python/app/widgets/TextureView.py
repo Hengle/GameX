@@ -6,21 +6,25 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtOpenGLWidgets import QOpenGLWidget
 from PyQt6.QtOpenGL import QOpenGLBuffer, QOpenGLShader, QOpenGLShaderProgram, QOpenGLTexture
 from openstk.gfx_render import RenderPass
-from openstk.gfx_texture import ITexture
+from openstk.gfx_texture import ITexture, ITextureSelect
 from openstk.gl_view import OpenGLView
 from openstk.gl_renders import TextureRenderer
+from openstk.gfx_ui import KeyboardState
 
 FACTOR: int = 1
 
 # typedefs
+class GLCamera: pass
 class IOpenGLGraphic: pass
 
 # TextureView
 class TextureView(OpenGLView):
     background: bool = False
-    span: range = None
+    level: range = None
     renderers: list[TextureRenderer] = []
     obj: obj = None
+    # ui
+    id: int = 0
 
     def __init__(self, parent, tab):
         super().__init__()
@@ -40,27 +44,26 @@ class TextureView(OpenGLView):
 
     def onProperty(self):
         if not self.graphic or not self.source: return
-        graphic = self.graphic
+        self.graphicGl = self.graphic
         self.obj = self.source if isinstance(self.source, ITexture) else None
         if not self.obj: return
+        if isinstance(self.source, ITextureSelect): self.source.select(self.id)
 
         self.handleResize()
         self.camera.setLocation(np.array([200., 200., 200.]))
         self.camera.lookAt(np.zeros(3))
 
-        graphic.textureManager.deleteTexture(self.obj)
-        texture, _ = graphic.textureManager.loadTexture(self.obj, self.span)
+        self.graphicGl.textureManager.deleteTexture(self.obj)
+        texture, _ = self.graphicGl.textureManager.createTexture(self.obj, self.level)
         self.renderers.clear()
-        self.renderers.append(TextureRenderer(graphic, texture, self.background))
+        self.renderers.append(TextureRenderer(self.graphicGl, texture, self.background))
 
-    def paintGL(self):
-        super().paintGL()
-        # self.handleInput(Keyboard.GetState())
-        for renderer in self.renderers: renderer.render(self.camera, RenderPass.Both)
-        self.update()
+    def render(self, camera: GLCamera, frameTime: float):
+        self.handleLocalInput(self.keyboardState)
+        for renderer in self.renderers: renderer.render(camera, RenderPass.Both)
 
-    # def keyPressed(key):
-    #     print(key)
+    def handleLocalInput(self, keyboardState: KeyboardState):
+        pass
     #     # if key == "r":
     #     #     glColor3f(1.0, 0.0, 0.0)
     #     #     print "Presionaste",key

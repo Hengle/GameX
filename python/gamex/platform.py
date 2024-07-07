@@ -2,23 +2,65 @@ import os
 from typing import Callable
 from enum import Enum
 from .pak import PakFile
-from openstk.gfx import IObjectManager, IMaterialManager, IShaderManager, ITextureManager, PlatformStats
+from openstk.gfx import IAudioManager, IObjectManager, IMaterialManager, IShaderManager, ITextureManager, PlatformStats
 from openstk.gfx_render import IMaterial
 from openstk.gfx_texture import ITexture
 
 # typedefs
-class Shader: pass
+class Audio: pass
 class Texture: pass
+class Shader: pass
 class Material: pass
+
+# AudioBuilderBase
+class AudioBuilderBase:
+    def createAudio(self, path: object) -> Audio: pass
+    def deleteAudio(self, audio: Audio) -> None: pass
+
+# AudioManager
+class AudioManager(IAudioManager):
+    _pakFile: PakFile
+    _builder: AudioBuilderBase
+    _cachedAudios: dict[object, (Audio, object)] = {}
+    _preloadTasks: dict[object, object] = {}
+
+    def __init__(self, pakFile: PakFile, builder: AudioBuilderBase):
+        self._pakFile = pakFile
+        self._builder = builder
+
+    def createAudio(self, key: object) -> (Audio, object):
+        if path in self._cachedAudios: return self._cachedAudios[path]
+        # load & cache the audio.
+        tag = self._loadAudio(path)
+        audio = self._builder.createAudio(tag) if tag else None
+        self._cachedAudios[path] = (audio, tag)
+        return (audio, tag)
+
+    def preloadAudio(self, path: object) -> None:
+        if path in self._cachedAudios: return
+        # start loading the audio file asynchronously if we haven't already started.
+        if not path in self._preloadTasks: self._preloadTasks[path] = self._pakFile.loadFileObject(object, path)
+
+    def deleteAudio(self, path: object) -> None:
+        if not path in self._cachedAudios: return
+        self._builder.deleteAudio(self._cachedAudios[0])
+        self._cachedAudios.remove(path)
+
+    async def _loadAudio(self, path: object) -> ITexture:
+        assert(not path in self._cachedAudios)
+        self.preloadAudio(s)
+        source = await self._preloadTasks[path]
+        self._preloadTasks.remove(path)
+        return source
 
 # TextureBuilderBase
 class TextureBuilderBase:
     maxTextureMaxAnisotropy: int = PlatformStats.maxTextureMaxAnisotropy
     defaultTexture: Texture
-    def buildTexture(info: ITexture, rng: range = None) -> Texture: pass
-    def buildSolidTexture(width: int, height: int, rgba: list[float]) -> Texture: pass
-    def buildNormalMap(source: Texture, strength: float): pass
-    def deleteTexture(texture: Texture): pass
+    def createTexture(self, reuse: Texture, source: ITexture, level: range = None) -> Texture: pass
+    def createSolidTexture(self, width: int, height: int, rgba: list[float]) -> Texture: pass
+    def createNormalMap(self, texture: Texture, strength: float) -> Texture: pass
+    def deleteTexture(self, texture: Texture) -> None: pass
 
 # TextureManager
 class TextureManager(ITextureManager):
@@ -31,51 +73,52 @@ class TextureManager(ITextureManager):
         self._pakFile = pakFile
         self._builder = builder
 
-    def buildSolidTexture(self, width: int, height: int, rgba: list[float] = None) -> Texture: return self._builder.buildSolidTexture(width, height, rgba)
+    def createSolidTexture(self, width: int, height: int, rgba: list[float] = None) -> Texture: return self._builder.createSolidTexture(width, height, rgba)
 
-    def buildNormalMap(self, source: Texture, strength: float) -> Texture: return self._builder.buildNormalMap(source, strength)
+    def createNormalMap(self, source: Texture, strength: float) -> Texture: return self._builder.createNormalMap(source, strength)
 
     @property
     def defaultTexture(self) -> Texture: return self._builder.defaultTexture
 
-    def loadTexture(self, key: object, level: range = None) -> (Texture, object):
-        if key in self._cachedTextures: return self._cachedTextures[key]
+    def createTexture(self, path: object, level: range = None) -> (Texture, object):
+        if path in self._cachedTextures: return self._cachedTextures[path]
         # load & cache the texture.
-        info = key if isinstance(key, ITexture) else self.loadTexture(key)
-        texture = self._builder.buildTexture(info, level) if info else self._builder.defaultTexture
-        tag = None #info.data if info else None
-        self._cachedTextures[key] = (texture, tag)
+        tag = path if isinstance(path, ITexture) else self._loadTexture(path)
+        texture = self._builder.createTexture(None, tag, level) if tag else self._builder.defaultTexture
+        self._cachedTextures[path] = (texture, tag)
         return (texture, tag)
 
-    def preloadTexture(self, key: object) -> None:
-        if key in self._cachedTextures: return
+    def reloadTexture(self, path: object, level: range = None) -> (Texture, object):
+        if path not in self._cachedTextures: return (None, None)
+        c = self._cachedTextures[path]
+        self._builder.createTexture(c[0], c[1], level)
+        return c
+
+    def preloadTexture(self, path: object) -> None:
+        if path in self._cachedTextures: return
         # start loading the texture file asynchronously if we haven't already started.
-        if not key in self._preloadTasks: self._preloadTasks[key] = self._pakFile.loadFileObject(key)
+        if not path in self._preloadTasks: self._preloadTasks[path] = self._pakFile.loadFileObject(object, path)
 
-    def deleteTexture(self, key: object) -> None:
-        if not key in self._cachedTextures: return
+    def deleteTexture(self, path: object) -> None:
+        if not path in self._cachedTextures: return
         self._builder.deleteTexture(self._cachedTextures[0])
-        self._cachedTextures.remove(key)
+        self._cachedTextures.remove(path)
 
-    async def _loadTexture(self, key: object) -> ITexture:
-        assert(not key in self._cachedTextures)
-        match key:
-            case s if isinstance(key, str):
-                self.preloadTexture(s)
-                info = await self._preloadTasks[key]
-                self._preloadTasks.remove(key)
-                return info
-            case _: raise Exception(f'Unknown {key}')
+    async def _loadTexture(self, path: object) -> ITexture:
+        assert(not path in self._cachedTextures)
+        self.preloadTexture(s)
+        source = await self._preloadTasks[path]
+        self._preloadTasks.remove(path)
+        return source
 
 # ShaderBuilderBase
 class ShaderBuilderBase:
-    def buildShader(self, path: str, args: dict[str, bool]) -> Shader: pass
-    def buildPlaneShader(self, path: str, args: dict[str, bool]) -> Shader: pass
+    def createShader(self, path: object, args: dict[str, bool]) -> Shader: pass
+    def createPlaneShader(self, path: object, args: dict[str, bool]) -> Shader: pass
 
 # ShaderManager
 class ShaderManager(IShaderManager):
     emptyArgs: dict[str, bool] = {}
-
     _pakFile: PakFile
     _builder: ShaderBuilderBase
 
@@ -83,24 +126,24 @@ class ShaderManager(IShaderManager):
         self._pakFile = pakFile
         self._builder = builder
     
-    def loadShader(self, path: str, args: dict[str, bool] = None) -> Shader:
-        return self._builder.buildShader(path, args or self.emptyArgs)
+    def createShader(self, path: object, args: dict[str, bool] = None) -> (Shader, object):
+        return (self._builder.createShader(path, args or self.emptyArgs), None)
 
-    def loadPlaneShader(self, path: str, args: dict[str, bool] = None) -> Shader:
-        return self._builder.buildPlaneShader(path, args or self.emptyArgs)
+    def createPlaneShader(self, path: object, args: dict[str, bool] = None) -> (Shader, object):
+        return (self._builder.createPlaneShader(path, args or self.emptyArgs), None) 
 
 # ObjectBuilderBase
 class ObjectBuilderBase:
-    def createObject(prefab: object) -> object: pass
-    def ensurePrefabContainerExists() -> None: pass
-    def buildObject(source: object, materialManager: IMaterialManager) -> object: pass
+    def ensurePrefab(self) -> None: pass
+    def createNewObject(self, prefab: object) -> object: pass
+    def createObject(self, source: object, materialManager: IMaterialManager) -> object: pass
 
 # ObjectManager
 class ObjectManager(IObjectManager):
     _pakFile: PakFile
     _materialManager: IMaterialManager
     _builder: ObjectBuilderBase
-    _cachedPrefabs: dict[str, object] = {}
+    _cachedObjects: dict[str, object] = {}
     _preloadTasks: dict[str, object] = {}
 
     def __init__(self, pakFile: PakFile, materialManager: IMaterialManager, builder: ObjectBuilderBase):
@@ -108,21 +151,21 @@ class ObjectManager(IObjectManager):
         self._materialManager = materialManager
         self._builder = builder
 
-    def createObject(self, path: str) -> (object, dict[str, object]):
-        data = None
-        self._builder.ensurePrefabContainerExists()
+    def createNewObject(self, path: object) -> (object, object):
+        tag = None
+        self._builder.ensurePrefab()
         # load & cache the prefab.
-        if not path in self._cachedPrefabs: prefab = self._cachedPrefabs[path] = self.loadPrefabDontAddToPrefabCache(path)
-        else: prefab = self._cachedPrefabs[path]
+        if not path in self._cachedObjects: prefab = self._cachedObjects[path] = (self._loadObject(path), tag)
+        else: prefab = self._cachedObjects[path]
         # instantiate the prefab.
-        return self._builder.createObject(prefab)
+        return (self._builder.createNewObject(prefab[0]), prefab[1])
  
-    def preloadObject(self, path: str) -> None:
+    def preloadObject(self, path: object) -> None:
         if path in self._cachedPrefabs: return
         # start loading the object asynchronously if we haven't already started.
         if not path in self._preloadTasks: self._preloadTasks[path] = self._pakFile.loadFileObject(object, path)
 
-    async def loadPrefabDontAddToPrefabCache(path: str) -> object:
+    async def _loadObject(self, path: object) -> object:
         assert(not path in self._cachedPrefabs)
         self.preloadObject(path)
         source = await self._preloadTasks[path]
@@ -136,7 +179,7 @@ class MaterialBuilderBase:
     defaultMaterial: Material
 
     def __init__(self, textureManager: ITextureManager): self.TextureManager = textureManager
-    def buildMaterial(self, key: object) -> Material: pass
+    def createMaterial(self, path: object) -> Material: pass
 
 # MaterialManager
 class MaterialManager(IMaterialManager):
@@ -152,26 +195,26 @@ class MaterialManager(IMaterialManager):
         self._textureManager = textureManager
         self._builder = builder
 
-    def loadMaterial(self, key: object) -> (Material, object):
-        if key in self._cachedMaterials: return self._cachedMaterials[key]
+    def createMaterial(self, path: object) -> (Material, object):
+        if path in self._cachedMaterials: return self._cachedMaterials[path]
         # load & cache the material.
-        info = key if isinstance(key, IMaterial) else self.loadMaterial(key)
-        material = self._builder.buildMaterial(info) if info else self._builder.defaultMaterial
-        tag = None #info.data if info else None
-        self._cachedMaterials[key] = (material, tag)
-        return material
+        source = path if isinstance(path, IMaterial) else self._loadMaterial(path)
+        material = self._builder.createMaterial(source) if source else self._builder.defaultMaterial
+        tag = None #source.data if source else None
+        self._cachedMaterials[path] = (material, tag)
+        return (material, tag)
 
-    def preloadMaterial(self, key: object) -> None:
-        if key in self._cachedMaterials: return
+    def preloadMaterial(self, path: object) -> None:
+        if path in self._cachedMaterials: return
         # start loading the material file asynchronously if we haven't already started.
-        if not key in self._preloadTasks: self._preloadTasks[key] = self._pakFile.loadFileObject(key)
+        if not path in self._preloadTasks: self._preloadTasks[path] = self._pakFile.loadFileObject(IMaterial, path)
 
-    async def loadMaterial(self, key: object) -> IMaterial:
-        assert(not key in self._cachedMaterials)
-        self.preloadMaterial(key)
-        info = await self.preloadTasks[key]
-        self.preloadTasks.remove(key)
-        return info
+    async def _loadMaterial(self, path: object) -> IMaterial:
+        assert(not path in self._cachedMaterials)
+        self.preloadMaterial(path)
+        source = await self.preloadTasks[path]
+        self.preloadTasks.remove(path)
+        return source
 
 # typedefs
 # class Type(Enum): pass
@@ -221,6 +264,7 @@ class TestGraphic:
 
 # TestPlatform
 class TestPlatform:
+    @staticmethod
     def startup() -> bool:
         Platform.platformType = Platform.Type.Test
         Platform.graphicFactory = lambda source: TestGraphic(source)

@@ -160,7 +160,7 @@ namespace GameX.Bethesda.Formats.Unity
                 obj.AddComponent<MeshFilter>().mesh = mesh;
                 var materialProps = NiAVObjectPropertiesToMaterialProperties(triShape);
                 var meshRenderer = obj.AddComponent<MeshRenderer>();
-                meshRenderer.material = _materialManager.LoadMaterial(materialProps, out var _);
+                (meshRenderer.material, _) = _materialManager.CreateMaterial(materialProps);
                 if (triShape.Flags.HasFlag(NiAVObject.NiFlags.Hidden)) meshRenderer.enabled = false;
                 obj.isStatic = true;
             }

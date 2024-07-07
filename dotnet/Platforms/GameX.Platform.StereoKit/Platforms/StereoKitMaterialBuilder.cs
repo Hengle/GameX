@@ -16,7 +16,7 @@ namespace GameX.Platforms
             return m;
         }
 
-        public override Material BuildMaterial(object key)
+        public override Material CreateMaterial(object key)
         {
             switch (key)
             {

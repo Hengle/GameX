@@ -111,7 +111,7 @@ namespace GameX.Bullfrog.Formats
         public int Height { get; }
         public int Depth => 0;
         public int MipMaps => 0;
-        public TextureFlags Flags => TextureFlags.NO_CACHE;
+        public TextureFlags Flags => 0;
         public int Frames { get; }
         public int Fps { get; }
 

@@ -1,9 +1,9 @@
-﻿//#define Arkane
+﻿#define Arkane
 //#define Bethesda
 //#define Bioware
 //#define Black
 //#define Blizzard
-#define Bullfrog
+//#define Bullfrog
 //#define Capcom
 //#define Cig
 //#define Cryptic

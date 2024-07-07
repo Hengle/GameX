@@ -12,12 +12,6 @@ namespace GameX.App.Explorer.Controls2
 {
     public class GL2MapViewer : GLViewerControl
     {
-        public GL2MapViewer()
-        {
-            GLPaint += OnPaint;
-            Unloaded += (a, b) => { GLPaint -= OnPaint; };
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
@@ -52,8 +46,6 @@ namespace GameX.App.Explorer.Controls2
 
         }
 
-        void OnPaint(object sender, RenderEventArgs e)
-        {
-        }
+        protected override void Render(Camera camera, float frameTime) { }
     }
 }

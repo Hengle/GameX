@@ -8,8 +8,7 @@ class AcfStruct:
 
     def __init__(self, region):
         def nextEndOf(str, open, close, startIndex):
-            if open == close:
-                raise Exception('"Open" and "Close" char are equivalent!')
+            if open == close: raise Exception('"Open" and "Close" char are equivalent!')
             openItem = 0; closeItem = 0
             for i in range(startIndex, len(str)):
                 if str[i] == open: openItem += 1

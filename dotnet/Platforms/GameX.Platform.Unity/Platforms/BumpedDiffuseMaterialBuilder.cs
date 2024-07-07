@@ -17,7 +17,7 @@ namespace GameX.Platforms
 
         public override Material DefaultMaterial => _defaultMaterial;
 
-        public override Material BuildMaterial(object key)
+        public override Material CreateMaterial(object key)
         {
             switch (key)
             {
@@ -29,10 +29,10 @@ namespace GameX.Platforms
                     else material = BuildMaterial();
                     if (p.MainFilePath != null)
                     {
-                        material.mainTexture = TextureManager.LoadTexture(p.MainFilePath, out var _);
-                        if (NormalGeneratorIntensity != null) material.SetTexture("_BumpMap", TextureManager.BuildNormalMap((Texture2D)material.mainTexture, NormalGeneratorIntensity.Value));
+                        (material.mainTexture, _) = TextureManager.CreateTexture(p.MainFilePath);
+                        if (NormalGeneratorIntensity != null) material.SetTexture("_BumpMap", TextureManager.CreateNormalMap((Texture2D)material.mainTexture, NormalGeneratorIntensity.Value));
                     }
-                    if (p.BumpFilePath != null) material.SetTexture("_BumpMap", TextureManager.LoadTexture(p.BumpFilePath, out var _));
+                    if (p.BumpFilePath != null) material.SetTexture("_BumpMap", TextureManager.CreateTexture(p.BumpFilePath).tex);
                     return material;
                 case MaterialTerrain _: return BuildMaterialTerrain();
                 default: throw new ArgumentOutOfRangeException(nameof(key));

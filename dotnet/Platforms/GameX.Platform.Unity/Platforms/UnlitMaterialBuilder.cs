@@ -17,7 +17,7 @@ namespace GameX.Platforms
 
         public override Material DefaultMaterial => _defaultMaterial;
 
-        public override Material BuildMaterial(object key)
+        public override Material CreateMaterial(object key)
         {
             switch (key)
             {
@@ -27,7 +27,7 @@ namespace GameX.Platforms
                     if (p.AlphaBlended) material = BuildMaterialBlended((ur.BlendMode)p.SrcBlendMode, (ur.BlendMode)p.DstBlendMode);
                     else if (p.AlphaTest) material = BuildMaterialTested(p.AlphaCutoff);
                     else material = BuildMaterial();
-                    if (p.MainFilePath != null) material.mainTexture = TextureManager.LoadTexture(p.MainFilePath, out var _);
+                    if (p.MainFilePath != null) (material.mainTexture, _) = TextureManager.CreateTexture(p.MainFilePath);
                     return material;
                 case MaterialTerrain _: return BuildMaterialTerrain();
                 default: throw new ArgumentOutOfRangeException(nameof(key));

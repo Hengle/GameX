@@ -14,12 +14,6 @@ namespace GameX.App.Explorer.Controls1
     {
         ParticleGridRenderer particleGrid;
        
-        public GLParticleViewer()
-        {
-            GLPaint += OnPaint;
-            Unloaded += (a, b) => { GLPaint -= OnPaint; };
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
@@ -52,7 +46,7 @@ namespace GameX.App.Explorer.Controls1
                 : null;
             if (source == null) return;
 
-            particleGrid = new ParticleGridRenderer(20, 5, graphic);
+            particleGrid = new ParticleGridRenderer(graphic, 20, 5);
             Camera.SetViewportSize((int)ActualWidth, (int)ActualHeight);
             Camera.SetLocation(new Vector3(200));
             Camera.LookAt(new Vector3(0));
@@ -60,13 +54,13 @@ namespace GameX.App.Explorer.Controls1
             Renderers.Add(new ParticleRenderer(graphic, source));
         }
 
-        void OnPaint(object sender, RenderEventArgs e)
+        protected override void Render(Camera camera, float frameTime)
         {
-            particleGrid?.Render(e.Camera, RenderPass.Both);
+            particleGrid?.Render(Camera, RenderPass.Both);
             foreach (var renderer in Renderers)
             {
-                renderer.Update(e.FrameTime);
-                renderer.Render(e.Camera, RenderPass.Both);
+                renderer.Update(frameTime);
+                renderer.Render(Camera, RenderPass.Both);
             }
         }
     }

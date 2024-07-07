@@ -22,12 +22,10 @@ namespace GameX.App.Explorer.Controls1
         readonly HashSet<TextureRenderer> Renderers = [];
         int Texture;
         int FrameDelay;
-
-        public GLTextureVideoViewer()
-        {
-            GLPaint += OnPaint;
-            Unloaded += (s, e) => { GLPaint -= OnPaint; };
-        }
+        // ui
+        Key[] Keys = [Key.Escape, Key.Space];
+        HashSet<Key> KeyDowns = [];
+        int Id = 0;
 
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -73,7 +71,7 @@ namespace GameX.App.Explorer.Controls1
             Camera.LookAt(new Vector3(0));
 
             GraphicGL.TextureManager.DeleteTexture(Obj);
-            Texture = GraphicGL.TextureManager.LoadTexture(Obj, out _, Level);
+            (Texture, _) = GraphicGL.TextureManager.CreateTexture(Obj, Level);
             Renderers.Clear();
             Renderers.Add(new TextureRenderer(GraphicGL, Texture, Background));
         }
@@ -84,22 +82,17 @@ namespace GameX.App.Explorer.Controls1
             FrameDelay += elapsedMs;
             if (FrameDelay <= Obj.Fps || !Obj.DecodeFrame()) return;
             FrameDelay = 0; // reset delay between frames
-            //GraphicGL.TextureManager.DeleteTexture(Obj);
-            GraphicGL.TextureManager.ReloadTexture(Obj, out _, Level);
+            GraphicGL.TextureManager.ReloadTexture(Obj, Level);
             Draw();
         }
 
-        void OnPaint(object sender, RenderEventArgs e)
+        protected override void Render(Camera camera, float frameTime)
         {
-            HandleInput(Keyboard.GetState());
-            foreach (var renderer in Renderers) renderer.Render(e.Camera, RenderPass.Both);
+            HandleLocalInput(Keyboard.GetState());
+            foreach (var renderer in Renderers) renderer.Render(camera, RenderPass.Both);
         }
 
-        Key[] Keys = [Key.Escape, Key.Space];
-        HashSet<Key> KeyDowns = [];
-        int Id = 0;
-
-        public void HandleInput(KeyboardState keyboardState)
+        public void HandleLocalInput(KeyboardState keyboardState)
         {
             foreach (var key in Keys)
                 if (!KeyDowns.Contains(key) && keyboardState.IsKeyDown(key)) KeyDowns.Add(key);
