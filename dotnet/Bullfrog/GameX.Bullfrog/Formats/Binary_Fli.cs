@@ -8,7 +8,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using static GameX.Formats.Unknown.IUnknownFileObject;
 using static OpenStack.Debug;
 
 namespace GameX.Bullfrog.Formats

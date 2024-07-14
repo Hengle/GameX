@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:GameX.App.Explorer.Views"
              xmlns:control1="clr-namespace:GameX.App.Explorer.Controls1"
-             xmlns:model="clr-namespace:GameX.Metadata;assembly=GameX.Base"
+             xmlns:model="clr-namespace:GameX.Meta;assembly=GameX.Base"
              x:Name="this"
              x:Class="GameX.App.Explorer.Views.FileContent">
     <Grid RowDefinitions="30,*">

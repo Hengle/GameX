@@ -39,7 +39,7 @@ namespace GameX.App.Explorer.Controls2
                 : null;
             if (source == null) return;
 
-            Camera.SetViewportSize((int)ActualWidth, (int)ActualHeight);
+            Camera.SetViewportSize(0, 0, (int)ActualWidth, (int)ActualHeight);
             Camera.SetLocation(new Vector3(200));
             Camera.LookAt(new Vector3(0));
 

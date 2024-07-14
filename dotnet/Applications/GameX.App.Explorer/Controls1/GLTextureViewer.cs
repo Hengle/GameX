@@ -5,7 +5,6 @@ using OpenTK.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Key = OpenTK.Input.Key;
@@ -46,12 +45,11 @@ namespace GameX.App.Explorer.Controls1
             set => SetValue(SourceProperty, value);
         }
 
-        protected override void HandleResize()
+        protected override void SetViewportSize(int x, int y, int width, int height)
         {
             if (Obj == null) return;
-            if (Obj.Width > 1024 || Obj.Height > 1024 || false) { base.HandleResize(); return; }
-            Camera.SetViewportSize(Obj.Width << FACTOR, Obj.Height << FACTOR);
-            RecalculatePositions();
+            if (Obj.Width > 1024 || Obj.Height > 1024 || false) base.SetViewportSize(x, y, width, height);
+            else base.SetViewportSize(x, y, Obj.Width << FACTOR, Obj.Height << FACTOR);
         }
 
         void OnProperty()
@@ -64,9 +62,8 @@ namespace GameX.App.Explorer.Controls1
             if (Obj == null) return;
             if (Obj is ITextureSelect z2) z2.Select(Id);
 
-            HandleResize();
-            Camera.SetLocation(new Vector3(200));
-            Camera.LookAt(new Vector3(0));
+            //Camera.SetLocation(new Vector3(200));
+            //Camera.LookAt(new Vector3(0));
 
             GraphicGL.TextureManager.DeleteTexture(Obj);
             var (texture, _) = GraphicGL.TextureManager.CreateTexture(Obj, Level);
@@ -76,11 +73,10 @@ namespace GameX.App.Explorer.Controls1
 
         protected override void Render(Camera camera, float frameTime)
         {
-            HandleLocalInput(Keyboard.GetState());
             foreach (var renderer in Renderers) renderer.Render(camera, RenderPass.Both);
         }
 
-        public void HandleLocalInput(KeyboardState keyboardState)
+        protected override void HandleInput(MouseState mouseState, KeyboardState keyboardState)
         {
             foreach (var key in Keys)
                 if (!KeyDowns.Contains(key) && keyboardState.IsKeyDown(key)) KeyDowns.Add(key);

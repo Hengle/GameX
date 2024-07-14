@@ -9,7 +9,7 @@ from openstk.gfx_render import RenderPass
 from openstk.gfx_texture import ITexture, ITextureSelect
 from openstk.gl_view import OpenGLView
 from openstk.gl_renders import TextureRenderer
-from openstk.gfx_ui import KeyboardState
+from openstk.gfx_ui import MouseState, KeyboardState
 
 FACTOR: int = 1
 
@@ -36,11 +36,10 @@ class TextureView(OpenGLView):
         super().initializeGL()
         self.onProperty()
 
-    def handleResize(self):
+    def setViewportSize(self, x: int, y: int, width: int, height: int) -> None:
         if not self.obj: return
-        if self.obj.width > 1024 or self.obj.height > 1024 or False: super().handleResize(); return
-        self.camera.setViewportSize(self.obj.width << FACTOR, self.obj.height << FACTOR)
-        self.recalculatePositions()
+        if self.obj.width > 1024 or self.obj.height > 1024 or False: super().setViewportSize(x, y, width, height)
+        else: super().setViewportSize(x, y, self.obj.width << FACTOR, self.obj.height << FACTOR)
 
     def onProperty(self):
         if not self.graphic or not self.source: return
@@ -49,9 +48,8 @@ class TextureView(OpenGLView):
         if not self.obj: return
         if isinstance(self.source, ITextureSelect): self.source.select(self.id)
 
-        self.handleResize()
-        self.camera.setLocation(np.array([200., 200., 200.]))
-        self.camera.lookAt(np.zeros(3))
+        # self.camera.setLocation(np.array([200., 200., 200.]))
+        # self.camera.lookAt(np.zeros(3))
 
         self.graphicGl.textureManager.deleteTexture(self.obj)
         texture, _ = self.graphicGl.textureManager.createTexture(self.obj, self.level)
@@ -59,10 +57,9 @@ class TextureView(OpenGLView):
         self.renderers.append(TextureRenderer(self.graphicGl, texture, self.background))
 
     def render(self, camera: GLCamera, frameTime: float):
-        self.handleLocalInput(self.keyboardState)
         for renderer in self.renderers: renderer.render(camera, RenderPass.Both)
 
-    def handleLocalInput(self, keyboardState: KeyboardState):
+    def handleInput(self, mouseState: MouseState, keyboardState: KeyboardState):
         pass
     #     # if key == "r":
     #     #     glColor3f(1.0, 0.0, 0.0)

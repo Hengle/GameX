@@ -5,7 +5,7 @@ namespace GameX.App.Explorer
 {
     public partial class App : Application
     {
-        static App() => Platform.Startups.Add(OpenGLPlatform.Startup);
+        static App() => Platforms.Platform.Startups.Add(OpenGLPlatform.Startup);
         public static App Instance;
 
         static string[] args = new string[0];

@@ -47,19 +47,19 @@ namespace GameX.App.Explorer.Controls1
             if (source == null) return;
 
             particleGrid = new ParticleGridRenderer(graphic, 20, 5);
-            Camera.SetViewportSize((int)ActualWidth, (int)ActualHeight);
+            Camera.SetViewportSize(0, 0, (int)ActualWidth, (int)ActualHeight);
             Camera.SetLocation(new Vector3(200));
             Camera.LookAt(new Vector3(0));
 
             Renderers.Add(new ParticleRenderer(graphic, source));
         }
 
-        protected override void Render(Camera camera, float frameTime)
+        protected override void Render(Camera camera, float deltaTime)
         {
             particleGrid?.Render(Camera, RenderPass.Both);
             foreach (var renderer in Renderers)
             {
-                renderer.Update(frameTime);
+                renderer.Update(deltaTime);
                 renderer.Render(Camera, RenderPass.Both);
             }
         }
