@@ -20,7 +20,7 @@ namespace GameX.Bethesda.Formats.Records
                 case "MODL": MODL = new MODLGroup(r, dataSize); return true;
                 case "MODB": MODL.MODBField(r, dataSize); return true;
                 case "ICON": ICON = r.ReadFILE(dataSize); return true;
-                case "DATA": DATA = r.ReadS2<BYTEField>(dataSize); return true;
+                case "DATA": DATA = r.ReadSAndVerify<BYTEField>(dataSize); return true;
                 default: return false;
             }
         }

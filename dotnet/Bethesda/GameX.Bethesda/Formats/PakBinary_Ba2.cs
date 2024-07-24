@@ -277,7 +277,7 @@ namespace GameX.Bethesda.Formats
                     default: throw new ArgumentOutOfRangeException(nameof(tex.Format), $"Unsupported DDS header format. File: {file.Path}");
                 }
                 w.Write(DDS_HEADER.MAGIC);
-                w.WriteT(ddsHeader, sizeof(DDS_HEADER));
+                w.WriteS(ddsHeader);
                 switch ((DXGI_FORMAT)tex.Format)
                 {
                     case DXGI_FORMAT.BC1_UNORM_SRGB:
@@ -286,15 +286,14 @@ namespace GameX.Bethesda.Formats
                     case DXGI_FORMAT.BC5_SNORM:
                     case DXGI_FORMAT.BC7_UNORM:
                     case DXGI_FORMAT.BC7_UNORM_SRGB:
-                        var dxt10 = new DDS_HEADER_DXT10
+                        w.WriteS(new DDS_HEADER_DXT10
                         {
                             dxgiFormat = (DXGI_FORMAT)tex.Format,
                             resourceDimension = D3D10_RESOURCE_DIMENSION.TEXTURE2D,
                             miscFlag = 0,
                             arraySize = 1,
                             miscFlags2 = (uint)DDS_ALPHA_MODE.ALPHA_MODE_UNKNOWN,
-                        };
-                        w.WriteT(dxt10, sizeof(DDS_HEADER_DXT10));
+                        });
                         break;
                 }
 

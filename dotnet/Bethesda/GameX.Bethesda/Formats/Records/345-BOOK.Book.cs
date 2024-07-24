@@ -63,7 +63,7 @@ namespace GameX.Bethesda.Formats.Records
                 case "DESC":
                 case "TEXT": DESC = r.ReadSTRV(dataSize); return true;
                 case "ENAM": ENAM = new FMIDField<ENCHRecord>(r, dataSize); return true;
-                case "ANAM": ANAM = r.ReadS2<IN16Field>(dataSize); return true;
+                case "ANAM": ANAM = r.ReadSAndVerify<IN16Field>(dataSize); return true;
                 default: return false;
             }
         }

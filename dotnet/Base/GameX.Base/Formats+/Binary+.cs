@@ -104,7 +104,7 @@ namespace GameX.Formats
 
         public Binary_Dds(BinaryReader r, bool readMagic = true)
         {
-            Bytes = DDS_HEADER.Read(r, readMagic, out Header, out HeaderDXT10, out Format);
+            (Header, HeaderDXT10, Format, Bytes) = DDS_HEADER.Read(r, readMagic);
             var numMipMaps = Math.Max(1, Header.dwMipMapCount);
             var offset = 0;
             Mips = new Range[numMipMaps];

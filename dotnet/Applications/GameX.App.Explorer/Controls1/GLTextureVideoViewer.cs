@@ -21,7 +21,7 @@ namespace GameX.App.Explorer.Controls1
         Range Level = 0..;
         readonly HashSet<TextureRenderer> Renderers = [];
         int Texture;
-        float FrameDelay;
+        int FrameDelay;
         // ui
         Key[] Keys = [Key.Escape, Key.Space];
         HashSet<Key> KeyDowns = [];
@@ -74,14 +74,13 @@ namespace GameX.App.Explorer.Controls1
             Renderers.Add(new TextureRenderer(GraphicGL, Texture, Background));
         }
 
-        public override void Tick(float? deltaTime = null)
+        public override void Tick(int? deltaTime = null)
         {
             base.Tick(deltaTime);
             if (GraphicGL == null || Obj == null || !Obj.HasFrames) return;
             FrameDelay += DeltaTime;
-            if (FrameDelay <= .05f || !Obj.DecodeFrame()) return;
-            //if (FrameDelay <= Obj.Fps || !Obj.DecodeFrame()) return;
-            FrameDelay = 0f; // reset delay between frames
+            if (FrameDelay <= Obj.Fps || !Obj.DecodeFrame()) return;
+            FrameDelay = 0; // reset delay between frames
             GraphicGL.TextureManager.ReloadTexture(Obj, Level);
             Render(Camera, 0f);
         }

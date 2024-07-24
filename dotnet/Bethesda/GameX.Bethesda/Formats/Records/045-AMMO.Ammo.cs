@@ -42,7 +42,7 @@ namespace GameX.Bethesda.Formats.Records
                 case "FULL": FULL = r.ReadSTRV(dataSize); return true;
                 case "ICON": ICON = r.ReadFILE(dataSize); return true;
                 case "ENAM": ENAM = new FMIDField<ENCHRecord>(r, dataSize); return true;
-                case "ANAM": ANAM = r.ReadS2<IN16Field>(dataSize); return true;
+                case "ANAM": ANAM = r.ReadSAndVerify<IN16Field>(dataSize); return true;
                 case "DATA": DATA = new DATAField(r, dataSize); return true;
                 default: return false;
             }

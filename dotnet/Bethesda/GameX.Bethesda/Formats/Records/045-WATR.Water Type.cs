@@ -58,9 +58,9 @@ namespace GameX.Bethesda.Formats.Records
                     return;
                 }
                 FogDistance_FarPlane = r.ReadSingle();
-                ShallowColor = r.ReadS2<ColorRef4>(dataSize);
-                DeepColor = r.ReadS2<ColorRef4>(dataSize);
-                ReflectionColor = r.ReadS2<ColorRef4>(dataSize);
+                ShallowColor = r.ReadSAndVerify<ColorRef4>(dataSize);
+                DeepColor = r.ReadSAndVerify<ColorRef4>(dataSize);
+                ReflectionColor = r.ReadSAndVerify<ColorRef4>(dataSize);
                 TextureBlend = r.ReadByte();
                 r.Skip(3); // Unused
                 if (dataSize == 62)
@@ -118,8 +118,8 @@ namespace GameX.Bethesda.Formats.Records
             {
                 case "EDID": EDID = r.ReadSTRV(dataSize); return true;
                 case "TNAM": TNAM = r.ReadSTRV(dataSize); return true;
-                case "ANAM": ANAM = r.ReadS2<BYTEField>(dataSize); return true;
-                case "FNAM": FNAM = r.ReadS2<BYTEField>(dataSize); return true;
+                case "ANAM": ANAM = r.ReadSAndVerify<BYTEField>(dataSize); return true;
+                case "FNAM": FNAM = r.ReadSAndVerify<BYTEField>(dataSize); return true;
                 case "MNAM": MNAM = r.ReadSTRV(dataSize); return true;
                 case "SNAM": SNAM = new FMIDField<SOUNRecord>(r, dataSize); return true;
                 case "DATA": DATA = new DATAField(r, dataSize); return true;

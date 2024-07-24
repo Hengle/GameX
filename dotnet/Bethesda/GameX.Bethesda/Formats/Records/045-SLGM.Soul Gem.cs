@@ -38,8 +38,8 @@ namespace GameX.Bethesda.Formats.Records
                 case "SCRI": SCRI = new FMIDField<SCPTRecord>(r, dataSize); return true;
                 case "DATA": DATA = new DATAField(r, dataSize); return true;
                 case "ICON": ICON = r.ReadFILE(dataSize); return true;
-                case "SOUL": SOUL = r.ReadS2<BYTEField>(dataSize); return true;
-                case "SLCP": SLCP = r.ReadS2<BYTEField>(dataSize); return true;
+                case "SOUL": SOUL = r.ReadSAndVerify<BYTEField>(dataSize); return true;
+                case "SLCP": SLCP = r.ReadSAndVerify<BYTEField>(dataSize); return true;
                 default: return false;
             }
         }
