@@ -12,10 +12,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<!-- Display name -->
-		<ApplicationTitle>GameX.App.Explorer2</ApplicationTitle>
+		<ApplicationTitle>GameX.App.ExplorerM</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.contoso.gamex.app.explorer2</ApplicationId>
+		<ApplicationId>com.contoso.gamex.app.explorerm</ApplicationId>
 		<ApplicationIdGuid>1b5191df-e453-4abe-a64b-73a693de1131</ApplicationIdGuid>
 
 		<!-- Versions -->
@@ -158,17 +158,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Properties\" />
 	  <Folder Include="Resources\Icons\" />
 	</ItemGroup>
 
 	<ProjectExtensions><VisualStudio><UserProperties XamarinHotReloadDebuggerTimeoutExceptionGameSpecAppExplorer2HideInfoBar="True" /></VisualStudio></ProjectExtensions>
 
 	<ItemGroup>
-	  <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.70" />
+	  <PackageReference Update="Microsoft.Maui.Controls" Version="9.0.0-preview.6.24327.7" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.70" />
+	  <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="9.0.0-preview.6.24327.7" />
 	</ItemGroup>
 
 </Project>

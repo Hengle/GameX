@@ -27,24 +27,25 @@
 
 namespace GameX
 {
-    /// <summary>
-    /// Default Options for Applications.
-    /// </summary>
-    public class DefaultOptions
-    {
-        public string Family { get; set; }
-        public string Game { get; set; }
-        public string Edition { get; set; }
-        public string ForcePath { get; set; }
-        public bool ForceOpen { get; set; }
-    }
-
     public partial class FamilyManager
     {
+        /// <summary>
+        /// Options.
+        /// </summary>
+        public class GlobalOption
+        {
+            public string Family;
+            public string Game;
+            public string Edition;
+            public string ForcePath;
+            public bool ForceOpen;
+            //public bool UseMapBuilder = false;
+        }
+
 #if Arkane
         static string[] FamilyKeys = new[] { "Arkane", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:1",
@@ -63,7 +64,7 @@ namespace GameX
 #elif Bethesda
         static string[] FamilyKeys = new[] { "Bethesda", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:0",
@@ -84,7 +85,7 @@ namespace GameX
 #elif Bioware
         static string[] FamilyKeys = new[] { "Bioware", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:0",
@@ -111,7 +112,7 @@ namespace GameX
 #elif Black
         static string[] FamilyKeys = new[] { "Black", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -122,7 +123,7 @@ namespace GameX
 #elif Blizzard
         static string[] FamilyKeys = new[] { "Blizzard", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -143,7 +144,7 @@ namespace GameX
 #elif Bullfrog
         static string[] FamilyKeys = new[] { "Bullfrog", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:0",
@@ -163,7 +164,7 @@ namespace GameX
 #elif Capcom
         static string[] FamilyKeys = new[] { "Capcom", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -209,7 +210,7 @@ namespace GameX
 #elif Cig
         static string[] FamilyKeys = new[] { "Cig", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             //ForcePath = "app:DataForge",
             //ForcePath = "app:StarWords",
@@ -223,7 +224,7 @@ namespace GameX
 #elif Cryptic
         static string[] FamilyKeys = new[] { "Cryptic", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:1",
@@ -235,7 +236,7 @@ namespace GameX
 #elif Crytek
         static string[] FamilyKeys = new[] { "Crytek", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -253,7 +254,7 @@ namespace GameX
 #elif Cyanide
         static string[] FamilyKeys = new[] { "Cyanide", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -264,7 +265,7 @@ namespace GameX
 #elif EA
         static string[] FamilyKeys = new[] { "EA", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -274,7 +275,7 @@ namespace GameX
 #elif Epic
         static string[] FamilyKeys = new[] { "Epic", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -289,7 +290,7 @@ namespace GameX
 #elif Frictional
         static string[] FamilyKeys = new[] { "Frictional", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -305,7 +306,7 @@ namespace GameX
 #elif Frontier
         static string[] FamilyKeys = new[] { "Frontier", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -315,7 +316,7 @@ namespace GameX
 #elif Id
         static string[] FamilyKeys = new[] { "Id", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:0",
@@ -335,7 +336,7 @@ namespace GameX
 #elif IW
         static string[] FamilyKeys = new[] { "IW", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -359,7 +360,7 @@ namespace GameX
 #elif Lucas
         static string[] FamilyKeys = new[] { "Lucas", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             //Edition = "enhanced",
             ForceOpen = true,
@@ -446,7 +447,7 @@ namespace GameX
 #elif Monolith
         static string[] FamilyKeys = new[] { "Monolith", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -460,7 +461,7 @@ namespace GameX
 #elif Origin
         static string[] FamilyKeys = new[] { "Origin", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:6",
@@ -473,7 +474,7 @@ namespace GameX
 #elif Red
         static string[] FamilyKeys = new[] { "Red", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -487,7 +488,7 @@ namespace GameX
 #elif Ubisoft
         static string[] FamilyKeys = new[] { "Ubisoft", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -497,7 +498,7 @@ namespace GameX
 #elif Unity
         static string[] FamilyKeys = new[] { "Unity", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -511,7 +512,7 @@ namespace GameX
 #elif Valve
         static string[] FamilyKeys = new[] { "Valve", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -546,7 +547,7 @@ namespace GameX
 #elif Volition
         static string[] FamilyKeys = new[] { "Volition", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:0",
@@ -575,7 +576,7 @@ namespace GameX
 #elif WbB
         static string[] FamilyKeys = new[] { "WbB", "Unknown" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -585,7 +586,7 @@ namespace GameX
 #else
         static string[] FamilyKeys = new[] { "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "Id", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WbB" };
 
-        public static DefaultOptions AppDefaultOptions = new DefaultOptions
+        public static GlobalOption Option = new GlobalOption
         {
         };
 #endif

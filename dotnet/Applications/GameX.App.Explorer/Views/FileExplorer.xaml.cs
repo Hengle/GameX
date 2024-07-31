@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using static GameX.FamilyManager;
 
 namespace GameX.App.Explorer.Views
 {
@@ -136,9 +137,9 @@ namespace GameX.App.Explorer.Views
 
         void OnReady(PakFile pakFile)
         {
-            if (string.IsNullOrEmpty(Config.ForcePath) || Config.ForcePath.StartsWith("app:")) return;
-            var sample = Config.ForcePath.StartsWith("sample:") ? pakFile.Game.GetSample(Config.ForcePath[7..]) : null;
-            var forcePath = sample != null ? sample.Path : Config.ForcePath;
+            if (string.IsNullOrEmpty(Option.ForcePath) || Option.ForcePath.StartsWith("app:")) return;
+            var sample = Option.ForcePath.StartsWith("sample:") ? pakFile.Game.GetSample(Option.ForcePath[7..]) : null;
+            var forcePath = sample != null ? sample.Path : Option.ForcePath;
             if (forcePath == null) return;
             SelectedItem = MetaItem.FindByPathForNodes(PakNodes, forcePath, Resource);
         }

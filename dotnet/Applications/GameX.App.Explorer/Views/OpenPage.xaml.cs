@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using static GameX.FamilyManager;
 
 namespace GameX.App.Explorer.Views
 {
@@ -158,12 +159,12 @@ namespace GameX.App.Explorer.Views
 
         void OnReady(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(Config.DefaultFamily)) return;
-            Family.SelectedIndex = FamilyManager.Families.Keys.ToList().IndexOf(Config.DefaultFamily);
-            if (string.IsNullOrEmpty(Config.DefaultGame)) return;
-            Game.SelectedIndex = ((List<FamilyGame>)Games).FindIndex(x => x.Id == Config.DefaultGame);
-            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == (Config.DefaultEdition ?? string.Empty));
-            if (Config.ForceOpen) Open_Click(null, null);
+            if (string.IsNullOrEmpty(Option.Family)) return;
+            Family.SelectedIndex = FamilyManager.Families.Keys.ToList().IndexOf(Option.Family);
+            if (string.IsNullOrEmpty(Option.Game)) return;
+            Game.SelectedIndex = ((List<FamilyGame>)Games).FindIndex(x => x.Id == Option.Game);
+            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == (Option.Edition ?? string.Empty));
+            if (Option.ForceOpen) Open_Click(null, null);
         }
     }
 }

@@ -3,7 +3,7 @@ __version__ = "0.0.1"
 __current__ = "Arkane"
 # __current__ = "Bullfrog"
 
-class DefaultOptions:
+class GlobalOption:
     def __init__(self, Family:str=None, Game:str=None, Edition:str=None, ForcePath:str=None, ForceOpen:bool=False):
         self.Family = Family
         self.Game = Game
@@ -15,7 +15,7 @@ match __current__:
     case 'Arkane':
         familyKeys = [ "Arkane", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:1",
             Family = "Arkane",
@@ -33,7 +33,7 @@ match __current__:
     case 'Bethesda':
         familyKeys = [ "Bethesda", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Bethesda",
@@ -53,7 +53,7 @@ match __current__:
     case 'Bioware':
         familyKeys = [ "Bioware", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Bioware",
@@ -79,7 +79,7 @@ match __current__:
     case 'Black':
         familyKeys = [ "Black", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Black",
@@ -89,7 +89,7 @@ match __current__:
     case 'Blizzard':
         familyKeys = [ "Blizzard", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Blizzard",
@@ -109,7 +109,7 @@ match __current__:
     case 'Bullfrog':
         familyKeys = [ "Bullfrog", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Bullfrog",
@@ -128,7 +128,7 @@ match __current__:
     case 'Capcom':
         familyKeys = [ "Capcom", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Capcom",
@@ -173,7 +173,7 @@ match __current__:
     case 'Cig':
         familyKeys = [ "Cig", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             # ForcePath = "app:DataForge",
             # ForcePath = "app:StarWords",
             # ForcePath = "app:Subsumption",
@@ -186,7 +186,7 @@ match __current__:
     case 'Cryptic':
         familyKeys = [ "Cryptic", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Cryptic",
@@ -197,7 +197,7 @@ match __current__:
     case 'Crytek':
         familyKeys = [ "Crytek", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Crytek",
@@ -214,7 +214,7 @@ match __current__:
     case 'Cyanide':
         familyKeys = [ "Cyanide", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Cyanide",
@@ -224,7 +224,7 @@ match __current__:
     case 'EA':
         familyKeys = [ "EA", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "EA",
@@ -233,7 +233,7 @@ match __current__:
     case 'Epic':
         familyKeys = [ "Epic", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Epic",
@@ -247,7 +247,7 @@ match __current__:
     case 'Frictional':
         familyKeys = [ "Frictional", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Frictional",
@@ -262,7 +262,7 @@ match __current__:
     case 'Frontier':
         familyKeys = [ "Frontier", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Frontier",
@@ -271,7 +271,7 @@ match __current__:
     case 'Id':
         familyKeys = [ "Id", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Id",
@@ -290,7 +290,7 @@ match __current__:
     case 'IW':
         familyKeys = [ "IW", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "IW",
@@ -313,7 +313,7 @@ match __current__:
     case 'Lucas':
         familyKeys = [ "Lucas", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Lucas",
@@ -398,7 +398,7 @@ match __current__:
     case 'Monolith':
         familyKeys = [ "Monolith", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Monolith",
@@ -411,7 +411,7 @@ match __current__:
     case 'Origin':
         familyKeys = [ "Origin", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             # ForcePath = "sample:6",
             ForcePath = "sample:0",
@@ -423,7 +423,7 @@ match __current__:
     case 'Red':
         familyKeys = [ "Red", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Red",
@@ -436,7 +436,7 @@ match __current__:
     case 'Ubisoft':
         familyKeys = [ "Ubisoft", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Ubisoft",
@@ -445,7 +445,7 @@ match __current__:
     case 'Unity':
         familyKeys = [ "Unity", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Unity",
@@ -458,7 +458,7 @@ match __current__:
     case 'Valve':
         familyKeys = [ "Valve", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Valve",
@@ -492,7 +492,7 @@ match __current__:
     case 'Volition':
         familyKeys = [ "Volition", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Volition",
@@ -520,7 +520,7 @@ match __current__:
     case 'WbB':
         familyKeys = [ "WbB", "Unknown" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "WbB",
@@ -529,5 +529,5 @@ match __current__:
     case _:
         familyKeys = [ "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "Id", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WbB" ]
 
-        appDefaultOptions = DefaultOptions(
+        option = GlobalOption(
         )

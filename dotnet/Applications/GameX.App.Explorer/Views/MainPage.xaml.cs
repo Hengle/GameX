@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using static GameX.FamilyManager;
 
 namespace GameX.App.Explorer.Views
 {
@@ -102,7 +103,7 @@ namespace GameX.App.Explorer.Views
 
         internal void OnReady()
         {
-            if (!string.IsNullOrEmpty(Config.ForcePath) && Config.ForcePath.StartsWith("app:") && FamilyApps != null && FamilyApps.TryGetValue(Config.ForcePath[4..], out var app))
+            if (!string.IsNullOrEmpty(Option.ForcePath) && Option.ForcePath.StartsWith("app:") && FamilyApps != null && FamilyApps.TryGetValue(Option.ForcePath[4..], out var app))
                 App_Click(new Button { DataContext = app }, null);
             OpenPage_Click(null, null);
         }
