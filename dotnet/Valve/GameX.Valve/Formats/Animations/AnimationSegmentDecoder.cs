@@ -1,4 +1,4 @@
-using OpenStack.Graphics;
+using OpenStack.Gfx;
 
 namespace GameX.Valve.Formats.Animations
 {

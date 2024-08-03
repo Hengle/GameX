@@ -1,5 +1,5 @@
-using OpenStack.Graphics;
-using OpenStack.Graphics.DirectX;
+using OpenStack.Gfx;
+using OpenStack.Gfx;
 using System;
 using UnityEngine;
 

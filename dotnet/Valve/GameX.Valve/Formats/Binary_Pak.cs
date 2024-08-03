@@ -1,7 +1,7 @@
 using GameX.Meta;
 using GameX.Valve.Formats.Blocks;
 using GameX.Valve.Formats.Extras;
-using OpenStack.Graphics;
+using OpenStack.Gfx;
 using System;
 using System.Collections.Generic;
 using System.IO;

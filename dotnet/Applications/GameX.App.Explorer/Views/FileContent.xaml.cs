@@ -1,5 +1,5 @@
 ﻿using GameX.Meta;
-using OpenStack.Graphics;
+using OpenStack.Gfx;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;

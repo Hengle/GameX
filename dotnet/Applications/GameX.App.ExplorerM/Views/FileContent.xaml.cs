@@ -1,5 +1,5 @@
 ﻿using GameX.Meta;
-using OpenStack.Graphics;
+using OpenStack.Gfx;
 
 namespace GameX.App.Explorer.Views
 {

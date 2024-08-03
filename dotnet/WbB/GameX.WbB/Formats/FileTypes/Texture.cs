@@ -1,7 +1,7 @@
 using GameX.Meta;
 using GameX.Platforms;
 using GameX.WbB.Formats.Props;
-using OpenStack.Graphics;
+using OpenStack.Gfx;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

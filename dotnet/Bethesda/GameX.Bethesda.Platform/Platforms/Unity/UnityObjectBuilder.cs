@@ -1,7 +1,7 @@
 using GameX.Bethesda.Formats;
 using GameX.Bethesda.Formats.Unity;
 using GameX.Platforms;
-using OpenStack.Graphics;
+using OpenStack.Gfx;
 using UnityEngine;
 
 namespace GameX.Bethesda.Platforms.Unity

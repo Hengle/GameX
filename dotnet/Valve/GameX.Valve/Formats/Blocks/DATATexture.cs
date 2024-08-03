@@ -1,6 +1,6 @@
 using GameX.Formats;
 using GameX.Platforms;
-using OpenStack.Graphics;
+using OpenStack.Gfx;
 using System;
 using System.Collections.Generic;
 using System.IO;

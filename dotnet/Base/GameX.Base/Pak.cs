@@ -1,7 +1,7 @@
 ﻿using GameX.Formats;
 using GameX.Meta;
 using GameX.Unknown;
-using OpenStack.Graphics;
+using OpenStack.Gfx;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

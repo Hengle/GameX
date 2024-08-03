@@ -1,6 +1,6 @@
 ﻿using GameX.Valve.Formats.Animations;
 using GameX.Valve.Formats.Blocks;
-using OpenStack.Graphics;
+using OpenStack.Gfx;
 using System.Collections.Generic;
 
 namespace GameX.Valve.Formats

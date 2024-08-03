@@ -1,7 +1,7 @@
 ﻿using OpenStack;
-using OpenStack.Graphics;
-using OpenStack.Graphics.OpenGL;
-using OpenStack.Graphics.Vulken;
+using OpenStack.Gfx;
+using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Vk;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;

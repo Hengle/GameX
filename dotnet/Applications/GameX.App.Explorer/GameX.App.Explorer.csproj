@@ -68,7 +68,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Platforms\GameX.Platform.OpenGL\GameX.Platform.OpenGL.csproj" />
-    <ProjectReference Include="..\..\OpenStack\Graphics\OpenStack.Graphics.GLControl\OpenStack.Graphics.GLControl.csproj" />
+    <ProjectReference Include="..\..\OpenStack\dotnet\Gfx\OpenStack.Gfx.GlControl\OpenStack.Gfx.GlControl.csproj" />
     <ProjectReference Include="..\..\Cig\GameX.Cig.Explorer\GameX.Cig.Explorer.csproj" />
     <ProjectReference Include="..\..\Base\GameX.All\GameX.All.csproj" />
   </ItemGroup>

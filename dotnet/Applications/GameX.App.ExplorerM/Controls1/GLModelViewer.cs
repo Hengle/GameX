@@ -1,7 +1,7 @@
 //using GameX.Graphics.Scenes;
 //using GameX.Valve.Formats;
 //using GameX.Valve.Graphics.OpenGL.Scenes;
-//using OpenStack.Graphics;
+//using OpenStack.Gfx;
 //using OpenStack.Graphics.Renderer1;
 
 //namespace GameX.App.Explorer.Controls1

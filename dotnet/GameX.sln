@@ -205,21 +205,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Bioware", "Bioware\Ga
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Crytek", "Crytek\GameX.Crytek\GameX.Crytek.csproj", "{2C3C4F52-8899-47E2-B0F4-72C926B9FB1D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Physics", "Physics", "{CFD8D658-BE5E-43FF-A6A8-C5282FB494F0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Phy", "Phy", "{CFD8D658-BE5E-43FF-A6A8-C5282FB494F0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gfx", "Gfx", "{8AFD3AEA-A28F-43C7-8D42-0CF8388BE7D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Graphics", "OpenStack\Graphics\OpenStack.Graphics\OpenStack.Graphics.csproj", "{5D3D4FC2-C888-4462-96CD-72B6030C9E26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx", "OpenStack\dotnet\Gfx\OpenStack.Gfx\OpenStack.Gfx.csproj", "{5D3D4FC2-C888-4462-96CD-72B6030C9E26}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Graphics.GLControl", "OpenStack\Graphics\OpenStack.Graphics.GLControl\OpenStack.Graphics.GLControl.csproj", "{D8ED51A9-99A8-4AAE-9436-EFD0EC729726}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx.GlControl", "OpenStack\dotnet\Gfx\OpenStack.Gfx.GlControl\OpenStack.Gfx.GlControl.csproj", "{D8ED51A9-99A8-4AAE-9436-EFD0EC729726}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Graphics.OpenGL", "OpenStack\Graphics\OpenStack.Graphics.OpenGL\OpenStack.Graphics.OpenGL.csproj", "{CEE4D753-134D-4B37-877B-912CBD0AE852}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx.Gl", "OpenStack\dotnet\Gfx\OpenStack.Gfx.Gl\OpenStack.Gfx.Gl.csproj", "{CEE4D753-134D-4B37-877B-912CBD0AE852}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.GraphicsTests", "OpenStack\Graphics\OpenStack.GraphicsTests\OpenStack.GraphicsTests.csproj", "{408C5AA0-004B-4237-9D5D-D9ECC35EE35F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.GfxTests", "OpenStack\dotnet\Gfx\OpenStack.GfxTests\OpenStack.GfxTests.csproj", "{408C5AA0-004B-4237-9D5D-D9ECC35EE35F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{D2430DDB-CF76-4570-8F9F-D8EAC21C9D95}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Polyfills", "OpenStack\Base\OpenStack.Polyfills\OpenStack.Polyfills.csproj", "{88DCAFE5-1E2F-4F05-BDC9-F92CD0E8B67C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Polyfills", "OpenStack\dotnet\Base\OpenStack.Polyfills\OpenStack.Polyfills.csproj", "{88DCAFE5-1E2F-4F05-BDC9-F92CD0E8B67C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.BaseTests", "Base\GameX.BaseTests\GameX.BaseTests.csproj", "{A77B276B-CE12-4215-9BBE-7B03CCD55813}"
 EndProject
@@ -267,7 +267,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Monolith", "Monolith\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Monolith.Platform", "Monolith\GameX.Monolith.Platform\GameX.Monolith.Platform.csproj", "{F27DA894-E285-4829-AB0D-3E9C9E7FD763}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.PolyIO", "OpenStack\Base\OpenStack.PolyIO\OpenStack.PolyIO.csproj", "{C9E0A904-D76C-45C9-B1B2-D2DCE789177A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.PolyIO", "OpenStack\dotnet\Base\OpenStack.PolyIO\OpenStack.PolyIO.csproj", "{C9E0A904-D76C-45C9-B1B2-D2DCE789177A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Frictional.Platform", "Frictional\GameX.Frictional.Platform\GameX.Frictional.Platform.csproj", "{DD1A2D4E-20CD-4F9F-A22D-B84BA246DB0F}"
 EndProject
@@ -377,6 +377,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Bullfrog.Game", "Bullfrog\GameX.Bullfrog.Game\GameX.Bullfrog.Game.csproj", "{70925A24-D761-4E38-8C9E-611C09EBB209}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sfx", "Sfx", "{4050146F-FAF9-4C0A-9FFA-E63FA38FA2A0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx.Vk", "OpenStack\dotnet\Gfx\OpenStack.Gfx.Vk\OpenStack.Gfx.Vk.csproj", "{9DAFCEAE-2B63-478B-B143-CE4E7558519F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1300,6 +1302,18 @@ Global
 		{70925A24-D761-4E38-8C9E-611C09EBB209}.Release|x64.Build.0 = Release|Any CPU
 		{70925A24-D761-4E38-8C9E-611C09EBB209}.Release|x86.ActiveCfg = Release|Any CPU
 		{70925A24-D761-4E38-8C9E-611C09EBB209}.Release|x86.Build.0 = Release|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Debug|x64.Build.0 = Debug|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Debug|x86.Build.0 = Debug|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Release|x64.ActiveCfg = Release|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Release|x64.Build.0 = Release|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Release|x86.ActiveCfg = Release|Any CPU
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1387,6 +1401,7 @@ Global
 		{A4773B2B-9042-4017-A8A9-C249D70DFD18} = {3BF732F3-7B66-471C-9E99-8D65CA029546}
 		{70925A24-D761-4E38-8C9E-611C09EBB209} = {5AF9DE0E-F59A-49A8-B406-06C8718D5988}
 		{4050146F-FAF9-4C0A-9FFA-E63FA38FA2A0} = {4EC06189-D9CE-42F3-BFA0-F70810EF617B}
+		{9DAFCEAE-2B63-478B-B143-CE4E7558519F} = {8AFD3AEA-A28F-43C7-8D42-0CF8388BE7D2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9F1BB93-CFBC-4E41-A865-325B22465054}
