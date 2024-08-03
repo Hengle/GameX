@@ -36,8 +36,8 @@
     <ProjectReference Include="..\..\Frictional\GameX.Frictional\GameX.Frictional.csproj" />
     <ProjectReference Include="..\..\Frontier\GameX.Frontier.Platform\GameX.Frontier.Platform.csproj" />
     <ProjectReference Include="..\..\Frontier\GameX.Frontier\GameX.Frontier.csproj" />
-    <ProjectReference Include="..\..\Id\GameX.Id.Platform\GameX.Id.Platform.csproj" />
-    <ProjectReference Include="..\..\Id\GameX.Id\GameX.Id.csproj" />
+    <ProjectReference Include="..\..\Id\GameX.Id.Platform\GameX.ID.Platform.csproj" />
+    <ProjectReference Include="..\..\Id\GameX.Id\GameX.ID.csproj" />
     <ProjectReference Include="..\..\IW\GameX.IW.Platform\GameX.IW.Platform.csproj" />
     <ProjectReference Include="..\..\IW\GameX.IW\GameX.IW.csproj" />
     <ProjectReference Include="..\..\Lucas\GameX.Lucas.Platform\GameX.Lucas.Platform.csproj" />
@@ -56,8 +56,8 @@
     <ProjectReference Include="..\..\Valve\GameX.Valve\GameX.Valve.csproj" />
 	<ProjectReference Include="..\..\Volition\GameX.Volition.Platform\GameX.Volition.Platform.csproj" />
     <ProjectReference Include="..\..\Volition\GameX.Volition\GameX.Volition.csproj" />
-	<ProjectReference Include="..\..\WbB\GameX.WbB.Platform\GameX.WbB.Platform.csproj" />
-    <ProjectReference Include="..\..\WbB\GameX.WbB\GameX.WbB.csproj" />
+	<ProjectReference Include="..\..\WB\GameX.WB.Platform\GameX.WB.Platform.csproj" />
+    <ProjectReference Include="..\..\WB\GameX.WB\GameX.WB.csproj" />
   </ItemGroup>
 
   <ItemGroup>

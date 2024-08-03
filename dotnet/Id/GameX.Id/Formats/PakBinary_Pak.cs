@@ -1,12 +1,12 @@
 ﻿using GameX.Formats;
-using GameX.Id.Formats.Q;
+using GameX.ID.Formats.Q;
 using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace GameX.Id.Formats
+namespace GameX.ID.Formats
 {
     public unsafe class PakBinary_Pak : PakBinary<PakBinary_Pak>
     {

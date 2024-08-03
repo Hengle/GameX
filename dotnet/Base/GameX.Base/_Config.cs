@@ -23,7 +23,7 @@
 //#define Unity
 //#define Valve
 //#define Volition
-//#define WbB
+//#define WB
 
 namespace GameX
 {
@@ -573,18 +573,18 @@ namespace GameX
             //Game = "RF:GR", // Red Faction: Guerrilla Re-Mars-tered
             //Game = "SR", // Saints Row
         };
-#elif WbB
-        static string[] FamilyKeys = new[] { "WbB", "Unknown" };
+#elif WB
+        static string[] FamilyKeys = new[] { "WB", "Unknown" };
 
         public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:*",
-            Family = "WbB",
+            Family = "WB",
             Game = "AC", // Asheron's Call [open, read, texture:GL]
         };
 #else
-        static string[] FamilyKeys = new[] { "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "Id", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WbB" };
+        static string[] FamilyKeys = new[] { "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "Id", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WB" };
 
         public static GlobalOption Option = new GlobalOption
         {

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 // https://www.gamers.org/dEngine/quake/spec/quake-spec34/qkspec_3.htm
-namespace GameX.Id.Formats.Q
+namespace GameX.ID.Formats.Q
 {
     #region Binary_Lump
 

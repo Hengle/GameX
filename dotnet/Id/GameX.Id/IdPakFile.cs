@@ -1,12 +1,12 @@
 ﻿using GameX.Formats;
 using GameX.Formats.Unknown;
-using GameX.Id.Formats;
-using GameX.Id.Transforms;
+using GameX.ID.Formats;
+using GameX.ID.Transforms;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace GameX.Id
+namespace GameX.ID
 {
     /// <summary>
     /// IdPakFile

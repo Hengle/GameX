@@ -46,8 +46,8 @@
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\FrictionalFamily.Sample.json" Link="Specs\FrictionalFamily.Sample.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\FrontierFamily.json" Link="Specs\FrontierFamily.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\FrontierFamily.Sample.json" Link="Specs\FrontierFamily.Sample.json" />
-    <EmbeddedResource Include="..\..\..\python\gamex\Specs\IdFamily.json" Link="Specs\IdFamily.json" />
-    <EmbeddedResource Include="..\..\..\python\gamex\Specs\IdFamily.Sample.json" Link="Specs\IdFamily.Sample.json" />
+    <EmbeddedResource Include="..\..\..\python\gamex\Specs\IDFamily.json" Link="Specs\IdFamily.json" />
+    <EmbeddedResource Include="..\..\..\python\gamex\Specs\IDFamily.Sample.json" Link="Specs\IdFamily.Sample.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\IWFamily.json" Link="Specs\IWFamily.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\IWFamily.Sample.json" Link="Specs\IWFamily.Sample.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\LucasFamily.json" Link="Specs\LucasFamily.json" />
@@ -71,8 +71,8 @@
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\ValveFamily.Sample.json" Link="Specs\ValveFamily.Sample.json" />
 	<EmbeddedResource Include="..\..\..\python\gamex\Specs\VolitionFamily.json" Link="Specs\VolitionFamily.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\VolitionFamily.Sample.json" Link="Specs\VolitionFamily.Sample.json" />  
-    <EmbeddedResource Include="..\..\..\python\gamex\Specs\WbBFamily.json" Link="Specs\WbBFamily.json" />
-    <EmbeddedResource Include="..\..\..\python\gamex\Specs\WbBFamily.Sample.json" Link="Specs\WbBFamily.Sample.json" />
+    <EmbeddedResource Include="..\..\..\python\gamex\Specs\WBFamily.json" Link="Specs\WBFamily.json" />
+    <EmbeddedResource Include="..\..\..\python\gamex\Specs\WBFamily.Sample.json" Link="Specs\WBFamily.Sample.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -100,8 +100,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\OpenStack\dotnet\Base\OpenStack.Polyfills\OpenStack.Polyfills.csproj" />
-    <ProjectReference Include="..\..\OpenStack\dotnet\Gfx\OpenStack.Gfx\OpenStack.Gfx.csproj" />
+    <ProjectReference Include="..\..\..\OpenStack\dotnet\Base\OpenStack.Polyfills\OpenStack.Polyfills.csproj" />
+    <ProjectReference Include="..\..\..\OpenStack\dotnet\Gfx\OpenStack.Gfx\OpenStack.Gfx.csproj" />
   </ItemGroup>
 
 </Project>

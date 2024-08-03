@@ -1,8 +1,8 @@
-using GameX.Id.Formats.Q;
+using GameX.ID.Formats.Q;
 using System;
 using static OpenStack.Debug;
 
-namespace GameX.Id.Games.Q
+namespace GameX.ID.Games.Q
 {
     public static class Database
     {

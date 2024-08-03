@@ -5,5 +5,5 @@
 	path = Tes/kfmxml
 	url = git@github.com:niftools/kfmxml.git
 [submodule "dotnet/OpenStack"]
-	path = dotnet/OpenStack
+	path = OpenStack
 	url = git@github.com:bclnet/OpenStack.git

@@ -1,12 +1,12 @@
-using GameX.WbB.Builders;
+using GameX.WB.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GameX.WbB
+namespace GameX.WB
 {
     [TestClass]
     public class BuilderTest
     {
-        static readonly Family family = FamilyManager.GetFamily("WbB");
+        static readonly Family family = FamilyManager.GetFamily("WB");
 
         [TestMethod]
         public void MapImageBuilder()

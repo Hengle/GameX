@@ -1,17 +1,17 @@
-using GameX.WbB.Formats;
-using GameX.WbB.Formats.FileTypes;
+using GameX.WB.Formats;
+using GameX.WB.Formats.FileTypes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Environment = GameX.WbB.Formats.FileTypes.Environment;
+using Environment = GameX.WB.Formats.FileTypes.Environment;
 
-namespace GameX.WbB
+namespace GameX.WB
 {
     [TestClass]
     public class FormatTests2
     {
-        static readonly Family family = FamilyManager.GetFamily("WbB");
+        static readonly Family family = FamilyManager.GetFamily("WB");
         static readonly PakFile portal = family.OpenPakFile(new Uri("game:/client_portal.dat#AC"));
         static readonly PakFile cell = family.OpenPakFile(new Uri("game:/client_cell_1.dat#AC"));
         static readonly PakFile localEnglish = family.OpenPakFile(new Uri("game:/client_local_English.dat#AC"));

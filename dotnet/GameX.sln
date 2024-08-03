@@ -28,11 +28,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bethesda", "Bethesda", "{7F
 		..\docs\Families\Bethesda\Readme.md = ..\docs\Families\Bethesda\Readme.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WbB", "WbB", "{BDE29250-8EA7-47E0-8D67-A58A176B2D30}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WB", "WB", "{BDE29250-8EA7-47E0-8D67-A58A176B2D30}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\Families\WbB\Readme.md = ..\docs\Families\WbB\Readme.md
-		..\python\gamex\Specs\WbBFamily.json = ..\python\gamex\Specs\WbBFamily.json
-		..\python\gamex\Specs\WbBFamily.Sample.json = ..\python\gamex\Specs\WbBFamily.Sample.json
+		..\docs\Families\WB\Readme.md = ..\docs\Families\WB\Readme.md
+		..\python\gamex\Specs\WBFamily.json = ..\python\gamex\Specs\WBFamily.json
+		..\python\gamex\Specs\WBFamily.Sample.json = ..\python\gamex\Specs\WBFamily.Sample.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Arkane", "Arkane", "{793BECC6-9830-4CB9-B65C-DBC4C14ADCA4}"
@@ -105,7 +105,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Valve", "Valve", "{B9CFB3F1
 		..\python\gamex\Specs\ValveFamily.Sample.json = ..\python\gamex\Specs\ValveFamily.Sample.json
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.WbB", "WbB\GameX.WbB\GameX.WbB.csproj", "{A5A1B037-867C-4EB9-B4C1-AA87FD81220B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.WB", "WB\GameX.WB\GameX.WB.csproj", "{A5A1B037-867C-4EB9-B4C1-AA87FD81220B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{6D2DEF34-0211-49A7-B0CE-8AF7AE738D8A}"
 	ProjectSection(SolutionItems) = preProject
@@ -151,11 +151,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blizzard", "Blizzard", "{38
 		..\docs\Families\Blizzard\Readme.md = ..\docs\Families\Blizzard\Readme.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Id", "Id", "{ADDD9C65-49FA-4981-BFA6-545759D762F7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ID", "ID", "{ADDD9C65-49FA-4981-BFA6-545759D762F7}"
 	ProjectSection(SolutionItems) = preProject
-		..\python\gamex\Specs\IdFamily.json = ..\python\gamex\Specs\IdFamily.json
-		..\python\gamex\Specs\IdFamily.Sample.json = ..\python\gamex\Specs\IdFamily.Sample.json
-		..\docs\Families\Id\Readme.md = ..\docs\Families\Id\Readme.md
+		..\python\gamex\Specs\IDFamily.json = ..\python\gamex\Specs\IDFamily.json
+		..\python\gamex\Specs\IDFamily.Sample.json = ..\python\gamex\Specs\IDFamily.Sample.json
+		..\docs\Families\ID\Readme.md = ..\docs\Families\ID\Readme.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cryptic", "Cryptic", "{CB2D9FBD-6D37-4B95-BC2D-65D172F89CEE}"
@@ -209,17 +209,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Phy", "Phy", "{CFD8D658-BE5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gfx", "Gfx", "{8AFD3AEA-A28F-43C7-8D42-0CF8388BE7D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx", "OpenStack\dotnet\Gfx\OpenStack.Gfx\OpenStack.Gfx.csproj", "{5D3D4FC2-C888-4462-96CD-72B6030C9E26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx", "..\OpenStack\dotnet\Gfx\OpenStack.Gfx\OpenStack.Gfx.csproj", "{5D3D4FC2-C888-4462-96CD-72B6030C9E26}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx.GlControl", "OpenStack\dotnet\Gfx\OpenStack.Gfx.GlControl\OpenStack.Gfx.GlControl.csproj", "{D8ED51A9-99A8-4AAE-9436-EFD0EC729726}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx.GlControl", "..\OpenStack\dotnet\Gfx\OpenStack.Gfx.GlControl\OpenStack.Gfx.GlControl.csproj", "{D8ED51A9-99A8-4AAE-9436-EFD0EC729726}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx.Gl", "OpenStack\dotnet\Gfx\OpenStack.Gfx.Gl\OpenStack.Gfx.Gl.csproj", "{CEE4D753-134D-4B37-877B-912CBD0AE852}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx.Gl", "..\OpenStack\dotnet\Gfx\OpenStack.Gfx.Gl\OpenStack.Gfx.Gl.csproj", "{CEE4D753-134D-4B37-877B-912CBD0AE852}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.GfxTests", "OpenStack\dotnet\Gfx\OpenStack.GfxTests\OpenStack.GfxTests.csproj", "{408C5AA0-004B-4237-9D5D-D9ECC35EE35F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.GfxTests", "..\OpenStack\dotnet\Gfx\OpenStack.GfxTests\OpenStack.GfxTests.csproj", "{408C5AA0-004B-4237-9D5D-D9ECC35EE35F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{D2430DDB-CF76-4570-8F9F-D8EAC21C9D95}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Polyfills", "OpenStack\dotnet\Base\OpenStack.Polyfills\OpenStack.Polyfills.csproj", "{88DCAFE5-1E2F-4F05-BDC9-F92CD0E8B67C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Polyfills", "..\OpenStack\dotnet\Base\OpenStack.Polyfills\OpenStack.Polyfills.csproj", "{88DCAFE5-1E2F-4F05-BDC9-F92CD0E8B67C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.BaseTests", "Base\GameX.BaseTests\GameX.BaseTests.csproj", "{A77B276B-CE12-4215-9BBE-7B03CCD55813}"
 EndProject
@@ -227,7 +227,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Cyanide", "Cyanide\Ga
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Origin", "Origin\GameX.Origin\GameX.Origin.csproj", "{A88A4ECA-E3A0-4FE5-BAB8-65FDAA420E47}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.WbB.Platform", "WbB\GameX.WbB.Platform\GameX.WbB.Platform.csproj", "{A8CFC567-7182-417E-BC84-5A90E1A3C805}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.WB.Platform", "WB\GameX.WB.Platform\GameX.WB.Platform.csproj", "{A8CFC567-7182-417E-BC84-5A90E1A3C805}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Arkane.Platform", "Arkane\GameX.Arkane.Platform\GameX.Arkane.Platform.csproj", "{0171784C-957E-46A2-B6D9-DA475D86AE85}"
 EndProject
@@ -267,7 +267,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Monolith", "Monolith\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Monolith.Platform", "Monolith\GameX.Monolith.Platform\GameX.Monolith.Platform.csproj", "{F27DA894-E285-4829-AB0D-3E9C9E7FD763}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.PolyIO", "OpenStack\dotnet\Base\OpenStack.PolyIO\OpenStack.PolyIO.csproj", "{C9E0A904-D76C-45C9-B1B2-D2DCE789177A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.PolyIO", "..\OpenStack\dotnet\Base\OpenStack.PolyIO\OpenStack.PolyIO.csproj", "{C9E0A904-D76C-45C9-B1B2-D2DCE789177A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Frictional.Platform", "Frictional\GameX.Frictional.Platform\GameX.Frictional.Platform.csproj", "{DD1A2D4E-20CD-4F9F-A22D-B84BA246DB0F}"
 EndProject
@@ -283,9 +283,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.IW.Platform", "IW\Gam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CascLib", "..\..\CascLib\CascLib\CascLib.csproj", "{068EA453-09C0-4EEF-86F3-12CE05C5B3B7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Id", "Id\GameX.Id\GameX.Id.csproj", "{893AE238-7783-40D7-BC8F-7B86B27FFCBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.ID", "Id\GameX.Id\GameX.ID.csproj", "{893AE238-7783-40D7-BC8F-7B86B27FFCBD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Id.Platform", "Id\GameX.Id.Platform\GameX.Id.Platform.csproj", "{5FFD07F5-DD55-485E-A5AB-0F3718CF2CAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.ID.Platform", "Id\GameX.Id.Platform\GameX.ID.Platform.csproj", "{5FFD07F5-DD55-485E-A5AB-0F3718CF2CAC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Cryptic", "Cryptic\GameX.Cryptic\GameX.Cryptic.csproj", "{4EB47393-4083-4C1E-997C-00F5775EB126}"
 EndProject
@@ -378,7 +378,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameX.Bullfrog.Game", "Bull
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sfx", "Sfx", "{4050146F-FAF9-4C0A-9FFA-E63FA38FA2A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx.Vk", "OpenStack\dotnet\Gfx\OpenStack.Gfx.Vk\OpenStack.Gfx.Vk.csproj", "{9DAFCEAE-2B63-478B-B143-CE4E7558519F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenStack.Gfx.Vk", "..\OpenStack\dotnet\Gfx\OpenStack.Gfx.Vk\OpenStack.Gfx.Vk.csproj", "{9DAFCEAE-2B63-478B-B143-CE4E7558519F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

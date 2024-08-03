@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace GameX.Id.Formats
+namespace GameX.ID.Formats
 {
     public unsafe class PakBinary_Wad : PakBinary<PakBinary_Wad>
     {

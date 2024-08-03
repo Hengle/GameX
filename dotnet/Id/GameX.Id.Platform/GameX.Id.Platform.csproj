@@ -10,7 +10,7 @@
     <ProjectReference Include="..\..\Platforms\GameX.Platform.StereoKit\GameX.Platform.StereoKit.csproj" />
     <ProjectReference Include="..\..\Platforms\GameX.Platform.Unity\GameX.Platform.Unity.csproj" />
     <ProjectReference Include="..\..\Platforms\GameX.Platform.Unreal\GameX.Platform.Unreal.csproj" />
-    <ProjectReference Include="..\GameX.Id\GameX.Id.csproj" />
+    <ProjectReference Include="..\GameX.Id\GameX.ID.csproj" />
   </ItemGroup>
 
   <ItemGroup>

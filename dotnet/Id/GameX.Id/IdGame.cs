@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace GameX.Id
+namespace GameX.ID
 {
     /// <summary>
     /// IdGame

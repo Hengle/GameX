@@ -1,5 +1,5 @@
-using GameX.WbB.Formats;
-using GameX.WbB.Formats.FileTypes;
+using GameX.WB.Formats;
+using GameX.WB.Formats.FileTypes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -7,12 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GameX.WbB
+namespace GameX.WB
 {
     [TestClass]
     public class FormatTests
     {
-        static readonly Family family = FamilyManager.GetFamily("WbB");
+        static readonly Family family = FamilyManager.GetFamily("WB");
         static readonly PakFile cell = family.OpenPakFile(new Uri("game:/client_cell_1.dat#AC")); const int ExpectedCellCount = 805003;
         static readonly PakFile portal = family.OpenPakFile(new Uri("game:/client_portal.dat#AC")); const int ExpectedPortalCount = 79694;
         static readonly PakFile localEnglish = family.OpenPakFile(new Uri("game:/client_local_English.dat#AC")); const int ExpectedLocalEnglishCount = 118;
