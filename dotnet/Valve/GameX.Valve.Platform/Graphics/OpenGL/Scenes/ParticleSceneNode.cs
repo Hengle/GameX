@@ -24,7 +24,7 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
 
         public ParticleSceneNode(Scene scene, DATAParticleSystem particleSystem) : base(scene)
         {
-            ParticleRenderer = new ParticleRenderer(Scene.Graphic as IOpenGLGraphic, new ParticleSystemWrapper(particleSystem));
+            ParticleRenderer = new ParticleRenderer(Scene.Graphic as IOpenGLGfx, new ParticleSystemWrapper(particleSystem));
             LocalBoundingBox = ParticleRenderer.BoundingBox;
         }
 

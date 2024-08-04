@@ -1,6 +1,7 @@
 ﻿using OpenStack;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
+using OpenStack.Sfx;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -222,21 +223,19 @@ namespace GameX.Platforms
     }
 
     /// <summary>
-    /// OpenGLGraphic
+    /// OpenGLGfx
     /// </summary>
-    public class OpenGLGraphic : IOpenGLGraphic
+    public class OpenGLGfx : IOpenGLGfx
     {
         readonly PakFile _source;
-        readonly AudioManager<object> _audioManager;
         readonly TextureManager<int> _textureManager;
         readonly MaterialManager<GLRenderMaterial, int> _materialManager;
         readonly ObjectManager<object, GLRenderMaterial, int> _objectManager;
         readonly ShaderManager<Shader> _shaderManager;
 
-        public OpenGLGraphic(PakFile source)
+        public OpenGLGfx(PakFile source)
         {
             _source = source;
-            _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
             _textureManager = new TextureManager<int>(source, new OpenGLTextureBuilder());
             _materialManager = new MaterialManager<GLRenderMaterial, int>(source, _textureManager, new OpenGLMaterialBuilder(_textureManager));
             _objectManager = new ObjectManager<object, GLRenderMaterial, int>(source, _materialManager, new OpenGLObjectBuilder());
@@ -245,12 +244,10 @@ namespace GameX.Platforms
         }
 
         public PakFile Source => _source;
-        public IAudioManager<object> AudioManager => _audioManager;
         public ITextureManager<int> TextureManager => _textureManager;
         public IMaterialManager<GLRenderMaterial, int> MaterialManager => _materialManager;
         public IObjectManager<object, GLRenderMaterial, int> ObjectManager => _objectManager;
         public IShaderManager<Shader> ShaderManager => _shaderManager;
-        public object CreateAudio(object path) => _audioManager.CreateAudio(path).aud;
         public int CreateTexture(object path, Range? level = null) => _textureManager.CreateTexture(path, level).tex;
         public void PreloadTexture(object path) => _textureManager.PreloadTexture(path);
         public object CreateObject(object path) => _objectManager.CreateObject(path).obj;
@@ -265,6 +262,25 @@ namespace GameX.Platforms
     }
 
     /// <summary>
+    /// OpenGLSfx
+    /// </summary>
+    public class OpenGLSfx : ISystemSfx
+    {
+        readonly PakFile _source;
+        readonly AudioManager<object> _audioManager;
+
+        public OpenGLSfx(PakFile source)
+        {
+            _source = source;
+            _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
+        }
+
+        public PakFile Source => _source;
+        public IAudioManager<object> AudioManager => _audioManager;
+        public object CreateAudio(object path) => _audioManager.CreateAudio(path).aud;
+    }
+
+    /// <summary>
     /// OpenGLPlatform
     /// </summary>
     public static class OpenGLPlatform
@@ -274,7 +290,8 @@ namespace GameX.Platforms
             try
             {
                 Platform.PlatformType = Platform.Type.OpenGL;
-                Platform.GraphicFactory = source => new OpenGLGraphic(source);
+                Platform.GfxFactory = source => new OpenGLGfx(source);
+                Platform.SfxFactory = source => new OpenGLSfx(source);
                 Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
                 Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
                 Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);

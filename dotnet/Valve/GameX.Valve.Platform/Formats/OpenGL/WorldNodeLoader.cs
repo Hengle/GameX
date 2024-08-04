@@ -13,9 +13,9 @@ namespace GameX.Valve.Formats.OpenGL
     public class WorldNodeLoader
     {
         readonly DATAWorldNode Node;
-        readonly IOpenGLGraphic Graphic;
+        readonly IOpenGLGfx Graphic;
 
-        public WorldNodeLoader(IOpenGLGraphic graphic, DATAWorldNode node)
+        public WorldNodeLoader(IOpenGLGfx graphic, DATAWorldNode node)
         {
             Node = node;
             Graphic = graphic;

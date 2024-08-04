@@ -6,15 +6,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Platforms\**" />
+    <EmbeddedResource Remove="Platforms\**" />
+    <None Remove="Platforms\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\..\docs\Platforms\StereoKit\Readme.md" Link="Readme.md" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="StereoKit" Version="0.3.9" />
+    <PackageReference Include="StereoKit" Version="0.4.0-preview.597" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OpenStack\dotnet\Sfx\OpenStack.Sfx\OpenStack.Sfx.csproj" />
     <ProjectReference Include="..\..\Base\GameX.Base\GameX.Base.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AndroidNativeLibrary Remove="Platforms\**" />
   </ItemGroup>
 
 </Project>

@@ -114,7 +114,7 @@ namespace GameX.Valve.Formats.Blocks
             return Animation.FromData(animationDataBlock.Data, decodeKey, Skeleton);
         }
 
-        public IEnumerable<Animation> GetAllAnimations(IOpenGraphic graphic)
+        public IEnumerable<Animation> GetAllAnimations(IOpenGfx graphic)
         {
             if (CachedAnimations != null) return CachedAnimations;
 

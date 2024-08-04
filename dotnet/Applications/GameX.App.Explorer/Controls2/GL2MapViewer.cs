@@ -15,9 +15,9 @@ namespace GameX.App.Explorer.Controls2
 
         public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Graphic), typeof(object), typeof(GL2ParticleViewer),
             new PropertyMetadata((d, e) => (d as GL2MapViewer).OnProperty()));
-        public IOpenGraphic Graphic
+        public IOpenGfx Graphic
         {
-            get => GetValue(GraphicProperty) as IOpenGraphic;
+            get => GetValue(GraphicProperty) as IOpenGfx;
             set => SetValue(GraphicProperty, value);
         }
 
@@ -32,7 +32,7 @@ namespace GameX.App.Explorer.Controls2
         void OnProperty()
         {
             if (Graphic == null || Source == null) return;
-            var graphic = Graphic as IOpenGLGraphic;
+            var graphic = Graphic as IOpenGLGfx;
             var source = Source is object z ? z
                 : Source is IRedirected<object> y ? y.Value
                 : null;

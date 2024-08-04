@@ -268,13 +268,13 @@ match __current__:
             Family = "Frontier",
             Game = "ED"
         )
-    case 'Id':
-        familyKeys = [ "Id", "Unknown" ]
+    case 'ID':
+        familyKeys = [ "ID", "Unknown" ]
 
         option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
-            Family = "Id",
+            Family = "ID",
             Game = "Q", # Quake
             # Game = "Q2", # Quake II
             # Game = "Q3:A", # Quake III Arena
@@ -517,13 +517,13 @@ match __current__:
             # Game = "RF:GR", # Red Faction: Guerrilla Re-Mars-tered
             # Game = "SR", # Saints Row
         )
-    case 'WbB':
-        familyKeys = [ "WbB", "Unknown" ]
+    case 'WB':
+        familyKeys = [ "WB", "Unknown" ]
 
         option = GlobalOption(
             ForceOpen = True,
             ForcePath = "sample:*",
-            Family = "WbB",
+            Family = "WB",
             Game = "AC", # Asheron's Call [open, read, texture:GL]
         )
     case _:

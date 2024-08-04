@@ -2,6 +2,7 @@
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
 using OpenStack.Gfx.Vk;
+using OpenStack.Sfx;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace GameX.Platforms
     public static class VulkenExtensions { }
 
     /// <summary>
-    /// OpenGLObjectBuilder
+    /// VulkenObjectBuilder
     /// </summary>
     public class VulkenObjectBuilder : ObjectBuilderBase<object, GLRenderMaterial, int>
     {
@@ -224,21 +225,19 @@ namespace GameX.Platforms
     }
 
     /// <summary>
-    /// OpenGLGraphic
+    /// VulkenGfx
     /// </summary>
-    public class VulkenGraphic : IVulkenGraphic
+    public class VulkenGfx : IVulkenGfx
     {
         readonly PakFile _source;
-        readonly AudioManager<object> _audioManager;
         readonly TextureManager<int> _textureManager;
         readonly MaterialManager<GLRenderMaterial, int> _materialManager;
         readonly ObjectManager<object, GLRenderMaterial, int> _objectManager;
         readonly ShaderManager<Shader> _shaderManager;
 
-        public VulkenGraphic(PakFile source)
+        public VulkenGfx(PakFile source)
         {
             _source = source;
-            _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
             _textureManager = new TextureManager<int>(source, new VulkenTextureBuilder());
             _materialManager = new MaterialManager<GLRenderMaterial, int>(source, _textureManager, new VulkenMaterialBuilder(_textureManager));
             _objectManager = new ObjectManager<object, GLRenderMaterial, int>(source, _materialManager, new VulkenObjectBuilder());
@@ -247,12 +246,10 @@ namespace GameX.Platforms
         }
 
         public PakFile Source => _source;
-        public IAudioManager<object> AudioManager => _audioManager;
         public ITextureManager<int> TextureManager => _textureManager;
         public IMaterialManager<GLRenderMaterial, int> MaterialManager => _materialManager;
         public IObjectManager<object, GLRenderMaterial, int> ObjectManager => _objectManager;
         public IShaderManager<Shader> ShaderManager => _shaderManager;
-        public object CreateAudio(object path) => _audioManager.CreateAudio(path).aud;
         public int CreateTexture(object path, Range? level = null) => _textureManager.CreateTexture(path, level).tex;
         public void PreloadTexture(object path) => _textureManager.PreloadTexture(path);
         public object CreateObject(object path) => _objectManager.CreateObject(path).obj;
@@ -267,6 +264,25 @@ namespace GameX.Platforms
     }
 
     /// <summary>
+    /// VulkenSfx
+    /// </summary>
+    public class VulkenSfx : ISystemSfx
+    {
+        readonly PakFile _source;
+        readonly AudioManager<object> _audioManager;
+
+        public VulkenSfx(PakFile source)
+        {
+            _source = source;
+            _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
+        }
+
+        public PakFile Source => _source;
+        public IAudioManager<object> AudioManager => _audioManager;
+        public object CreateAudio(object path) => _audioManager.CreateAudio(path).aud;
+    }
+
+    /// <summary>
     /// VulkenPlatform
     /// </summary>
     public static class VulkenPlatform
@@ -276,7 +292,8 @@ namespace GameX.Platforms
             try
             {
                 Platform.PlatformType = Platform.Type.Vulken;
-                Platform.GraphicFactory = source => new VulkenGraphic(source);
+                Platform.GfxFactory = source => new VulkenGfx(source);
+                Platform.SfxFactory = source => new VulkenSfx(source);
                 Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
                 Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
                 Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);

@@ -120,7 +120,7 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
         {
             // Get embedded meshes
             foreach (var embeddedMesh in Model.GetEmbeddedMeshesAndLoD().Where(m => (m.LoDMask & 1) != 0))
-                MeshRenderers.Add(new GLRenderableMesh(Scene.Graphic as IOpenGLGraphic, embeddedMesh.Mesh, embeddedMesh.MeshIndex, SkinMaterials, Model));
+                MeshRenderers.Add(new GLRenderableMesh(Scene.Graphic as IOpenGLGfx, embeddedMesh.Mesh, embeddedMesh.MeshIndex, SkinMaterials, Model));
 
             // Load referred meshes from file (only load meshes with LoD 1)
             foreach (var refMesh in GetLod1RefMeshes())
@@ -130,7 +130,7 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
 
                 if (!newResource.ContainsBlockType<VBIB>()) { Console.WriteLine("Old style model, no VBIB!"); continue; }
 
-                MeshRenderers.Add(new GLRenderableMesh(Scene.Graphic as IOpenGLGraphic, (DATAMesh)newResource.DATA, refMesh.MeshIndex, SkinMaterials, Model));
+                MeshRenderers.Add(new GLRenderableMesh(Scene.Graphic as IOpenGLGfx, (DATAMesh)newResource.DATA, refMesh.MeshIndex, SkinMaterials, Model));
             }
 
             // Set active meshes to default

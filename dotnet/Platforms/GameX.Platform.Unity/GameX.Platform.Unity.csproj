@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OpenStack\dotnet\Sfx\OpenStack.Sfx\OpenStack.Sfx.csproj" />
     <ProjectReference Include="..\..\Base\GameX.Base\GameX.Base.csproj" />
   </ItemGroup>
 

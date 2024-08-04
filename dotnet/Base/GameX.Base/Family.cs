@@ -516,7 +516,7 @@ namespace GameX
             if (Platform.InTestHost && Platform.Startups.Count == 0) Platform.Startups.Add(TestPlatform.Startup);
             foreach (var startup in Platform.Startups) if (startup()) return;
             Platform.PlatformType = Platform.Type.Unknown;
-            Platform.GraphicFactory = source => null; // throw new Exception("No GraphicFactory");
+            Platform.GfxFactory = source => null; // throw new Exception("No GraphicFactory");
             Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
             Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
             Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);
@@ -1237,7 +1237,7 @@ namespace GameX
         /// <returns></returns>
         static PakFile WithPlatformGraphic(PakFile pakFile)
         {
-            if (pakFile != null) pakFile.Graphic = Platform.GraphicFactory?.Invoke(pakFile);
+            if (pakFile != null) pakFile.Gfx = Platform.GfxFactory?.Invoke(pakFile);
             return pakFile;
         }
 

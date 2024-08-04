@@ -1,5 +1,6 @@
 ﻿using OpenStack;
 using OpenStack.Gfx;
+using OpenStack.Sfx;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -366,9 +367,14 @@ namespace GameX.Platforms
             : throw new ArgumentOutOfRangeException(nameof(RuntimeInformation.IsOSPlatform), RuntimeInformation.OSDescription);
 
         /// <summary>
-        /// Gets or sets the platform graphics factory.
+        /// Gets or sets the platforms gfx factory.
         /// </summary>
-        public static Func<PakFile, IOpenGraphic> GraphicFactory;
+        public static Func<PakFile, IOpenGfx> GfxFactory;
+
+        /// <summary>
+        /// Gets or sets the platforms sfx factory.
+        /// </summary>
+        public static Func<PakFile, IOpenSfx> SfxFactory;
 
         /// <summary>
         /// Gets the platform startups.
@@ -383,15 +389,15 @@ namespace GameX.Platforms
 
     #endregion
 
-    #region TestGraphic
+    #region TestGfx
 
-    public interface ITestGraphic : IOpenGraphic { }
+    public interface ITestGfx : IOpenGfx { }
 
-    public class TestGraphic : ITestGraphic
+    public class TestGfx : ITestGfx
     {
         readonly PakFile _source;
 
-        public TestGraphic(PakFile source) => _source = source;
+        public TestGfx(PakFile source) => _source = source;
         public object Source => _source;
         public Task<T> LoadFileObject<T>(object path) => throw new NotSupportedException();
         public void PreloadTexture(object path) => throw new NotSupportedException();
@@ -409,7 +415,7 @@ namespace GameX.Platforms
             try
             {
                 Platform.PlatformType = Platform.Type.Test;
-                Platform.GraphicFactory = source => new TestGraphic(source);
+                Platform.GfxFactory = source => new TestGfx(source);
                 Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
                 Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
                 Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);

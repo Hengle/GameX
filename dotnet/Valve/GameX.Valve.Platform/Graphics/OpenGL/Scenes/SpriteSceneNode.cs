@@ -20,7 +20,7 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
 
         public SpriteSceneNode(Scene scene, Binary_Pak resource, Vector3 position) : base(scene)
         {
-            var graphic = scene.Graphic as IOpenGLGraphic;
+            var graphic = scene.Graphic as IOpenGLGfx;
             (material, _) = graphic.MaterialManager.CreateMaterial(resource);
             (shader, _) = graphic.ShaderManager.CreateShader(material.Material.ShaderName, material.Material.GetShaderArgs());
 

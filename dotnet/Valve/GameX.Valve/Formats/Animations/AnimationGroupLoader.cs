@@ -8,7 +8,7 @@ namespace GameX.Valve.Formats.Animations
     //was:Resource/ResourceTypes/ModelAnimation/AnimationGroupLoader
     public static class AnimationGroupLoader
     {
-        public static IEnumerable<Animation> LoadAnimationGroup(Binary_Pak resource, IOpenGraphic graphic, Skeleton skeleton)
+        public static IEnumerable<Animation> LoadAnimationGroup(Binary_Pak resource, IOpenGfx graphic, Skeleton skeleton)
         {
             var data = resource.DATA.AsKeyValue();
             var decodeKey = data.GetSub("m_decodeKey"); // Get the key to decode the animations

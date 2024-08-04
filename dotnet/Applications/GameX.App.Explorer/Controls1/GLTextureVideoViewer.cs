@@ -15,7 +15,7 @@ namespace GameX.App.Explorer.Controls1
     {
         const int FACTOR = 2;
         bool Background;
-        IOpenGLGraphic GraphicGL;
+        IOpenGLGfx GraphicGL;
         ITextureVideo Obj;
         Range Level = 0..;
         readonly HashSet<TextureRenderer> Renderers = [];
@@ -32,9 +32,9 @@ namespace GameX.App.Explorer.Controls1
         public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Graphic), typeof(object), typeof(GLTextureVideoViewer),
             new PropertyMetadata((d, e) => (d as GLTextureVideoViewer).OnProperty()));
 
-        public IOpenGraphic Graphic
+        public IOpenGfx Graphic
         {
-            get => GetValue(GraphicProperty) as IOpenGraphic;
+            get => GetValue(GraphicProperty) as IOpenGfx;
             set => SetValue(GraphicProperty, value);
         }
 
@@ -57,7 +57,7 @@ namespace GameX.App.Explorer.Controls1
         void OnProperty()
         {
             if (Graphic == null || Source == null) return;
-            GraphicGL = Graphic as IOpenGLGraphic;
+            GraphicGL = Graphic as IOpenGLGfx;
             Obj = Source is ITextureVideo z ? z
                 : Source is IRedirected<ITextureVideo> y ? y.Value
                 : null;

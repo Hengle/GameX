@@ -18,7 +18,7 @@ namespace GameX.Valve.Formats.OpenGL
     public class WorldLoader
     {
         readonly DATAWorld World;
-        readonly IOpenGLGraphic Graphic;
+        readonly IOpenGLGfx Graphic;
 
         // Contains metadata that can't be captured by manipulating the scene itself. Returned from Load().
         public class LoadResult
@@ -31,7 +31,7 @@ namespace GameX.Valve.Formats.OpenGL
             public Vector3 SkyboxOrigin = Vector3.Zero;
         }
 
-        public WorldLoader(IOpenGLGraphic graphic, DATAWorld world)
+        public WorldLoader(IOpenGLGfx graphic, DATAWorld world)
         {
             World = world;
             Graphic = graphic;

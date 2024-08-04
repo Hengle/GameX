@@ -13,7 +13,7 @@
 //#define Epic
 //#define Frictional
 //#define Frontier
-//#define Id
+//#define ID
 //#define IW
 //#define Lucas
 //#define Monolith
@@ -313,14 +313,14 @@ namespace GameX
             Family = "Frontier",
             Game = "ED"
         };
-#elif Id
-        static string[] FamilyKeys = new[] { "Id", "Unknown" };
+#elif ID
+        static string[] FamilyKeys = new[] { "ID", "Unknown" };
 
         public static GlobalOption Option = new GlobalOption
         {
             ForceOpen = true,
             ForcePath = "sample:0",
-            Family = "Id",
+            Family = "ID",
             //Game = "Q", // Quake
             //Game = "Q2", // Quake II
             //Game = "Q3", // Quake III Arena
@@ -584,7 +584,7 @@ namespace GameX
             Game = "AC", // Asheron's Call [open, read, texture:GL]
         };
 #else
-        static string[] FamilyKeys = new[] { "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "Id", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WB" };
+        static string[] FamilyKeys = new[] { "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "ID", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WB" };
 
         public static GlobalOption Option = new GlobalOption
         {

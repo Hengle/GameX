@@ -17,7 +17,7 @@ namespace GameX.Valve.Formats
         IEnumerable<bool> GetActiveMeshMaskForGroup(string groupName);
         IEnumerable<string> GetMeshGroups();
         IEnumerable<string> GetDefaultMeshGroups();
-        IEnumerable<Animation> GetAllAnimations(IOpenGraphic graphic);
+        IEnumerable<Animation> GetAllAnimations(IOpenGfx graphic);
         DATAPhysAggregateData GetEmbeddedPhys();
         IEnumerable<string> GetReferencedPhysNames();
     }

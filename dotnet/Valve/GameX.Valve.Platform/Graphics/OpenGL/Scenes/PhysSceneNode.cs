@@ -189,7 +189,7 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
                 //Console.WriteLine($"Phys mesh verts {verts.Count} inds {inds.Count}");
             }
 
-            (shader, _) = (Scene.Graphic as IOpenGLGraphic).ShaderManager.CreateShader("vrf.grid", new Dictionary<string, bool>());
+            (shader, _) = (Scene.Graphic as IOpenGLGfx).ShaderManager.CreateShader("vrf.grid", new Dictionary<string, bool>());
             GL.UseProgram(shader.Program);
 
             vaoHandle = GL.GenVertexArray();

@@ -26,8 +26,8 @@ namespace GameX.App.Explorer.Views
         public event PropertyChangedEventHandler PropertyChanged;
         void OnPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        IOpenGraphic _graphic;
-        public IOpenGraphic Graphic
+        IOpenGfx _graphic;
+        public IOpenGfx Graphic
         {
             get => _graphic;
             set { _graphic = value; OnPropertyChanged(); }
@@ -43,7 +43,7 @@ namespace GameX.App.Explorer.Views
         public void OnInfo(PakFile pakFile, List<MetaInfo> infos)
         {
             if (ContentTabs != null) foreach (var dispose in ContentTabs.Where(x => x.Dispose != null).Select(x => x.Dispose)) dispose.Dispose();
-            Graphic = pakFile.Graphic;
+            Graphic = pakFile.Gfx;
             ContentTabs = infos?.Select(x => x.Tag as MetaContent).Where(x => x != null).ToList();
             ContentTab.SelectedIndex = ContentTabs != null ? 0 : -1;
         }

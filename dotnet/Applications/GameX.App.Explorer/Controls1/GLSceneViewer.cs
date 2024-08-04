@@ -47,9 +47,9 @@ namespace GameX.App.Explorer.Controls1
         public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Graphic), typeof(object), typeof(GLSceneViewer),
             new PropertyMetadata((d, e) => (d as GLSceneViewer).OnProperty()));
 
-        public IOpenGraphic Graphic
+        public IOpenGfx Graphic
         {
-            get => GetValue(GraphicProperty) as IOpenGraphic;
+            get => GetValue(GraphicProperty) as IOpenGfx;
             set => SetValue(GraphicProperty, value);
         }
 
@@ -66,7 +66,7 @@ namespace GameX.App.Explorer.Controls1
         {
             if (Graphic == null || Source == null) return;
 
-            var graphic = Graphic as IOpenGLGraphic;
+            var graphic = Graphic as IOpenGLGfx;
 
             Scene = new Scene(graphic, MeshBatchRenderer.Render);
             BaseGrid = new ParticleGridRenderer(graphic, 20, 5);
@@ -86,8 +86,8 @@ namespace GameX.App.Explorer.Controls1
                 Camera.LookAt(bbox.Center);
             }
 
-            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Graphic as IOpenGLGraphic, false);
-            DynamicOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.DynamicOctree, Graphic as IOpenGLGraphic, true);
+            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Graphic as IOpenGLGfx, false);
+            DynamicOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.DynamicOctree, Graphic as IOpenGLGfx, true);
 
             //if (_renderModeComboBox != null)
             //{
@@ -131,7 +131,7 @@ namespace GameX.App.Explorer.Controls1
         protected void SetEnabledLayers(HashSet<string> layers)
         {
             Scene.SetEnabledLayers(layers);
-            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Graphic as IOpenGLGraphic, false);
+            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Graphic as IOpenGLGfx, false);
         }
 
         //protected void AddRenderModeSelectionControl()

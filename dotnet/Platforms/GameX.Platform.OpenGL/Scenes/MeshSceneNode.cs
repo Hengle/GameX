@@ -11,7 +11,7 @@ namespace GameX.Scenes
 
         public MeshSceneNode(Scene scene, IMesh mesh, int meshIndex, IDictionary<string, string> skinMaterials = null) : base(scene)
         {
-            Mesh = new GLRenderableMesh(Scene.Graphic as IOpenGLGraphic, mesh, meshIndex, skinMaterials);
+            Mesh = new GLRenderableMesh(Scene.Graphic as IOpenGLGfx, mesh, meshIndex, skinMaterials);
             LocalBoundingBox = Mesh.BoundingBox;
         }
 

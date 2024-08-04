@@ -2,6 +2,7 @@
 using GameX.Meta;
 using GameX.Unknown;
 using OpenStack.Gfx;
+using OpenStack.Sfx;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -182,7 +183,7 @@ namespace GameX
             PakPath = state.Path;
             Name = !string.IsNullOrEmpty(z = Path.GetFileName(state.Path)) ? z : Path.GetFileName(Path.GetDirectoryName(state.Path));
             Tag = state.Tag;
-            Graphic = null;
+            Gfx = null;
         }
 
         /// <summary>
@@ -269,12 +270,20 @@ namespace GameX
         }
 
         /// <summary>
-        /// Gets the graphic.
+        /// Gets the gfx.
         /// </summary>
         /// <value>
         /// The graphic.
         /// </value>
-        public IOpenGraphic Graphic { get; internal set; }
+        public IOpenGfx Gfx { get; internal set; }
+
+        /// <summary>
+        /// Gets the gfx.
+        /// </summary>
+        /// <value>
+        /// The graphic.
+        /// </value>
+        public IOpenSfx Sfx { get; internal set; }
 
         /// <summary>
         /// Gets the file source.
