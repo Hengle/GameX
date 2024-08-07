@@ -18,10 +18,10 @@
             <ColumnDefinition Width=".1*" />
         </Grid.ColumnDefinitions>
         <Grid.Resources>
-            <DataTemplate x:Key="FileExplorer" DataType="{x:Type views:ExplorerMainTab}">
+            <DataTemplate x:Key="FileExplorer" DataType="{x:Type views:MainPageTab}">
                 <views:FileExplorer x:Name="PakFileExplorer" PakFile="{Binding RelativeSource={x:Static RelativeSource.TemplatedParent}, Path=Content.PakFile}" Margin="0,0,10,10" />
             </DataTemplate>
-            <DataTemplate x:Key="AppList" DataType="{x:Type views:ExplorerMainTab}">
+            <DataTemplate x:Key="AppList" DataType="{x:Type views:MainPageTab}">
                 <StackPanel Orientation="Vertical">
                     <TextBlock TextWrapping="Wrap" Text="{Binding Text}" Margin="5,5,5,5" />
                     <ItemsControl ItemsSource="{Binding AppList}">
@@ -33,7 +33,7 @@
                     </ItemsControl>
                 </StackPanel>
             </DataTemplate>
-            <DataTemplate x:Key="TextBlock" DataType="{x:Type views:ExplorerMainTab}">
+            <DataTemplate x:Key="TextBlock" DataType="{x:Type views:MainPageTab}">
                 <ScrollViewer>
                     <TextBlock TextWrapping="Wrap" Text="{Binding Text}" Margin="5,5,5,5" />
                 </ScrollViewer>
@@ -64,12 +64,12 @@
 
         <TabControl x:Name="MainTabControl" Grid.Row="1" Margin="0,0,0,10" ItemsSource="{Binding MainTabs}">
             <TabControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type views:ExplorerMainTab}" >
+                <DataTemplate DataType="{x:Type views:MainPageTab}" >
                     <TextBlock Text="{Binding Name}" />
                 </DataTemplate>
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
-                <DataTemplate DataType="{x:Type views:ExplorerMainTab}">
+                <DataTemplate DataType="{x:Type views:MainPageTab}">
                     <ContentControl Content="{Binding}">
                         <ContentControl.Style>
                             <Style TargetType="ContentControl">

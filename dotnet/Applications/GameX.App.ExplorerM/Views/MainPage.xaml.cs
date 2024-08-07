@@ -1,9 +1,11 @@
-﻿namespace GameX.App.Explorer.Views
+﻿using static GameX.FamilyManager;
+
+namespace GameX.App.Explorer.Views
 {
     /// <summary>
-    /// ExplorerMainTab
+    /// MainPageTab
     /// </summary>
-    public class ExplorerMainTab
+    public class MainPageTab
     {
         public string Name { get; set; }
         public PakFile PakFile { get; set; }
@@ -39,16 +41,16 @@
             OnOpenedAsync(family, path).Wait();
         }
 
-        public static readonly BindableProperty MainTabsProperty = BindableProperty.Create(nameof(MainTabs), typeof(IList<ExplorerMainTab>), typeof(MainPage),
+        public static readonly BindableProperty MainTabsProperty = BindableProperty.Create(nameof(MainTabs), typeof(IList<MainPageTab>), typeof(MainPage),
             propertyChanged: (d, e, n) =>
             {
                 var mainTab = ((MainPage)d).MainTab;
                 var firstTab = mainTab.Children.FirstOrDefault() as RadioButton;
                 if (firstTab != null) firstTab.IsChecked = true;
             });
-        public IList<ExplorerMainTab> MainTabs
+        public IList<MainPageTab> MainTabs
         {
-            get => (IList<ExplorerMainTab>)GetValue(MainTabsProperty);
+            get => (IList<MainPageTab>)GetValue(MainTabsProperty);
             set => SetValue(MainTabsProperty, value);
         }
 
@@ -56,13 +58,22 @@
 
         public Task OnOpenedAsync(Family family, string path = null)
         {
-            var tabs = PakFiles.Select(pakFile => new ExplorerMainTab
+            var tabs = PakFiles.Select(pakFile => new MainPageTab
             {
                 Name = pakFile.Name,
                 PakFile = pakFile,
             }).ToList();
+            //var firstPakFile = tabs.FirstOrDefault()?.PakFile ?? PakFile.Empty;
+            //if (FamilyApps.Count > 0)
+            //    tabs.Add(new MainPageTab
+            //    {
+            //        Name = "Apps",
+            //        PakFile = firstPakFile,
+            //        AppList = FamilyApps.Values.ToList(),
+            //        Text = "Choose an application.",
+            //    });
             if (!string.IsNullOrEmpty(family.Description))
-                tabs.Add(new ExplorerMainTab
+                tabs.Add(new MainPageTab
                 {
                     Name = "Information",
                     Text = family.Description,
@@ -71,8 +82,17 @@
             return Task.CompletedTask;
         }
 
+        //void App_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var button = (Button)sender;
+        //    var app = (FamilyApp)button.DataContext;
+        //    app.OpenAsync(app.ExplorerType, Manager).Wait();
+        //}
+
         internal void OnReady()
         {
+            //if (!string.IsNullOrEmpty(Option.ForcePath) && Option.ForcePath.StartsWith("app:") && FamilyApps != null && FamilyApps.TryGetValue(Option.ForcePath[4..], out var app))
+            //    App_Click(new Button { DataContext = app }, null);
             OpenPage_Click(null, null);
         }
 

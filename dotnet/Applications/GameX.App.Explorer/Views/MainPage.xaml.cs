@@ -12,9 +12,9 @@ using static GameX.FamilyManager;
 namespace GameX.App.Explorer.Views
 {
     /// <summary>
-    /// ExplorerMainTab
+    /// MainPageTab
     /// </summary>
-    public class ExplorerMainTab
+    public class MainPageTab
     {
         public string Name { get; set; }
         public PakFile PakFile { get; set; }
@@ -57,8 +57,8 @@ namespace GameX.App.Explorer.Views
             return this;
         }
 
-        IList<ExplorerMainTab> _mainTabs;
-        public IList<ExplorerMainTab> MainTabs
+        IList<MainPageTab> _mainTabs;
+        public IList<MainPageTab> MainTabs
         {
             get => _mainTabs;
             set { _mainTabs = value; OnPropertyChanged(); }
@@ -70,14 +70,14 @@ namespace GameX.App.Explorer.Views
         public Task OnOpenedAsync(Family family, string path = null)
         {
             MainTabControl.SelectedIndex = 0; // family.Apps != null ? 1 : 0;
-            var tabs = PakFiles.Select(pakFile => new ExplorerMainTab
+            var tabs = PakFiles.Select(pakFile => new MainPageTab
             {
                 Name = pakFile.Name,
                 PakFile = pakFile,
             }).ToList();
             var firstPakFile = tabs.FirstOrDefault()?.PakFile ?? PakFile.Empty;
             if (FamilyApps.Count > 0)
-                tabs.Add(new ExplorerMainTab
+                tabs.Add(new MainPageTab
                 {
                     Name = "Apps",
                     PakFile = firstPakFile,
@@ -85,7 +85,7 @@ namespace GameX.App.Explorer.Views
                     Text = "Choose an application.",
                 });
             if (!string.IsNullOrEmpty(family.Description))
-                tabs.Add(new ExplorerMainTab
+                tabs.Add(new MainPageTab
                 {
                     Name = "Information",
                     Text = family.Description,

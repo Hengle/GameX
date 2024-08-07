@@ -110,10 +110,10 @@ namespace GameX.App.Explorer.Views
                 }
                 catch (Exception ex)
                 {
-                    OnInfo(new[] {
+                    OnInfo([
                         new MetaInfo($"EXCEPTION: {ex.Message}"),
                         new MetaInfo(ex.StackTrace),
-                    });
+                    ]);
                 }
             }
         }

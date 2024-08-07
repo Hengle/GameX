@@ -72,13 +72,6 @@ namespace GameX.App.Explorer.Views
             set { _infos = value; OnPropertyChanged(); }
         }
 
-        void OnNodeSelected(object s, EventArgs args)
-        {
-            var parameter = ((TappedEventArgs)args).Parameter;
-            if (parameter is MetaItem item && item.PakFile != null) SelectedItem = item;
-            //e.Handled = true;
-        }
-
         MetaItem _selectedItem;
         public MetaItem SelectedItem
         {
@@ -95,25 +88,35 @@ namespace GameX.App.Explorer.Views
                     {
                         if (pak.Status == PakFile.PakStatus.Opened) return;
                         pak.Open(value.Items, Resource);
-                        //value.Items.AddRange(pak.GetMetaItemsAsync(Resource).Result);
-                        //OnFilterKeyUp(null, null);
+                        //OnFilterKeyUp(null, null); //value.Items.AddRange(pak.GetMetaItemsAsync(Resource).Result);
                     }
                     OnInfo(value.PakFile?.GetMetaInfos(Resource, value).Result);
                 }
                 catch (Exception ex)
                 {
-                    OnInfo(new[] {
+                    OnInfo([
                         new MetaInfo($"EXCEPTION: {ex.Message}"),
                         new MetaInfo(ex.StackTrace),
-                    });
+                    ]);
                 }
             }
+        }
+
+        public void OnInfoUpdated()
+        {
         }
 
         public void OnInfo(IEnumerable<MetaInfo> infos = null)
         {
             FileContent.Instance.OnInfo(PakFile, infos?.Where(x => x.Name == null).ToList());
             Infos = infos?.Where(x => x.Name != null).ToList();
+        }
+
+        void OnNodeSelected(object s, EventArgs args)
+        {
+            var parameter = ((TappedEventArgs)args).Parameter;
+            if (parameter is MetaItem item && item.PakFile != null) SelectedItem = item;
+            //e.Handled = true;
         }
 
         void OnReady(PakFile pakFile)
