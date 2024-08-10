@@ -5,11 +5,11 @@ from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt
 from PyQt6.QtOpenGLWidgets import QOpenGLWidget
 from PyQt6.QtOpenGL import QOpenGLBuffer, QOpenGLShader, QOpenGLShaderProgram, QOpenGLTexture
-from openstk.gfx_render import RenderPass
-from openstk.gfx_texture import ITexture, ITextureSelect
-from openstk.gl_view import OpenGLView
-from openstk.gl_renders import TextureRenderer
-from openstk.gfx_ui import MouseState, KeyboardState
+from openstk.gfx.gfx_render import RenderPass
+from openstk.gfx.gfx_texture import ITexture, ITextureSelect
+from openstk.gfx.gl_view import OpenGLView
+from openstk.gfx.gl_renders import TextureRenderer
+from openstk.gfx.gfx_ui import MouseState, KeyboardState
 
 FACTOR: int = 1
 

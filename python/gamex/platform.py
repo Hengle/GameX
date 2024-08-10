@@ -2,9 +2,10 @@ import os
 from typing import Callable
 from enum import Enum
 from .pak import PakFile
-from openstk.gfx import IAudioManager, IObjectManager, IMaterialManager, IShaderManager, ITextureManager, PlatformStats
-from openstk.gfx_render import IMaterial
-from openstk.gfx_texture import ITexture
+from openstk.gfx.gfx import IObjectManager, IMaterialManager, IShaderManager, ITextureManager, PlatformStats
+from openstk.gfx.gfx_render import IMaterial
+from openstk.gfx.gfx_texture import ITexture
+from openstk.sfx.sfx import IAudioManager
 
 # typedefs
 class Audio: pass

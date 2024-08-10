@@ -1,11 +1,11 @@
 import os
 import numpy as np
 from OpenGL.GL import *
-from openstk.gfx import IFixedMaterial, IParamMaterial
-from openstk.gl import IOpenGLGraphic, QuadIndexBuffer, GLMeshBufferCache
-from openstk.gl_shader import ShaderDebugLoader
-from openstk.gl_render import GLRenderMaterial
-from openstk.gfx_texture import TextureGLFormat, TextureFlags
+from openstk.gfx.gfx import IFixedMaterial, IParamMaterial
+from openstk.gfx.gl import IOpenGLGfx, QuadIndexBuffer, GLMeshBufferCache
+from openstk.gfx.gl_shader import ShaderDebugLoader
+from openstk.gfx.gl_render import GLRenderMaterial
+from openstk.gfx.gfx_texture import TextureGLFormat, TextureFlags
 from openstk.poly import IDisposable
 from .platform_system import SystemAudioBuilder
 from .platform import AudioBuilderBase, AudioManager, ObjectBuilderBase, ObjectManager, MaterialBuilderBase, MaterialManager, ShaderBuilderBase, ShaderManager, TextureManager, TextureBuilderBase, Platform
@@ -185,7 +185,7 @@ class OpenGLMaterialBuilder(MaterialBuilderBase):
             case _: raise Exception(f'Unknown: {key}')
 
 # OpenGLGraphic
-class OpenGLGraphic(IOpenGLGraphic):
+class OpenGLGraphic(IOpenGLGfx):
     source: PakFile
     audioManager: AudioManager
     textureManager: TextureManager

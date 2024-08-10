@@ -32,10 +32,10 @@
                 </Grid>
             </ControlTemplate>
             <ControlTemplate x:Key="FileExplorer" x:DataType="{x:Type views:MainPageTab}">
-                <views:FileExplorer PakFile="{TemplateBinding BindingContext.PakFile}" />
+                <views:FileExplorer PakFile="{TemplateBinding PakFile}" />
             </ControlTemplate>
             <ControlTemplate x:Key="AppList" x:DataType="{x:Type views:MainPageTab}">
-                <VerticalStackLayout BindableLayout.ItemsSource="{TemplateBinding BindingContext.AppList}">
+                <VerticalStackLayout BindableLayout.ItemsSource="{TemplateBinding AppList}">
                     <Label Text="{Binding Text}" Margin="5,5,5,5" />
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
@@ -46,7 +46,7 @@
             </ControlTemplate>
             <ControlTemplate x:Key="TextBlock" x:DataType="{x:Type views:MainPageTab}">
                 <ScrollView>
-                    <Label Text="{TemplateBinding BindingContext.Text}" Margin="5,5,5,5" />
+                    <Label Text="{TemplateBinding Text}" Margin="5,5,5,5" />
                 </ScrollView>
             </ControlTemplate>
         </Grid.Resources>

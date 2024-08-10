@@ -1,8 +1,8 @@
 import os, numpy as np, imageio as iio
 from io import BytesIO
 from enum import Enum
-from openstk.gfx_dds import DDS_HEADER
-from openstk.gfx_texture import ITexture, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
+from openstk.gfx.gfx_dds import DDS_HEADER
+from openstk.gfx.gfx_texture import ITexture, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinary
 from gamex.meta import MetaManager, MetaInfo, MetaContent, IHaveMetaInfo
