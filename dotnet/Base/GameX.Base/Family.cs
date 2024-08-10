@@ -54,7 +54,7 @@ namespace GameX
         static readonly Func<string, Stream> GetManifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream;
         static string FamilyLoader(string path)
         {
-            using var r = new StreamReader(GetManifestResourceStream($"GameX.Base.Specs.{path}"));
+            using var r = new StreamReader(GetManifestResourceStream($"GameX.Base.Specs.{path}") ?? throw new Exception($"Unable to spec: GameX.Base.Specs.{path}"));
             return r.ReadToEnd();
         }
 
@@ -63,10 +63,15 @@ namespace GameX
             Family.Bootstrap();
             var loadSamples = true;
             foreach (var id in FamilyKeys)
-            {
-                var family = CreateFamily($"{id}Family.json", FamilyLoader, loadSamples);
-                Families.Add(family.Id, family);
-            }
+                try
+                {
+                    var family = CreateFamily($"{id}Family.json", FamilyLoader, loadSamples);
+                    Families.Add(family.Id, family);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
             Unknown = GetFamily("Unknown");
             UnknownPakFile = Unknown.OpenPakFile(new Uri("game:/#APP"), throwOnError: false);
         }

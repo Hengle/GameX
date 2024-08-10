@@ -3,12 +3,12 @@
 namespace GameX.ID
 {
     /// <summary>
-    /// IdGame
+    /// IDGame
     /// </summary>
     /// <seealso cref="GameX.FamilyGame" />
-    public class IdGame : FamilyGame
+    public class IDGame : FamilyGame
     {
-        public IdGame(Family family, string id, JsonElement elem, FamilyGame dgame) : base(family, id, elem, dgame) { }
+        public IDGame(Family family, string id, JsonElement elem, FamilyGame dgame) : base(family, id, elem, dgame) { }
 
         /// <summary>
         /// Ensures this instance.

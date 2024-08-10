@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 namespace GameX.ID
 {
     /// <summary>
-    /// IdPakFile
+    /// IDPakFile
     /// </summary>
     /// <seealso cref="GameX.Formats.BinaryPakFile" />
-    public class IdPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
+    public class IDPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IdPakFile" /> class.
+        /// Initializes a new instance of the <see cref="IDPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public IdPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
+        public IDPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
         {
             ObjectFactoryFactoryMethod = ObjectFactoryFactory;
         }

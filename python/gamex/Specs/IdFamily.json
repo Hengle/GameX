@@ -1,10 +1,10 @@
 ﻿{
-  "id": "Id",
-  "name": "Id",
+  "id": "ID",
+  "name": "ID",
   "studio": "id Software",
   "url": "https://en.wikipedia.org/wiki/List_of_id_Software_games",
   "samples": [
-    "IdFamily.Sample.json"
+    "IDFamily.Sample.json"
   ],
   "engines": {
     "idTech0": { "name": "id Tech 0" },
@@ -21,8 +21,8 @@
   },
   "games": {
     "*": {
-      "gameType": "GameX.Id.IdGame, GameX.Id",
-      "pakFileType": "GameX.Id.IdPakFile, GameX.Id",
+      "gameType": "GameX.ID.IDGame, GameX.ID",
+      "pakFileType": "GameX.ID.IDPakFile, GameX.ID",
       "pakExt": ".pak"
     },
     "CK:IOTV": {

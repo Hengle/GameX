@@ -12,18 +12,18 @@ using Environment = GameX.WB.Formats.FileTypes.Environment;
 namespace GameX.WB
 {
     /// <summary>
-    /// WbBPakFile
+    /// WBPakFile
     /// </summary>
     /// <seealso cref="GameEstate.Formats.BinaryPakFile" />
-    public class WbBPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
+    public class WBPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
     {
-        static WbBPakFile() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        static WBPakFile() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WbBPakFile" /> class.
+        /// Initializes a new instance of the <see cref="WBPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public WbBPakFile(PakState state) : base(state, PakBinary_AC.Instance)
+        public WBPakFile(PakState state) : base(state, PakBinary_AC.Instance)
         {
             ObjectFactoryFactoryMethod = ObjectFactoryFactory;
             UseFileId = true;
@@ -167,7 +167,7 @@ namespace GameX.WB
                     case 0x34: return (PakFileType.PhysicsScriptTable, "pet");
                     case 0x39: return (PakFileType.MasterProperty, "mpr");
                     case 0x40: return (PakFileType.Font, "font");
-                    case 0x78: return (PakFileType.DbProperties, new PakFileExtensionAttribute(typeof(WbBPakFile), "DbPropertyExtensionLookup").Value);
+                    case 0x78: return (PakFileType.DbProperties, new PakFileExtensionAttribute(typeof(WBPakFile), "DbPropertyExtensionLookup").Value);
                 }
                 switch (objectId >> 16)
                 {

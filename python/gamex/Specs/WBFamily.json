@@ -5,12 +5,12 @@
   "url": "https://en.wikipedia.org/wiki/WB_Games_Boston",
   "description": "The file formats used in WB Games Boston games.",
   "samples": [
-    "WbBFamily.Sample.json"
+    "WBFamily.Sample.json"
   ],
   "games": {
     "*": {
-      "gameType": "GameX.WbB.WbBGame, GameX.WbB",
-      "pakFileType": "GameX.WbB.WbBPakFile, GameX.WbB"
+      "gameType": "GameX.WB.WBGame, GameX.WB",
+      "pakFileType": "GameX.WB.WBPakFile, GameX.WB"
     },
     "AC": {
       "name": "Asheron's Call",

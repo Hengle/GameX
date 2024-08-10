@@ -51,7 +51,7 @@ namespace GameX.WB
                 if ((uint)key == Iteration.FILE_ID) continue;
                 if (file.FileSize == 0) continue; // DatFileType.LandBlock files can be empty
 
-                var fileType = WbBPakFile.GetFileType(file, PakType.Cell).fileType;
+                var fileType = WBPakFile.GetFileType(file, PakType.Cell).fileType;
                 Assert.IsNotNull(fileType, $"Key: 0x{key:X8}, ObjectID: 0x{file.Id:X8}, FileSize: {file.FileSize}");
 
                 var factory = source.EnsureCachedObjectFactory(file);
@@ -72,7 +72,7 @@ namespace GameX.WB
             {
                 if ((uint)key == Iteration.FILE_ID) continue;
 
-                var fileType = WbBPakFile.GetFileType(file, PakType.Portal).fileType;
+                var fileType = WBPakFile.GetFileType(file, PakType.Portal).fileType;
                 Assert.IsNotNull(fileType, $"Key: 0x{key:X8}, ObjectID: 0x{file.Id:X8}, FileSize: {file.FileSize}");
 
                 // These file types aren't converted yet
@@ -102,7 +102,7 @@ namespace GameX.WB
             {
                 if ((uint)key == Iteration.FILE_ID) continue;
 
-                var fileType = WbBPakFile.GetFileType(file, PakType.Language).fileType;
+                var fileType = WBPakFile.GetFileType(file, PakType.Language).fileType;
 
                 Assert.IsNotNull(fileType, $"Key: 0x{key:X8}, ObjectID: 0x{file.Id:X8}, FileSize: {file.FileSize}");
 

@@ -3,12 +3,12 @@
 namespace GameX.WB
 {
     /// <summary>
-    /// WbBGame
+    /// WBGame
     /// </summary>
     /// <seealso cref="GameX.FamilyGame" />
-    public class WbBGame : FamilyGame
+    public class WBGame : FamilyGame
     {
-        public WbBGame(Family family, string id, JsonElement elem, FamilyGame dgame) : base(family, id, elem, dgame) { }
+        public WBGame(Family family, string id, JsonElement elem, FamilyGame dgame) : base(family, id, elem, dgame) { }
 
         /// <summary>
         /// Ensures this instance.

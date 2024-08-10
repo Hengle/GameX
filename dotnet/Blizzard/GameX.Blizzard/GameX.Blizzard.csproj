@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Casc\**" />
+    <EmbeddedResource Remove="Casc\**" />
+    <None Remove="Casc\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Formats\Casc\WDB2Reader.cs" />
     <Compile Remove="Formats\Casc\WDB3Reader.cs" />
     <Compile Remove="Formats\Casc\WDB5Reader.cs" />

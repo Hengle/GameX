@@ -87,7 +87,7 @@ namespace GameX.WB.Formats
                         Hash = (ulong)blockSize,
                         Tag = entry,
                     };
-                    file.Path = Path.Combine(path, WbBPakFile.GetPath(file, r, pakType, out var type));
+                    file.Path = Path.Combine(path, WBPakFile.GetPath(file, r, pakType, out var type));
                     file.ExtraArgs = (pakType, type);
                     files.Add(file);
                 }
