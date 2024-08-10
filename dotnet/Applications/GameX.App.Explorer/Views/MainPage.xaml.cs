@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using static GameX.FamilyManager;
 
 namespace GameX.App.Explorer.Views
 {
@@ -27,13 +26,13 @@ namespace GameX.App.Explorer.Views
     /// </summary>
     public partial class MainPage : Window, INotifyPropertyChanged
     {
-        public static MetaManager Manager = new ResourceManager();
-        public static MainPage Instance;
+        public readonly static MetaManager Manager = ResourceManager.Current;
+        public static MainPage Current;
 
         public MainPage()
         {
             InitializeComponent();
-            Instance = this;
+            Current = this;
             DataContext = this;
         }
 
@@ -64,7 +63,7 @@ namespace GameX.App.Explorer.Views
             set { _mainTabs = value; OnPropertyChanged(); }
         }
 
-        public readonly IList<PakFile> PakFiles = new List<PakFile>();
+        public readonly IList<PakFile> PakFiles = [];
         public IDictionary<string, FamilyApp> FamilyApps;
 
         public Task OnOpenedAsync(Family family, string path = null)
@@ -94,26 +93,19 @@ namespace GameX.App.Explorer.Views
             return Task.CompletedTask;
         }
 
-        void App_Click(object sender, RoutedEventArgs e)
+        #region Menu
+
+        internal void App_Click(object sender, EventArgs e)
         {
             var button = (Button)sender;
             var app = (FamilyApp)button.DataContext;
             app.OpenAsync(app.ExplorerType, Manager).Wait();
         }
 
-        internal void OnReady()
-        {
-            if (!string.IsNullOrEmpty(Option.ForcePath) && Option.ForcePath.StartsWith("app:") && FamilyApps != null && FamilyApps.TryGetValue(Option.ForcePath[4..], out var app))
-                App_Click(new Button { DataContext = app }, null);
-            OpenPage_Click(null, null);
-        }
-
-        #region Menu
-
-        void OpenPage_Click(object sender, RoutedEventArgs e)
+        internal void OpenPage_Click(object sender, RoutedEventArgs e)
         {
             var openPage = new OpenPage();
-            if (openPage.ShowDialog() == true) Instance.Open((Family)openPage.Family.SelectedItem, openPage.PakUris);
+            if (openPage.ShowDialog() == true) Current.Open((Family)openPage.Family.SelectedItem, openPage.PakUris);
         }
 
         void OptionsPage_Click(object sender, RoutedEventArgs e)

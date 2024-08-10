@@ -100,7 +100,7 @@ namespace GameX.App.Explorer.Controls1
             if (Obj == null) return;
             if (Obj is ITextureSelect z2) z2.Select(Id);
             OnProperty();
-            Views.FileExplorer.Instance.OnInfoUpdated();
+            Views.FileExplorer.Current.OnInfoUpdated();
         }
         void MoveReset() { Id = 0; Level = 0..; OnProperty(); }
         void MoveNext() { if (Level.Start.Value < 10) Level = new(Level.Start.Value + 1, Level.End); OnProperty(); }

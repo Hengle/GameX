@@ -6,9 +6,8 @@ namespace GameX.App.Explorer
     public partial class App : Application
     {
         static App() => Platforms.Platform.Startups.Add(OpenGLPlatform.Startup);
-        public static App Instance;
 
-        static string[] args = new string[0];
+        static string[] args = [];
         //static string[] args = new string[] { "open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "01000001.obj" };
         //static string[] args = new string[] { "open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "02000001.set" };
         //static string[] args = new string[] { "open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "03000001.obj" };
@@ -27,7 +26,6 @@ namespace GameX.App.Explorer
         public App()
         {
             InitializeComponent();
-            Instance = this;
             MainPage = new AppShell();
         }
 
@@ -37,10 +35,10 @@ namespace GameX.App.Explorer
             //GLViewerControl.ShowConsole = true;
             Parser.Default.ParseArguments<DefaultOptions, TestOptions, OpenOptions>(args)
             .MapResult(
-                (DefaultOptions opts) => Instance.RunDefault(opts),
-                (TestOptions opts) => Instance.RunTest(opts),
-                (OpenOptions opts) => Instance.RunOpen(opts),
-                errs => Instance.RunError(errs));
+                (DefaultOptions opts) => RunDefault(opts),
+                (TestOptions opts) => RunTest(opts),
+                (OpenOptions opts) => RunOpen(opts),
+                errs => RunError(errs));
             base.OnStart();
         }
 
@@ -67,29 +65,11 @@ namespace GameX.App.Explorer
 
         #endregion
 
-        int RunDefault(DefaultOptions opts)
-        {
-            var page = (AppShell)MainPage;
-            page.OnReady();
-            return 0;
-        }
+        int RunDefault(DefaultOptions opts) => (Shell.Current as AppShell).Startup();
 
-        int RunTest(TestOptions opts)
-        {
-            var page = (AppShell)MainPage;
-            page.OnReady();
-            return 0;
-        }
+        int RunTest(TestOptions opts) => (Shell.Current as AppShell).Startup();
 
-        int RunOpen(OpenOptions opts)
-        {
-            var page = (AppShell)MainPage;
-            var family = FamilyManager.GetFamily(opts.Family);
-            //var wnd = new MainWindow(false);
-            //MainPage.Open(family, new[] { opts.Uri }, opts.Path);
-            //MainPage.Show();
-            return 0;
-        }
+        int RunOpen(OpenOptions opts) => (Shell.Current as AppShell).StartupOpen(FamilyManager.GetFamily(opts.Family), [opts.Uri], opts.Path);
 
         int RunError(IEnumerable<Error> errs)
         {

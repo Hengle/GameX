@@ -8,6 +8,7 @@ namespace GameX.App.Explorer.Views
         {
             InitializeComponent();
             BindingContext = this;
+            Loaded += OnLoaded;
         }
 
         public IList<Family> Families { get; } = FamilyManager.Families.Values.ToList();
@@ -130,16 +131,15 @@ namespace GameX.App.Explorer.Views
             }
         }
 
-        async void Cancel_Click(object sender, EventArgs e) => await Navigation.PushAsync(new MainPage());
+        async void Cancel_Click(object sender, EventArgs e) => await Shell.Current.GoToAsync("//home");
 
         async void Open_Click(object sender, EventArgs e)
         {
-            var mainPage = new MainPage();
-            mainPage.Open(FamilySelectedItem, PakUris);
-            await Navigation.PushAsync(mainPage);
+            MainPage.Current.Open(FamilySelectedItem, PakUris);
+            await Shell.Current.GoToAsync("//home");
         }
 
-        internal void OnReady()
+        void OnLoaded(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(Option.Family)) return;
             Family.SelectedIndex = FamilyManager.Families.Keys.ToList().IndexOf(Option.Family);

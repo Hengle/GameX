@@ -17,7 +17,7 @@ namespace GameX.App.Explorer
     {
         static App() => Platform.Startups.Add(OpenGLPlatform.Startup);
 
-        static string[] args = new string[0];
+        static string[] args = [];
         //static string[] args = new string[] { "open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "01000001.obj" };
         //static string[] args = new string[] { "open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "02000001.set" };
         //static string[] args = new string[] { "open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "03000001.obj" };
@@ -37,6 +37,7 @@ namespace GameX.App.Explorer
         {
             //GLViewerControl.ShowConsole = true;
             //var args = e.Args;
+            new AppShell();
             Parser.Default.ParseArguments<DefaultOptions, TestOptions, OpenOptions>(args)
             .MapResult(
                 (DefaultOptions opts) => RunDefault(opts),
@@ -68,11 +69,11 @@ namespace GameX.App.Explorer
 
         #endregion
 
-        static int RunDefault(DefaultOptions opts) { var page = new MainPage(); page.OnReady(); page.Show(); return 0; }
+        static int RunDefault(DefaultOptions opts) => AppShell.Current.Startup();
 
-        static int RunTest(TestOptions opts) { var page = new MainPage(); page.OnReady(); page.Show(); return 0; }
+        static int RunTest(TestOptions opts) => AppShell.Current.Startup();
 
-        static int RunOpen(OpenOptions opts) { var page = new MainPage().Open(FamilyManager.GetFamily(opts.Family), new[] { opts.Uri }, opts.Path); page.Show(); return 0; }
+        static int RunOpen(OpenOptions opts) => AppShell.Current.StartupOpen(FamilyManager.GetFamily(opts.Family), [opts.Uri], opts.Path);
 
         static int RunError(IEnumerable<Error> errs) { MessageBox.Show("Errors: \n\n" + errs.First()); Current.Shutdown(1); return 1; }
     }

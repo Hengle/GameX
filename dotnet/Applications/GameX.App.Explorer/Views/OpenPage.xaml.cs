@@ -19,7 +19,7 @@ namespace GameX.App.Explorer.Views
         {
             InitializeComponent();
             DataContext = this;
-            Loaded += OnReady;
+            Loaded += OnLoaded;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -151,13 +151,9 @@ namespace GameX.App.Explorer.Views
 
         void Cancel_Click(object sender, RoutedEventArgs e) => Close();
 
-        void Open_Click(object sender, RoutedEventArgs e)
-        {
-            DialogResult = true;
-            Close();
-        }
+        void Open_Click(object sender, RoutedEventArgs e) { DialogResult = true; Close(); }
 
-        void OnReady(object sender, EventArgs e)
+        void OnLoaded(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(Option.Family)) return;
             Family.SelectedIndex = FamilyManager.Families.Keys.ToList().IndexOf(Option.Family);

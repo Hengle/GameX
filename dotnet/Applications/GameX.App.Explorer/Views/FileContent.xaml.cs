@@ -14,12 +14,12 @@ namespace GameX.App.Explorer.Views
     /// </summary>
     public partial class FileContent : UserControl, INotifyPropertyChanged
     {
-        public static FileContent Instance;
+        public static FileContent Current;
 
         public FileContent()
         {
             InitializeComponent();
-            Instance = this;
+            Current = this;
             DataContext = this;
         }
 

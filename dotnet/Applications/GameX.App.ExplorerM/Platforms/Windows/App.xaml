@@ -1,8 +1,8 @@
 ﻿<maui:MauiWinUIApplication
-    x:Class="GameX.App.ExplorerM.WinUI.App"
+    x:Class="GameX.App.Explorer.WinUI.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:maui="using:Microsoft.Maui"
-    xmlns:local="using:GameX.App.ExplorerM.WinUI">
+    xmlns:local="using:GameX.App.Explorer.WinUI">
 
 </maui:MauiWinUIApplication>

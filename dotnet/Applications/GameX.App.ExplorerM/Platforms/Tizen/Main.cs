@@ -2,7 +2,7 @@ using Microsoft.Maui;
 using Microsoft.Maui.Hosting;
 using System;
 
-namespace GameX.App.Explorer2
+namespace GameX.App.Explorer
 {
     internal class Program : MauiApplication
     {

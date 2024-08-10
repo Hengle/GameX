@@ -5,13 +5,13 @@ namespace GameX.App.Explorer.Views
 {
     public partial class FileExplorer : ContentView
     {
-        public static MetaManager Resource = new ResourceManager();
-        public static FileExplorer Instance;
+        public readonly static MetaManager Resource = ResourceManager.Current;
+        public static FileExplorer Current;
 
         public FileExplorer()
         {
             InitializeComponent();
-            Instance = this;
+            Current = this;
             BindingContext = this;
         }
 
@@ -21,7 +21,7 @@ namespace GameX.App.Explorer.Views
                 if (d is not FileExplorer fileExplorer || n is not PakFile pakFile) return;
                 fileExplorer.Filters = pakFile.GetMetadataFilters(Resource);
                 fileExplorer.Nodes = fileExplorer.PakNodes = pakFile.GetMetaItems(Resource);
-                fileExplorer.OnReady(pakFile);
+                fileExplorer.Ready(pakFile);
             });
         public PakFile PakFile
         {
@@ -108,7 +108,7 @@ namespace GameX.App.Explorer.Views
 
         public void OnInfo(IEnumerable<MetaInfo> infos = null)
         {
-            FileContent.Instance.OnInfo(PakFile, infos?.Where(x => x.Name == null).ToList());
+            FileContent.Current.OnInfo(PakFile, infos?.Where(x => x.Name == null).ToList());
             Infos = infos?.Where(x => x.Name != null).ToList();
         }
 
@@ -119,13 +119,14 @@ namespace GameX.App.Explorer.Views
             //e.Handled = true;
         }
 
-        void OnReady(PakFile pakFile)
+        FileExplorer Ready(PakFile pakFile)
         {
-            if (string.IsNullOrEmpty(Option.ForcePath) || Option.ForcePath.StartsWith("app:")) return;
+            if (string.IsNullOrEmpty(Option.ForcePath) || Option.ForcePath.StartsWith("app:")) return this;
             var sample = Option.ForcePath.StartsWith("sample:") ? pakFile.Game.GetSample(Option.ForcePath[7..]) : null;
             var forcePath = sample != null ? sample.Path : Option.ForcePath;
-            if (forcePath == null) return;
+            if (forcePath == null) return this;
             SelectedItem = MetaItem.FindByPathForNodes(PakNodes, forcePath, Resource);
+            return this;
         }
     }
 }

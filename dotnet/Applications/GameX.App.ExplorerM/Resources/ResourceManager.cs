@@ -7,13 +7,14 @@ namespace GameX.App.Explorer
 {
     public class ResourceManager : MetaManager
     {
-        readonly Dictionary<string, IImage> Icons = new();
+        public static ResourceManager Current = new();
+        readonly Dictionary<string, IImage> Icons = [];
         readonly ConcurrentDictionary<string, IImage> ImageCache = new();
         readonly object _defaultIcon;
         readonly object _folderIcon;
         readonly object _packageIcon;
 
-        public ResourceManager()
+        ResourceManager()
         {
             LoadIcons();
             _defaultIcon = GetIcon("_default");

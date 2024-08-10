@@ -4,11 +4,11 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:GameX.App.Explorer.Views"
-    Shell.FlyoutBehavior="Disabled"
+    Shell.FlyoutBehavior="Flyout"
     Title="Explorer">
 
-    <ShellContent Title="Home" ContentTemplate="{DataTemplate views:MainPage}" Route="MainPage" />
-    <ShellContent Title="Open" ContentTemplate="{DataTemplate views:OpenPage}" />
+    <ShellContent Title="Home" ContentTemplate="{DataTemplate views:MainPage}" Route="home" />
+    <ShellContent Title="Open" ContentTemplate="{DataTemplate views:OpenPage}" Route="open" />
     <FlyoutItem Title="View">
         <ShellContent Title="Options" ContentTemplate="{DataTemplate views:OptionsPage}" />
         <ShellContent Title="World Map" ContentTemplate="{DataTemplate views:OptionsPage}" />
