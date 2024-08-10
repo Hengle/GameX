@@ -19,7 +19,7 @@
         </Grid.ColumnDefinitions>
         <Grid.Resources>
             <DataTemplate x:Key="FileExplorer" DataType="{x:Type views:MainPageTab}">
-                <views:FileExplorer x:Name="PakFileExplorer" PakFile="{Binding RelativeSource={x:Static RelativeSource.TemplatedParent}, Path=Content.PakFile}" Margin="0,0,10,10" />
+                <views:FileExplorer PakFile="{Binding Content.PakFile, RelativeSource={RelativeSource TemplatedParent}}" Margin="0,0,10,10" />
             </DataTemplate>
             <DataTemplate x:Key="AppList" DataType="{x:Type views:MainPageTab}">
                 <StackPanel Orientation="Vertical">
@@ -27,7 +27,7 @@
                     <ItemsControl ItemsSource="{Binding AppList}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Content="{Binding Name}" Click="App_Click"  />
+                                <Button Content="{Binding Name}" Click="App_Click" Margin="5,5,5,5" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

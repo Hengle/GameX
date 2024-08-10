@@ -135,14 +135,13 @@ namespace GameX.App.Explorer.Views
             e.Handled = true;
         }
 
-        FileExplorer Ready(PakFile pakFile)
+        void Ready(PakFile pakFile)
         {
-            if (string.IsNullOrEmpty(Option.ForcePath) || Option.ForcePath.StartsWith("app:")) return this;
+            if (string.IsNullOrEmpty(Option.ForcePath) || Option.ForcePath.StartsWith("app:")) return;
             var sample = Option.ForcePath.StartsWith("sample:") ? pakFile.Game.GetSample(Option.ForcePath[7..]) : null;
             var forcePath = sample != null ? sample.Path : Option.ForcePath;
-            if (forcePath == null) return this;
+            if (forcePath == null) return;
             SelectedItem = MetaItem.FindByPathForNodes(PakNodes, forcePath, Resource);
-            return this;
         }
     }
 }

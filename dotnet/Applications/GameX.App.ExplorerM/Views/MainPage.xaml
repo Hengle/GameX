@@ -31,12 +31,22 @@
                     <BoxView x:Name="Indicator" Grid.Row="1" Color="Transparent"/>
                 </Grid>
             </ControlTemplate>
-            <ControlTemplate x:Key="FileExplorerTemplate" x:DataType="{x:Type views:MainPageTab}">
-                <views:FileExplorer PakFile="{Binding PakFile}" />
+            <ControlTemplate x:Key="FileExplorer" x:DataType="{x:Type views:MainPageTab}">
+                <views:FileExplorer PakFile="{TemplateBinding BindingContext.PakFile}" />
             </ControlTemplate>
-            <ControlTemplate x:Key="TextBlockTemplate" x:DataType="{x:Type views:MainPageTab}">
-                <ScrollView>
+            <ControlTemplate x:Key="AppList" x:DataType="{x:Type views:MainPageTab}">
+                <VerticalStackLayout BindableLayout.ItemsSource="{TemplateBinding BindingContext.AppList}">
                     <Label Text="{Binding Text}" Margin="5,5,5,5" />
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Button Text="{Binding Name}" Margin="5,5,5,5" />
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </ControlTemplate>
+            <ControlTemplate x:Key="TextBlock" x:DataType="{x:Type views:MainPageTab}">
+                <ScrollView>
+                    <Label Text="{TemplateBinding BindingContext.Text}" Margin="5,5,5,5" />
                 </ScrollView>
             </ControlTemplate>
         </Grid.Resources>
@@ -53,10 +63,13 @@
                 <ContentView x:Name="MainTabContent" Grid.Row="1">
                     <ContentView.Style>
                         <Style TargetType="ContentView">
-                            <Setter Property="ControlTemplate" Value="{StaticResource FileExplorerTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource AppList}" />
                             <Style.Triggers>
+                                <DataTrigger TargetType="ContentView" Binding="{Binding AppList}" Value="{x:Null}">
+                                    <Setter Property="ControlTemplate" Value="{StaticResource FileExplorer}" />
+                                </DataTrigger>
                                 <DataTrigger TargetType="ContentView" Binding="{Binding PakFile}" Value="{x:Null}">
-                                    <Setter Property="ControlTemplate" Value="{StaticResource TextBlockTemplate}" />
+                                    <Setter Property="ControlTemplate" Value="{StaticResource TextBlock}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

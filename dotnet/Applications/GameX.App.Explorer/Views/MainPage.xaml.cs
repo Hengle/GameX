@@ -80,7 +80,7 @@ namespace GameX.App.Explorer.Views
                 {
                     Name = "Apps",
                     PakFile = firstPakFile,
-                    AppList = FamilyApps.Values.ToList(),
+                    AppList = [..FamilyApps.Values],
                     Text = "Choose an application.",
                 });
             if (!string.IsNullOrEmpty(family.Description))
