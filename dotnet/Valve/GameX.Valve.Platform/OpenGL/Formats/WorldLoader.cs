@@ -1,7 +1,7 @@
+using GameX.Valve.Formats;
 using GameX.Valve.Formats.Blocks;
 using GameX.Valve.Formats.Extras;
-using GameX.Valve.Graphics.OpenGL.Scenes;
-using OpenStack;
+using GameX.Valve.OpenGL.Scenes;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
 using System;
@@ -12,13 +12,13 @@ using System.Numerics;
 using static GameX.Valve.Formats.Blocks.DATAEntityLump;
 using static System.Numerics.Polyfill;
 
-namespace GameX.Valve.Formats.OpenGL
+namespace GameX.Valve.OpenGL.Formats
 {
     //was:Renderer/WorldLoader
     public class WorldLoader
     {
         readonly DATAWorld World;
-        readonly IOpenGLGfx Graphic;
+        readonly IOpenGLGfx Gfx;
 
         // Contains metadata that can't be captured by manipulating the scene itself. Returned from Load().
         public class LoadResult
@@ -31,10 +31,10 @@ namespace GameX.Valve.Formats.OpenGL
             public Vector3 SkyboxOrigin = Vector3.Zero;
         }
 
-        public WorldLoader(IOpenGLGfx graphic, DATAWorld world)
+        public WorldLoader(IOpenGLGfx gfx, DATAWorld world)
         {
             World = world;
-            Graphic = graphic;
+            Gfx = gfx;
         }
 
         public LoadResult Load(Scene scene)
@@ -46,9 +46,9 @@ namespace GameX.Valve.Formats.OpenGL
             foreach (var worldNode in World.GetWorldNodeNames())
                 if (worldNode != null)
                 {
-                    var newResource = Graphic.LoadFileObject<Binary_Pak>($"{worldNode}.vwnod_c").Result;
+                    var newResource = Gfx.LoadFileObject<Binary_Pak>($"{worldNode}.vwnod_c").Result;
                     if (newResource == null) continue;
-                    var subloader = new WorldNodeLoader(Graphic, (DATAWorldNode)newResource.DATA);
+                    var subloader = new WorldNodeLoader(Gfx, (DATAWorldNode)newResource.DATA);
                     subloader.Load(scene);
                 }
 
@@ -56,7 +56,7 @@ namespace GameX.Valve.Formats.OpenGL
             {
                 if (lumpName == null) continue;
 
-                var newResource = Graphic.LoadFileObject<Binary_Pak>("{lumpName}_c").Result;
+                var newResource = Gfx.LoadFileObject<Binary_Pak>("{lumpName}_c").Result;
                 if (newResource == null) continue;
 
                 var entityLump = (DATAEntityLump)newResource.DATA;
@@ -69,7 +69,7 @@ namespace GameX.Valve.Formats.OpenGL
         {
             foreach (var childEntityName in entityLump.GetChildEntityNames())
             {
-                var newResource = Graphic.LoadFileObject<Binary_Pak>(childEntityName).Result;
+                var newResource = Gfx.LoadFileObject<Binary_Pak>(childEntityName).Result;
                 if (newResource == null) continue;
 
                 var childLump = (DATAEntityLump)newResource.DATA;
@@ -98,7 +98,7 @@ namespace GameX.Valve.Formats.OpenGL
                     var targetmapname = entity.Get<string>("targetmapname");
 
                     var skyboxWorldPath = $"maps/{Path.GetFileNameWithoutExtension(targetmapname)}/world.vwrld_c";
-                    var skyboxPackage = Graphic.LoadFileObject<Binary_Pak>(skyboxWorldPath).Result;
+                    var skyboxPackage = Gfx.LoadFileObject<Binary_Pak>(skyboxWorldPath).Result;
                     if (skyboxPackage != null) result.Skybox = (DATAWorld)skyboxPackage.DATA;
                 }
 
@@ -126,7 +126,7 @@ namespace GameX.Valve.Formats.OpenGL
 
                 if (particle != null)
                 {
-                    var particleResource = Graphic.LoadFileObject<Binary_Pak>(particle).Result;
+                    var particleResource = Gfx.LoadFileObject<Binary_Pak>(particle).Result;
                     if (particleResource != null)
                     {
                         var particleSystem = (DATAParticleSystem)particleResource.DATA;
@@ -134,7 +134,7 @@ namespace GameX.Valve.Formats.OpenGL
                         {
                             var particleNode = new ParticleSceneNode(scene, particleSystem)
                             {
-                                Transform = Matrix4x4.CreateTranslation((Vector3)origin),
+                                Transform = Matrix4x4.CreateTranslation(origin),
                                 LayerName = layerName,
                             };
                             scene.Add(particleNode, true);
@@ -178,10 +178,10 @@ namespace GameX.Valve.Formats.OpenGL
                     continue;
                 }
 
-                var newEntity = Graphic.LoadFileObject<Binary_Pak>($"{model}_c").Result;
+                var newEntity = Gfx.LoadFileObject<Binary_Pak>($"{model}_c").Result;
                 if (newEntity == null)
                 {
-                    var errorModelResource = Graphic.LoadFileObject<Binary_Pak>("models/dev/error.vmdl_c").Result;
+                    var errorModelResource = Gfx.LoadFileObject<Binary_Pak>("models/dev/error.vmdl_c").Result;
                     if (errorModelResource != null)
                     {
                         var errorModel = new ModelSceneNode(scene, (IValveModel)errorModelResource.DATA, skin, false)
@@ -234,7 +234,7 @@ namespace GameX.Valve.Formats.OpenGL
                     var refPhysicsPaths = newModel.GetReferencedPhysNames();
                     if (refPhysicsPaths.Any())
                     {
-                        var newResource = Graphic.LoadFileObject<Binary_Pak>($"{refPhysicsPaths.First()}_c").Result;
+                        var newResource = Gfx.LoadFileObject<Binary_Pak>($"{refPhysicsPaths.First()}_c").Result;
                         if (newResource != null) phys = (DATAPhysAggregateData)newResource.DATA;
                     }
                 }
@@ -255,11 +255,11 @@ namespace GameX.Valve.Formats.OpenGL
         void AddToolModel(Scene scene, string classname, Matrix4x4 transformationMatrix, Vector3 position)
         {
             var filename = HammerEntities.GetToolModel(classname);
-            var resource = Graphic.LoadFileObject<Binary_Pak>($"{filename}_c").Result;
+            var resource = Gfx.LoadFileObject<Binary_Pak>($"{filename}_c").Result;
             if (resource == null)
             {
                 // TODO: Create a 16x16x16 box to emulate how Hammer draws them
-                resource = Graphic.LoadFileObject<Binary_Pak>("materials/editor/obsolete.vmat_c").Result;
+                resource = Gfx.LoadFileObject<Binary_Pak>("materials/editor/obsolete.vmat_c").Result;
                 if (resource == null) return;
             }
 

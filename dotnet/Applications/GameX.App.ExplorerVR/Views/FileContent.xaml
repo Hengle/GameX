@@ -56,23 +56,23 @@
             </ControlTemplate>
             <ControlTemplate x:Key="MaterialTemplate" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="Material" />
-                <!--<control1:GLMaterialViewer Source="{Binding Value}" Graphic="{Binding Graphic, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+                <!--<control1:GLMaterialViewer Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
             </ControlTemplate>
             <ControlTemplate x:Key="ParticleTemplate" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="Particle" />
-                <!--<control1:GLParticleViewer Source="{Binding Value}" Graphic="{Binding Graphic, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+                <!--<control1:GLParticleViewer Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
             </ControlTemplate>
             <ControlTemplate x:Key="TextureTemplate" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="Texture" />
-                <!--<control1:GLTextureViewer Source="{Binding Value}" Graphic="{Binding Graphic, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+                <!--<control1:GLTextureViewer Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
             </ControlTemplate>
             <ControlTemplate x:Key="ModelTemplate" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="Model" />
-                <!--<control1:GLModelViewer Source="{Binding Value}" Graphic="{Binding Graphic, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+                <!--<control1:GLModelViewer Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
             </ControlTemplate>
             <ControlTemplate x:Key="WorldTemplate" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="World" />
-                <!--<control1:GLModelViewer Source="{Binding Value}" Graphic="{Binding Graphic, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+                <!--<control1:GLModelViewer Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
             </ControlTemplate>
         </Grid.Resources>
         <HorizontalStackLayout x:Name="ContentTab" Grid.Row="0" BindableLayout.ItemsSource="{Binding ContentTabs}" VerticalOptions="StartAndExpand" RadioButtonGroup.GroupName="Tabs" BackgroundColor="LightGrey">

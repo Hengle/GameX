@@ -33,22 +33,22 @@
                 <Image MaxWidth="{Binding MaxWidth}" MaxHeight="{Binding MaxHeight}" Margin="5,5,5,5" />
             </DataTemplate>
             <DataTemplate x:Key="MaterialTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLMaterialViewer Source="{Binding Value}" Graphic="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Graphic}" Margin="3,3,3,3" />
+                <control1:GLMaterialViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
             <DataTemplate x:Key="ParticleTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLParticleViewer Source="{Binding Value}" Graphic="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Graphic}" Margin="3,3,3,3" />
+                <control1:GLParticleViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
             <DataTemplate x:Key="TextureTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLTextureViewer Source="{Binding Value}" Graphic="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Graphic}" Margin="3,3,3,3" />
+                <control1:GLTextureViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
             <DataTemplate x:Key="TextureVideoTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLTextureVideoViewer Source="{Binding Value}" Graphic="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Graphic}" Margin="3,3,3,3" />
+                <control1:GLTextureVideoViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
             <DataTemplate x:Key="ModelTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLModelViewer Source="{Binding Value}" Graphic="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Graphic}" Margin="3,3,3,3" />
+                <control1:GLModelViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
             <DataTemplate x:Key="WorldTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLModelViewer Source="{Binding Value}" Graphic="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Graphic}" Margin="3,3,3,3" />
+                <control1:GLModelViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
             <DataTemplate x:Key="CustomTemplate" DataType="{x:Type model:MetaContent}">
                 <views:Custom Source="{Binding Value}" Margin="3,3,3,3" />

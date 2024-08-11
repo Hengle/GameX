@@ -273,7 +273,7 @@ namespace GameX
         /// Gets the gfx.
         /// </summary>
         /// <value>
-        /// The graphic.
+        /// The gfx.
         /// </value>
         public IOpenGfx Gfx { get; internal set; }
 
@@ -281,7 +281,7 @@ namespace GameX
         /// Gets the gfx.
         /// </summary>
         /// <value>
-        /// The graphic.
+        /// The sfx.
         /// </value>
         public IOpenSfx Sfx { get; internal set; }
 

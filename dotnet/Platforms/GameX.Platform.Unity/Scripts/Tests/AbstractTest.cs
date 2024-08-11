@@ -11,7 +11,7 @@ namespace Tests
         protected readonly UnityTest Test;
         protected readonly Family Family;
         protected readonly List<PakFile> PakFiles = new List<PakFile>();
-        protected readonly IUnityGfx Graphic;
+        protected readonly IUnityGfx Gfx;
 
         public AbstractTest(UnityTest test)
         {
@@ -22,7 +22,7 @@ namespace Tests
             if (!string.IsNullOrEmpty(test.Pak2Uri)) PakFiles.Add(Family.OpenPakFile(new Uri(test.Pak2Uri)));
             if (!string.IsNullOrEmpty(test.Pak3Uri)) PakFiles.Add(Family.OpenPakFile(new Uri(test.Pak3Uri)));
             var first = PakFiles.FirstOrDefault();
-            Graphic = (IUnityGfx)first?.Gfx;
+            Gfx = (IUnityGfx)first?.Gfx;
         }
 
         public virtual void Dispose()

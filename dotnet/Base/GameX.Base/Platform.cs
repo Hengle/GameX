@@ -316,27 +316,7 @@ namespace GameX.Platforms
     /// </summary>
     public static class Platform
     {
-        /// <summary>
-        /// The platform stats.
-        /// </summary>
-        public class Stats
-        {
-            static readonly bool _HighRes = Stopwatch.IsHighResolution;
-            static readonly double _HighFrequency = 1000.0 / Stopwatch.Frequency;
-            static readonly double _LowFrequency = 1000.0 / TimeSpan.TicksPerSecond;
-            static bool _UseHRT = false;
-
-            public static bool UsingHighResolutionTiming => _UseHRT && _HighRes && !Unix;
-            public static long TickCount => (long)Ticks;
-            public static double Ticks => _UseHRT && _HighRes && !Unix ? Stopwatch.GetTimestamp() * _HighFrequency : DateTime.UtcNow.Ticks * _LowFrequency;
-
-            public static readonly bool Is64Bit = Environment.Is64BitProcess;
-            public static bool MultiProcessor { get; private set; }
-            public static int ProcessorCount { get; private set; }
-            public static bool Unix { get; private set; }
-            public static bool VR { get; private set; }
-        }
-
+        
         /// <summary>
         /// The platform type.
         /// </summary>
@@ -385,6 +365,39 @@ namespace GameX.Platforms
         /// Determines if in a test host.
         /// </summary>
         public static bool InTestHost => AppDomain.CurrentDomain.GetAssemblies().Any(x => x.FullName.StartsWith("testhost,"));
+
+        /// <summary>
+        /// The platform stats.
+        /// </summary>
+        public class Stats
+        {
+            static readonly bool _HighRes = Stopwatch.IsHighResolution;
+            static readonly double _HighFrequency = 1000.0 / Stopwatch.Frequency;
+            static readonly double _LowFrequency = 1000.0 / TimeSpan.TicksPerSecond;
+            static bool _UseHRT = false;
+
+            public static bool UsingHighResolutionTiming => _UseHRT && _HighRes && !Unix;
+            public static long TickCount => (long)Ticks;
+            public static double Ticks => _UseHRT && _HighRes && !Unix ? Stopwatch.GetTimestamp() * _HighFrequency : DateTime.UtcNow.Ticks * _LowFrequency;
+
+            public static readonly bool Is64Bit = Environment.Is64BitProcess;
+            public static bool MultiProcessor { get; private set; }
+            public static int ProcessorCount { get; private set; }
+            public static bool Unix { get; private set; }
+            public static bool VR { get; private set; }
+        }
+
+        public static void Startup()
+        {
+            if (InTestHost && Startups.Count == 0) Startups.Add(TestPlatform.Startup);
+            foreach (var startup in Startups) if (startup()) return;
+            PlatformType = Type.Unknown;
+            GfxFactory = source => null; // throw new Exception("No GfxFactory");
+            SfxFactory = source => null; // throw new Exception("No SfxFactory");
+            Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
+            Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
+            Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);
+        }
     }
 
     #endregion
@@ -406,6 +419,20 @@ namespace GameX.Platforms
 
     #endregion
 
+    #region TestSfx
+
+    public interface ITestSfx : IOpenSfx { }
+
+    public class TestSfx : ITestSfx
+    {
+        readonly PakFile _source;
+
+        public TestSfx(PakFile source) => _source = source;
+        public object Source => _source;
+    }
+
+    #endregion
+
     #region TestPlatform
 
     public static class TestPlatform
@@ -416,6 +443,7 @@ namespace GameX.Platforms
             {
                 Platform.PlatformType = Platform.Type.Test;
                 Platform.GfxFactory = source => new TestGfx(source);
+                Platform.SfxFactory = source => new TestSfx(source);
                 Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
                 Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
                 Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);

@@ -46,7 +46,7 @@ namespace GameX.WB
         [DataTestMethod]
         [DataRow("GfxObj/01000001.obj")]
         [DataRow("GfxObj/01004E59.obj")]
-        public void GraphicsObject(string sampleFile) => LoadObject<GfxObj>(portal, sampleFile);
+        public void GfxObject(string sampleFile) => LoadObject<GfxObj>(portal, sampleFile);
 
         [DataTestMethod]
         [DataRow("SetupModel/02000001.set")]

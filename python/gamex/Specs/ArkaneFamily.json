@@ -105,7 +105,7 @@
   "fileManager": {
     "applications": {
       "AF": {
-        "key": "GOG:1207658680",
+        "key": "Gog:1207658680",
         "reg": "GOG.com/Games/1207658680",
         "dir": "Arx Fatalis"
       },
@@ -116,25 +116,25 @@
         "path": "vpks"
       },
       "D": {
-        "key": "GOG:1701063787",
+        "key": "Gog:1701063787",
         "reg": "GOG.com/Games/1701063787",
         "dir": "Dishonored",
         "path": "DishonoredGame/CookedPCConsole"
       },
       "D2": {
-        "key": "GOG:1431426311",
+        "key": "Gog:1431426311",
         "reg": "GOG.com/Games/1431426311",
         "dir": "Dishonored 2",
         "path": "base"
       },
       "P": {
-        "key": "GOG:1158493447",
+        "key": "Gog:1158493447",
         "reg": "GOG.com/Games/1158493447",
         "dir": "Prey",
         "path": "GameSDK"
       },
       "D:DOTO": {
-        "key": "GOG:1707860700",
+        "key": "Gog:1707860700",
         "reg": "GOG.com/Games/1707860700",
         "dir": "Dishonored Death of the Outsider",
         "path": "base"

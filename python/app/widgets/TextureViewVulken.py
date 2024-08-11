@@ -15,7 +15,7 @@ FACTOR: int = 1
 
 # typedefs
 class VulkenCamera: pass
-class IVulkenGraphic: pass
+class IVulkenGfx: pass
 
 # TextureView
 class TextureView(VulkenView):
@@ -29,7 +29,7 @@ class TextureView(VulkenView):
     def __init__(self, parent, tab):
         super().__init__()
         self.parent = parent
-        self.graphic: IOpenGLGraphic = parent.graphic
+        self.gfx: IOpenGLGfx = parent.gfx
         self.source: ITexture = tab.value
         
     def initializeGL(self):
@@ -42,8 +42,8 @@ class TextureView(VulkenView):
         else: super().setViewportSize(x, y, self.obj.width << FACTOR, self.obj.height << FACTOR)
 
     def onProperty(self):
-        if not self.graphic or not self.source: return
-        self.graphicGl = self.graphic
+        if not self.gfx or not self.source: return
+        self.gl = self.gfx
         self.obj = self.source if isinstance(self.source, ITexture) else None
         if not self.obj: return
         if isinstance(self.source, ITextureSelect): self.source.select(self.id)
@@ -51,10 +51,10 @@ class TextureView(VulkenView):
         # self.camera.setLocation(np.array([200., 200., 200.]))
         # self.camera.lookAt(np.zeros(3))
 
-        self.graphicGl.textureManager.deleteTexture(self.obj)
-        texture, _ = self.graphicGl.textureManager.createTexture(self.obj, self.level)
+        self.gl.textureManager.deleteTexture(self.obj)
+        texture, _ = self.gl.textureManager.createTexture(self.obj, self.level)
         self.renderers.clear()
-        self.renderers.append(TextureRenderer(self.graphicGl, texture, self.background))
+        self.renderers.append(TextureRenderer(self.gl, texture, self.background))
 
     def render(self, camera: GLCamera, frameTime: float):
         for renderer in self.renderers: renderer.render(camera, RenderPass.Both)

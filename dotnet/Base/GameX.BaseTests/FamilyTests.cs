@@ -9,20 +9,6 @@ namespace GameX
     public class FamilyTests
     {
         [TestMethod]
-        public void Bootstrap_CanRegisterAnotherStartup()
-        {
-            lock (this)
-            {
-                Platform.Startups.Clear();
-                Assert.AreEqual(0, Platform.Startups.Count, "None registered");
-                Platform.Startups.Add(SomePlatform.Startup);
-                Family.Bootstrap();
-                Assert.AreEqual(1, Platform.Startups.Count, "Single Startup");
-                Assert.AreEqual(SomePlatform.Startup, Platform.Startups.First(), $"Default is {nameof(SomePlatform.Startup)}");
-            }
-        }
-
-        [TestMethod]
         public void ShouldGetGame()
         {
             var family = Some.Family;

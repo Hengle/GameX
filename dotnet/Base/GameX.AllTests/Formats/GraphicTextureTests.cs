@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace GameX.Formats
 {
     [TestClass]
-    public class GraphicTextureTests
+    public class GfxTextureTests
     {
         [DataTestMethod]
         [DataRow("AC:AC", "client_highres.dat:Texture/060043BE.tex")]
@@ -28,7 +28,7 @@ namespace GameX.Formats
         [DataRow("Tes:Fallout4VR", "Fallout4 - Startup.ba2:Textures/Water/WaterRainRipples.dds")]
         [DataRow("Tes:Fallout4VR", "Fallout4 - Textures8.ba2:Textures/Terrain/DiamondCity/DiamondCity.16.-2.-2.DDS")]
         [DataRow("Valve:Dota2", "dota/pak01_dir.vpk:stringtokendatabase.txt")]
-        public async Task LoadGraphicTexture(string pak, string sampleFile)
+        public async Task LoadGfxTexture(string pak, string sampleFile)
         {
             var source = TestHelper.Paks[pak].Value;
             Assert.IsTrue(source.Contains(sampleFile));

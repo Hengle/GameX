@@ -1,4 +1,4 @@
-﻿//using GameEstate.Graphics.Controls;
+﻿//using GameEstate.Gfx.Controls;
 
 //namespace GameEstate.Explorer.Views
 //{

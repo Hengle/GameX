@@ -406,20 +406,9 @@ namespace GameX.Platforms
     }
 
     // UnitySfx
-    public class UnitySfx : ISystemSfx
+    public class UnitySfx : SystemSfx
     {
-        readonly PakFile _source;
-        readonly IAudioManager<object> _audioManager;
-
-        public UnitySfx(PakFile source)
-        {
-            _source = source;
-            _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
-        }
-
-        public PakFile Source => _source;
-        public IAudioManager<object> AudioManager => _audioManager;
-        public object CreateAudio(object path) => _audioManager.CreateAudio(path).aud;
+        public UnitySfx(PakFile source) : base(source) { }
     }
 
     // UnityPlatform

@@ -117,20 +117,9 @@ namespace GameX.Platforms
     }
 
     // UnrealSfx
-    public class UnrealSfx : ISystemSfx
+    public class UnrealSfx : SystemSfx
     {
-        readonly PakFile _source;
-        readonly IAudioManager<object> _audioManager;
-
-        public UnrealSfx(PakFile source)
-        {
-            _source = source;
-            _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
-        }
-
-        public PakFile Source => _source;
-        public IAudioManager<object> AudioManager => _audioManager;
-        public object CreateAudio(object path) => _audioManager.CreateAudio(path).aud;
+        public UnrealSfx(PakFile source) : base(source) { }
     }
 
     // UnrealPlatform

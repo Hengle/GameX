@@ -16,13 +16,13 @@ namespace GameX.App.Explorer.Controls1
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Graphic), typeof(object), typeof(GLParticleViewer),
+        public static readonly DependencyProperty GfxProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(GLParticleViewer),
             new PropertyMetadata((d, e) => (d as GLParticleViewer).OnProperty()));
 
-        public IOpenGfx Graphic
+        public IOpenGfx Gfx
         {
-            get => GetValue(GraphicProperty) as IOpenGfx;
-            set => SetValue(GraphicProperty, value);
+            get => GetValue(GfxProperty) as IOpenGfx;
+            set => SetValue(GfxProperty, value);
         }
 
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(GLParticleViewer),
@@ -38,19 +38,19 @@ namespace GameX.App.Explorer.Controls1
 
         void OnProperty()
         {
-            if (Graphic == null || Source == null) return;
-            var graphic = Graphic as IOpenGLGfx;
+            if (Gfx == null || Source == null) return;
+            var gfx = Gfx as IOpenGLGfx;
             var source = Source is IParticleSystem z ? z
                 : Source is IRedirected<IParticleSystem> y ? y.Value
                 : null;
             if (source == null) return;
 
-            particleGrid = new ParticleGridRenderer(graphic, 20, 5);
+            particleGrid = new ParticleGridRenderer(gfx, 20, 5);
             Camera.SetViewportSize(0, 0, (int)ActualWidth, (int)ActualHeight);
             Camera.SetLocation(new Vector3(200));
             Camera.LookAt(new Vector3(0));
 
-            Renderers.Add(new ParticleRenderer(graphic, source));
+            Renderers.Add(new ParticleRenderer(gfx, source));
         }
 
         protected override void Render(Camera camera, float deltaTime)

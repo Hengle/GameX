@@ -13,13 +13,13 @@ namespace GameX.App.Explorer.Controls1
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Graphic), typeof(object), typeof(GLMaterialViewer),
+        public static readonly DependencyProperty GfxProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(GLMaterialViewer),
             new PropertyMetadata((d, e) => (d as GLMaterialViewer).OnProperty()));
 
-        public IOpenGfx Graphic
+        public IOpenGfx Gfx
         {
-            get => GetValue(GraphicProperty) as IOpenGfx;
-            set => SetValue(GraphicProperty, value);
+            get => GetValue(GfxProperty) as IOpenGfx;
+            set => SetValue(GfxProperty, value);
         }
 
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(GLMaterialViewer),
@@ -33,14 +33,14 @@ namespace GameX.App.Explorer.Controls1
 
         void OnProperty()
         {
-            if (Graphic == null || Source == null) return;
-            var graphic = Graphic as IOpenGLGfx;
+            if (Gfx == null || Source == null) return;
+            var gfx = Gfx as IOpenGLGfx;
             var source = Source is IMaterial z ? z
                 : Source is IRedirected<IMaterial> y ? y.Value
                 : null;
             if (source == null) return;
-            var (material, _) = graphic.MaterialManager.CreateMaterial(source);
-            Renderers.Add(new MaterialRenderer(graphic, material));
+            var (material, _) = gfx.MaterialManager.CreateMaterial(source);
+            Renderers.Add(new MaterialRenderer(gfx, material));
         }
 
         readonly HashSet<MaterialRenderer> Renderers = [];

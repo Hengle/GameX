@@ -1,7 +1,7 @@
 import os
 from typing import Callable
 from enum import Enum
-from .pak import PakFile
+from gamex.pak import PakFile
 from openstk.gfx.gfx import IObjectManager, IMaterialManager, IShaderManager, ITextureManager, PlatformStats
 from openstk.gfx.gfx_render import IMaterial
 from openstk.gfx.gfx_texture import ITexture
@@ -240,7 +240,8 @@ class Platform:
     platformType: Type = None
     platformTag: str = None
     platformOS: OS = OS.Windows
-    graphicFactory: Callable = None
+    gfxFactory: Callable = None
+    sfxFactory: Callable = None
     startups: list[object] = []
     inTestHost: bool = False
     logFunc: Callable = None
@@ -255,11 +256,17 @@ class Platform:
         for startup in Platform.startups:
             if startup(): return
         Platform.platformType = Platform.Type.Unknown
-        Platform.graphicFactory = lambda source: None
+        Platform.gfxFactory = lambda source: None
+        Platform.sfxFactory = lambda source: None
         Platform.logFunc = lambda a: print(a)
 
-# TestGraphic
-class TestGraphic:
+# TestGfx
+class TestGfx:
+    def __init__(self, source):
+        self._source = source
+
+# TestGfx
+class TestSfx:
     def __init__(self, source):
         self._source = source
 
@@ -268,6 +275,7 @@ class TestPlatform:
     @staticmethod
     def startup() -> bool:
         Platform.platformType = Platform.Type.Test
-        Platform.graphicFactory = lambda source: TestGraphic(source)
+        Platform.gfxFactory = lambda source: TestGfx(source)
+        Platform.sfxFactory = lambda source: TestSfx(source)
         Platform.logFunc = lambda a: print(a)
         return True

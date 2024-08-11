@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace GameX.Valve.Graphics.OpenGL.Scenes
+namespace GameX.Valve.OpenGL.Scenes
 {
     //was:Renderer/SpriteSceneNode
     public class SpriteSceneNode : SceneNode
@@ -20,9 +20,9 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
 
         public SpriteSceneNode(Scene scene, Binary_Pak resource, Vector3 position) : base(scene)
         {
-            var graphic = scene.Graphic as IOpenGLGfx;
-            (material, _) = graphic.MaterialManager.CreateMaterial(resource);
-            (shader, _) = graphic.ShaderManager.CreateShader(material.Material.ShaderName, material.Material.GetShaderArgs());
+            var gfx = scene.Gfx as IOpenGLGfx;
+            (material, _) = gfx.MaterialManager.CreateMaterial(resource);
+            (shader, _) = gfx.ShaderManager.CreateShader(material.Material.ShaderName, material.Material.GetShaderArgs());
 
             if (quadVao == 0) quadVao = SetupQuadBuffer();
 

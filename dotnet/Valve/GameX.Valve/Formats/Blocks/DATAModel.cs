@@ -114,7 +114,7 @@ namespace GameX.Valve.Formats.Blocks
             return Animation.FromData(animationDataBlock.Data, decodeKey, Skeleton);
         }
 
-        public IEnumerable<Animation> GetAllAnimations(IOpenGfx graphic)
+        public IEnumerable<Animation> GetAllAnimations(IOpenGfx gfx)
         {
             if (CachedAnimations != null) return CachedAnimations;
 
@@ -124,8 +124,8 @@ namespace GameX.Valve.Formats.Blocks
             // Load animations from referenced animation groups
             foreach (var animGroupPath in animGroupPaths)
             {
-                var animGroup = graphic.LoadFileObject<Binary_Pak>($"{animGroupPath}_c").Result;
-                if (animGroup != default) animations.AddRange(AnimationGroupLoader.LoadAnimationGroup(animGroup, graphic, Skeleton));
+                var animGroup = gfx.LoadFileObject<Binary_Pak>($"{animGroupPath}_c").Result;
+                if (animGroup != default) animations.AddRange(AnimationGroupLoader.LoadAnimationGroup(animGroup, gfx, Skeleton));
             }
 
             CachedAnimations = animations.ToList();

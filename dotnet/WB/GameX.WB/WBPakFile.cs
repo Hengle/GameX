@@ -58,7 +58,7 @@ namespace GameX.WB
                 PakFileType.EnvCell => (0, (r, m, s) => Task.FromResult((object)new EnvCell(r))),
                 //PakFileType.LandBlockObjects => (0, null),
                 //PakFileType.Instantiation => (0, null),
-                PakFileType.GraphicsObject => (0, (r, m, s) => Task.FromResult((object)new GfxObj(r))),
+                PakFileType.GfxObject => (0, (r, m, s) => Task.FromResult((object)new GfxObj(r))),
                 PakFileType.Setup => (0, (r, m, s) => Task.FromResult((object)new SetupModel(r))),
                 PakFileType.Animation => (0, (r, m, s) => Task.FromResult((object)new Animation(r))),
                 //PakFileType.AnimationHook => (0, null),
@@ -135,7 +135,7 @@ namespace GameX.WB
             {
                 switch (objectId >> 24)
                 {
-                    case 0x01: return (PakFileType.GraphicsObject, "obj");
+                    case 0x01: return (PakFileType.GfxObject, "obj");
                     case 0x02: return (PakFileType.Setup, "set");
                     case 0x03: return (PakFileType.Animation, "anm");
                     case 0x04: return (PakFileType.Palette, "pal");

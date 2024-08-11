@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using GameX.App.Explorer.Views;
 using GameX.Platforms;
 using System;
 using System.Collections.Generic;

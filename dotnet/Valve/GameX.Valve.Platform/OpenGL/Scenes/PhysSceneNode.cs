@@ -9,7 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 
-namespace GameX.Valve.Graphics.OpenGL.Scenes
+namespace GameX.Valve.OpenGL.Scenes
 {
     //was:Renderer/PhysSceneNode
     public class PhysSceneNode : SceneNode
@@ -85,7 +85,7 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
                     {
                         var verticesBlob = hull.Get<byte[]>("m_Vertices");
                         vertices = Enumerable.Range(0, verticesBlob.Length / 12)
-                            .Select(i => new Vector3(BitConverter.ToSingle(verticesBlob, i * 12), BitConverter.ToSingle(verticesBlob, (i * 12) + 4), BitConverter.ToSingle(verticesBlob, (i * 12) + 8))).ToArray();
+                            .Select(i => new Vector3(BitConverter.ToSingle(verticesBlob, i * 12), BitConverter.ToSingle(verticesBlob, i * 12 + 4), BitConverter.ToSingle(verticesBlob, i * 12 + 8))).ToArray();
                     }
                     var vertOffset = verts.Count / 7;
                     foreach (var v in vertices)
@@ -142,7 +142,7 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
                         //KV3 has vertices as blob
                         var verticesBlob = mesh.Get<byte[]>("m_Vertices");
                         vertices = Enumerable.Range(0, verticesBlob.Length / 12)
-                            .Select(i => new Vector3(BitConverter.ToSingle(verticesBlob, i * 12), BitConverter.ToSingle(verticesBlob, (i * 12) + 4), BitConverter.ToSingle(verticesBlob, (i * 12) + 8))).ToArray();
+                            .Select(i => new Vector3(BitConverter.ToSingle(verticesBlob, i * 12), BitConverter.ToSingle(verticesBlob, i * 12 + 4), BitConverter.ToSingle(verticesBlob, i * 12 + 8))).ToArray();
                     }
 
                     foreach (var vec in vertices)
@@ -189,7 +189,7 @@ namespace GameX.Valve.Graphics.OpenGL.Scenes
                 //Console.WriteLine($"Phys mesh verts {verts.Count} inds {inds.Count}");
             }
 
-            (shader, _) = (Scene.Graphic as IOpenGLGfx).ShaderManager.CreateShader("vrf.grid", new Dictionary<string, bool>());
+            (shader, _) = (Scene.Gfx as IOpenGLGfx).ShaderManager.CreateShader("vrf.grid", new Dictionary<string, bool>());
             GL.UseProgram(shader.Program);
 
             vaoHandle = GL.GenVertexArray();

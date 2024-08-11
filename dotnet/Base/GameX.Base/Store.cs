@@ -15,7 +15,7 @@ namespace GameX
             return k switch
             {
                 "Steam" => Store_Steam.SteamPaths.TryGetValue(v, out var z) ? z : null,
-                "GOG" => Store_Gog.GogPaths.TryGetValue(v, out var z) ? z : null,
+                "Gog" => Store_Gog.GogPaths.TryGetValue(v, out var z) ? z : null,
                 "Blizzard" => Store_Blizzard.BlizzardPaths.TryGetValue(v, out var z) ? z : null,
                 "Epic" => Store_Epic.EpicPaths.TryGetValue(v, out var z) ? z : null,
                 "Ubisoft" => Store_Ubisoft.UbisoftPaths.TryGetValue(v, out var z) ? z : null,

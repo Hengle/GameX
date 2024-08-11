@@ -16,7 +16,7 @@ namespace GameX
         //internal static PakFile CreatePakFile(FamilyGame game, object value, IFileSystem fileSystem, PakOption options, bool throwOnError)
         //{
         //    var family = game.Family;
-        //    return WithPlatformGraphic(value switch
+        //    return WithPlatform(value switch
         //    {
         //        string path when game.PakFileType != null => (PakFile)Activator.CreateInstance(game.PakFileType, game, path, null),
         //        //string path when (options & PakOption.Stream) != 0 => new StreamPakFile(family.FileManager.HostFactory, game, path, fileSystem),

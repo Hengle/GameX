@@ -20,11 +20,11 @@ namespace GameX.App.Explorer.Views
 
         //void ContentTab_Changed(object sender, CheckedChangedEventArgs e) => ContentTabContent.BindingContext = ((RadioButton)sender).BindingContext;
 
-        IOpenGraphic _graphic;
-        public IOpenGraphic Graphic
+        IOpenGfx _gfx;
+        public IOpenGfx Gfx
         {
-            get => _graphic;
-            set { _graphic = value; OnPropertyChanged(); }
+            get => _gfx;
+            set { _gfx = value; OnPropertyChanged(); }
         }
 
         IList<MetadataContent> _contentTabs;
@@ -37,7 +37,7 @@ namespace GameX.App.Explorer.Views
         public void OnFileInfo(PakFile pakFile, List<MetadataInfo> infos)
         {
             if (ContentTabs != null) foreach (var dispose in ContentTabs.Where(x => x.Dispose != null).Select(x => x.Dispose)) dispose.Dispose();
-            Graphic = pakFile.Graphic;
+            Gfx = pakFile.Gfx;
             ContentTabs = infos?.Select(x => x.Tag as MetadataContent).Where(x => x != null).ToList();
             //ContentTab.CurrentItem = ContentTabs != null ? ContentTabs.FirstOrDefault() : null;
         }

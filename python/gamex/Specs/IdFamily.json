@@ -322,7 +322,7 @@
         "dir": "Quake 2"
       },
       "Q3": {
-        "key": [ "Steam:2200", "GOG:1441704920" ],
+        "key": [ "Steam:2200", "Gog:1441704920" ],
         "reg": [ "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2200", "GOG.com/Games/1441704920" ],
         "dir": "Quake III"
       },

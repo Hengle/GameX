@@ -9,6 +9,7 @@ from gamex.pak import PakFile
 from gamex.meta import MetaContent
 from .HexView import HexView
 from .TextureView import TextureView
+from .TestGfxView import TestGfxView
 
 # typedefs
 class MetaInfo: pass
@@ -34,7 +35,7 @@ class FileContent(QTabWidget):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        self._graphic = []
+        self._gfx = []
         self._contentTabs = []
         self.initUI()
 
@@ -52,15 +53,16 @@ class FileContent(QTabWidget):
         for tab in self.contentTabs:
             control = TextView(self, tab) if tab.type == 'Text' else \
                 HexView(self, tab) if tab.type == 'Hex' else \
-                TextureView(self, tab) if tab.type == 'Texture' else \
+                TestGfxView(self, tab) if tab.type == 'Texture' else \
+                TextureView(self, tab) if tab.type == 'Texture2' else \
                 NullView(self, tab)
             self.contentTab.addTab(control, tab.name)
 
     @property
-    def graphic(self): return self._graphic
-    @graphic.setter
-    def graphic(self, value):
-        self._graphic = value
+    def gfx(self): return self._gfx
+    @gfx.setter
+    def gfx(self, value):
+        self._gfx = value
 
     @property
     def contentTabs(self) -> list[MetaContent]: return self._contentTabs
@@ -70,6 +72,6 @@ class FileContent(QTabWidget):
         self.updateTabs()
 
     def onInfo(self, pakFile: PakFile, infos: list[MetaInfo] = None):
-        self.graphic = pakFile.graphic
+        self.gfx = pakFile.gfx
         self.contentTabs = [x.tag for x in infos if isinstance(x.tag, MetaContent)] if infos else None
         self.contentTab.selectedIndex = 0 if infos else -1

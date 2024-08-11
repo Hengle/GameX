@@ -61,7 +61,7 @@
   "fileManager": {
     "applications": {
       "Witcher": {
-        "key": "GOG:1207658924",
+        "key": "Gog:1207658924",
         "reg": [
           "CD Projekt RED/The Witcher",
           "GOG.com/Games/1207658924"
@@ -70,7 +70,7 @@
         "path": "Data"
       },
       "Witcher2": {
-        "key": "GOG:1207658930",
+        "key": "Gog:1207658930",
         "reg": [
           "CD Projekt RED/The Witcher 2",
           "GOG.com/Games/1207658930"
@@ -80,8 +80,8 @@
       },
       "Witcher3": {
         "key": [
-          "GOG:1207664643",
-          "GOG:1495134320"
+          "Gog:1207664643",
+          "Gog:1495134320"
         ],
         "reg": [
           "GOG.com/Games/1207664643",

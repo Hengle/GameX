@@ -44,10 +44,10 @@ namespace GameX.App.Explorer.Controls1
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Graphic), typeof(object), typeof(GLSceneViewer),
+        public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(GLSceneViewer),
             new PropertyMetadata((d, e) => (d as GLSceneViewer).OnProperty()));
 
-        public IOpenGfx Graphic
+        public IOpenGfx Gfx
         {
             get => GetValue(GraphicProperty) as IOpenGfx;
             set => SetValue(GraphicProperty, value);
@@ -64,12 +64,12 @@ namespace GameX.App.Explorer.Controls1
 
         void OnProperty()
         {
-            if (Graphic == null || Source == null) return;
+            if (Gfx == null || Source == null) return;
 
-            var graphic = Graphic as IOpenGLGfx;
+            var gfx = Gfx as IOpenGLGfx;
 
-            Scene = new Scene(graphic, MeshBatchRenderer.Render);
-            BaseGrid = new ParticleGridRenderer(graphic, 20, 5);
+            Scene = new Scene(gfx, MeshBatchRenderer.Render);
+            BaseGrid = new ParticleGridRenderer(gfx, 20, 5);
 
             Camera.SetViewportSize(0, 0, (int)ActualWidth, (int)ActualHeight); //: HandleResize()
             Camera.SetLocation(new Vector3(256));
@@ -86,8 +86,8 @@ namespace GameX.App.Explorer.Controls1
                 Camera.LookAt(bbox.Center);
             }
 
-            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Graphic as IOpenGLGfx, false);
-            DynamicOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.DynamicOctree, Graphic as IOpenGLGfx, true);
+            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Gfx as IOpenGLGfx, false);
+            DynamicOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.DynamicOctree, Gfx as IOpenGLGfx, true);
 
             //if (_renderModeComboBox != null)
             //{
@@ -131,7 +131,7 @@ namespace GameX.App.Explorer.Controls1
         protected void SetEnabledLayers(HashSet<string> layers)
         {
             Scene.SetEnabledLayers(layers);
-            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Graphic as IOpenGLGfx, false);
+            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Gfx as IOpenGLGfx, false);
         }
 
         //protected void AddRenderModeSelectionControl()

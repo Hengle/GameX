@@ -1,8 +1,5 @@
 //using OpenStack;
 //using OpenStack.Gfx;
-//using OpenStack.Graphics.OpenGL.Renderer1;
-//using OpenStack.Graphics.OpenGL.Renderer1.Renderers;
-//using OpenStack.Graphics.Renderer1;
 //using OpenTK.Graphics.OpenGL;
 //using System.ComponentModel;
 //using System.Numerics;
@@ -49,13 +46,13 @@
 //        public event PropertyChangedEventHandler PropertyChanged;
 //        void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-//        public static readonly BindableProperty GraphicProperty = BindableProperty.Create(nameof(Graphic), typeof(object), typeof(GLSceneViewer),
+//        public static readonly BindableProperty GfxProperty = BindableProperty.Create(nameof(Gfx), typeof(object), typeof(GLSceneViewer),
 //            propertyChanged: (d, e, n) => (d as GLSceneViewer).OnProperty());
 
-//        public IOpenGraphic Graphic
+//        public IOpenGfx Gfx
 //        {
-//            get => GetValue(GraphicProperty) as IOpenGraphic;
-//            set => SetValue(GraphicProperty, value);
+//            get => GetValue(GfxProperty) as IOpenGfx;
+//            set => SetValue(GfxProperty, value);
 //        }
 
 //        public static readonly BindableProperty SourceProperty = BindableProperty.Create(nameof(Source), typeof(object), typeof(GLSceneViewer),
@@ -69,12 +66,12 @@
 
 //        void OnProperty()
 //        {
-//            if (Graphic == null || Source == null) return;
+//            if (Gfx == null || Source == null) return;
 
-//            var graphic = Graphic as IOpenGLGraphic;
+//            var gfx = Gfx as IOpenGLGfx;
 
-//            Scene = new Scene(graphic, MeshBatchRenderer.Render);
-//            BaseGrid = new ParticleGridRenderer(20, 5, graphic);
+//            Scene = new Scene(gfx, MeshBatchRenderer.Render);
+//            BaseGrid = new ParticleGridRenderer(20, 5, gfx);
 
 //            Camera.SetViewportSize((int)ActualWidth, (int)ActualHeight); //: HandleResize()
 //            Camera.SetLocation(new Vector3(256));
@@ -91,8 +88,8 @@
 //                Camera.LookAt(bbox.Center);
 //            }
 
-//            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Graphic as IOpenGLGraphic, false);
-//            DynamicOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.DynamicOctree, Graphic as IOpenGLGraphic, true);
+//            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Gfx as IOpenGLGfx, false);
+//            DynamicOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.DynamicOctree, Gfx as IOpenGLGfx, true);
 
 //            //if (_renderModeComboBox != null)
 //            //{
@@ -138,7 +135,7 @@
 //        protected void SetEnabledLayers(HashSet<string> layers)
 //        {
 //            Scene.SetEnabledLayers(layers);
-//            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Graphic as IOpenGLGraphic, false);
+//            StaticOctreeRenderer = new OctreeDebugRenderer<SceneNode>(Scene.StaticOctree, Gfx as IOpenGLGfx, false);
 //        }
 
 //        //protected void AddRenderModeSelectionControl()

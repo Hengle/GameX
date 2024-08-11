@@ -1,7 +1,5 @@
 //using OpenStack;
 //using OpenStack.Gfx;
-//using OpenStack.Graphics.OpenGL.Renderer1.Renderers;
-//using OpenStack.Graphics.Renderer1;
 //using System.ComponentModel;
 //using System.Runtime.CompilerServices;
 
@@ -19,13 +17,13 @@
 //        public event PropertyChangedEventHandler PropertyChanged;
 //        void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-//        public static readonly BindableProperty GraphicProperty = BindableProperty.Create(nameof(Graphic), typeof(object), typeof(GLMaterialViewer),
+//        public static readonly BindableProperty GfxProperty = BindableProperty.Create(nameof(Gfx), typeof(object), typeof(GLMaterialViewer),
 //            propertyChanged: (d, e, n) => (d as GLMaterialViewer).OnProperty());
 
-//        public IOpenGraphic Graphic
+//        public IOpenGfx Gfx
 //        {
-//            get => GetValue(GraphicProperty) as IOpenGraphic;
-//            set => SetValue(GraphicProperty, value);
+//            get => GetValue(GfxProperty) as IOpenGfx;
+//            set => SetValue(GfxProperty, value);
 //        }
 
 //        public static readonly BindableProperty SourceProperty = BindableProperty.Create(nameof(Source), typeof(object), typeof(GLMaterialViewer),
@@ -39,14 +37,14 @@
 
 //        void OnProperty()
 //        {
-//            if (Graphic == null || Source == null) return;
-//            var graphic = Graphic as IOpenGLGraphic;
+//            if (Gfx == null || Source == null) return;
+//            var gfx = Gfx as IOpenGLGfx;
 //            var source = Source is IMaterial z ? z
 //                : Source is IRedirected<IMaterial> y ? y.Value
 //                : null;
 //            if (source == null) return;
-//            var material = graphic.MaterialManager.LoadMaterial(source, out var _);
-//            Renderers.Add(new MaterialRenderer(graphic, material));
+//            var material = gfx.MaterialManager.LoadMaterial(source, out var _);
+//            Renderers.Add(new MaterialRenderer(gfx, material));
 //        }
 
 //        readonly HashSet<MaterialRenderer> Renderers = new();

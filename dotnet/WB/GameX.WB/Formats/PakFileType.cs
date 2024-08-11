@@ -110,7 +110,7 @@ namespace GameX.WB.Formats
         /// </summary>
         [PakFileExtension("ins")] Instantiation = 5, // DB_TYPE_INSTANTIATION
 
-        [PakType(PakType.Portal), PakFileExtension("obj"), PakFileIdRange(0x01000000, 0x0100FFFF)] GraphicsObject = 6, // DB_TYPE_GFXOBJ
+        [PakType(PakType.Portal), PakFileExtension("obj"), PakFileIdRange(0x01000000, 0x0100FFFF)] GfxObject = 6, // DB_TYPE_GFXOBJ
 
         [PakType(PakType.Portal), PakFileExtension("set"), PakFileIdRange(0x02000000, 0x0200FFFF)] Setup = 7, // DB_TYPE_SETUP
 

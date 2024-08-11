@@ -188,42 +188,42 @@
         "dir": "Populous 2"
       },
       "S": {
-        "key": "GOG:1207658992",
+        "key": "Gog:1207658992",
         "reg": "GOG.com/Games/1207658992",
         "dir": "Syndicate Plus"
       },
       "MC": {
-        "key": "GOG:1207658935",
+        "key": "Gog:1207658935",
         "reg": "GOG.com/Games/1207658935",
         "dir": "Magic Carpet Plus",
         "path": "CARPET.CD"
       },
       "TP": {
-        "key": "GOG:1207660423",
+        "key": "Gog:1207660423",
         "reg": "GOG.com/Games/1207660423",
         "dir": "Theme Park"
       },
       "MC2": {
-        "key": "GOG:1207659187",
+        "key": "Gog:1207659187",
         "reg": "GOG.com/Games/1207659187",
         "dir": "Magic Carpet 2",
         "path": "GAME/NETHERW"
       },
       "S2": {
-        "key": "GOG:1207659193",
+        "key": "Gog:1207659193",
         "reg": "GOG.com/Games/1207659193",
         "dir": "Syndicate Wars",
         "path": "SWARS"
       },
       "TH": {
-        "key": "GOG:1207659026",
+        "key": "Gog:1207659026",
         "reg": "GOG.com/Games/1207659026",
         "dir": "Theme Hospital"
       },
       "DK": {
         "key": [
           "Steam:1996630",
-          "GOG:1207658934"
+          "Gog:1207658934"
         ],
         "reg": [
           "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 1996630",

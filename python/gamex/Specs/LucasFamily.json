@@ -2492,7 +2492,7 @@
         "path": "ida"
       },
       "A": {
-        "key": "GOG:1425308948",
+        "key": "Gog:1425308948",
         "reg": "GOG.com/Games/1425308948",
         "dir": "Afterlife"
       },
@@ -2675,8 +2675,8 @@
       "SW:KotOR": {
         "key": [
           "Steam:32370",
-          "GOG:1207666283",
-          "GOG:111"
+          "Gog:1207666283",
+          "Gog:111"
         ],
         "reg": [
           "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 32370",
@@ -2748,7 +2748,7 @@
         // https://www.gog.com/en/game/star_wars_the_force_unleashed_ultimate_sith_edition
         "key": [
           "Steam:32430",
-          "GOG:0"
+          "Gog:0"
         ],
         "reg": [
           "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 32430",
@@ -2760,7 +2760,7 @@
         // https://www.gog.com/en/game/tales_of_monkey_island
         "key": [
           "Steam:31170",
-          "GOG:0"
+          "Gog:0"
         ],
         "reg": [
           "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 31170",
@@ -2772,7 +2772,7 @@
         // https://www.gog.com/en/game/the_secret_of_monkey_island_special_edition
         "key": [
           "Steam:32360",
-          "GOG:0"
+          "Gog:0"
         ],
         "reg": [
           "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 32360",

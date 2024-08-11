@@ -182,31 +182,31 @@
   "fileManager": {
     "applications": {
       "SS": {
-        "key": "GOG:1207658669",
+        "key": "Gog:1207658669",
         "reg": "GOG.com/Games/1207658669",
         "dir": "Shattered Steel"
       },
       "BG": {
-        "key": "GOG:1207666353",
+        "key": "Gog:1207666353",
         "reg": "GOG.com/Games/1207666353",
         "dir": "Baldur's Gate - Enhanced Edition"
       },
       "MDK2": {
-        "key": "GOG:1207658645",
+        "key": "Gog:1207658645",
         "reg": "GOG.com/Games/1207658645",
         "dir": "MDK 2",
         "path": "data"
       },
       "BG2": {
-        "key": "GOG:1207666373",
+        "key": "Gog:1207666373",
         "reg": "GOG.com/Games/1207666373",
         "dir": "Baldur's Gate II - Enhanced Edition\"\""
       },
       "NWN": {
         "key": [
           "Steam:704450",
-          "GOG:1097893768",
-          "GOG:1207658890"
+          "Gog:1097893768",
+          "Gog:1207658890"
         ],
         "reg": [
           "BioWare/NWN/Neverwinter",
@@ -220,8 +220,8 @@
       "KotOR": {
         "key": [
           "Steam:32370",
-          "GOG:1207666283",
-          "GOG:111"
+          "Gog:1207666283",
+          "Gog:111"
         ],
         "reg": [
           "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 32370",
@@ -239,7 +239,7 @@
         "see": "Lucas"
       },
       "JE": {
-        "key": "GOG:1207659237",
+        "key": "Gog:1207659237",
         "reg": "GOG.com/Games/1207659237",
         "dir": "Jade Empire"
       },
@@ -249,7 +249,7 @@
         "dir": "Mass Effect"
       },
       "NWN2": {
-        "key": "GOG:1207659162",
+        "key": "Gog:1207659162",
         "reg": [
           "Obsidian/NWN 2/Neverwinter",
           "GOG.com/Games/1207659162"

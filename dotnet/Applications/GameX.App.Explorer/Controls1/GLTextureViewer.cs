@@ -14,7 +14,7 @@ namespace GameX.App.Explorer.Controls1
     {
         const int FACTOR = 1;
         bool Background;
-        IOpenGLGfx GraphicGL;
+        IOpenGLGfx GL;
         ITexture Obj;
         Range Level = 0..;
         readonly HashSet<TextureRenderer> Renderers = [];
@@ -26,13 +26,13 @@ namespace GameX.App.Explorer.Controls1
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Graphic), typeof(object), typeof(GLTextureViewer),
+        public static readonly DependencyProperty GfxProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(GLTextureViewer),
             new PropertyMetadata((d, e) => (d as GLTextureViewer).OnProperty()));
 
-        public IOpenGfx Graphic
+        public IOpenGfx Gfx
         {
-            get => GetValue(GraphicProperty) as IOpenGfx;
-            set => SetValue(GraphicProperty, value);
+            get => GetValue(GfxProperty) as IOpenGfx;
+            set => SetValue(GfxProperty, value);
         }
 
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(GLTextureViewer),
@@ -53,8 +53,8 @@ namespace GameX.App.Explorer.Controls1
 
         void OnProperty()
         {
-            if (Graphic == null || Source == null) return;
-            GraphicGL = Graphic as IOpenGLGfx;
+            if (Gfx == null || Source == null) return;
+            GL = Gfx as IOpenGLGfx;
             Obj = Source is ITexture z ? z
                 : Source is IRedirected<ITexture> y ? y.Value
                 : null;
@@ -64,10 +64,10 @@ namespace GameX.App.Explorer.Controls1
             //Camera.SetLocation(new Vector3(200));
             //Camera.LookAt(new Vector3(0));
 
-            GraphicGL.TextureManager.DeleteTexture(Obj);
-            var (texture, _) = GraphicGL.TextureManager.CreateTexture(Obj, Level);
+            GL.TextureManager.DeleteTexture(Obj);
+            var (texture, _) = GL.TextureManager.CreateTexture(Obj, Level);
             Renderers.Clear();
-            Renderers.Add(new TextureRenderer(GraphicGL, texture, Background));
+            Renderers.Add(new TextureRenderer(GL, texture, Background));
         }
 
         protected override void Render(Camera camera, float frameTime)

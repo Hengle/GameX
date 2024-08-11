@@ -60,7 +60,7 @@ namespace GameX
 
         static FamilyManager()
         {
-            Family.Bootstrap();
+            Family.Touch();
             var loadSamples = true;
             foreach (var id in FamilyKeys)
                 try
@@ -516,16 +516,7 @@ namespace GameX
         /// </value>
         public FileManager FileManager { get; set; }
 
-        static unsafe Family()
-        {
-            if (Platform.InTestHost && Platform.Startups.Count == 0) Platform.Startups.Add(TestPlatform.Startup);
-            foreach (var startup in Platform.Startups) if (startup()) return;
-            Platform.PlatformType = Platform.Type.Unknown;
-            Platform.GfxFactory = source => null; // throw new Exception("No GraphicFactory");
-            Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
-            Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
-            Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);
-        }
+        static unsafe Family() => Platform.Startup();
 
         /// <summary>
         /// Family
@@ -567,7 +558,7 @@ namespace GameX
         /// <summary>
         /// Touches this instance.
         /// </summary>
-        public static void Bootstrap() { }
+        public static void Touch() { }
 
         /// <summary>
         /// Converts to string.
@@ -1236,13 +1227,15 @@ namespace GameX
         #region Pak
 
         /// <summary>
-        /// Adds the platform graphic.
+        /// Adds the platform.
         /// </summary>
         /// <param name="pakFile">The pak file.</param>
         /// <returns></returns>
-        static PakFile WithPlatformGraphic(PakFile pakFile)
+        static PakFile WithPlatform(PakFile pakFile)
         {
-            if (pakFile != null) pakFile.Gfx = Platform.GfxFactory?.Invoke(pakFile);
+            if (pakFile == null) { return null; }
+            pakFile.Gfx = Platform.GfxFactory?.Invoke(pakFile);
+            pakFile.Sfx = Platform.SfxFactory?.Invoke(pakFile);
             return pakFile;
         }
 
@@ -1297,7 +1290,7 @@ namespace GameX
                                 : p));
                             break;
                     }
-            return WithPlatformGraphic(CreatePakFileObj(fileSystem, edition, pakFiles));
+            return WithPlatform(CreatePakFileObj(fileSystem, edition, pakFiles));
         }
 
         /// <summary>

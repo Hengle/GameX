@@ -3,9 +3,9 @@ from typing import Callable
 from enum import Enum, Flag
 from io import BytesIO
 from openstk.poly import Reader
-from .filesrc import FileSource
-from .meta import MetaManager, MetaItem
-from .util import _throw
+from gamex.filesrc import FileSource
+from gamex.meta import MetaManager, MetaItem
+from gamex.util import _throw
 
 # typedef
 class FamilyGame: pass
@@ -55,7 +55,7 @@ class PakFile:
         self.pakPath = state.path
         self.name = z if not state.path or (z := os.path.basename(state.path)) else os.path.basename(os.path.dirname(state.path))
         self.tag = state.tag
-        self.graphic = None
+        self.gfx = None
     def __enter__(self): return self
     def __exit__(self, type, value, traceback): self.close()
     def __repr__(self): return f'{self.name}#{self.game.id}'

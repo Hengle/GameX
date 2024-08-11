@@ -1,24 +1,25 @@
 using GameX.Scenes;
+using GameX.Valve.Formats;
 using GameX.Valve.Formats.Blocks;
-using GameX.Valve.Graphics.OpenGL.Scenes;
+using GameX.Valve.OpenGL.Scenes;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace GameX.Valve.Formats.OpenGL
+namespace GameX.Valve.OpenGL.Formats
 {
     //was:Renderer/WorldLoader
     public class WorldNodeLoader
     {
         readonly DATAWorldNode Node;
-        readonly IOpenGLGfx Graphic;
+        readonly IOpenGLGfx Gfx;
 
-        public WorldNodeLoader(IOpenGLGfx graphic, DATAWorldNode node)
+        public WorldNodeLoader(IOpenGLGfx gfx, DATAWorldNode node)
         {
             Node = node;
-            Graphic = graphic;
+            Gfx = gfx;
         }
 
         public void Load(Scene scene)
@@ -44,7 +45,7 @@ namespace GameX.Valve.Formats.OpenGL
 
                 if (renderableModel != null)
                 {
-                    var newResource = Graphic.LoadFileObject<Binary_Pak>($"{renderableModel}_c").Result;
+                    var newResource = Gfx.LoadFileObject<Binary_Pak>($"{renderableModel}_c").Result;
                     if (newResource == null) continue;
                     var modelNode = new ModelSceneNode(scene, (IValveModel)newResource.DATA, null, false)
                     {
@@ -59,7 +60,7 @@ namespace GameX.Valve.Formats.OpenGL
                 var renderable = sceneObject.Get<string>("m_renderable");
                 if (renderable != null)
                 {
-                    var newResource = Graphic.LoadFileObject<Binary_Pak>($"{renderable}_c").Result;
+                    var newResource = Gfx.LoadFileObject<Binary_Pak>($"{renderable}_c").Result;
                     if (newResource == null) continue;
                     var meshNode = new MeshSceneNode(scene, new DATAMesh(newResource), 0)
                     {
@@ -80,7 +81,7 @@ namespace GameX.Valve.Formats.OpenGL
                 var renderableModel = sceneObject.Get<string>("m_renderableModel");
                 if (renderableModel != null)
                 {
-                    var newResource = Graphic.LoadFileObject<Binary_Pak>($"{renderableModel}_c").Result;
+                    var newResource = Gfx.LoadFileObject<Binary_Pak>($"{renderableModel}_c").Result;
                     if (newResource == null) continue;
 
                     var layerIndex = sceneObject.Get<int>("m_nLayer");

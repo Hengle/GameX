@@ -13,7 +13,7 @@ namespace GameX.WB.Formats.FileTypes
     /// These are client_portal.dat files starting with 0x01. 
     /// These are used both on their own for some pre-populated structures in the world (trees, buildings, etc) or make up SetupModel (0x02) objects.
     /// </summary>
-    [PakFileType(PakFileType.GraphicsObject)]
+    [PakFileType(PakFileType.GfxObject)]
     public class GfxObj : FileType, IHaveMetaInfo
     {
         public readonly GfxObjFlags Flags;

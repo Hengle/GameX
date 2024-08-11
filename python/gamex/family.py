@@ -386,10 +386,12 @@ class FamilyGame:
         idx = random.randrange(len(samples)) if id == '*' else int(id)
         return samples[idx] if len(samples) > idx else None
 
-    # with platform graphic
+    # with platform
     @staticmethod
-    def withPlatformGraphic(pakFile: PakFile) -> PakFile:
-        if pakFile and Platform.graphicFactory: pakFile.graphic = Platform.graphicFactory(pakFile)
+    def withPlatform(pakFile: PakFile) -> PakFile:
+        if not pakFile: return None
+        if Platform.gfxFactory: pakFile.gfx = Platform.gfxFactory(pakFile)
+        if Platform.sfxFactory: pakFile.sfx = Platform.sfxFactory(pakFile)
         return pakFile
 
     # create SearchPatterns
@@ -420,7 +422,7 @@ class FamilyGame:
                 else:
                     pakFiles.append(self.createPakFileObj(fileSystem, edition,
                         (p[0], [x for x in p[1] if x.find(slash) >= 0]) if self.searchBy == 'DirDown' else p))
-        return FamilyGame.withPlatformGraphic(self.createPakFileObj(fileSystem, edition, pakFiles))
+        return FamilyGame.withPlatform(self.createPakFileObj(fileSystem, edition, pakFiles))
 
     # create createPakFileObj
     def createPakFileObj(self, fileSystem: IFileSystem, edition: Edition, value: object, tag: object = None) -> PakFile:

@@ -55,7 +55,7 @@ namespace GameX.WB.Formats.FileTypes
             Flags = (SetupFlags)r.ReadUInt32();
             AllowFreeHeading = (Flags & SetupFlags.AllowFreeHeading) != 0;
             HasPhysicsBSP = (Flags & SetupFlags.HasPhysicsBSP) != 0;
-            // Get all the GraphicsObjects in this SetupModel. These are all the 01-types.
+            // Get all the GfxObjects in this SetupModel. These are all the 01-types.
             var numParts = r.ReadUInt32();
             Parts = r.ReadTArray<uint>(sizeof(uint), (int)numParts);
             if ((Flags & SetupFlags.HasParent) != 0) ParentIndex = r.ReadTArray<uint>(sizeof(uint), (int)numParts);

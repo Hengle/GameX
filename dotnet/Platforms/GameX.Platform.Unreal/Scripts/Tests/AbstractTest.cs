@@ -11,7 +11,7 @@ namespace GameSpecUnreal.Tests
         protected readonly UnrealTest Test;
         protected readonly Family Family;
         protected readonly List<PakFile> PakFiles = new List<PakFile>();
-        protected readonly IUnrealGfx Graphic;
+        protected readonly IUnrealGfx Gfx;
 
         public AbstractTest(UnrealTest test)
         {
@@ -22,7 +22,7 @@ namespace GameSpecUnreal.Tests
             if (!string.IsNullOrEmpty(test.Pak2Uri)) PakFiles.Add(Family.OpenPakFile(new Uri(test.Pak2Uri)));
             if (!string.IsNullOrEmpty(test.Pak3Uri)) PakFiles.Add(Family.OpenPakFile(new Uri(test.Pak3Uri)));
             var first = PakFiles.FirstOrDefault();
-            Graphic = (IUnrealGfx)first?.Gfx;
+            Gfx = (IUnrealGfx)first?.Gfx;
         }
 
         public virtual void Dispose()

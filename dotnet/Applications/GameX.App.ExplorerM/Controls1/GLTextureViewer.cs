@@ -1,7 +1,5 @@
 //using OpenStack;
 //using OpenStack.Gfx;
-//using OpenStack.Graphics.OpenGL.Renderer1.Renderers;
-//using OpenStack.Graphics.Renderer1;
 //using System.ComponentModel;
 //using System.Numerics;
 //using System.Runtime.CompilerServices;
@@ -20,13 +18,13 @@
 //        public event PropertyChangedEventHandler PropertyChanged;
 //        void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-//        public static readonly BindableProperty GraphicProperty = BindableProperty.Create(nameof(Graphic), typeof(object), typeof(GLTextureViewer),
+//        public static readonly BindableProperty GfxProperty = BindableProperty.Create(nameof(Gfx), typeof(object), typeof(GLTextureViewer),
 //            propertyChanged: (d, e, n) => (d as GLTextureViewer).OnProperty());
         
-//        public IOpenGraphic Graphic
+//        public IOpenGfx Gfx
 //        {
-//            get => GetValue(GraphicProperty) as IOpenGraphic;
-//            set => SetValue(GraphicProperty, value);
+//            get => GetValue(GfxProperty) as IOpenGfx;
+//            set => SetValue(GfxProperty, value);
 //        }
 
 //        public static readonly BindableProperty SourceProperty = BindableProperty.Create(nameof(Source), typeof(object), typeof(GLTextureViewer),
@@ -40,8 +38,8 @@
 
 //        void OnProperty()
 //        {
-//            if (Graphic == null || Source == null) return;
-//            var graphic = Graphic as IOpenGLGraphic;
+//            if (Gfx == null || Source == null) return;
+//            var gfx = Gfx as IOpenGLGfx;
 //            var source = Source is ITexture z ? z
 //                : Source is IRedirected<ITexture> y ? y.Value
 //                : null;
@@ -53,8 +51,8 @@
 //            Camera.SetLocation(new Vector3(200));
 //            Camera.LookAt(new Vector3(0));
 
-//            var texture = graphic.TextureManager.LoadTexture(source, out _);
-//            Renderers.Add(new TextureRenderer(graphic, texture));
+//            var texture = gfx.TextureManager.LoadTexture(source, out _);
+//            Renderers.Add(new TextureRenderer(gfx, texture));
 //        }
 
 //        readonly HashSet<TextureRenderer> Renderers = new();

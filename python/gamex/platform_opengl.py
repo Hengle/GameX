@@ -7,8 +7,8 @@ from openstk.gfx.gl_shader import ShaderDebugLoader
 from openstk.gfx.gl_render import GLRenderMaterial
 from openstk.gfx.gfx_texture import TextureGLFormat, TextureFlags
 from openstk.poly import IDisposable
-from .platform_system import SystemAudioBuilder
-from .platform import AudioBuilderBase, AudioManager, ObjectBuilderBase, ObjectManager, MaterialBuilderBase, MaterialManager, ShaderBuilderBase, ShaderManager, TextureManager, TextureBuilderBase, Platform
+from gamex.platform_system import SystemSfx
+from gamex.platform import ObjectBuilderBase, ObjectManager, MaterialBuilderBase, MaterialManager, ShaderBuilderBase, ShaderManager, TextureManager, TextureBuilderBase, Platform
 
 # typedefs
 class PakFile: pass
@@ -184,10 +184,9 @@ class OpenGLMaterialBuilder(MaterialBuilderBase):
                     case _: raise Exception(f'Unknown: {s}')
             case _: raise Exception(f'Unknown: {key}')
 
-# OpenGLGraphic
-class OpenGLGraphic(IOpenGLGfx):
+# OpenGLGfx
+class OpenGLGfx(IOpenGLGfx):
     source: PakFile
-    audioManager: AudioManager
     textureManager: TextureManager
     materialManager: MaterialManager
     objectManager: ObjectManager
@@ -195,7 +194,6 @@ class OpenGLGraphic(IOpenGLGfx):
 
     def __init__(self, source: PakFile):
         self.source = source
-        self.audioManager = AudioManager(source, SystemAudioBuilder())
         self.textureManager = TextureManager(source, OpenGLTextureBuilder())
         self.materialManager = MaterialManager(source, self.textureManager, OpenGLMaterialBuilder(self.textureManager))
         self.objectManager = ObjectManager(source, self.materialManager, OpenGLObjectBuilder())
@@ -219,7 +217,8 @@ class OpenGLGraphic(IOpenGLGfx):
 class OpenGLPlatform:
     def startup() -> bool:
         Platform.platformType = Platform.Type.OpenGL
-        Platform.graphicFactory = lambda source: OpenGLGraphic(source)
+        Platform.gfxFactory = lambda source: OpenGLGfx(source)
+        Platform.sfxFactory = lambda source: SystemSfx(source)
         Platform.logFunc = lambda a: print(a)
         return True
 

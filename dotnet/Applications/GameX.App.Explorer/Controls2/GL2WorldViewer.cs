@@ -13,12 +13,12 @@ namespace GameX.App.Explorer.Controls2
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Graphic), typeof(object), typeof(GL2ParticleViewer),
+        public static readonly DependencyProperty GfxProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(GL2ParticleViewer),
             new PropertyMetadata((d, e) => (d as GL2WorldViewer).OnProperty()));
-        public IOpenGfx Graphic
+        public IOpenGfx Gfx
         {
-            get => GetValue(GraphicProperty) as IOpenGfx;
-            set => SetValue(GraphicProperty, value);
+            get => GetValue(GfxProperty) as IOpenGfx;
+            set => SetValue(GfxProperty, value);
         }
 
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(GL2ParticleViewer),
@@ -31,8 +31,8 @@ namespace GameX.App.Explorer.Controls2
 
         void OnProperty()
         {
-            if (Graphic == null || Source == null) return;
-            var graphic = Graphic as IOpenGLGfx;
+            if (Gfx == null || Source == null) return;
+            var gfx = Gfx as IOpenGLGfx;
             var source = Source is object z ? z
                 : Source is IRedirected<object> y ? y.Value
                 : null;

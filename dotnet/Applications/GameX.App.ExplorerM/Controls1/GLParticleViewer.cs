@@ -1,7 +1,5 @@
 //using OpenStack;
 //using OpenStack.Gfx;
-//using OpenStack.Graphics.OpenGL.Renderer1.Renderers;
-//using OpenStack.Graphics.Renderer1;
 //using System.ComponentModel;
 //using System.Numerics;
 //using System.Runtime.CompilerServices;
@@ -22,13 +20,13 @@
 //        public event PropertyChangedEventHandler PropertyChanged;
 //        void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-//        public static readonly BindableProperty GraphicProperty = BindableProperty.Create(nameof(Graphic), typeof(object), typeof(GLParticleViewer),
+//        public static readonly BindableProperty GfxProperty = BindableProperty.Create(nameof(Gfx), typeof(object), typeof(GLParticleViewer),
 //            propertyChanged: (d, e, n) => (d as GLParticleViewer).OnProperty());
 
-//        public IOpenGraphic Graphic
+//        public IOpenGfx Gfx
 //        {
-//            get => GetValue(GraphicProperty) as IOpenGraphic;
-//            set => SetValue(GraphicProperty, value);
+//            get => GetValue(GfxProperty) as IOpenGfx;
+//            set => SetValue(GfxProperty, value);
 //        }
 
 //        public static readonly BindableProperty SourceProperty = BindableProperty.Creat(nameof(Source), typeof(object), typeof(GLParticleViewer),
@@ -44,19 +42,19 @@
 
 //        void OnProperty()
 //        {
-//            if (Graphic == null || Source == null) return;
-//            var graphic = Graphic as IOpenGLGraphic;
+//            if (Gfx == null || Source == null) return;
+//            var gfx = Gfx as IOpenGLGfx;
 //            var source = Source is IParticleSystem z ? z
 //                : Source is IRedirected<IParticleSystem> y ? y.Value
 //                : null;
 //            if (source == null) return;
 
-//            particleGrid = new ParticleGridRenderer(20, 5, graphic);
+//            particleGrid = new ParticleGridRenderer(20, 5, gfx);
 //            Camera.SetViewportSize((int)ActualWidth, (int)ActualHeight);
 //            Camera.SetLocation(new Vector3(200));
 //            Camera.LookAt(new Vector3(0));
 
-//            Renderers.Add(new ParticleRenderer(graphic, source));
+//            Renderers.Add(new ParticleRenderer(gfx, source));
 //        }
 
 //        void OnPaint(object sender, RenderEventArgs e)

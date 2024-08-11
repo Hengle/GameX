@@ -262,25 +262,6 @@ namespace GameX.Platforms
     }
 
     /// <summary>
-    /// OpenGLSfx
-    /// </summary>
-    public class OpenGLSfx : ISystemSfx
-    {
-        readonly PakFile _source;
-        readonly AudioManager<object> _audioManager;
-
-        public OpenGLSfx(PakFile source)
-        {
-            _source = source;
-            _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
-        }
-
-        public PakFile Source => _source;
-        public IAudioManager<object> AudioManager => _audioManager;
-        public object CreateAudio(object path) => _audioManager.CreateAudio(path).aud;
-    }
-
-    /// <summary>
     /// OpenGLPlatform
     /// </summary>
     public static class OpenGLPlatform
@@ -291,7 +272,7 @@ namespace GameX.Platforms
             {
                 Platform.PlatformType = Platform.Type.OpenGL;
                 Platform.GfxFactory = source => new OpenGLGfx(source);
-                Platform.SfxFactory = source => new OpenGLSfx(source);
+                Platform.SfxFactory = source => new SystemSfx(source);
                 Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
                 Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
                 Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);
