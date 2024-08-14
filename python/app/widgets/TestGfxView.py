@@ -68,7 +68,7 @@ class TestGfxView(OpenGLView):
         self.source: ITexture = tab.value
         
     def initializeGL(self):
-        # super().initializeGL()
+        super().initializeGL()
         # self.onProperty()
 
         self.shader = compileProgram(compileShader(vertex_src, GL_VERTEX_SHADER), compileShader(fragment_src, GL_FRAGMENT_SHADER))
@@ -80,11 +80,11 @@ class TestGfxView(OpenGLView):
                  0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
                  0.0,  0.5, 0.0, 0.0, 0.0, 1.0), dtype=np.float32)
 
-        self.vbo = glGenBuffers(1)
-        self.vao = glGenVertexArrays(1)
+        self.vao = glGenVertexArrays(1); 
         glBindVertexArray(self.vao)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vao)
 
+        self.vbo = glGenBuffers(1); 
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferData(GL_ARRAY_BUFFER, self.vertices.nbytes, self.vertices, GL_STATIC_DRAW)
 
         glEnableVertexAttribArray(0)
@@ -100,10 +100,10 @@ class TestGfxView(OpenGLView):
         glDrawArrays(GL_TRIANGLES, 0, 6)
         glUseProgram(0)
 
-    # def setViewportSize(self, x: int, y: int, width: int, height: int) -> None:
-    #     if not self.obj: return
-    #     if self.obj.width > 1024 or self.obj.height > 1024 or False: super().setViewportSize(x, y, width, height)
-    #     else: super().setViewportSize(x, y, self.obj.width << FACTOR, self.obj.height << FACTOR)
+    def setViewportSize(self, x: int, y: int, width: int, height: int) -> None:
+        if not self.obj: return
+        if self.obj.width > 1024 or self.obj.height > 1024 or False: super().setViewportSize(x, y, width, height)
+        else: super().setViewportSize(x, y, self.obj.width << FACTOR, self.obj.height << FACTOR)
 
     def onProperty(self):
         if not self.gfx or not self.source: return

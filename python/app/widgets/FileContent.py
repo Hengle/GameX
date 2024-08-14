@@ -53,8 +53,9 @@ class FileContent(QTabWidget):
         for tab in self.contentTabs:
             control = TextView(self, tab) if tab.type == 'Text' else \
                 HexView(self, tab) if tab.type == 'Hex' else \
-                TestGfxView(self, tab) if tab.type == 'Texture' else \
-                TextureView(self, tab) if tab.type == 'Texture2' else \
+                TestGfxView(self, tab) if tab.type == 'Texturex' else \
+                TestTriView(self, tab) if tab.type == 'Texture' else \
+                TextureView(self, tab) if tab.type == 'Texturex' else \
                 NullView(self, tab)
             self.contentTab.addTab(control, tab.name)
 

@@ -50,12 +50,12 @@ class GLWindow(QOpenGLWindow):
                 -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
                  0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
                  0.0,  0.5, 0.0, 0.0, 0.0, 1.0), dtype=np.float32)
-
-        self.vbo = glGenBuffers(1)
+        
         self.vao = glGenVertexArrays(1)
         glBindVertexArray(self.vao)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vao)
 
+        self.vbo = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferData(GL_ARRAY_BUFFER, self.vertices.nbytes, self.vertices, GL_STATIC_DRAW)
 
         glEnableVertexAttribArray(0)
