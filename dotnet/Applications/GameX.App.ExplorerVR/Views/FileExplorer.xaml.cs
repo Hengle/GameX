@@ -1,5 +1,6 @@
 ﻿using GameX.Formats;
 using GameX.Meta;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Maui.Controls;
 using System;
 using System.Collections.Generic;
@@ -9,13 +10,13 @@ namespace GameX.App.Explorer.Views
 {
     public partial class FileExplorer : ContentView
     {
-        public static MetaManager Resource = new ResourceManager();
-        public static FileExplorer Instance;
+        public readonly static MetaManager Resource = ResourceManager.Current;
+        public static FileExplorer Current;
 
         public FileExplorer()
         {
             InitializeComponent();
-            Instance = this;
+            Current = this;
             BindingContext = this;
         }
 
@@ -25,7 +26,7 @@ namespace GameX.App.Explorer.Views
                 if (d is not FileExplorer fileExplorer || n is not PakFile pakFile) return;
                 fileExplorer.Filters = pakFile.GetMetadataFilters(Resource);
                 fileExplorer.Nodes = fileExplorer.PakNodes = pakFile.GetMetaItems(Resource);
-                fileExplorer.OnReady(pakFile);
+                fileExplorer.Ready(pakFile);
             });
         public PakFile PakFile
         {
@@ -76,13 +77,6 @@ namespace GameX.App.Explorer.Views
             set { _infos = value; OnPropertyChanged(); }
         }
 
-        void OnNodeSelected(object s, EventArgs args)
-        {
-            var parameter = ((TappedEventArgs)args).Parameter;
-            if (parameter is MetaItem item && item.PakFile != null) SelectedItem = item;
-            //e.Handled = true;
-        }
-
         MetaItem _selectedItem;
         public MetaItem SelectedItem
         {
@@ -106,25 +100,36 @@ namespace GameX.App.Explorer.Views
                 }
                 catch (Exception ex)
                 {
-                    OnInfo(new[] {
+                    OnInfo([
                         new MetaInfo($"EXCEPTION: {ex.Message}"),
                         new MetaInfo(ex.StackTrace),
-                    });
+                    ]);
                 }
             }
         }
 
+        public void OnInfoUpdated()
+        {
+        }
+
         public void OnInfo(IEnumerable<MetaInfo> infos = null)
         {
-            FileContent.Instance.OnInfo(PakFile, infos?.Where(x => x.Name == null).ToList());
+            FileContent.Current.OnInfo(PakFile, infos?.Where(x => x.Name == null).ToList());
             Infos = infos?.Where(x => x.Name != null).ToList();
         }
 
-        void OnReady(PakFile pakFile)
+        void OnNodeSelected(object s, EventArgs args)
         {
-            if (string.IsNullOrEmpty(Config.ForcePath) || Config.ForcePath.StartsWith("app:")) return;
-            var sample = Config.ForcePath.StartsWith("sample:") ? pakFile.Game.GetSample(Config.ForcePath[7..]) : null;
-            var forcePath = sample != null ? sample.Path : Config.ForcePath;
+            var parameter = ((TappedEventArgs)args).Parameter;
+            if (parameter is MetaItem item && item.PakFile != null) SelectedItem = item;
+            //e.Handled = true;
+        }
+
+        void Ready(PakFile pakFile)
+        {
+            if (string.IsNullOrEmpty(Option.ForcePath) || Option.ForcePath.StartsWith("app:")) return;
+            var sample = Option.ForcePath.StartsWith("sample:") ? pakFile.Game.GetSample(Option.ForcePath[7..]) : null;
+            var forcePath = sample != null ? sample.Path : Option.ForcePath;
             if (forcePath == null) return;
             SelectedItem = MetaItem.FindByPathForNodes(PakNodes, forcePath, Resource);
         }

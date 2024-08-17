@@ -57,50 +57,49 @@ namespace GameX.App.Cli
 
         #endregion
 
-        static string[] test00 = new[] { "test" };
-
-        static string[] args00 = new[] { "list" };
-        static string[] args01 = new[] { "list", "-f", "Red" };
-        static string[] args02 = new[] { "list", "-f", "Tes", "-u", "game:/Oblivion*.bsa#Oblivion" };
-        static string[] args03 = new[] { "list", "-f", "Tes", "-u", "file:///D:/T_/Oblivion/Oblivion*.bsa#Oblivion" };
-
-        static string[] dev00 = new[] { "list", "-f", "Unity", "-u", "game:/resources.assets#Cities" };
-
-
-        static string[] dev0zb = new[] { "list", "-f", "Unity", "-u", @"file:///C:/T_/Unity/Assets/myscene.unity#AmongUs" };
-
-        static string[] dev01a = new[] { "list", "-f", "Unity", "-u", @"game:/StreamingAssets\aa\Steam\StandaloneWindows\6fcbc56bf87ce16ef93cf7950ec3d7c9_unitybuiltinshaders_e998f854a714e8c70679af5d74e29f20.bundle#AmongUs" };
-        static string[] dev01aa = new[] { "list", "-f", "Unity", "-u", @"game:/StreamingAssets\aa\Steam\StandaloneWindows\initialmaps_assets_all.bundle#AmongUs" };
-        static string[] dev01b = new[] { "list", "-f", "Unity", "-u", @"game:/resources.assets#AmongUs" }; // asset.v22
-        static string[] dev01c = new[] { "list", "-f", "Unity", "-u", @"game:/sharedassets2.assets#AmongUs" }; // asset.v22
-        static string[] dev01d = new[] { "list", "-f", "Unity", "-u", @"game:/globalgamemanagers.assets#AmongUs" }; // asset.v22
-
-        static string[] dev02a = new[] { "list", "-f", "Unity", "-u", @"game:/resources.assets#Cities" }; // asset.v17
-        static string[] dev02b = new[] { "list", "-f", "Unity", "-u", @"game:/resources.assets#Cities" }; // asset.v17
-        static string[] dev02c = new[] { "list", "-f", "Unity", "-u", @"game:/globalgamemanagers.assets#Cities" }; // asset.v17
-
-        static string[] dev03b = new[] { "list", "-f", "Unity", "-u", @"game:/resources.assets#Tabletop" }; // asset.v21
-        static string[] dev03c = new[] { "list", "-f", "Unity", "-u", @"game:/globalgamemanagers.assets#Tabletop" }; // asset.v21
-
-        static string[] dev04a = new[] { "list", "-f", "Lith", "-u", @"game:/FEAR_1.Arch00#FEAR" };
-
-        static string[] argsRsi1 = new[] { "export", "-f", "Rsi", "-u", "game:/Data.p4k#StarCitizen", "--path", @"D:\T_\StarCitizen" };
-
-        static string[] argsTes1 = new[] { "export", "-f", "Tes", "-u", "game:/Oblivion*.bsa#Oblivion", "--path", @"D:\T_\Oblivion" };
-        static string[] argsTes2 = new[] { "import", "-f", "Tes", "-u", "game:/Oblivion*.bsa#Oblivion", "--path", @"D:\T_\Oblivion" };
-        //
-        static string[] argsRed1 = new[] { "export", "-f", "Red", "-u", "game:/main.key#Witcher", "--path", @"D:\T_\Witcher" };
-        static string[] argsRed2 = new[] { "export", "-f", "Red", "-u", "game:/krbr.dzip#Witcher2", "--path", @"D:\T_\Witcher2" };
-
-        static string[] argsArkane1 = new[] { "list", "-f", "Arkane" };
-        static string[] argsArkane2 = new[] { "export", "-f", "Arkane", "-u", "game:/*.pak#AF", "--path", @"C:\T_\AF" };
-        static string[] argsBlizzard1 = new[] { "list", "-f", "Blizzard" };
-        static string[] argsBioware1 = new[] { "list", "-f", "Bioware" };
-        static string[] argsValve1 = new[] { "list", "-f", "Valve" };
-        static string[] argsValve2 = new[] { "list", "-f", "Valve", "-u", "game:/*_dir.vpk#L4D" };
-        static string[] argsValve3 = new[] { "export", "-f", "Valve", "-u", "game:/*_dir.vpk#L4D", "--path", @"~/T_/L4D" };
-        static string[] argsValveNull = new[] { "export", "-f", "Valve", "-u", "game:/*_dir.vpk#L4D", "--path", "null" };
-        static string[] argsIW1 = new[] { "list", "-f", "IW" };
+        static readonly string[] test00 = ["test"];
+                
+        static readonly string[] args00 = ["list"];
+        static readonly string[] args01 = ["list", "-f", "Red"];
+        static readonly string[] args02 = ["list", "-f", "Tes", "-u", "game:/Oblivion*.bsa#Oblivion"];
+        static readonly string[] args03 = ["list", "-f", "Tes", "-u", "file:///D:/T_/Oblivion/Oblivion*.bsa#Oblivion"];
+                
+        static readonly string[] dev00 = ["list", "-f", "Unity", "-u", "game:/resources.assets#Cities"];
+                
+        static readonly string[] dev0zb = ["list", "-f", "Unity", "-u", @"file:///C:/T_/Unity/Assets/myscene.unity#AmongUs"];
+                
+        static readonly string[] dev01a = ["list", "-f", "Unity", "-u", @"game:/StreamingAssets\aa\Steam\StandaloneWindows\6fcbc56bf87ce16ef93cf7950ec3d7c9_unitybuiltinshaders_e998f854a714e8c70679af5d74e29f20.bundle#AmongUs"];
+        static readonly string[] dev01aa = ["list", "-f", "Unity", "-u", @"game:/StreamingAssets\aa\Steam\StandaloneWindows\initialmaps_assets_all.bundle#AmongUs"];
+        static readonly string[] dev01b = ["list", "-f", "Unity", "-u", @"game:/resources.assets#AmongUs"]; // asset.v22
+        static readonly string[] dev01c = ["list", "-f", "Unity", "-u", @"game:/sharedassets2.assets#AmongUs"]; // asset.v22
+        static readonly string[] dev01d = ["list", "-f", "Unity", "-u", @"game:/globalgamemanagers.assets#AmongUs"]; // asset.v22
+                
+        static readonly string[] dev02a = ["list", "-f", "Unity", "-u", @"game:/resources.assets#Cities"]; // asset.v17
+        static readonly string[] dev02b = ["list", "-f", "Unity", "-u", @"game:/resources.assets#Cities"]; // asset.v17
+        static readonly string[] dev02c = ["list", "-f", "Unity", "-u", @"game:/globalgamemanagers.assets#Cities"]; // asset.v17
+                
+        static readonly string[] dev03b = ["list", "-f", "Unity", "-u", @"game:/resources.assets#Tabletop"]; // asset.v21
+        static readonly string[] dev03c = ["list", "-f", "Unity", "-u", @"game:/globalgamemanagers.assets#Tabletop"]; // asset.v21
+                
+        static readonly string[] dev04a = ["list", "-f", "Lith", "-u", @"game:/FEAR_1.Arch00#FEAR"];
+                
+        static readonly string[] argsRsi1 = ["export", "-f", "Rsi", "-u", "game:/Data.p4k#StarCitizen", "--path", @"D:\T_\StarCitizen"];
+                
+        static readonly string[] argsTes1 = ["export", "-f", "Tes", "-u", "game:/Oblivion*.bsa#Oblivion", "--path", @"D:\T_\Oblivion"];
+        static readonly string[] argsTes2 = ["import", "-f", "Tes", "-u", "game:/Oblivion*.bsa#Oblivion", "--path", @"D:\T_\Oblivion"];
+         
+        static readonly string[] argsRed1 = ["export", "-f", "Red", "-u", "game:/main.key#Witcher", "--path", @"D:\T_\Witcher"];
+        static readonly string[] argsRed2 = ["export", "-f", "Red", "-u", "game:/krbr.dzip#Witcher2", "--path", @"D:\T_\Witcher2"];
+                
+        static readonly string[] argsArkane1 = ["list", "-f", "Arkane"];
+        static readonly string[] argsArkane2 = ["export", "-f", "Arkane", "-u", "game:/*.pak#AF", "--path", @"C:\T_\AF"];
+        static readonly string[] argsBlizzard1 = ["list", "-f", "Blizzard"];
+        static readonly string[] argsBioware1 = ["list", "-f", "Bioware"];
+        static readonly string[] argsValve1 = ["list", "-f", "Valve"];
+        static readonly string[] argsValve2 = ["list", "-f", "Valve", "-u", "game:/*_dir.vpk#L4D"];
+        static readonly string[] argsValve3 = ["export", "-f", "Valve", "-u", "game:/*_dir.vpk#L4D", "--path", @"~/T_/L4D"];
+        static readonly string[] argsValveNull = ["export", "-f", "Valve", "-u", "game:/*_dir.vpk#L4D", "--path", "null"];
+        static readonly string[] argsIW1 = ["list", "-f", "IW"];
 
         static void Register()
         {

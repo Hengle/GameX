@@ -11,7 +11,7 @@ namespace GameX.App.Explorer.Views
             Loaded += OnLoaded;
         }
 
-        public IList<Family> Families { get; } = FamilyManager.Families.Values.ToList();
+        public IList<Family> Families { get; } = [.. FamilyManager.Families.Values];
 
         internal Family FamilySelectedItem => (Family)Family.SelectedItem;
 

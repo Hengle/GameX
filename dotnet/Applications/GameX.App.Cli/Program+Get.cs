@@ -24,7 +24,7 @@ namespace GameX.App.Cli
 
         static async Task<int> RunGetAsync(GetOptions args)
         {
-            var from = ProgramState.Load(data => Convert.ToInt32(data), 0);
+            var from = ProgramState.Load(Convert.ToInt32, 0);
 
             // get family
             var family = FamilyManager.GetFamily(args.Family);

@@ -2,6 +2,17 @@
 
 namespace GameX.App.Explorer
 {
+//    public class ReadWriteStoragePerms : BasePlatformPermission
+//    {
+//#if __ANDROID__
+//        public override (string androidPermission, bool isRuntime)[] RequiredPermissions => new List<(string androidPermission, bool isRuntime)>
+//        {
+//            (global::Android.Manifest.Permission.ReadExternalStorage, true),
+//            (global::Android.Manifest.Permission.WriteExternalStorage, true)
+//        }.ToArray();
+//#endif
+//    }
+
     public partial class App
     {
         static bool HasPermissions()

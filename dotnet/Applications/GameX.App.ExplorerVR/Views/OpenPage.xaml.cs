@@ -1,4 +1,5 @@
 ﻿using GameX.App.Explorer.Controls;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using System;
@@ -13,9 +14,10 @@ namespace GameX.App.Explorer.Views
         {
             InitializeComponent();
             BindingContext = this;
+            Loaded += OnLoaded;
         }
 
-        public IList<Family> Families { get; } = FamilyManager.Families.Values.ToList();
+        public IList<Family> Families { get; } = [.. FamilyManager.Families.Values];
 
         internal Family FamilySelectedItem => (Family)Family.SelectedItem;
 
@@ -135,24 +137,22 @@ namespace GameX.App.Explorer.Views
             }
         }
 
-        async void Cancel_Click(object sender, EventArgs e) => await Navigation.PushAsync(new MainPage());
+        async void Cancel_Click(object sender, EventArgs e) => await Shell.Current.GoToAsync("//home");
 
         async void Open_Click(object sender, EventArgs e)
         {
-            var mainPage = new MainPage();
-            mainPage.Open(FamilySelectedItem, PakUris);
-            //App.Instance.MainPage = mainPage;
-            await Navigation.PushAsync(mainPage);
+            MainPage.Current.Open(FamilySelectedItem, PakUris);
+            await Shell.Current.GoToAsync("//home");
         }
 
-        internal void OnReady()
+        void OnLoaded(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(Config.DefaultFamily)) return;
-            Family.SelectedIndex = FamilyManager.Families.Keys.ToList().IndexOf(Config.DefaultFamily);
-            if (string.IsNullOrEmpty(Config.DefaultGame)) return;
-            Game.SelectedIndex = ((List<FamilyGame>)Games).FindIndex(x => x.Id == Config.DefaultGame);
-            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == (Config.DefaultEdition ?? string.Empty));
-            if (Config.ForceOpen) Open_Click(null, null);
+            if (string.IsNullOrEmpty(Option.Family)) return;
+            Family.SelectedIndex = FamilyManager.Families.Keys.ToList().IndexOf(Option.Family);
+            if (string.IsNullOrEmpty(Option.Game)) return;
+            Game.SelectedIndex = ((List<FamilyGame>)Games).FindIndex(x => x.Id == Option.Game);
+            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == (Option.Edition ?? string.Empty));
+            if (Option.ForceOpen) Open_Click(null, null);
         }
     }
 }

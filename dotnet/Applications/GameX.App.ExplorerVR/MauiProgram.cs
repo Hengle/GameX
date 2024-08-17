@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Controls.Hosting;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
 
 namespace GameX.App.Explorer
@@ -10,11 +11,15 @@ namespace GameX.App.Explorer
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseSKMauiApp<App>();
-                //.ConfigureFonts(fonts =>
-                //{
-                //    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                //    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                //});
+            //.ConfigureFonts(fonts =>
+            //{
+            //    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+            //    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            //});
+
+#if DEBUG
+            builder.Logging.AddDebug();
+#endif
 
             return builder.Build();
         }

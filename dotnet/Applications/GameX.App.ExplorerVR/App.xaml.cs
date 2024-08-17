@@ -11,29 +11,27 @@ namespace GameX.App.Explorer
     public partial class App : Application
     {
         static App() => Platform.Startups.Add(StereoKitPlatform.Startup);
-        public static App Instance;
         Page MainPage2;
 
-        static string[] args = new string[0];
-        //static string[] args = new string[] { "open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "01000001.obj" };
-        //static string[] args = new string[] { "open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "02000001.set" };
-        //static string[] args = new string[] { "open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "03000001.obj" };
-        //static string[] args = new string[] { "open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "0400008E.pal" };
-        //static string[] args = new string[] { "open", "-e", "Red", "-u", "game:/basegame_2_mainmenu.archive#CP77" };
-        //static string[] args = new string[] { "open", "-e", "Red", "-u", "game:/basegame_1_engine.archive#CP77" };
-        //static string[] args = new string[] { "open", "-e", "Red", "-u", "game:/lang_en_text.archive#CP77" };
-        //static string[] args = new string[] { "open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "materials/models/npc_minions/siege1_color_psd_12a9c12b.vtex_c" };
-        //static string[] args = new string[] { "open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "materials/models/npc_minions/siege1.vmat_c" };
-        //static string[] args = new string[] { "open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "materials/startup_background_color_png_65ffcfa7.vtex_c" };
-        //static string[] args = new string[] { "open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "materials/startup_background.vmat_c" };
-        //static string[] args = new string[] { "open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "models/npc_minions/draft_siege_good_reference.vmesh_c" };
-        //static string[] args = new string[] { "open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "models/npc_minions/draft_siege_good.vmdl_c" };
-        //static string[] args = new string[] { "open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "particles/hw_fx/candy_carrying_overhead.vpcf_c" };
+        static readonly string[] args = [];
+        //static readonly string[] args = ["open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "01000001.obj"];
+        //static readonly string[] args = ["open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "02000001.set"];
+        //static readonly string[] args = ["open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "03000001.obj"];
+        //static readonly string[] args = ["open", "-e", "AC", "-u", "game:/client_portal.dat#AC", "-p", "0400008E.pal"];
+        //static readonly string[] args = ["open", "-e", "Red", "-u", "game:/basegame_2_mainmenu.archive#CP77"];
+        //static readonly string[] args = ["open", "-e", "Red", "-u", "game:/basegame_1_engine.archive#CP77"];
+        //static readonly string[] args = ["open", "-e", "Red", "-u", "game:/lang_en_text.archive#CP77"];
+        //static readonly string[] args = ["open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "materials/models/npc_minions/siege1_color_psd_12a9c12b.vtex_c"];
+        //static readonly string[] args = ["open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "materials/models/npc_minions/siege1.vmat_c"];
+        //static readonly string[] args = ["open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "materials/startup_background_color_png_65ffcfa7.vtex_c"];
+        //static readonly string[] args = ["open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "materials/startup_background.vmat_c"];
+        //static readonly string[] args = ["open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "models/npc_minions/draft_siege_good_reference.vmesh_c"];
+        //static readonly string[] args = ["open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "models/npc_minions/draft_siege_good.vmdl_c"];
+        //static readonly string[] args = ["open", "-e", "Valve", "-u", "game:/dota/pak01_dir.vpk#Dota2", "-p", "particles/hw_fx/candy_carrying_overhead.vpcf_c"];
 
         public App()
         {
             InitializeComponent();
-            Instance = this;
             MainPage = new MainPage();
         }
 
@@ -43,10 +41,10 @@ namespace GameX.App.Explorer
             //GLViewerControl.ShowConsole = true;
             Parser.Default.ParseArguments<DefaultOptions, TestOptions, OpenOptions>(args)
             .MapResult(
-                (DefaultOptions opts) => Instance.RunDefault(opts),
-                (TestOptions opts) => Instance.RunTest(opts),
-                (OpenOptions opts) => Instance.RunOpen(opts),
-                errs => Instance.RunError(errs));
+                (DefaultOptions opts) => RunDefault(opts),
+                (TestOptions opts) => RunTest(opts),
+                (OpenOptions opts) => RunOpen(opts),
+                RunError);
             base.OnStart();
         }
 

@@ -1,40 +1,44 @@
 ﻿using Microsoft.Maui.Controls;
-using System;
+using GameX.Meta;
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace GameX.App.Explorer.Views
 {
     /// <summary>
-    /// ExplorerMainTab
+    /// MainPageTab
     /// </summary>
-    public class ExplorerMainTab
+    public class MainPageTab
     {
         public string Name { get; set; }
         public PakFile PakFile { get; set; }
+        public IList<FamilyApp> AppList { get; set; }
         public string Text { get; set; }
     }
 
     public partial class MainPage : ContentPage
     {
-        public static MainPage Instance;
+        public readonly static MetaManager Manager = ResourceManager.Current;
+        public static MainPage Current;
 
         public MainPage()
         {
             InitializeComponent();
-            Instance = this;
+            Current = this;
             BindingContext = this;
         }
 
         // https://dev.to/davidortinau/making-a-tabbar-or-segmentedcontrol-in-net-maui-54ha
         void MainTab_Changed(object sender, CheckedChangedEventArgs e) => MainTabContent.BindingContext = ((RadioButton)sender).BindingContext;
 
-        public void Open(Family family, IEnumerable<Uri> pakUris, string path = null)
+        public MainPage Open(Family family, IEnumerable<Uri> pakUris, string path = null)
         {
             foreach (var pakFile in PakFiles) pakFile?.Dispose();
             PakFiles.Clear();
-            if (family == null) return;
+            if (family == null) return this;
+            FamilyApps = family.Apps;
             foreach (var pakUri in pakUris)
             {
                 Log.WriteLine($"Opening {pakUri}");
@@ -43,32 +47,43 @@ namespace GameX.App.Explorer.Views
             }
             Log.WriteLine("Done");
             OnOpenedAsync(family, path).Wait();
+            return this;
         }
 
-        public static readonly BindableProperty MainTabsProperty = BindableProperty.Create(nameof(MainTabs), typeof(IList<ExplorerMainTab>), typeof(MainPage),
+        public static readonly BindableProperty MainTabsProperty = BindableProperty.Create(nameof(MainTabs), typeof(IList<MainPageTab>), typeof(MainPage),
             propertyChanged: (d, e, n) =>
             {
                 var mainTab = ((MainPage)d).MainTab;
-                var firstTab = mainTab.Children.FirstOrDefault() as RadioButton;
-                if (firstTab != null) firstTab.IsChecked = true;
+                if (mainTab.Children.FirstOrDefault() is RadioButton firstTab) firstTab.IsChecked = true;
             });
-        public IList<ExplorerMainTab> MainTabs
+        public IList<MainPageTab> MainTabs
         {
-            get => (IList<ExplorerMainTab>)GetValue(MainTabsProperty);
+            get => (IList<MainPageTab>)GetValue(MainTabsProperty);
             set => SetValue(MainTabsProperty, value);
         }
 
-        public readonly IList<PakFile> PakFiles = new List<PakFile>();
+        public readonly IList<PakFile> PakFiles = [];
+        public Dictionary<string, FamilyApp> FamilyApps;
 
         public Task OnOpenedAsync(Family family, string path = null)
         {
-            var tabs = PakFiles.Select(pakFile => new ExplorerMainTab
+            //MainTabControl.SelectedIndex = 0; // family.Apps != null ? 1 : 0
+            var tabs = PakFiles.Select(pakFile => new MainPageTab
             {
                 Name = pakFile.Name,
                 PakFile = pakFile,
             }).ToList();
+            var firstPakFile = tabs.FirstOrDefault()?.PakFile ?? PakFile.Empty;
+            if (FamilyApps.Count > 0)
+                tabs.Add(new MainPageTab
+                {
+                    Name = "Apps",
+                    PakFile = firstPakFile,
+                    AppList = [.. FamilyApps.Values],
+                    Text = "Choose an application.",
+                });
             if (!string.IsNullOrEmpty(family.Description))
-                tabs.Add(new ExplorerMainTab
+                tabs.Add(new MainPageTab
                 {
                     Name = "Information",
                     Text = family.Description,
@@ -77,12 +92,19 @@ namespace GameX.App.Explorer.Views
             return Task.CompletedTask;
         }
 
-        internal void OnReady()
+        internal void App_Click(object sender, EventArgs e)
         {
-            OpenPage_Click(null, null);
+            var button = (Button)sender;
+            var app = (FamilyApp)button.BindingContext;
+            app.OpenAsync(app.ExplorerType, Manager).Wait();
         }
 
         #region Menu
+
+        internal void Ready()
+        {
+            OpenPage_Click(null, null);
+        }
 
         void OpenPage_Click(object sender, EventArgs e)
         {

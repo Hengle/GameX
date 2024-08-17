@@ -8,12 +8,12 @@ namespace GameX.App.Explorer.Views
 {
     public partial class FileContent : ContentView
     {
-        public static FileContent Instance;
+        public static FileContent Current;
 
         public FileContent()
         {
             InitializeComponent();
-            Instance = this;
+            Current = this;
             BindingContext = this;
         }
 
