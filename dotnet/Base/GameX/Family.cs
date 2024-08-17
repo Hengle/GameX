@@ -81,7 +81,7 @@ namespace GameX
         /// <value>
         /// The family.
         /// </value>
-        public static readonly IDictionary<string, Family> Families = new Dictionary<string, Family>(StringComparer.OrdinalIgnoreCase);
+        public static readonly Dictionary<string, Family> Families = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Gets the specified family.
@@ -199,7 +199,7 @@ namespace GameX
         /// <param name="paths"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        internal static FamilyGame CreateFamilyGame(Family family, string id, JsonElement elem, ref FamilyGame dgame, IDictionary<string, PathItem> paths)
+        internal static FamilyGame CreateFamilyGame(Family family, string id, JsonElement elem, ref FamilyGame dgame, Dictionary<string, PathItem> paths)
         {
             var gameType = _value(elem, "gameType", z => Type.GetType(z.GetString(), false) ?? throw new ArgumentOutOfRangeException("gameType", $"Unknown type: {z}"), dgame.GameType);
             var game = gameType != null ? (FamilyGame)Activator.CreateInstance(gameType, family, id, elem, dgame) : new FamilyGame(family, id, elem, dgame);
@@ -240,7 +240,7 @@ namespace GameX
         /// <param name="virtuals">The virtuals.</param>
         /// <param name="host">The host.</param>
         /// <returns></returns>
-        internal static IFileSystem CreateFileSystem(Type fileSystemType, PathItem path, string subPath, IDictionary<string, byte[]> virtuals, Uri host = null)
+        internal static IFileSystem CreateFileSystem(Type fileSystemType, PathItem path, string subPath, Dictionary<string, byte[]> virtuals, Uri host = null)
         {
             var firstPath = path?.Paths.FirstOrDefault();
             var system = host != null ? new HostFileSystem(host)
@@ -267,7 +267,7 @@ namespace GameX
     /// </summary>
     public class Detector
     {
-        protected ConcurrentDictionary<string, object> Cache = new ConcurrentDictionary<string, object>();
+        protected ConcurrentDictionary<string, object> Cache = new();
         protected Dictionary<string, Dictionary<string, object>> Hashs;
 
         /// <summary>
@@ -314,8 +314,8 @@ namespace GameX
         public virtual Dictionary<string, object> ParseHash(FamilyGame game, JsonElement elem)
             => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
             {
-                "edition" => game.Editions != null && game.Editions.TryGetValue(x.Value.GetString(), out var a) ? a : (object)x.Value.GetString(),
-                "locale" => game.Locales != null && game.Locales.TryGetValue(x.Value.GetString(), out var a) ? a : (object)x.Value.GetString(),
+                "edition" => game.Editions != null && game.Editions.TryGetValue(x.Value.GetString(), out var a) ? a : x.Value.GetString(),
+                "locale" => game.Locales != null && game.Locales.TryGetValue(x.Value.GetString(), out var a) ? a : x.Value.GetString(),
                 _ => _valueV(x.Value)
             });
 
@@ -432,7 +432,7 @@ namespace GameX
         /// <value>
         /// The file filters.
         /// </value>
-        //public IDictionary<string, IDictionary<string, string>> Filters => FileManager.Filters;
+        //public Dictionary<string, Dictionary<string, string>> Filters => FileManager.Filters;
 
         /// <summary>
         /// Gets or sets the family identifier.
@@ -487,25 +487,25 @@ namespace GameX
         /// Gets the family samples.
         /// </summary>
         /// <returns></returns>
-        public IDictionary<string, List<FamilySample.File>> Samples { get; set; }
+        public Dictionary<string, List<FamilySample.File>> Samples { get; set; }
 
         /// <summary>
         /// Gets the family engines.
         /// </summary>
         /// <returns></returns>
-        public IDictionary<string, FamilyEngine> Engines { get; set; }
+        public Dictionary<string, FamilyEngine> Engines { get; set; }
 
         /// <summary>
         /// Gets the family games.
         /// </summary>
         /// <returns></returns>
-        public IDictionary<string, FamilyGame> Games { get; set; }
+        public Dictionary<string, FamilyGame> Games { get; set; }
 
         /// <summary>
         /// Gets the family apps.
         /// </summary>
         /// <returns></returns>
-        public IDictionary<string, FamilyApp> Apps { get; set; }
+        public Dictionary<string, FamilyApp> Apps { get; set; }
 
         /// <summary>
         /// Gets or sets the family file manager.
@@ -1128,19 +1128,19 @@ namespace GameX
         /// <summary>
         /// Gets or sets the game editions.
         /// </summary>
-        public IDictionary<string, Edition> Editions { get; set; }
+        public Dictionary<string, Edition> Editions { get; set; }
         /// <summary>
         /// Gets or sets the game dlcs.
         /// </summary>
-        public IDictionary<string, DownloadableContent> Dlcs { get; set; }
+        public Dictionary<string, DownloadableContent> Dlcs { get; set; }
         /// <summary>
         /// Gets or sets the game locales.
         /// </summary>
-        public IDictionary<string, Locale> Locales { get; set; }
+        public Dictionary<string, Locale> Locales { get; set; }
         /// <summary>
         /// Gets or sets the detectorss.
         /// </summary>
-        public IDictionary<string, Detector> Detectors { get; set; }
+        public Dictionary<string, Detector> Detectors { get; set; }
         /// <summary>
         /// Gets the displayed game name.
         /// </summary>

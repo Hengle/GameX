@@ -6,7 +6,7 @@ namespace GameX.Formats.Unknown
 {
     public abstract class UnknownFileWriter
     {
-        public static readonly IDictionary<string, Func<IUnknownFileModel, UnknownFileWriter>> Factories = new Dictionary<string, Func<IUnknownFileModel, UnknownFileWriter>>(StringComparer.OrdinalIgnoreCase);
+        public static readonly Dictionary<string, Func<IUnknownFileModel, UnknownFileWriter>> Factories = new Dictionary<string, Func<IUnknownFileModel, UnknownFileWriter>>(StringComparer.OrdinalIgnoreCase);
 
         // ARGS
         public DirectoryInfo DataDir = null;

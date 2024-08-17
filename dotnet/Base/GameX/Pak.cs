@@ -166,7 +166,7 @@ namespace GameX
         /// <summary>
         /// Gets the pak path finders.
         /// </summary>
-        public readonly IDictionary<Type, Func<string, string>> PathFinders = new Dictionary<Type, Func<string, string>>();
+        public readonly Dictionary<Type, Func<string, string>> PathFinders = [];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PakFile" /> class.
@@ -403,7 +403,7 @@ namespace GameX
         public uint Magic;
         public uint Version;
         // metadata/factory
-        protected Dictionary<string, Func<MetaManager, BinaryPakFile, FileSource, Task<List<MetaInfo>>>> MetaInfos = new Dictionary<string, Func<MetaManager, BinaryPakFile, FileSource, Task<List<MetaInfo>>>>();
+        protected Dictionary<string, Func<MetaManager, BinaryPakFile, FileSource, Task<List<MetaInfo>>>> MetaInfos = [];
         public FuncObjectFactoryFactory ObjectFactoryFactoryMethod;
 
         // binary
@@ -593,7 +593,7 @@ namespace GameX
         public override Task<Stream> LoadFileData(object path, FileOption option = default, bool throwOnError = true)
         {
             if (path == null) return default;
-            else if (!(path is FileSource))
+            else if (path is not FileSource)
             {
                 var (p, f2) = GetFileSource(path, throwOnError);
                 return p?.LoadFileData(f2, option, throwOnError);
@@ -613,7 +613,7 @@ namespace GameX
         public override async Task<T> LoadFileObject<T>(object path, FileOption option = default, bool throwOnError = true)
         {
             if (path == null) return default;
-            else if (!(path is FileSource))
+            else if (path is not FileSource)
             {
                 var (p, f2) = GetFileSource(path, throwOnError);
                 return await p.LoadFileObject<T>(f2, option, throwOnError);
@@ -677,7 +677,7 @@ namespace GameX
         /// <param name="path">The path.</param>
         (PakFile pak, string next) FindPath(string path)
         {
-            var paths = path.Split(new[] { ':' }, 2);
+            var paths = path.Split([':'], 2);
             var p = paths[0].Replace('\\', '/');
             var pak = FilesByPath[p]?.FirstOrDefault()?.Pak?.Open();
             return (pak, pak != null && paths.Length > 1 ? paths[1] : null);
@@ -869,7 +869,7 @@ namespace GameX
 
         IList<PakFile> FindPakFiles(string path, out string next)
         {
-            var paths = path.Split(new[] { '\\', '/', ':' }, 2);
+            var paths = path.Split(['\\', '/', ':'], 2);
             if (paths.Length == 1) { next = path; return PakFiles; }
             path = paths[0]; next = paths[1];
             var pakFiles = PakFiles.Where(x => x.Name.StartsWith(path)).ToList();

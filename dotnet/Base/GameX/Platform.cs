@@ -27,8 +27,8 @@ namespace GameX.Platforms
     {
         readonly PakFile PakFile;
         readonly AudioBuilderBase<Audio> Builder;
-        readonly Dictionary<object, (Audio aud, object tag)> CachedAudios = new Dictionary<object, (Audio aud, object tag)>();
-        readonly Dictionary<object, Task<object>> PreloadTasks = new Dictionary<object, Task<object>>();
+        readonly Dictionary<object, (Audio aud, object tag)> CachedAudios = [];
+        readonly Dictionary<object, Task<object>> PreloadTasks = [];
 
         public AudioManager(PakFile pakFile, AudioBuilderBase<Audio> builder)
         {
@@ -97,8 +97,8 @@ namespace GameX.Platforms
     {
         readonly PakFile PakFile;
         readonly TextureBuilderBase<Texture> Builder;
-        readonly Dictionary<object, (Texture tex, object tag)> CachedTextures = new Dictionary<object, (Texture tex, object tag)>();
-        readonly Dictionary<object, Task<ITexture>> PreloadTasks = new Dictionary<object, Task<ITexture>>();
+        readonly Dictionary<object, (Texture tex, object tag)> CachedTextures = [];
+        readonly Dictionary<object, Task<ITexture>> PreloadTasks = [];
 
         public TextureManager(PakFile pakFile, TextureBuilderBase<Texture> builder)
         {
@@ -169,7 +169,7 @@ namespace GameX.Platforms
 
     public class ShaderManager<Shader> : IShaderManager<Shader>
     {
-        static readonly Dictionary<string, bool> EmptyArgs = new Dictionary<string, bool>();
+        static readonly Dictionary<string, bool> EmptyArgs = [];
         readonly PakFile PakFile;
         readonly ShaderBuilderBase<Shader> Builder;
 
@@ -267,8 +267,8 @@ namespace GameX.Platforms
     {
         readonly PakFile PakFile;
         readonly MaterialBuilderBase<Material, Texture> Builder;
-        readonly Dictionary<object, (Material material, object tag)> CachedMaterials = new Dictionary<object, (Material material, object tag)>();
-        readonly Dictionary<object, Task<IMaterial>> PreloadTasks = new Dictionary<object, Task<IMaterial>>();
+        readonly Dictionary<object, (Material material, object tag)> CachedMaterials = [];
+        readonly Dictionary<object, Task<IMaterial>> PreloadTasks = [];
 
         public ITextureManager<Texture> TextureManager { get; }
 
@@ -316,7 +316,6 @@ namespace GameX.Platforms
     /// </summary>
     public static class Platform
     {
-        
         /// <summary>
         /// The platform type.
         /// </summary>

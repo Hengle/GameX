@@ -11,7 +11,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Ubisoft
     {
-        internal static Dictionary<string, string> UbisoftPaths = new Dictionary<string, string>();
+        internal static Dictionary<string, string> UbisoftPaths = [];
 
         static Store_Ubisoft()
         {
@@ -29,7 +29,7 @@ namespace GameX.Store
             {
                 // windows paths
                 var home = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                var search = new[] { "Ubisoft Game Launcher" };
+                string[] search = ["Ubisoft Game Launcher"];
                 paths = search.Select(path => Path.Join(home, path));
             }
             else if (RuntimeInformation.OSDescription.StartsWith("android-")) return null;
@@ -37,14 +37,14 @@ namespace GameX.Store
             {
                 // linux paths
                 var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var search = new[] { "??" };
+                string[] search = ["??"];
                 paths = search.Select(path => Path.Join(home, path));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 // mac paths
                 var home = "/Users/Shared";
-                var search = new[] { "??" };
+                string[] search = ["??"];
                 paths = search.Select(path => Path.Join(home, path));
 
             }

@@ -33,16 +33,16 @@ namespace GameX
         public static T[] _listV<T>(JsonElement elem, Func<string, T> func)
             => elem.ValueKind switch
             {
-                JsonValueKind.Number => new[] { func(elem.GetInt32().ToString()) },
-                JsonValueKind.String => new[] { func(elem.GetString()) },
+                JsonValueKind.Number => [func(elem.GetInt32().ToString())],
+                JsonValueKind.String => [func(elem.GetString())],
                 JsonValueKind.Array => elem.EnumerateArray().Select(s => func(s.GetString())).ToArray(),
                 _ => throw new ArgumentOutOfRangeException($"{elem}"),
             };
         public static string[] _listV(JsonElement elem)
             => elem.ValueKind switch
             {
-                JsonValueKind.Number => new[] { elem.GetInt32().ToString() },
-                JsonValueKind.String => new[] { elem.GetString() },
+                JsonValueKind.Number => [elem.GetInt32().ToString()],
+                JsonValueKind.String => [elem.GetString()],
                 JsonValueKind.Array => elem.EnumerateArray().Select(s => s.GetString()).ToArray(),
                 _ => throw new ArgumentOutOfRangeException($"{elem}"),
             };
@@ -53,10 +53,10 @@ namespace GameX
 
         // related
         public static Dictionary<string, T> _related<T>(JsonElement elem, string key, Func<string, JsonElement, T> func)
-            => elem.TryGetProperty(key, out var z) ? z.EnumerateObject().ToDictionary(x => x.Name, x => func(x.Name, x.Value)) : new Dictionary<string, T>();
+            => elem.TryGetProperty(key, out var z) ? z.EnumerateObject().ToDictionary(x => x.Name, x => func(x.Name, x.Value)) : [];
 
         public static Dictionary<string, T> _related<T>(JsonElement elem, string key, Func<JsonElement, string> keyFunc, Func<JsonElement, T> valueFunc)
-            => elem.TryGetProperty(key, out var z) ? z.EnumerateArray().ToDictionary(x => keyFunc(x), x => valueFunc(x)) : new Dictionary<string, T>();
+            => elem.TryGetProperty(key, out var z) ? z.EnumerateArray().ToDictionary(x => keyFunc(x), x => valueFunc(x)) : [];
 
         public static Dictionary<string, T> _dictTrim<T>(Dictionary<string, T> source)
             => source.Where(x => x.Value != null).ToDictionary(x => x.Key, x => x.Value);

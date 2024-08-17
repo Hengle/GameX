@@ -39,7 +39,7 @@ namespace GameX.Meta
         {
             Name = name;
             Tag = tag;
-            Items = items ?? Enumerable.Empty<MetaInfo>();
+            Items = items ?? [];
             Clickable = clickable;
         }
 
@@ -85,7 +85,7 @@ namespace GameX.Meta
             Icon = icon;
             Tag = tag;
             PakFile = pakFile;
-            Items = items ?? new List<MetaItem>();
+            Items = items ?? [];
         }
 
         public MetaItem Search(Func<MetaItem, bool> predicate)
@@ -108,7 +108,7 @@ namespace GameX.Meta
 
         public MetaItem FindByPath(string path, MetaManager manager)
         {
-            var paths = path.Split(new[] { '\\', '/', ':' }, 2);
+            var paths = path.Split(['\\', '/', ':'], 2);
             var node = Items.FirstOrDefault(x => x.Name == paths[0]);
             (node?.Source as FileSource)?.Pak?.Open(node.Items, manager);
             return node == null || paths.Length == 1 ? node : node.FindByPath(paths[1], manager);
@@ -116,7 +116,7 @@ namespace GameX.Meta
 
         public static MetaItem FindByPathForNodes(List<MetaItem> nodes, string path, MetaManager manager)
         {
-            var paths = path.Split(new[] { '\\', '/', ':' }, 2);
+            var paths = path.Split(['\\', '/', ':'], 2);
             var node = nodes.FirstOrDefault(x => x.Name == paths[0]);
             (node?.Source as FileSource)?.Pak?.Open(node.Items, manager);
             return node == null || paths.Length == 1 ? node : node.FindByPath(paths[1], manager);
@@ -158,7 +158,7 @@ namespace GameX.Meta
             var bytes = ms.ToArray();
             if (dispose) stream.Dispose();
             return !bytes.Contains<byte>(0x00)
-                ? (object)Encoding.UTF8.GetString(bytes)
+                ? Encoding.UTF8.GetString(bytes)
                 : bytes;
         }
 
@@ -179,27 +179,27 @@ namespace GameX.Meta
             else if (obj is Stream stream)
             {
                 var value = GuessStringOrBytes(stream);
-                nodes = value is string text ? new List<MetaInfo> {
-                        new MetaInfo(null, new MetaContent { Type = "Text", Name = "Text", Value = text }),
-                        new MetaInfo("Text", items: new List<MetaInfo> {
-                            new MetaInfo($"Length: {text.Length}"),
-                        }) }
-                    : value is byte[] bytes ? new List<MetaInfo> {
-                        new MetaInfo(null, new MetaContent { Type = "Hex", Name = "Hex", Value = new MemoryStream(bytes) }),
-                        new MetaInfo("Bytes", items: new List<MetaInfo> {
-                            new MetaInfo($"Length: {bytes.Length}"),
-                        }) }
+                nodes = value is string text ? [
+                        new(null, new MetaContent { Type = "Text", Name = "Text", Value = text }),
+                        new("Text", items: [
+                            new($"Length: {text.Length}"),
+                        ]) ]
+                    : value is byte[] bytes ? [
+                        new(null, new MetaContent { Type = "Hex", Name = "Hex", Value = new MemoryStream(bytes) }),
+                        new("Bytes", items: [
+                            new($"Length: {bytes.Length}"),
+                        ]) ]
                     : throw new ArgumentOutOfRangeException(nameof(value), value.GetType().Name);
             }
             else if (obj is IDisposable disposable) disposable.Dispose();
             if (nodes == null) return null;
-            nodes.Add(new MetaInfo("File", items: new List<MetaInfo> {
-                new MetaInfo($"Path: {file.Path}"),
-                new MetaInfo($"FileSize: {file.FileSize}"),
+            nodes.Add(new MetaInfo("File", items: [
+                new($"Path: {file.Path}"),
+                new($"FileSize: {file.FileSize}"),
                 file.Parts != null
                     ? new MetaInfo("Parts", items: file.Parts.Select(part => new MetaInfo($"{part.FileSize}@{part.Path}")))
                     : null
-            }));
+            ]));
             //nodes.Add(new MetaInfo(null, new MetaContent { Type = "Hex", Name = "TEST", Value = new MemoryStream() }));
             //nodes.Add(new MetaInfo(null, new MetaContent { Type = "Image", Name = "TEST", MaxWidth = 500, MaxHeight = 500, Value = null }));
             return nodes;

@@ -13,7 +13,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Steam
     {
-        internal static Dictionary<string, string> SteamPaths = new Dictionary<string, string>();
+        internal static Dictionary<string, string> SteamPaths = [];
 
         static Store_Steam()
         {
@@ -54,14 +54,14 @@ namespace GameX.Store
             {
                 // linux paths
                 var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var search = new[] { ".steam", ".steam/steam", ".steam/root", ".local/share/Steam" };
+                string[] search = [".steam", ".steam/steam", ".steam/root", ".local/share/Steam"];
                 paths = search.Select(path => Path.Join(home, path, "appcache"));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 // mac paths
                 var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var search = new[] { "Library/Application Support/Steam" };
+                string[] search = ["Library/Application Support/Steam"];
                 paths = search.Select(path => Path.Join(home, path, "appcache"));
             }
             else throw new PlatformNotSupportedException();

@@ -13,7 +13,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Gog
     {
-        internal static Dictionary<string, string> GogPaths = new Dictionary<string, string>();
+        internal static Dictionary<string, string> GogPaths = [];
 
         static Store_Gog()
         {
@@ -50,7 +50,7 @@ namespace GameX.Store
             {
                 // windows paths
                 var home = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                var search = new[] { @"GOG.com\Galaxy" };
+                string[] search = [@"GOG.com\Galaxy"];
                 paths = search.Select(path => Path.Join(home, path, "storage"));
             }
             else if (RuntimeInformation.OSDescription.StartsWith("android-")) return null;
@@ -58,14 +58,14 @@ namespace GameX.Store
             {
                 // linux paths
                 var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var search = new[] { "??" };
+                string[] search = ["??"];
                 paths = search.Select(path => Path.Join(home, path, "Storage"));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 // mac paths
                 var home = "/Users/Shared";
-                var search = new[] { "GOG.com/Galaxy" };
+                string[] search = ["GOG.com/Galaxy"];
                 paths = search.Select(path => Path.Join(home, path, "Storage"));
 
             }

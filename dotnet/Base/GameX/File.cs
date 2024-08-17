@@ -35,7 +35,7 @@ namespace GameX
             {
                 Root = root;
                 Type = elem.TryGetProperty("type", out var z) ? z.GetString() : null;
-                Paths = elem.TryGetProperty("path", out z) ? _listV(z) : new string[0];
+                Paths = elem.TryGetProperty("path", out z) ? _listV(z) : [];
             }
 
             public void Add(string root, JsonElement elem)
@@ -61,24 +61,24 @@ namespace GameX
         /// <summary>
         /// The locations
         /// </summary>
-        public readonly IDictionary<string, PathItem> Paths = new Dictionary<string, PathItem>();
+        public readonly Dictionary<string, PathItem> Paths = [];
 
         /// <summary>
         /// The ignores
         /// </summary>
-        public readonly IDictionary<string, HashSet<string>> Ignores = new Dictionary<string, HashSet<string>>();
+        public readonly Dictionary<string, HashSet<string>> Ignores = [];
 
         /// <summary>
         /// The virtuals
         /// </summary>
-        public readonly IDictionary<string, IDictionary<string, byte[]>> Virtuals = new Dictionary<string, IDictionary<string, byte[]>>();
+        public readonly Dictionary<string, Dictionary<string, byte[]>> Virtuals = [];
 
         /// <summary>
         /// The filters
         /// </summary>
-        public readonly IDictionary<string, IDictionary<string, string>> Filters = new Dictionary<string, IDictionary<string, string>>();
+        public readonly Dictionary<string, Dictionary<string, string>> Filters = [];
 
-        public static readonly IDictionary<string, string> LocalGames;
+        public static readonly Dictionary<string, string> LocalGames;
 
         static FileManager()
         {
@@ -154,7 +154,7 @@ namespace GameX
             string z;
             if (Platform.PlatformOS == Platform.OS.Windows && elem.TryGetProperty("reg", out var y))
                 foreach (var k in _listV(y))
-                    if (!Paths.ContainsKey(id) && (z = GetPathByRegistryKey(k, elem.TryGetProperty(k, out y) ? y : (JsonElement?)null)) != null)
+                    if (!Paths.ContainsKey(id) && (z = GetPathByRegistryKey(k, elem.TryGetProperty(k, out y) ? y : null)) != null)
                         AddPath(id, elem, z);
             if (elem.TryGetProperty("key", out y))
                 foreach (var k in _listV(y))
@@ -168,20 +168,20 @@ namespace GameX
 
         protected void AddFilter(string id, JsonElement elem)
         {
-            if (!Filters.TryGetValue(id, out var z2)) Filters.Add(id, z2 = new Dictionary<string, string>());
+            if (!Filters.TryGetValue(id, out var z2)) Filters.Add(id, z2 = []);
             foreach (var z in elem.EnumerateObject())
                 z2.Add(z.Name, _valueV(z.Value).ToString());
         }
 
         protected void AddIgnore(string id, string[] paths)
         {
-            if (!Ignores.TryGetValue(id, out var z2)) Ignores.Add(id, z2 = new HashSet<string>());
+            if (!Ignores.TryGetValue(id, out var z2)) Ignores.Add(id, z2 = []);
             foreach (var v in paths) z2.Add(v);
         }
 
         protected void AddVirtual(string id, JsonElement elem)
         {
-            if (!Virtuals.TryGetValue(id, out var z2)) Virtuals.Add(id, z2 = new Dictionary<string, byte[]>());
+            if (!Virtuals.TryGetValue(id, out var z2)) Virtuals.Add(id, z2 = []);
             foreach (var z in elem.EnumerateObject())
                 z2.Add(z.Name, z.Value.ValueKind == JsonValueKind.String ? Convert.FromBase64String(z.Value.GetString()) : null);
         }
@@ -241,7 +241,7 @@ namespace GameX
 
         protected static string GetPathByRegistryKey(string key, JsonElement? elem)
         {
-            var path = FindRegistryPath(new[] { $@"Wow6432Node\{key}", key });
+            var path = FindRegistryPath([$@"Wow6432Node\{key}", key]);
             if (elem == null) return path;
             else if (elem.Value.TryGetProperty("path", out var z)) return Path.GetFullPath(GetPathWithSpecialFolders(z.GetString(), path));
             else if (elem.Value.TryGetProperty("xml", out z) && elem.Value.TryGetProperty("xmlPath", out var y))
@@ -358,8 +358,8 @@ namespace GameX
     internal class VirtualFileSystem : IFileSystem
     {
         readonly IFileSystem Base;
-        readonly IDictionary<string, byte[]> Virtuals;
-        public VirtualFileSystem(IFileSystem @base, IDictionary<string, byte[]> virtuals)
+        readonly Dictionary<string, byte[]> Virtuals;
+        public VirtualFileSystem(IFileSystem @base, Dictionary<string, byte[]> virtuals)
         {
             Base = @base;
             Virtuals = virtuals;
@@ -404,7 +404,7 @@ namespace GameX
         }
         public bool FileExists(string path) => Pak.GetEntry(Path.Combine(Root, path)) != null;
         public (string path, long length) FileInfo(string path) { var e = Pak.GetEntry(Path.Combine(Root, path)); return e != null ? (e.Name, e.Length) : (null, 0); }
-        public BinaryReader OpenReader(string path) => new BinaryReader(Pak.GetEntry(Path.Combine(Root, path)).Open());
+        public BinaryReader OpenReader(string path) => new(Pak.GetEntry(Path.Combine(Root, path)).Open());
         public BinaryWriter OpenWriter(string path) => throw new NotSupportedException();
     }
 
@@ -431,7 +431,7 @@ namespace GameX
         }
         public bool FileExists(string path) => Pak.GetEntry(path) != null;
         public (string path, long length) FileInfo(string path) { var e = Pak.GetEntry(path); return e != null ? (e.Name, e.Length) : (null, 0); }
-        public BinaryReader OpenReader(string path) => new BinaryReader(Pak.GetEntry(path).Open());
+        public BinaryReader OpenReader(string path) => new(Pak.GetEntry(path).Open());
         public BinaryWriter OpenWriter(string path) => throw new NotSupportedException();
     }
 

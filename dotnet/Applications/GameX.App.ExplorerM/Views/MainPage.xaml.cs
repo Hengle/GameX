@@ -58,7 +58,7 @@ namespace GameX.App.Explorer.Views
         }
 
         public readonly IList<PakFile> PakFiles = [];
-        public IDictionary<string, FamilyApp> FamilyApps;
+        public Dictionary<string, FamilyApp> FamilyApps;
 
         public Task OnOpenedAsync(Family family, string path = null)
         {

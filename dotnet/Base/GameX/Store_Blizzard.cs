@@ -12,7 +12,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Blizzard
     {
-        internal static Dictionary<string, string> BlizzardPaths = new Dictionary<string, string>();
+        internal static Dictionary<string, string> BlizzardPaths = [];
 
         static Store_Blizzard()
         {
@@ -48,21 +48,21 @@ namespace GameX.Store
             {
                 // windows paths
                 var home = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                paths = new[] { Path.Combine(home, "Battle.net", "Agent") };
+                paths = [Path.Combine(home, "Battle.net", "Agent")];
             }
             else if (RuntimeInformation.OSDescription.StartsWith("android-")) return null;
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 // linux paths
                 var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var search = new[] { ".steam", ".steam/steam", ".steam/root", ".local/share/Steam" };
+                string[] search = [".steam", ".steam/steam", ".steam/root", ".local/share/Steam"];
                 paths = search.Select(path => Path.Join(home, path, "appcache"));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 // mac paths
                 var home = "/Users/Shared";
-                var search = new[] { "Battle.net/Agent" };
+                string[] search = ["Battle.net/Agent"];
                 paths = search.Select(path => Path.Join(home, path, "data"));
             }
             else throw new PlatformNotSupportedException();

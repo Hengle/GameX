@@ -12,7 +12,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Epic
     {
-        internal static Dictionary<string, string> EpicPaths = new Dictionary<string, string>();
+        internal static Dictionary<string, string> EpicPaths = [];
 
         static Store_Epic()
         {
@@ -38,7 +38,7 @@ namespace GameX.Store
             {
                 // windows paths
                 var home = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                var search = new[] { @"Epic\EpicGamesLauncher" };
+                string[] search = [@"Epic\EpicGamesLauncher"];
                 paths = search.Select(path => Path.Join(home, path, "Data"));
             }
             else if (RuntimeInformation.OSDescription.StartsWith("android-")) return null;
@@ -46,14 +46,14 @@ namespace GameX.Store
             {
                 // linux paths
                 var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var search = new[] { "Epic/EpicGamesLauncher" };
+                string[] search = ["Epic/EpicGamesLauncher"];
                 paths = search.Select(path => Path.Join(home, path, "Data"));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 // mac paths
                 var home = "/Users/Shared";
-                var search = new[] { "Epic/EpicGamesLauncher" };
+                string[] search = ["Epic/EpicGamesLauncher"];
                 paths = search.Select(path => Path.Join(home, path, "Data"));
             }
             else throw new PlatformNotSupportedException();
