@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:GameX.App.Explorer.Views"
-             xmlns:base="clr-namespace:GameX;assembly=GameX.Base"
+             xmlns:base="clr-namespace:GameX;assembly=GameX"
              x:Class="GameX.App.Explorer.Views.MainPage"
              Title="Main">
 

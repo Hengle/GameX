@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Base\GameX.Base\GameX.Base.csproj" />
+    <ProjectReference Include="..\..\Base\GameX\GameX.csproj" />
     <ProjectReference Include="..\..\Crytek\GameX.Crytek\GameX.Crytek.csproj" />
     <ProjectReference Include="..\..\Id\GameX.Id\GameX.ID.csproj" />
     <ProjectReference Include="..\..\Epic\GameX.Epic\GameX.Epic.csproj" />

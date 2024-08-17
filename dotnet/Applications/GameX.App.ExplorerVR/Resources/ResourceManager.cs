@@ -1,20 +1,20 @@
 using GameX.Meta;
-using System;
+//using Microsoft.Maui.Graphics.Platform;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+using IImage = Microsoft.Maui.Graphics.IImage;
 
 namespace GameX.App.Explorer
 {
     public class ResourceManager : MetaManager
     {
-        readonly Dictionary<string, object> Icons = new();
-        readonly ConcurrentDictionary<string, object> ImageCache = new();
+        public static ResourceManager Current = new();
+        readonly Dictionary<string, IImage> Icons = [];
+        readonly ConcurrentDictionary<string, IImage> ImageCache = new();
         readonly object _defaultIcon;
         readonly object _folderIcon;
         readonly object _packageIcon;
 
-        public ResourceManager()
+        ResourceManager()
         {
             LoadIcons();
             _defaultIcon = GetIcon("_default");

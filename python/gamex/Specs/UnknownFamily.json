@@ -3,10 +3,10 @@
   "name": "Unknown",
   "studio": "",
   "description": "Unknown formats",
-  "familyType": "GameX.Unknown.UnknownFamily, GameX.Base",
+  "familyType": "GameX.Unknown.UnknownFamily, GameX",
   "games": {
     "*": {
-      "pakFileType": "GameX.Unknown.UnknownPakFile, GameX.Base"
+      "pakFileType": "GameX.Unknown.UnknownPakFile, GameX"
     },
     "APP": {
       "name": "Application",

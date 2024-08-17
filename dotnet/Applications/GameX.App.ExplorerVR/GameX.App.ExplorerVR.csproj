@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-android34.0</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net9.0-android34.0</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>GameX.App.Explorer</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -12,7 +12,7 @@
 		<ApplicationTitle>GameX.App.ExplorerVR</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.contoso.gamex.app.explorerVR</ApplicationId>
+		<ApplicationId>com.contoso.gamex.app.explorervr</ApplicationId>
 		<ApplicationIdGuid>fd51f409-dd2c-49a7-8d7e-ab4e91e09972</ApplicationIdGuid>
 
 		<!-- Versions -->
@@ -35,7 +35,7 @@
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
+		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
 
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
@@ -56,6 +56,19 @@
 	  <Content Include="Assets\power.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommandLineParser" Version="2.9.1" />
+		<PackageReference Include="NLayer.NAudioSupport" Version="1.1.0" />
+		<PackageReference Include="TreeView.Maui" Version="1.0.5" />
+		<PackageReference Include="StereoKit" Version="0.4.0-preview.689" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0-preview.6.24321.8" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Base\GameX.All\GameX.All.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -109,90 +122,6 @@
 
 	<ItemGroup>
 	  <None Include="..\..\..\docs\Applications\Explorer\Readme.md" Link="Readme.md" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Include="CommandLineParser" Version="2.9.1" />
-	  <PackageReference Include="NLayer.NAudioSupport" Version="1.1.0" />
-	  <PackageReference Include="StereoKit" Version="0.3.7-preview.9" />
-	  <PackageReference Include="TreeView.Maui" Version="1.0.5" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\..\Base\GameX.All\GameX.All.csproj" />
-	  <ProjectReference Include="..\StereoKit.Maui\StereoKit.Maui.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Update="App+Permissions.cs">
-	    <DependentUpon>%(Filename)</DependentUpon>
-	  </Compile>
-	  <Compile Update="MainPagex.xaml.cs">
-	    <DependentUpon>MainPagex.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\AboutPage.xaml.cs">
-	    <DependentUpon>%(Filename)</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\AudioPlayer.xaml.cs">
-	    <DependentUpon>%(Filename)</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\FileContent.xaml.cs">
-	    <DependentUpon>%(Filename)</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\FileExplorer.xaml.cs">
-	    <DependentUpon>%(Filename)</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\OpenPage.xaml.cs">
-	    <DependentUpon>%(Filename)</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\OptionsPage.xaml.cs">
-	    <DependentUpon>%(Filename)</DependentUpon>
-	  </Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiXaml Update="MainPagex.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\AboutPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\AudioPlayer.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\FileContent.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\FileExplorer.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\MainPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\OpenPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\OptionsPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Resources\Icons\" />
-	</ItemGroup>
-
-	<ProjectExtensions>
-		<VisualStudio>
-			<UserProperties XamarinHotReloadDebuggerTimeoutExceptionGameSpecAppExplorer2HideInfoBar="True" />
-		</VisualStudio>
-	</ProjectExtensions>
-
-	<ItemGroup>
-	  <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.20" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.20" />
 	</ItemGroup>
 
 </Project>
