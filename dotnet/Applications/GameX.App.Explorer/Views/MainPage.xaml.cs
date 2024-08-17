@@ -56,7 +56,7 @@ namespace GameX.App.Explorer.Views
             return this;
         }
 
-        IList<MainPageTab> _mainTabs;
+        IList<MainPageTab> _mainTabs = [];
         public IList<MainPageTab> MainTabs
         {
             get => _mainTabs;

@@ -1,12 +1,12 @@
 ﻿<UserControl x:Class="GameX.App.Explorer.AppShell"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Menu>
+    <!--<Menu>
         <MenuItem Header="_File">
             <MenuItem Header="_Open" Click="OpenPage_Click">
-                <!--<MenuItem.Icon>
+                --><!--<MenuItem.Icon>
                 <Image x:Name="OpenIcon" Source="../Resources/Icons/_openFile.png" />
-            </MenuItem.Icon>-->
+            </MenuItem.Icon>--><!--
             </MenuItem>
         </MenuItem>
         <MenuItem Header="_Edit">
@@ -19,5 +19,5 @@
             <MenuItem Header="_View Help" Click="Guide_Click" />
             <MenuItem Header="_About" Click="AboutPage_Click" />
         </MenuItem>
-    </Menu>
+    </Menu>-->
 </UserControl>

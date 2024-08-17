@@ -68,6 +68,7 @@
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\UnityFamily.json" Link="Specs\UnityFamily.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\UnityFamily.Sample.json" Link="Specs\UnityFamily.Sample.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\UnknownFamily.json" Link="Specs\UnknownFamily.json" />
+    <EmbeddedResource Include="..\..\..\python\gamex\Specs\UnknownFamily.Sample.json" Link="Specs\UnknownFamily.Sample.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\ValveFamily.json" Link="Specs\ValveFamily.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\ValveFamily.Sample.json" Link="Specs\ValveFamily.Sample.json" />
     <EmbeddedResource Include="..\..\..\python\gamex\Specs\VolitionFamily.json" Link="Specs\VolitionFamily.json" />
@@ -89,7 +90,7 @@
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="8.0.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
     <PackageReference Include="System.Text.Json" Version="8.0.4" />
     <PackageReference Include="ZstdNet" Version="1.4.5" />
     <PackageReference Include="Google.Protobuf" Version="3.27.3" />

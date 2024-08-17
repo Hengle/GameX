@@ -1,7 +1,6 @@
 ﻿using GameX.App.Explorer.Views;
-using System.Collections.Generic;
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using static GameX.FamilyManager;
@@ -17,14 +16,13 @@ namespace GameX.App.Explorer
 
         public AppShell()
         {
-            //InitializeComponent();
+            InitializeComponent();
             Current = this;
-            new MainPage();
         }
 
         internal int Startup()
         {
-            var p = MainPage.Current;
+            var p = new MainPage();
             p.Show();
             if (!string.IsNullOrEmpty(Option.ForcePath) && Option.ForcePath.StartsWith("app:") && p.FamilyApps != null && p.FamilyApps.TryGetValue(Option.ForcePath[4..], out var app))
                 p.App_Click(new Button { DataContext = app }, null);
@@ -34,7 +32,7 @@ namespace GameX.App.Explorer
 
         internal int StartupOpen(Family family, IEnumerable<Uri> pakUris, string path = null)
         {
-            var p = MainPage.Current;
+            var p = new MainPage();
             p.Show();
             p.Open(family, pakUris, path);
             return 0;

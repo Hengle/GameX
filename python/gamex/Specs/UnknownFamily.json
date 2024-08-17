@@ -4,17 +4,23 @@
   "studio": "",
   "description": "Unknown formats",
   "familyType": "GameX.Unknown.UnknownFamily, GameX",
+  "samples": [
+    "UnknownFamily.Sample.json"
+  ],
   "games": {
     "*": {
       "pakFileType": "GameX.Unknown.UnknownPakFile, GameX"
     },
     "APP": {
-      "name": "Application",
-      "searchByx": "None"
+      "name": "Application"
     },
     "CAT": {
       "name": "Catalog",
       "pak": "game:/main.yaml"
+    },
+    "T": {
+      "name": "T",
+      "pakExt": ".pak"
     }
   },
   "fileManager": {
@@ -24,8 +30,16 @@
       },
       "CAT": {
         "path": "%AppPath%/catalogs"
+      },
+      "T": {
+        "path": "%AppPath%"
       }
     },
-    "applications": {}
+    "applications": {},
+    "virtuals": {
+      "T": {
+        "_testtri": null
+      }
+    }
   }
 }

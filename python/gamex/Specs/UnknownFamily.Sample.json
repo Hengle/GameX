@@ -1,0 +1,11 @@
+﻿{
+  "T": {
+    "name": "Test",
+    "files": [
+      {
+        "path": "_testtri",
+        "type": "Test"
+      }
+    ]
+  }
+}

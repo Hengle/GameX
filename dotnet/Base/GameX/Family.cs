@@ -229,7 +229,7 @@ namespace GameX
         /// <param name="elem"></param>
         /// <returns></returns>
         internal static FileManager CreateFileManager(JsonElement elem)
-            => new FileManager(elem);
+            => new(elem);
 
         /// <summary>
         /// Creates the file system.
@@ -422,7 +422,7 @@ namespace GameX
         {
             Id = string.Empty,
             Name = "Empty",
-            Games = new Dictionary<string, FamilyGame>(),
+            Games = [],
             FileManager = new FileManager(),
         };
 
@@ -540,8 +540,8 @@ namespace GameX
                 FileManager = _method(elem, "fileManager", CreateFileManager);
                 var paths = FileManager?.Paths;
                 // related
-                var dgame = new FamilyGame { SearchBy = SearchBy.Default, Paks = new[] { new Uri("game:/") } };
-                Samples = new Dictionary<string, List<FamilySample.File>>();
+                var dgame = new FamilyGame { SearchBy = SearchBy.Default, Paks = [new Uri("game:/")] };
+                Samples = [];
                 Engines = _related(elem, "engines", (k, v) => CreateFamilyEngine(this, k, v));
                 Games = _dictTrim(_related(elem, "games", (k, v) => CreateFamilyGame(this, k, v, ref dgame, paths)));
                 Apps = _related(elem, "apps", (k, v) => CreateFamilyApp(this, k, v));
@@ -737,7 +737,7 @@ namespace GameX
         {
             var explorer = Activator.CreateInstance(explorerType);
             var startupMethod = explorerType.GetMethod("Application_Startup", BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new ArgumentOutOfRangeException(nameof(explorerType), "No Application_Startup found");
-            startupMethod.Invoke(explorer, new object[] { this, null });
+            startupMethod.Invoke(explorer, [this, null]);
             return Task.CompletedTask;
         }
     }
@@ -1352,8 +1352,6 @@ namespace GameX
                 yield return (path, fileSearch.ToArray());
             }
         }
-
-
 
         #endregion
     }

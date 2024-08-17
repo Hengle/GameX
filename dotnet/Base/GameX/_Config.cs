@@ -1,5 +1,5 @@
-﻿//#define Arkane
-#define Bethesda
+﻿#define Arkane
+//#define Bethesda
 //#define Bioware
 //#define Black
 //#define Blizzard
@@ -21,6 +21,7 @@
 //#define Red
 //#define Ubisoft
 //#define Unity
+//#define Unknown
 //#define Valve
 //#define Volition
 //#define WB
@@ -43,9 +44,9 @@ namespace GameX
         }
 
 #if Arkane
-        static string[] FamilyKeys = new[] { "Arkane", "Unknown" };
+        static readonly string[] FamilyKeys = ["Arkane", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:1",
@@ -62,9 +63,9 @@ namespace GameX
             //Missing: Game = "RF", // Redfall (future)
         };
 #elif Bethesda
-        static string[] FamilyKeys = new[] { "Bethesda", "Unknown" };
+        static readonly string[] FamilyKeys = ["Bethesda", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:0",
@@ -83,9 +84,9 @@ namespace GameX
             //Game = "Starfield", // Starfield
         };
 #elif Bioware
-        static string[] FamilyKeys = new[] { "Bioware", "Unknown" };
+        static readonly string[] FamilyKeys = ["Bioware", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:0",
@@ -110,9 +111,9 @@ namespace GameX
             //Game = "ME:LE", // Mass Effect: Legendary Edition
         };
 #elif Black
-        static string[] FamilyKeys = new[] { "Black", "Unknown" };
+        static readonly string[] FamilyKeys = ["Black", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -121,9 +122,9 @@ namespace GameX
             //Game = "Fallout2", // Fallout 2
         };
 #elif Blizzard
-        static string[] FamilyKeys = new[] { "Blizzard", "Unknown" };
+        static readonly string[] FamilyKeys = ["Blizzard", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -142,9 +143,9 @@ namespace GameX
             //Game = "D4", // Diablo IV
         };
 #elif Bullfrog
-        static string[] FamilyKeys = new[] { "Bullfrog", "Unknown" };
+        static readonly string[] FamilyKeys = ["Bullfrog", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:0",
@@ -162,9 +163,9 @@ namespace GameX
             //Game = "DK2", // Dungeon Keeper 2
         };
 #elif Capcom
-        static string[] FamilyKeys = new[] { "Capcom", "Unknown" };
+        static readonly string[] FamilyKeys = ["Capcom", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -208,9 +209,9 @@ namespace GameX
             //Game = "DT:R", // XX
         };
 #elif Cig
-        static string[] FamilyKeys = new[] { "Cig", "Unknown" };
+        static readonly string[] FamilyKeys = ["Cig", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             //ForcePath = "app:DataForge",
             //ForcePath = "app:StarWords",
@@ -222,9 +223,9 @@ namespace GameX
             Game = "StarCitizen", // Star Citizen
         };
 #elif Cryptic
-        static string[] FamilyKeys = new[] { "Cryptic", "Unknown" };
+        static readonly string[] FamilyKeys = ["Cryptic", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:1",
@@ -234,9 +235,9 @@ namespace GameX
             //Game = "NVW", // Neverwinter [open, read]
         };
 #elif Crytek
-        static string[] FamilyKeys = new[] { "Crytek", "Unknown" };
+        static readonly string[] FamilyKeys = ["Crytek", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -252,9 +253,9 @@ namespace GameX
             //Game = "Snow", // SNOW - The Ultimate Edition
         };
 #elif Cyanide
-        static string[] FamilyKeys = new[] { "Cyanide", "Unknown" };
+        static readonly string[] FamilyKeys = ["Cyanide", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -263,9 +264,9 @@ namespace GameX
             //Game = "Werewolf:TA", // Werewolf: The Apocalypse - Earthblood
         };
 #elif EA
-        static string[] FamilyKeys = new[] { "EA", "Unknown" };
+        static readonly string[] FamilyKeys = ["EA", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -273,9 +274,9 @@ namespace GameX
             Game = "xx", // xx
         };
 #elif Epic
-        static string[] FamilyKeys = new[] { "Epic", "Unknown" };
+        static readonly string[] FamilyKeys = ["Epic", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -288,9 +289,9 @@ namespace GameX
             //Game = "BioShock:Inf", // BioShock Infinite
         };
 #elif Frictional
-        static string[] FamilyKeys = new[] { "Frictional", "Unknown" };
+        static readonly string[] FamilyKeys = ["Frictional", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -304,9 +305,9 @@ namespace GameX
             //Game = "A:R", // Amnesia: Rebirth
         };
 #elif Frontier
-        static string[] FamilyKeys = new[] { "Frontier", "Unknown" };
+        static readonly string[] FamilyKeys = ["Frontier", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -314,9 +315,9 @@ namespace GameX
             Game = "ED"
         };
 #elif ID
-        static string[] FamilyKeys = new[] { "ID", "Unknown" };
+        static readonly string[] FamilyKeys = ["ID", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:0",
@@ -334,9 +335,9 @@ namespace GameX
             Game = "Q:C", // Quake Champions
         };
 #elif IW
-        static string[] FamilyKeys = new[] { "IW", "Unknown" };
+        static readonly string[] FamilyKeys = ["IW", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -358,9 +359,9 @@ namespace GameX
             //Game = "Vanguard", // Call of Duty Vanguard
         };
 #elif Lucas
-        static string[] FamilyKeys = new[] { "Lucas", "Unknown" };
+        static readonly string[] FamilyKeys = ["Lucas", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             //Edition = "enhanced",
             ForceOpen = true,
@@ -445,9 +446,9 @@ namespace GameX
             //Game = "SW:TOR", // Star Wars: The Old Republic
         };
 #elif Monolith
-        static string[] FamilyKeys = new[] { "Monolith", "Unknown" };
+        static readonly string[] FamilyKeys = ["Monolith", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -459,9 +460,9 @@ namespace GameX
             //Game = "FEAR3", // F.E.A.R. 3
         };
 #elif Origin
-        static string[] FamilyKeys = new[] { "Origin", "Unknown" };
+        static readonly string[] FamilyKeys = ["Origin", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:6",
@@ -472,9 +473,9 @@ namespace GameX
             //Game = "U9", // Ultima IX
         };
 #elif Red
-        static string[] FamilyKeys = new[] { "Red", "Unknown" };
+        static readonly string[] FamilyKeys = ["Red", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -486,9 +487,9 @@ namespace GameX
             //Game = "Witcher4", // The Witcher 4 Polaris (future)
         };
 #elif Ubisoft
-        static string[] FamilyKeys = new[] { "Ubisoft", "Unknown" };
+        static readonly string[] FamilyKeys = ["Ubisoft", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -496,9 +497,9 @@ namespace GameX
             //Game = "XX", // xx
         };
 #elif Unity
-        static string[] FamilyKeys = new[] { "Unity", "Unknown" };
+        static readonly string[] FamilyKeys = ["Unity", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -509,10 +510,20 @@ namespace GameX
             //Game = "UBoat", // Destroyer: The U-Boat Hunter
             //Game = "7D2D", // 7 Days to Die
         };
-#elif Valve
-        static string[] FamilyKeys = new[] { "Valve", "Unknown" };
+#elif Unknown
+        static readonly string[] FamilyKeys = ["Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
+        {
+            ForceOpen = true,
+            ForcePath = "sample:*",
+            Family = "Unknown",
+            Game = "T", // Test
+        };
+#elif Valve
+        static readonly string[] FamilyKeys = ["Valve", "Unknown"];
+
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -545,9 +556,9 @@ namespace GameX
             //Game = "HL:Alyx", // Half-Life: Alyx [open, read, texture:GL, model:GL]
         };
 #elif Volition
-        static string[] FamilyKeys = new[] { "Volition", "Unknown" };
+        static readonly string[] FamilyKeys = ["Volition", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:0",
@@ -574,9 +585,9 @@ namespace GameX
             //Game = "SR", // Saints Row
         };
 #elif WB
-        static string[] FamilyKeys = new[] { "WB", "Unknown" };
+        static readonly string[] FamilyKeys = ["WB", "Unknown"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
             ForceOpen = true,
             ForcePath = "sample:*",
@@ -584,9 +595,9 @@ namespace GameX
             Game = "AC", // Asheron's Call [open, read, texture:GL]
         };
 #else
-        static string[] FamilyKeys = new[] { "Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "ID", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WB" };
+        static readonly string[] FamilyKeys = ["Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "ID", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WB"];
 
-        public static GlobalOption Option = new GlobalOption
+        public static GlobalOption Option = new()
         {
         };
 #endif
