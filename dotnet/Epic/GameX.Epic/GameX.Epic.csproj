@@ -6,10 +6,12 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
     <DefineConstants>$(DefineConstants);USE_COMPACT_PACKAGE_STRUCTS</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
     <DefineConstants>$(DefineConstants);USE_COMPACT_PACKAGE_STRUCTS</DefineConstants>
   </PropertyGroup>
 

@@ -5,11 +5,13 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Data\UO\Body.cs" />
-    <Compile Remove="Formats\UO\Binary_Font_DEL.cs" />
-    <Compile Remove="Formats\UO\_\Binary_Hue_DEL.cs" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
 
   <ItemGroup>
     <Content Include="Formats\UO\_\Binary_Font_DEL.cs" />

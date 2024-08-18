@@ -9,7 +9,7 @@ namespace GameX.App.Explorer
 {
     public class ResourceManager : MetaManager
     {
-        public static ResourceManager Current = new();
+        public readonly static ResourceManager Current = new();
         readonly Dictionary<string, BitmapImage> Icons = [];
         readonly ConcurrentDictionary<string, BitmapImage> ImageCache = new();
         readonly object _defaultIcon;

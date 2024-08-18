@@ -5,6 +5,14 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Platforms\GameX.Platform.OpenGL\GameX.Platform.OpenGL.csproj" />
     <ProjectReference Include="..\..\Platforms\GameX.Platform.StereoKit\GameX.Platform.StereoKit.csproj" />
@@ -15,7 +23,7 @@
 
   <ItemGroup>
     <Reference Include="UnityEngine">
-	  <HintPath>..\..\Base\Native\Unity\UnityEngine.dll</HintPath>
+	  <HintPath>..\..\Platforms\Unity\6000.0.15f1\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
 
