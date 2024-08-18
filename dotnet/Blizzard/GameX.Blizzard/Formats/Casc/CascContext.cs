@@ -1,5 +1,4 @@
-﻿using CASCLib;
-using GameX.Formats;
+﻿using GameX.FileSystems.Casc;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,18 +8,18 @@ namespace GameX.Blizzard.Formats.Casc
     public unsafe class CascContext
     {
         readonly BackgroundWorkerEx worker = new BackgroundWorkerEx();
-        CASCConfig config;
-        CASCHandler handle;
-        CASCFolder root;
+        CascConfig config;
+        CascHandler handle;
+        CascFolder root;
 
         public void Read(string filePath, string product, IList<FileSource> files)
         {
             var localeFlags = LocaleFlags.enUS;
-            CASCConfig.LoadFlags |= LoadFlags.Install;
+            CascConfig.LoadFlags |= LoadFlags.Install;
             config = false
-                ? CASCConfig.LoadOnlineStorageConfig(product, "us")
-                : CASCConfig.LoadLocalStorageConfig(filePath, product);
-            handle = CASCHandler.OpenStorage(config, worker);
+                ? CascConfig.LoadOnlineStorageConfig(product, "us")
+                : CascConfig.LoadLocalStorageConfig(filePath, product);
+            handle = CascHandler.OpenStorage(config, worker);
             handle.Root.SetFlags(localeFlags, false, false);
             CascLoadFileDataComplete(handle);
             handle.Root.LoadListFile("listfile.csv", worker);
@@ -30,7 +29,7 @@ namespace GameX.Blizzard.Formats.Casc
             CascLoadFiles(handle, root, files);
         }
 
-        static void CascLoadFiles(CASCHandler handle, CASCFolder folder, IList<FileSource> files)
+        static void CascLoadFiles(CascHandler handle, CascFolder folder, IList<FileSource> files)
         {
             foreach (var f in folder.Files.Values)
                 files.Add(new FileSource
@@ -43,7 +42,7 @@ namespace GameX.Blizzard.Formats.Casc
                 CascLoadFiles(handle, f, files);
         }
 
-        static void CascLoadFileDataComplete(CASCHandler casc)
+        static void CascLoadFileDataComplete(CascHandler casc)
         {
             if (!casc.FileExists("DBFilesClient\\FileDataComplete.db2"))
                 return;
@@ -64,7 +63,7 @@ namespace GameX.Blizzard.Formats.Casc
                         //Logger.WriteLine("Invalid file name: {0}", fullname);
                         continue;
                     }
-                    CASCFile.Files[fileHash] = new CASCFile(fileHash, fullname);
+                    CascFile.Files[fileHash] = new CascFile(fileHash, fullname);
                 }
             }
         }

@@ -1,11 +1,11 @@
-﻿using CASCLib;
+﻿using GameX.FileSystems.Casc;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using Ext = CASCLib.CStringExtensions;
+using Ext = GameX.FileSystems.Casc.CStringExtensions;
 
 namespace GameX.Blizzard.Formats.Casc
 {

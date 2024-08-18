@@ -1,4 +1,4 @@
-﻿using CASCLib;
+﻿using GameX.FileSystems.Casc;
 using System;
 using System.Collections;
 using System.Collections.Generic;

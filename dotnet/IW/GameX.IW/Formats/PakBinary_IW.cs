@@ -1,6 +1,4 @@
-﻿using CASCLib;
-using GameX.Blizzard.Formats.Casc;
-using GameX.Formats;
+﻿using GameX.Blizzard.Formats.Casc;
 using ICSharpCode.SharpZipLib.Zip;
 using System;
 using System.Collections.Generic;
@@ -8,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using static OpenStack.Debug;
 using ZipFile = ICSharpCode.SharpZipLib.Zip.ZipFile;
 
 namespace GameX.IW.Formats
