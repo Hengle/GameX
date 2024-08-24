@@ -19,7 +19,7 @@ namespace GameX.Capcom
             HashEntries = pak.Entries.ToDictionary(x => x.Name, x => x);
         }
 
-        static readonly ConcurrentDictionary<string, IDictionary<ulong, string>> HashLookups = new ConcurrentDictionary<string, IDictionary<ulong, string>>();
+        static readonly ConcurrentDictionary<string, IDictionary<ulong, string>> HashLookups = new();
         public static IDictionary<ulong, string> GetHashLookup(string path) => HashLookups.GetOrAdd(path, x =>
         {
             var value = new Dictionary<ulong, string>();

@@ -87,7 +87,7 @@ namespace GameX.Bethesda.Formats
                 return Task.CompletedTask;
             }
             // read groups
-            Groups = new Dictionary<string, RecordGroup>();
+            Groups = [];
             var endPosition = r.BaseStream.Length;
             while (r.BaseStream.Position < endPosition)
             {

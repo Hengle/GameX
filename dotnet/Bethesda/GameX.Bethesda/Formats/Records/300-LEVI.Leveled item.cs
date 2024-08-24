@@ -10,8 +10,8 @@ namespace GameX.Bethesda.Formats.Records
         public IN32Field DATA; // List data - 1 = Calc from all levels <= PC level, 2 = Calc for each item
         public BYTEField NNAM; // Chance None?
         public IN32Field INDX; // Number of items in list
-        public List<STRVField> INAMs = new List<STRVField>(); // ID string of list item
-        public List<IN16Field> INTVs = new List<IN16Field>(); // PC level for previous INAM
+        public List<STRVField> INAMs = []; // ID string of list item
+        public List<IN16Field> INTVs = []; // PC level for previous INAM
         // The CNAM/INTV can occur many times in pairs
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)

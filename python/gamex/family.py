@@ -334,10 +334,10 @@ class FamilyGame:
         self.family = family
         self.id = id
         if not dgame:
-            self.ignore = False; self.searchBy = 'Default'; self.paks = ['game:/']
+            self.ignore = False; self.searchBy = 'Default'; self.paks = ['game:/']; self.dats = []
             self.gameType = self.engine = self.resource = \
             self.paths = self.key = self.detector = self.fileSystemType = \
-            self.pakFileType = self.pakExts = None
+            self.pakFileType = self.pakExts = self.datExts = None
             return
         self.ignore = _value(elem, 'n/a', dgame.ignore)
         self.name = _value(elem, 'name')
@@ -347,7 +347,7 @@ class FamilyGame:
         self.date = _value(elem, 'date')
         #self.option = _list(elem, 'option', dgame.option)
         self.paks = _list(elem, 'pak', dgame.paks)
-        #self.dats = _list(elem, 'dats', dgame.dats)
+        self.dats = _list(elem, 'dat', dgame.dats)
         self.paths = _list(elem, 'path', dgame.paths)
         self.key = _method(elem, 'key', createKey, dgame.key)
         # self.status = _value(elem, 'status')
@@ -357,6 +357,7 @@ class FamilyGame:
         self.searchBy = _value(elem, 'searchBy', dgame.searchBy)
         self.pakFileType = _value(elem, 'pakFileType', dgame.pakFileType)
         self.pakExts = _list(elem, 'pakExt', dgame.pakExts) 
+        self.datExts = _list(elem, 'datExt', dgame.datExts) 
         # related
         self.editions = _related(elem, 'editions', lambda k,v: FamilyGame.Edition(k, v))
         self.dlcs = _related(elem, 'dlcs', lambda k,v: FamilyGame.DownloadableContent(k, v))
@@ -377,7 +378,11 @@ class FamilyGame:
 
     # converts the Paks to Application Paks
     def toPaks(self, edition: str) -> list[str]:
-        return [f'{x}#{self.id}' for x in self.paks] # if self.paks else []
+        return [f'{x}#{self.id}' + f'.{edition}' if edition else '' for x in self.paks] # if self.paks else []
+
+    # converts the Dats to Application Dats
+    def toDats(self, edition: str) -> list[str]:
+        return [f'{x}#{self.id}' + f'.{edition}' if edition else '' for x in self.dats] # if self.dats else []
 
     # gets a family sample
     def getSample(self, id: str) -> FamilySample.File:
@@ -422,24 +427,20 @@ class FamilyGame:
                 else:
                     pakFiles.append(self.createPakFileObj(fileSystem, edition,
                         (p[0], [x for x in p[1] if x.find(slash) >= 0]) if self.searchBy == 'DirDown' else p))
-        return FamilyGame.withPlatform(self.createPakFileObj(fileSystem, edition, pakFiles))
+        return FamilyGame.withPlatform(pakFiles[0] if len(pakFiles) == 1 else self.createPakFileObj(fileSystem, edition, pakFiles))
 
     # create createPakFileObj
     def createPakFileObj(self, fileSystem: IFileSystem, edition: Edition, value: object, tag: object = None) -> PakFile:
+        pakState = PakState(fileSystem, self, edition, value if value is isinstance(value, str) else None, tag)
         match value:
-            case s if isinstance(value, str):
-                return self.createPakFileType(PakState(fileSystem, self, edition, s, tag)) if self.isPakFile(s) else \
-                    _throw(f'{self.id} missing {s}')
+            case s if isinstance(value, str): return self.createPakFileType(pakState) if self.isPakFile(s) else _throw(f'{self.id} missing {s}')
             case p, l if isinstance(value, tuple):
                 return self.createPakFileObj(fileSystem, edition, l[0], tag) if len(l) == 1 and self.isPakFile(l[0]) \
                     else ManyPakFile(
-                        self.createPakFileType(PakState(fileSystem, self, edition, None, tag)),
-                        PakState(fileSystem, self, edition, None, tag),
+                        self.createPakFileType(pakState), pakState,
                         p if len(p) > 0 else 'Many', l,
                         pathSkip = len(p) + 1 if len(p) > 0 else 0)
-            case s if isinstance(value, list):
-                return s[0] if len(s) == 1 else \
-                    MultiPakFile(PakState(fileSystem, self, edition, None, tag), 'Multi', s)
+            case s if isinstance(value, list): return s[0] if len(s) == 1 else MultiPakFile(pakState, 'Multi', s)
             case None: return None
             case _: raise Exception(f'Unknown: {value}')
 

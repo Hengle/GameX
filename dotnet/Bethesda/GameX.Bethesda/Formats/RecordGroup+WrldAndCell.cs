@@ -25,11 +25,10 @@ namespace GameX.Bethesda.Formats
             return null;
         }
 
-        //  = nxn[nbits] + 4x4[2bits] + 8x8[3bit]
+        //= nxn[nbits] + 4x4[2bits] + 8x8[3bit]
         public RecordGroup EnsureCell(Int3 cellId)
         {
-            if (_ensureCELLsByLabel == null)
-                _ensureCELLsByLabel = new HashSet<byte[]>(ByteArrayComparer.Default);
+            _ensureCELLsByLabel ??= new HashSet<byte[]>(ByteArrayComparer.Default);
             var cellBlockX = (short)(cellId.X >> 5);
             var cellBlockY = (short)(cellId.Y >> 5);
             var cellSubBlockX = (short)(cellId.X >> 3);
@@ -37,13 +36,10 @@ namespace GameX.Bethesda.Formats
             var cellSubBlockId = new byte[4];
             Buffer.BlockCopy(BitConverter.GetBytes(cellSubBlockY), 0, cellSubBlockId, 0, 2);
             Buffer.BlockCopy(BitConverter.GetBytes(cellSubBlockX), 0, cellSubBlockId, 2, 2);
-            if (_ensureCELLsByLabel.Contains(cellSubBlockId))
-                return this;
+            if (_ensureCELLsByLabel.Contains(cellSubBlockId)) return this;
             Load();
-            if (CELLsById == null)
-                CELLsById = new Dictionary<Int3, CELLRecord>();
-            if (LANDsById == null && cellId.Z >= 0)
-                LANDsById = new Dictionary<Int3, LANDRecord>();
+            CELLsById ??= [];
+            LANDsById ??= cellId.Z >= 0 ? [] : null;
             if (GroupsByLabel.TryGetValue(cellSubBlockId, out var cellSubBlocks))
             {
                 // find cell

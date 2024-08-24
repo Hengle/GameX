@@ -1,5 +1,4 @@
-﻿using OpenStack;
-using OpenStack.Gfx;
+﻿using OpenStack.Gfx;
 using OpenStack.Sfx;
 using System;
 using System.Collections.Generic;
@@ -23,18 +22,12 @@ namespace GameX.Platforms
 
     #region AudioManager
 
-    public class AudioManager<Audio> : IAudioManager<Audio>
+    public class AudioManager<Audio>(PakFile pakFile, AudioBuilderBase<Audio> builder) : IAudioManager<Audio>
     {
-        readonly PakFile PakFile;
-        readonly AudioBuilderBase<Audio> Builder;
+        readonly PakFile PakFile = pakFile;
+        readonly AudioBuilderBase<Audio> Builder = builder;
         readonly Dictionary<object, (Audio aud, object tag)> CachedAudios = [];
         readonly Dictionary<object, Task<object>> PreloadTasks = [];
-
-        public AudioManager(PakFile pakFile, AudioBuilderBase<Audio> builder)
-        {
-            PakFile = pakFile;
-            Builder = builder;
-        }
 
         public (Audio aud, object tag) CreateAudio(object path)
         {
@@ -93,18 +86,12 @@ namespace GameX.Platforms
 
     #region TextureManager
 
-    public class TextureManager<Texture> : ITextureManager<Texture>
+    public class TextureManager<Texture>(PakFile pakFile, TextureBuilderBase<Texture> builder) : ITextureManager<Texture>
     {
-        readonly PakFile PakFile;
-        readonly TextureBuilderBase<Texture> Builder;
+        readonly PakFile PakFile = pakFile;
+        readonly TextureBuilderBase<Texture> Builder = builder;
         readonly Dictionary<object, (Texture tex, object tag)> CachedTextures = [];
         readonly Dictionary<object, Task<ITexture>> PreloadTasks = [];
-
-        public TextureManager(PakFile pakFile, TextureBuilderBase<Texture> builder)
-        {
-            PakFile = pakFile;
-            Builder = builder;
-        }
 
         public Texture CreateSolidTexture(int width, int height, params float[] rgba) => Builder.CreateSolidTexture(width, height, rgba);
 
@@ -167,17 +154,11 @@ namespace GameX.Platforms
 
     #region ShaderManager
 
-    public class ShaderManager<Shader> : IShaderManager<Shader>
+    public class ShaderManager<Shader>(PakFile pakFile, ShaderBuilderBase<Shader> builder) : IShaderManager<Shader>
     {
         static readonly Dictionary<string, bool> EmptyArgs = [];
-        readonly PakFile PakFile;
-        readonly ShaderBuilderBase<Shader> Builder;
-
-        public ShaderManager(PakFile pakFile, ShaderBuilderBase<Shader> builder)
-        {
-            PakFile = pakFile;
-            Builder = builder;
-        }
+        readonly PakFile PakFile = pakFile;
+        readonly ShaderBuilderBase<Shader> Builder = builder;
 
         public (Shader sha, object tag) CreateShader(object path, IDictionary<string, bool> args = null)
             => (Builder.CreateShader(path, args ?? EmptyArgs), null);
@@ -201,20 +182,13 @@ namespace GameX.Platforms
 
     #region ObjectManager
 
-    public class ObjectManager<Object, Material, Texture> : IObjectManager<Object, Material, Texture>
+    public class ObjectManager<Object, Material, Texture>(PakFile pakFile, IMaterialManager<Material, Texture> materialManager, ObjectBuilderBase<Object, Material, Texture> builder) : IObjectManager<Object, Material, Texture>
     {
-        readonly PakFile PakFile;
-        readonly IMaterialManager<Material, Texture> MaterialManager;
-        readonly ObjectBuilderBase<Object, Material, Texture> Builder;
+        readonly PakFile PakFile = pakFile;
+        readonly IMaterialManager<Material, Texture> MaterialManager = materialManager;
+        readonly ObjectBuilderBase<Object, Material, Texture> Builder = builder;
         readonly Dictionary<object, (Object obj, object tag)> CachedObjects = new Dictionary<object, (Object obj, object tag)>();
         readonly Dictionary<object, Task<object>> PreloadTasks = new Dictionary<object, Task<object>>();
-
-        public ObjectManager(PakFile pakFile, IMaterialManager<Material, Texture> materialManager, ObjectBuilderBase<Object, Material, Texture> builder)
-        {
-            PakFile = pakFile;
-            MaterialManager = materialManager;
-            Builder = builder;
-        }
 
         public (Object obj, object tag) CreateObject(object path)
         {
@@ -245,14 +219,12 @@ namespace GameX.Platforms
 
     #region MaterialBuilderBase
 
-    public abstract class MaterialBuilderBase<Material, Texture>
+    public abstract class MaterialBuilderBase<Material, Texture>(ITextureManager<Texture> textureManager)
     {
-        protected ITextureManager<Texture> TextureManager;
+        protected ITextureManager<Texture> TextureManager = textureManager;
         public float? NormalGeneratorIntensity = 0.75f;
         public abstract Material DefaultMaterial { get; }
 
-        public MaterialBuilderBase(ITextureManager<Texture> textureManager) => TextureManager = textureManager;
-  
         public abstract Material CreateMaterial(object path);
     }
 
@@ -263,21 +235,13 @@ namespace GameX.Platforms
     /// <summary>
     /// Manages loading and instantiation of materials.
     /// </summary>
-    public class MaterialManager<Material, Texture> : IMaterialManager<Material, Texture>
+    public class MaterialManager<Material, Texture>(PakFile pakFile, ITextureManager<Texture> textureManager, MaterialBuilderBase<Material, Texture> builder) : IMaterialManager<Material, Texture>
     {
-        readonly PakFile PakFile;
-        readonly MaterialBuilderBase<Material, Texture> Builder;
+        readonly PakFile PakFile = pakFile;
+        readonly MaterialBuilderBase<Material, Texture> Builder = builder;
         readonly Dictionary<object, (Material material, object tag)> CachedMaterials = [];
         readonly Dictionary<object, Task<IMaterial>> PreloadTasks = [];
-
-        public ITextureManager<Texture> TextureManager { get; }
-
-        public MaterialManager(PakFile pakFile, ITextureManager<Texture> textureManager, MaterialBuilderBase<Material, Texture> builder)
-        {
-            PakFile = pakFile;
-            TextureManager = textureManager;
-            Builder = builder;
-        }
+        public ITextureManager<Texture> TextureManager { get; } = textureManager;
 
         public (Material mat, object tag) CreateMaterial(object path)
         {
@@ -370,15 +334,13 @@ namespace GameX.Platforms
         /// </summary>
         public class Stats
         {
-            static readonly bool _HighRes = Stopwatch.IsHighResolution;
-            static readonly double _HighFrequency = 1000.0 / Stopwatch.Frequency;
-            static readonly double _LowFrequency = 1000.0 / TimeSpan.TicksPerSecond;
-            static bool _UseHRT = false;
-
-            public static bool UsingHighResolutionTiming => _UseHRT && _HighRes && !Unix;
+            static readonly bool HighRes = Stopwatch.IsHighResolution;
+            static readonly double HighFrequency = 1000.0 / Stopwatch.Frequency;
+            static readonly double LowFrequency = 1000.0 / TimeSpan.TicksPerSecond;
+            static readonly bool UseHrt = false;
+            public static bool UsingHighResolutionTiming => UseHrt && HighRes && !Unix;
             public static long TickCount => (long)Ticks;
-            public static double Ticks => _UseHRT && _HighRes && !Unix ? Stopwatch.GetTimestamp() * _HighFrequency : DateTime.UtcNow.Ticks * _LowFrequency;
-
+            public static double Ticks => UseHrt && HighRes && !Unix ? Stopwatch.GetTimestamp() * HighFrequency : DateTime.UtcNow.Ticks * LowFrequency;
             public static readonly bool Is64Bit = Environment.Is64BitProcess;
             public static bool MultiProcessor { get; private set; }
             public static int ProcessorCount { get; private set; }
@@ -393,9 +355,9 @@ namespace GameX.Platforms
             PlatformType = Type.Unknown;
             GfxFactory = source => null; // throw new Exception("No GfxFactory");
             SfxFactory = source => null; // throw new Exception("No SfxFactory");
-            Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
-            Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
-            Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);
+            AssertFunc = x => System.Diagnostics.Debug.Assert(x);
+            LogFunc = a => System.Diagnostics.Debug.Print(a);
+            LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);
         }
     }
 
@@ -405,11 +367,9 @@ namespace GameX.Platforms
 
     public interface ITestGfx : IOpenGfx { }
 
-    public class TestGfx : ITestGfx
+    public class TestGfx(PakFile source) : ITestGfx
     {
-        readonly PakFile _source;
-
-        public TestGfx(PakFile source) => _source = source;
+        readonly PakFile _source = source;
         public object Source => _source;
         public Task<T> LoadFileObject<T>(object path) => throw new NotSupportedException();
         public void PreloadTexture(object path) => throw new NotSupportedException();
@@ -422,11 +382,9 @@ namespace GameX.Platforms
 
     public interface ITestSfx : IOpenSfx { }
 
-    public class TestSfx : ITestSfx
+    public class TestSfx(PakFile source) : ITestSfx
     {
-        readonly PakFile _source;
-
-        public TestSfx(PakFile source) => _source = source;
+        readonly PakFile _source = source;
         public object Source => _source;
     }
 
@@ -443,9 +401,9 @@ namespace GameX.Platforms
                 Platform.PlatformType = Platform.Type.Test;
                 Platform.GfxFactory = source => new TestGfx(source);
                 Platform.SfxFactory = source => new TestSfx(source);
-                Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);
-                Debug.LogFunc = a => System.Diagnostics.Debug.Print(a);
-                Debug.LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);
+                AssertFunc = x => System.Diagnostics.Debug.Assert(x);
+                LogFunc = a => System.Diagnostics.Debug.Print(a);
+                LogFormatFunc = (a, b) => System.Diagnostics.Debug.Print(a, b);
                 return true;
             }
             catch { return false; }

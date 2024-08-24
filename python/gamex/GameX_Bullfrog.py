@@ -28,7 +28,7 @@ class BullfrogGame(FamilyGame):
 class BullfrogPakFile(BinaryPakFile):
     def __init__(self, state: PakState):
         super().__init__(state, self.getPakBinary(state.game, state.path))
-        self.objectFactoryFactoryMethod = self.objectFactoryFactory
+        self.objectFactoryFunc = self.objectFactoryFactory
 
     #region Factories
     @staticmethod

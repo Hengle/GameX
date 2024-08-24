@@ -20,7 +20,7 @@ namespace GameX.IW
         /// <param name="state">The state.</param>
         public IWPakFile(PakState state) : base(state, PakBinary_IW.Instance)
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
             UseReader = false;
         }
 

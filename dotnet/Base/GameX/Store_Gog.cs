@@ -13,7 +13,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Gog
     {
-        internal static Dictionary<string, string> GogPaths = [];
+        internal static readonly Dictionary<string, string> GogPaths = [];
 
         static Store_Gog()
         {

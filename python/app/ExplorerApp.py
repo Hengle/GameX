@@ -16,5 +16,5 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     p = MainPage()
-    p.onReady()
+    p.startup()
     sys.exit(app.exec())

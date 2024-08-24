@@ -17,10 +17,6 @@
     "CAT": {
       "name": "Catalog",
       "pak": "game:/main.yaml"
-    },
-    "T": {
-      "name": "T",
-      "pakExt": ".pak"
     }
   },
   "fileManager": {
@@ -30,15 +26,12 @@
       },
       "CAT": {
         "path": "%AppPath%/catalogs"
-      },
-      "T": {
-        "path": "%AppPath%"
       }
     },
     "applications": {},
     "virtuals": {
-      "T": {
-        "_testtri": null
+      "APP": {
+        "testtri.gfx": null
       }
     }
   }

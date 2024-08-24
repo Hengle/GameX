@@ -2,11 +2,9 @@ using GameX.Formats;
 
 namespace GameX.Bethesda
 {
-    public class Database
+    public class Database(PakFile source)
     {
-        public readonly BinaryPakFile Source;
-
-        public Database(PakFile source) => Source = source as BinaryPakFile;
+        public readonly BinaryPakFile Source = source as BinaryPakFile;
 
         public override string ToString() => Source.Name;
 

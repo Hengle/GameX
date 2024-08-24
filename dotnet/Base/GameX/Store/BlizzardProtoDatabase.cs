@@ -100,7 +100,7 @@ namespace GameX.Store {
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
             new pbr::GeneratedClrTypeInfo(new[] {typeof(global::GameX.Store.LanguageOption), typeof(global::GameX.Store.LanguageSettingType), typeof(global::GameX.Store.ShortcutOption), typeof(global::GameX.Store.Operation), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::GameX.Store.LanguageSetting), global::GameX.Store.LanguageSetting.Parser, new[]{ "Language", "Option" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::GameX.Store.LanguageSetting), global::GameX.Store.LanguageSetting.Parser, new[]{ "Language", "Config" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::GameX.Store.UserSettings), global::GameX.Store.UserSettings.Parser, new[]{ "InstallPath", "PlayRegion", "DesktopShortcut", "StartmenuShortcut", "LanguageSettings", "SelectedTextLanguage", "SelectedSpeechLanguage", "Languages", "AdditionalTags", "VersionBranch", "AccountCountry", "GeoIpCountry", "GameSubfolder" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::GameX.Store.InstallHandshake), global::GameX.Store.InstallHandshake.Parser, new[]{ "Product", "Uid", "Settings" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::GameX.Store.BuildConfig), global::GameX.Store.BuildConfig.Parser, new[]{ "Region", "BuildConfig_" }, null, null, null, null),

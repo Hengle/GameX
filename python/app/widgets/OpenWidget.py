@@ -143,10 +143,10 @@ class OpenWidget(QWidget):
         self.callback(self)
         self.close()
 
-    def onReady(self):
-        if not config.Family: return
-        self.familyInput.setCurrentIndex(_find([x.id for x in familyValues], config.Family) + 1)
-        if not config.Game: return
-        self.gameInput.setCurrentIndex(_find([x.id for x in self.gameValues], config.Game) + 1)
-        self.editionInput.setCurrentIndex(_find([x.id for x in self.editionValues], config.Edition or '') + 1)
-        if config.ForceOpen: self.open_click()
+    def loaded(self):
+        if not option.Family: return
+        self.familyInput.setCurrentIndex(_find([x.id for x in familyValues], option.Family) + 1)
+        if not option.Game: return
+        self.gameInput.setCurrentIndex(_find([x.id for x in self.gameValues], option.Game) + 1)
+        if self.editionInput: self.editionInput.setCurrentIndex(_find([x.id for x in self.editionValues], option.Edition or '') + 1)
+        if option.ForceOpen: self.open_click()

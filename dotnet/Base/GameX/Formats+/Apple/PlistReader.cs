@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
@@ -33,18 +32,16 @@ namespace GameX.Formats.Apple
         /// <summary>
         /// Represents an item in a binary plist's object table.
         /// </summary>
-        class PlistItem
+        /// <remarks>
+        /// Initializes a new instance of the BinaryPlistItem class.
+        /// </remarks>
+        /// <param name="value">The value of the object the item represents.</param>
+        class PlistItem(object value)
         {
-            /// <summary>
-            /// Initializes a new instance of the BinaryPlistItem class.
-            /// </summary>
-            /// <param name="value">The value of the object the item represents.</param>
-            public PlistItem(object value) => Value = value;
-
             /// <summary>
             /// Gets the item's byte value collection.
             /// </summary>
-            public List<byte> ByteValue = new List<byte>();
+            public List<byte> ByteValue = [];
 
             /// <summary>
             /// Gets or sets a value indicating whether this item represents an array.
@@ -59,7 +56,7 @@ namespace GameX.Formats.Apple
             /// <summary>
             /// Gets the item's marker value collection.
             /// </summary>
-            public List<byte> Marker = new List<byte>();
+            public List<byte> Marker = [];
 
             /// <summary>
             /// Gets the item's size, which is a sum of the <see cref="Marker"/> and <see cref="ByteValue"/> lengths.
@@ -69,7 +66,7 @@ namespace GameX.Formats.Apple
             /// <summary>
             /// Gets or sets the object value this item represents.
             /// </summary>
-            public object Value;
+            public object Value = value;
 
             /// <summary>
             /// Sets the <see cref="ByteValue"/> to the given collection.
@@ -91,7 +88,12 @@ namespace GameX.Formats.Apple
         /// <summary>
         /// Represents an array value in a binary plist.
         /// </summary>
-        class PlistArray
+        /// <remarks>
+        /// Initializes a new instance of the BinaryPlistArray class.
+        /// </remarks>
+        /// <param name="objectTable">A reference to the binary plist's object table.</param>
+        /// <param name="size">The size of the array.</param>
+        class PlistArray(IList<PlistItem> objectTable, int size)
         {
             /// <summary>
             /// Initializes a new instance of the BinaryPlistArray class.
@@ -100,25 +102,14 @@ namespace GameX.Formats.Apple
             public PlistArray(IList<PlistItem> objectTable) : this(objectTable, 0) { }
 
             /// <summary>
-            /// Initializes a new instance of the BinaryPlistArray class.
-            /// </summary>
-            /// <param name="objectTable">A reference to the binary plist's object table.</param>
-            /// <param name="size">The size of the array.</param>
-            public PlistArray(IList<PlistItem> objectTable, int size)
-            {
-                ObjectReference = new List<int>(size);
-                ObjectTable = objectTable;
-            }
-
-            /// <summary>
             /// Gets the array's object reference collection.
             /// </summary>
-            public IList<int> ObjectReference;
+            public IList<int> ObjectReference = new List<int>(size);
 
             /// <summary>
             /// Gets a reference to the binary plist's object table.
             /// </summary>
-            public IList<PlistItem> ObjectTable;
+            public IList<PlistItem> ObjectTable = objectTable;
 
             /// <summary>
             /// Converts this instance into an <see cref="T:object[]"/> array.
@@ -142,8 +133,7 @@ namespace GameX.Formats.Apple
                         else
                         {
                             innerArray = objectValue as PlistArray;
-                            if (innerArray != null)
-                                objectValue = innerArray.ToArray();
+                            if (innerArray != null) objectValue = innerArray.ToArray();
                         }
                         array[i] = objectValue;
                     }
@@ -173,34 +163,27 @@ namespace GameX.Formats.Apple
         /// <summary>
         /// Represents a dictionary in a binary plist.
         /// </summary>
-        class PlistDictionary
+        /// <remarks>
+        /// Initializes a new instance of the BinaryPlistDictionary class.
+        /// </remarks>
+        /// <param name="objectTable">A reference to the binary plist's object table.</param>
+        /// <param name="size">The size of the dictionary.</param>
+        class PlistDictionary(IList<PlistItem> objectTable, int size)
         {
-            /// <summary>
-            /// Initializes a new instance of the BinaryPlistDictionary class.
-            /// </summary>
-            /// <param name="objectTable">A reference to the binary plist's object table.</param>
-            /// <param name="size">The size of the dictionary.</param>
-            public PlistDictionary(IList<PlistItem> objectTable, int size)
-            {
-                KeyReference = new List<int>(size);
-                ObjectReference = new List<int>(size);
-                ObjectTable = objectTable;
-            }
-
             /// <summary>
             /// Gets the dictionary's key reference collection.
             /// </summary>
-            public IList<int> KeyReference;
+            public IList<int> KeyReference = new List<int>(size);
 
             /// <summary>
             /// Gets the dictionary's object reference collection.
             /// </summary>
-            public IList<int> ObjectReference;
+            public IList<int> ObjectReference = new List<int>(size);
 
             /// <summary>
             /// Gets a reference to the binary plist's object table.
             /// </summary>
-            public IList<PlistItem> ObjectTable;
+            public IList<PlistItem> ObjectTable = objectTable;
 
             /// <summary>
             /// Converts this instance into a <see cref="Dictionary{Object, Object}"/>.
@@ -276,7 +259,7 @@ namespace GameX.Formats.Apple
         /// <summary>
         /// Gets Apple's reference date value.
         /// </summary>
-        static readonly DateTime ReferenceDate = new DateTime(2001, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        static readonly DateTime ReferenceDate = new(2001, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         List<PlistItem> objectTable;
         List<int> offsetTable;
@@ -362,7 +345,7 @@ namespace GameX.Formats.Apple
 
                 if (objectTable[^1].Value is PlistDictionary root) dictionary = root.ToDictionary();
                 else throw new InvalidOperationException($"Unsupported root plist object: {objectTable[^1].GetType()}. A dictionary must be the root plist object.");
-                return dictionary ?? new Dictionary<object, object>();
+                return dictionary ?? [];
             }
             finally
             {
@@ -448,9 +431,9 @@ namespace GameX.Formats.Apple
             if (buffer.Length > 1 && BitConverter.IsLittleEndian) Array.Reverse(buffer);
             return size switch
             {
-                1 => (long)buffer[0],
-                2 => (long)BitConverter.ToUInt16(buffer, 0),
-                4 => (long)BitConverter.ToUInt32(buffer, 0),
+                1 => buffer[0],
+                2 => BitConverter.ToUInt16(buffer, 0),
+                4 => BitConverter.ToUInt32(buffer, 0),
                 8 => (long)BitConverter.ToUInt64(buffer, 0),
                 _ => throw new InvalidOperationException($"Unsupported variable-length integer size: {size}"),
             };
@@ -557,7 +540,7 @@ namespace GameX.Formats.Apple
         /// <returns>A dictionary value.</returns>
         PlistDictionary ReadDictionary(BinaryReader r, long index, int size)
         {
-            PlistDictionary dictionary = new PlistDictionary(objectTable, size);
+            PlistDictionary dictionary = new(objectTable, size);
             var skip = size * objectRefSize;
             for (var i = 0; i < size; i++)
             {
@@ -675,8 +658,8 @@ namespace GameX.Formats.Apple
         void Reset()
         {
             objectRefSize = objectCount = offsetIntSize = offsetTableOffset = topLevelObjectOffset = 0;
-            objectTable = new List<PlistItem>();
-            offsetTable = new List<int>();
+            objectTable = [];
+            offsetTable = [];
         }
     }
 }

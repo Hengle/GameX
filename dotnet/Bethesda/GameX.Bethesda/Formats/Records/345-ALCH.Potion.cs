@@ -32,28 +32,16 @@ namespace GameX.Bethesda.Formats.Records
         }
 
         // TES3
-        public struct ENAMField
+        public struct ENAMField(BinaryReader r, int dataSize)
         {
-            public short EffectId;
-            public byte SkillId; // for skill related effects, -1/0 otherwise
-            public byte AttributeId; // for attribute related effects, -1/0 otherwise
-            public int Unknown1;
-            public int Unknown2;
-            public int Duration;
-            public int Magnitude;
-            public int Unknown4;
-
-            public ENAMField(BinaryReader r, int dataSize)
-            {
-                EffectId = r.ReadInt16();
-                SkillId = r.ReadByte();
-                AttributeId = r.ReadByte();
-                Unknown1 = r.ReadInt32();
-                Unknown2 = r.ReadInt32();
-                Duration = r.ReadInt32();
-                Magnitude = r.ReadInt32();
-                Unknown4 = r.ReadInt32();
-            }
+            public short EffectId = r.ReadInt16();
+            public byte SkillId = r.ReadByte(); // for skill related effects, -1/0 otherwise
+            public byte AttributeId = r.ReadByte(); // for attribute related effects, -1/0 otherwise
+            public int Unknown1 = r.ReadInt32();
+            public int Unknown2 = r.ReadInt32();
+            public int Duration = r.ReadInt32();
+            public int Magnitude = r.ReadInt32();
+            public int Unknown4 = r.ReadInt32();
         }
 
         public override string ToString() => $"ALCH: {EDID.Value}";
@@ -65,8 +53,8 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField ICON; // Icon
         public FMIDField<SCPTRecord>? SCRI; // Script (optional)
         // TES4
-        public List<ENCHRecord.EFITField> EFITs = new List<ENCHRecord.EFITField>(); // Effect Data
-        public List<ENCHRecord.SCITField> SCITs = new List<ENCHRecord.SCITField>(); // Script Effect Data
+        public List<ENCHRecord.EFITField> EFITs = []; // Effect Data
+        public List<ENCHRecord.SCITField> SCITs = []; // Script Effect Data
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

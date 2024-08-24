@@ -7,35 +7,22 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class REFRRecord : Record
     {
-        public struct XTELField
+        public struct XTELField(BinaryReader r, int dataSize)
         {
-            public FormId<REFRRecord> Door;
-            public Vector3 Position;
-            public Vector3 Rotation;
-
-            public XTELField(BinaryReader r, int dataSize)
-            {
-                Door = new FormId<REFRRecord>(r.ReadUInt32());
-                Position = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
-                Rotation = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
-            }
+            public FormId<REFRRecord> Door = new(r.ReadUInt32());
+            public Vector3 Position = new(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
+            public Vector3 Rotation = new(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
         }
 
-        public struct DATAField
+        public struct DATAField(BinaryReader r, int dataSize)
         {
-            public Vector3 Position;
-            public Vector3 Rotation;
-
-            public DATAField(BinaryReader r, int dataSize)
-            {
-                Position = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
-                Rotation = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
-            }
+            public Vector3 Position = new(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
+            public Vector3 Rotation = new(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
         }
 
         public struct XLOCField
         {
-            public override string ToString() => $"{Key}";
+            public override readonly string ToString() => $"{Key}";
             public byte LockLevel;
             public FormId<KEYMRecord> Key;
             public byte Flags;
@@ -45,8 +32,7 @@ namespace GameX.Bethesda.Formats.Records
                 LockLevel = r.ReadByte();
                 r.Skip(3); // Unused
                 Key = new FormId<KEYMRecord>(r.ReadUInt32());
-                if (dataSize == 16)
-                    r.Skip(4); // Unused
+                if (dataSize == 16) r.Skip(4); // Unused
                 Flags = r.ReadByte();
                 r.Skip(3); // Unused
             }
@@ -54,7 +40,7 @@ namespace GameX.Bethesda.Formats.Records
 
         public struct XESPField
         {
-            public override string ToString() => $"{Reference}";
+            public override readonly string ToString() => $"{Reference}";
             public FormId<Record> Reference;
             public byte Flags;
 
@@ -68,14 +54,13 @@ namespace GameX.Bethesda.Formats.Records
 
         public struct XSEDField
         {
-            public override string ToString() => $"{Seed}";
+            public override readonly string ToString() => $"{Seed}";
             public byte Seed;
 
             public XSEDField(BinaryReader r, int dataSize)
             {
                 Seed = r.ReadByte();
-                if (dataSize == 4)
-                    r.Skip(3); // Unused
+                if (dataSize == 4) r.Skip(3); // Unused
             }
         }
 
@@ -121,7 +106,7 @@ namespace GameX.Bethesda.Formats.Records
                 case "XTEL": XTEL = new XTELField(r, dataSize); return true;
                 case "DATA": DATA = new DATAField(r, dataSize); return true;
                 case "XLOC": XLOC = new XLOCField(r, dataSize); return true;
-                case "XOWN": if (XOWNs == null) XOWNs = new List<CELLRecord.XOWNGroup>(); XOWNs.Add(new CELLRecord.XOWNGroup { XOWN = new FMIDField<Record>(r, dataSize) }); return true;
+                case "XOWN": XOWNs ??= []; XOWNs.Add(new CELLRecord.XOWNGroup { XOWN = new FMIDField<Record>(r, dataSize) }); return true;
                 case "XRNK": XOWNs.Last().XRNK = r.ReadSAndVerify<IN32Field>(dataSize); return true;
                 case "XGLB": XOWNs.Last().XGLB = new FMIDField<Record>(r, dataSize); return true;
                 case "XESP": XESP = new XESPField(r, dataSize); return true;

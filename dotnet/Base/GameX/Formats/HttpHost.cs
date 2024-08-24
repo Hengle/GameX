@@ -38,8 +38,8 @@ namespace GameX.Formats
     /// <seealso cref="GameEstate.Core.AbstractHost" />
     public class HttpHost : AbstractHost
     {
-        readonly MemoryCache _cache = new MemoryCache(new MemoryCacheOptions { });
-        readonly HttpClient _hc = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
+        readonly MemoryCache _cache = new(new MemoryCacheOptions { });
+        readonly HttpClient _hc = new() { Timeout = TimeSpan.FromMinutes(30) };
 
         public HttpHost(Uri address, string folder = null)
             => _hc.BaseAddress = folder == null ? address : new UriBuilder(address) { Path = $"{address.LocalPath}{folder}/" }.Uri;
@@ -51,7 +51,7 @@ namespace GameX.Formats
             var requestUri = ToPathAndQueryString(path, nvc);
             //Log($"query: {requestUri}");
             var r = await _hc.GetAsync(requestUri).ConfigureAwait(false);
-            if (!r.IsSuccessStatusCode) return !shouldThrow ? default(T) : throw new InvalidOperationException(r.ReasonPhrase);
+            if (!r.IsSuccessStatusCode) return !shouldThrow ? default : throw new InvalidOperationException(r.ReasonPhrase);
             var data = await r.Content.ReadAsByteArrayAsync();
             return FromBytes<T>(data);
         }
@@ -85,7 +85,7 @@ namespace GameX.Formats
                 if (lines?.Length >= 0)
                 {
                     var startIndex = Path.GetDirectoryName(lines[0].TrimEnd().Replace('\\', '/')).Length + 1;
-                    foreach (var line in lines) if (line.Length >= startIndex && (path = line.Substring(startIndex).TrimEnd().Replace('\\', '/')) != ".set") d.Add(path);
+                    foreach (var line in lines) if (line.Length >= startIndex && (path = line[startIndex..].TrimEnd().Replace('\\', '/')) != ".set") d.Add(path);
                 }
                 return (T)(object)d;
             }

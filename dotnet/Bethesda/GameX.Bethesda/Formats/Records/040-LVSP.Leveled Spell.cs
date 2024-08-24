@@ -9,7 +9,7 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField EDID { get; set; } // Editor ID
         public BYTEField LVLD; // Chance
         public BYTEField LVLF; // Flags
-        public List<LVLIRecord.LVLOField> LVLOs = new List<LVLIRecord.LVLOField>(); // Number of items in list
+        public List<LVLIRecord.LVLOField> LVLOs = []; // Number of items in list
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

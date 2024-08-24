@@ -94,54 +94,29 @@ namespace GameX.Bethesda.Formats.Records
             }
         }
 
-        public struct CSADField
+        public struct CSADField(BinaryReader r, int dataSize)
         {
-            public float DodgeFatigueModMult;
-            public float DodgeFatigueModBase;
-            public float EncumbSpeedModBase;
-            public float EncumbSpeedModMult;
-            public float DodgeWhileUnderAttackMult;
-            public float DodgeNotUnderAttackMult;
-            public float DodgeBackWhileUnderAttackMult;
-            public float DodgeBackNotUnderAttackMult;
-            public float DodgeForwardWhileAttackingMult;
-            public float DodgeForwardNotAttackingMult;
-            public float BlockSkillModifierMult;
-            public float BlockSkillModifierBase;
-            public float BlockWhileUnderAttackMult;
-            public float BlockNotUnderAttackMult;
-            public float AttackSkillModifierMult;
-            public float AttackSkillModifierBase;
-            public float AttackWhileUnderAttackMult;
-            public float AttackNotUnderAttackMult;
-            public float AttackDuringBlockMult;
-            public float PowerAttFatigueModBase;
-            public float PowerAttFatigueModMult;
-
-            public CSADField(BinaryReader r, int dataSize)
-            {
-                DodgeFatigueModMult = r.ReadSingle();
-                DodgeFatigueModBase = r.ReadSingle();
-                EncumbSpeedModBase = r.ReadSingle();
-                EncumbSpeedModMult = r.ReadSingle();
-                DodgeWhileUnderAttackMult = r.ReadSingle();
-                DodgeNotUnderAttackMult = r.ReadSingle();
-                DodgeBackWhileUnderAttackMult = r.ReadSingle();
-                DodgeBackNotUnderAttackMult = r.ReadSingle();
-                DodgeForwardWhileAttackingMult = r.ReadSingle();
-                DodgeForwardNotAttackingMult = r.ReadSingle();
-                BlockSkillModifierMult = r.ReadSingle();
-                BlockSkillModifierBase = r.ReadSingle();
-                BlockWhileUnderAttackMult = r.ReadSingle();
-                BlockNotUnderAttackMult = r.ReadSingle();
-                AttackSkillModifierMult = r.ReadSingle();
-                AttackSkillModifierBase = r.ReadSingle();
-                AttackWhileUnderAttackMult = r.ReadSingle();
-                AttackNotUnderAttackMult = r.ReadSingle();
-                AttackDuringBlockMult = r.ReadSingle();
-                PowerAttFatigueModBase = r.ReadSingle();
-                PowerAttFatigueModMult = r.ReadSingle();
-            }
+            public float DodgeFatigueModMult = r.ReadSingle();
+            public float DodgeFatigueModBase = r.ReadSingle();
+            public float EncumbSpeedModBase = r.ReadSingle();
+            public float EncumbSpeedModMult = r.ReadSingle();
+            public float DodgeWhileUnderAttackMult = r.ReadSingle();
+            public float DodgeNotUnderAttackMult = r.ReadSingle();
+            public float DodgeBackWhileUnderAttackMult = r.ReadSingle();
+            public float DodgeBackNotUnderAttackMult = r.ReadSingle();
+            public float DodgeForwardWhileAttackingMult = r.ReadSingle();
+            public float DodgeForwardNotAttackingMult = r.ReadSingle();
+            public float BlockSkillModifierMult = r.ReadSingle();
+            public float BlockSkillModifierBase = r.ReadSingle();
+            public float BlockWhileUnderAttackMult = r.ReadSingle();
+            public float BlockNotUnderAttackMult = r.ReadSingle();
+            public float AttackSkillModifierMult = r.ReadSingle();
+            public float AttackSkillModifierBase = r.ReadSingle();
+            public float AttackWhileUnderAttackMult = r.ReadSingle();
+            public float AttackNotUnderAttackMult = r.ReadSingle();
+            public float AttackDuringBlockMult = r.ReadSingle();
+            public float PowerAttFatigueModBase = r.ReadSingle();
+            public float PowerAttFatigueModMult = r.ReadSingle();
         }
 
         public override string ToString() => $"CSTY: {EDID.Value}";

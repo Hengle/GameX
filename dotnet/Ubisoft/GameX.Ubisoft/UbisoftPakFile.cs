@@ -20,7 +20,7 @@ namespace GameX.Ubisoft
         /// <param name="state">The state.</param>
         public UbisoftPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

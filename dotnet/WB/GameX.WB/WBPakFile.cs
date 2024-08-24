@@ -25,7 +25,7 @@ namespace GameX.WB
         /// <param name="state">The state.</param>
         public WBPakFile(PakState state) : base(state, PakBinary_AC.Instance)
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
             UseFileId = true;
         }
 

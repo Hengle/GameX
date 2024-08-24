@@ -5,16 +5,10 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class CLMTRecord : Record, IHaveEDID, IHaveMODL
     {
-        public struct WLSTField
+        public struct WLSTField(BinaryReader r, int dataSize)
         {
-            public FormId<WTHRRecord> Weather;
-            public int Chance;
-
-            public WLSTField(BinaryReader r, int dataSize)
-            {
-                Weather = new FormId<WTHRRecord>(r.ReadUInt32());
-                Chance = r.ReadInt32();
-            }
+            public FormId<WTHRRecord> Weather = new(r.ReadUInt32());
+            public int Chance = r.ReadInt32();
         }
 
         public struct TNAMField

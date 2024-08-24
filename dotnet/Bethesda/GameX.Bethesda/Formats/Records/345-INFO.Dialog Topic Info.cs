@@ -8,24 +8,14 @@ namespace GameX.Bethesda.Formats.Records
     public class INFORecord : Record
     {
         // TES3
-        public struct DATA3Field
+        public struct DATA3Field(BinaryReader r, int dataSize)
         {
-            public int Unknown1;
-            public int Disposition;
-            public byte Rank; // (0-10)
-            public byte Gender; // 0xFF = None, 0x00 = Male, 0x01 = Female
-            public byte PCRank; // (0-10)
-            public byte Unknown2;
-
-            public DATA3Field(BinaryReader r, int dataSize)
-            {
-                Unknown1 = r.ReadInt32();
-                Disposition = r.ReadInt32();
-                Rank = r.ReadByte();
-                Gender = r.ReadByte();
-                PCRank = r.ReadByte();
-                Unknown2 = r.ReadByte();
-            }
+            public int Unknown1 = r.ReadInt32();
+            public int Disposition = r.ReadInt32();
+            public byte Rank = r.ReadByte(); // (0-10)
+            public byte Gender = r.ReadByte(); // 0xFF = None, 0x00 = Male, 0x01 = Female
+            public byte PCRank = r.ReadByte(); // (0-10)
+            public byte Unknown2 = r.ReadByte();
         }
 
         public class TES3Group
@@ -50,18 +40,11 @@ namespace GameX.Bethesda.Formats.Records
         }
 
         // TES4
-        public struct DATA4Field
+        public struct DATA4Field(BinaryReader r, int dataSize)
         {
-            public byte Type;
-            public byte NextSpeaker;
-            public byte Flags;
-
-            public DATA4Field(BinaryReader r, int dataSize)
-            {
-                Type = r.ReadByte();
-                NextSpeaker = r.ReadByte();
-                Flags = dataSize == 3 ? r.ReadByte() : (byte)0;
-            }
+            public byte Type = r.ReadByte();
+            public byte NextSpeaker = r.ReadByte();
+            public byte Flags = dataSize == 3 ? r.ReadByte() : (byte)0;
         }
 
         public class TRDTField
@@ -103,8 +86,8 @@ namespace GameX.Bethesda.Formats.Records
         public override string ToString() => $"INFO: {EDID.Value}";
         public STRVField EDID { get; set; } // Editor ID - Info name string (unique sequence of #'s), ID
         public FMIDField<INFORecord> PNAM; // Previous info ID
-        public TES3Group TES3 = new TES3Group();
-        public TES4Group TES4 = new TES4Group();
+        public TES3Group TES3 = new();
+        public TES4Group TES4 = new();
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

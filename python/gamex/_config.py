@@ -1,7 +1,7 @@
 __title__ = "gamex"
 __version__ = "0.0.1"
-# __current__ = "Arkane"
-__current__ = "Unknown"
+__current__ = "Arkane"
+#__current__ = "Unknown"
 # __current__ = "Bullfrog"
 
 class GlobalOption:
@@ -463,7 +463,7 @@ match __current__:
             ForceOpen = True,
             ForcePath = "sample:*",
             Family = "Unknown",
-            Game = "T" # Test
+            Game = "APP" # Application
         )
     case 'Valve':
         familyKeys = [ "Valve", "Unknown" ]

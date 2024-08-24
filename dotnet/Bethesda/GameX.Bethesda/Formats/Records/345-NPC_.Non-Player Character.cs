@@ -89,24 +89,14 @@ namespace GameX.Bethesda.Formats.Records
             }
         }
 
-        public struct DODTField
+        public struct DODTField(BinaryReader r, int dataSize)
         {
-            public float XPos;
-            public float YPos;
-            public float ZPos;
-            public float XRot;
-            public float YRot;
-            public float ZRot;
-
-            public DODTField(BinaryReader r, int dataSize)
-            {
-                XPos = r.ReadSingle();
-                YPos = r.ReadSingle();
-                ZPos = r.ReadSingle();
-                XRot = r.ReadSingle();
-                YRot = r.ReadSingle();
-                ZRot = r.ReadSingle();
-            }
+            public float XPos = r.ReadSingle();
+            public float YPos = r.ReadSingle();
+            public float ZPos = r.ReadSingle();
+            public float XRot = r.ReadSingle();
+            public float YRot = r.ReadSingle();
+            public float ZRot = r.ReadSingle();
         }
 
         public override string ToString() => $"NPC_: {EDID.Value}";

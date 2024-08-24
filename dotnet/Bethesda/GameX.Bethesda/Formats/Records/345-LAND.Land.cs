@@ -7,11 +7,9 @@ namespace GameX.Bethesda.Formats.Records
     public unsafe class LANDRecord : Record
     {
         // TESX
-        public struct VNMLField
+        public struct VNMLField(BinaryReader r, int dataSize)
         {
-            public Byte3[] Vertexs; // XYZ 8 bit floats
-
-            public VNMLField(BinaryReader r, int dataSize) => Vertexs = r.ReadTArray<Byte3>(dataSize, dataSize / 3);
+            public Byte3[] Vertexs = r.ReadTArray<Byte3>(dataSize, dataSize / 3); // XYZ 8 bit floats
         }
 
         public struct VHGTField
@@ -28,11 +26,9 @@ namespace GameX.Bethesda.Formats.Records
             }
         }
 
-        public struct VCLRField
+        public struct VCLRField(BinaryReader r, int dataSize)
         {
-            public ColorRef3[] Colors; // 24-bit RGB
-
-            public VCLRField(BinaryReader r, int dataSize) => Colors = r.ReadTArray<ColorRef3>(dataSize, dataSize / 24);
+            public ColorRef3[] Colors = r.ReadTArray<ColorRef3>(dataSize, dataSize / 24); // 24-bit RGB
         }
 
         public struct VTEXField
@@ -60,7 +56,7 @@ namespace GameX.Bethesda.Formats.Records
             public static (string, int) Struct = ("<ii", sizeof(CORDField));
             public int CellX;
             public int CellY;
-            public override string ToString() => $"{CellX},{CellY}";
+            public override readonly string ToString() => $"{CellX},{CellY}";
         }
 
         public struct WNAMField

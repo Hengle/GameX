@@ -19,7 +19,7 @@ namespace GameX.Origin
         /// <param name="state">The state.</param>
         public OriginPakFile(PakState state) : base(state, GetPakBinary(state.Game))
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

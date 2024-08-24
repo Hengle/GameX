@@ -20,7 +20,7 @@ namespace GameX.Cyanide
         /// <param name="state">The state.</param>
         public CyanidePakFile(PakState state) : base(state, PakBinary_Cpk.Instance)
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

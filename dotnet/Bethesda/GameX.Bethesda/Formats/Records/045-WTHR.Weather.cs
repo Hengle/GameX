@@ -5,56 +5,30 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class WTHRRecord : Record, IHaveEDID, IHaveMODL
     {
-        public struct FNAMField
+        public struct FNAMField(BinaryReader r, int dataSize)
         {
-            public float DayNear;
-            public float DayFar;
-            public float NightNear;
-            public float NightFar;
-
-            public FNAMField(BinaryReader r, int dataSize)
-            {
-                DayNear = r.ReadSingle();
-                DayFar = r.ReadSingle();
-                NightNear = r.ReadSingle();
-                NightFar = r.ReadSingle();
-            }
+            public float DayNear = r.ReadSingle();
+            public float DayFar = r.ReadSingle();
+            public float NightNear = r.ReadSingle();
+            public float NightFar = r.ReadSingle();
         }
 
-        public struct HNAMField
+        public struct HNAMField(BinaryReader r, int dataSize)
         {
-            public float EyeAdaptSpeed;
-            public float BlurRadius;
-            public float BlurPasses;
-            public float EmissiveMult;
-            public float TargetLUM;
-            public float UpperLUMClamp;
-            public float BrightScale;
-            public float BrightClamp;
-            public float LUMRampNoTex;
-            public float LUMRampMin;
-            public float LUMRampMax;
-            public float SunlightDimmer;
-            public float GrassDimmer;
-            public float TreeDimmer;
-
-            public HNAMField(BinaryReader r, int dataSize)
-            {
-                EyeAdaptSpeed = r.ReadSingle();
-                BlurRadius = r.ReadSingle();
-                BlurPasses = r.ReadSingle();
-                EmissiveMult = r.ReadSingle();
-                TargetLUM = r.ReadSingle();
-                UpperLUMClamp = r.ReadSingle();
-                BrightScale = r.ReadSingle();
-                BrightClamp = r.ReadSingle();
-                LUMRampNoTex = r.ReadSingle();
-                LUMRampMin = r.ReadSingle();
-                LUMRampMax = r.ReadSingle();
-                SunlightDimmer = r.ReadSingle();
-                GrassDimmer = r.ReadSingle();
-                TreeDimmer = r.ReadSingle();
-            }
+            public float EyeAdaptSpeed = r.ReadSingle();
+            public float BlurRadius = r.ReadSingle();
+            public float BlurPasses = r.ReadSingle();
+            public float EmissiveMult = r.ReadSingle();
+            public float TargetLUM = r.ReadSingle();
+            public float UpperLUMClamp = r.ReadSingle();
+            public float BrightScale = r.ReadSingle();
+            public float BrightClamp = r.ReadSingle();
+            public float LUMRampNoTex = r.ReadSingle();
+            public float LUMRampMin = r.ReadSingle();
+            public float LUMRampMax = r.ReadSingle();
+            public float SunlightDimmer = r.ReadSingle();
+            public float GrassDimmer = r.ReadSingle();
+            public float TreeDimmer = r.ReadSingle();
         }
 
         public struct DATAField
@@ -91,16 +65,10 @@ namespace GameX.Bethesda.Formats.Records
             }
         }
 
-        public struct SNAMField
+        public struct SNAMField(BinaryReader r, int dataSize)
         {
-            public FormId<SOUNRecord> Sound; // Sound FormId
-            public uint Type; // Sound Type - 0=Default, 1=Precipitation, 2=Wind, 3=Thunder
-
-            public SNAMField(BinaryReader r, int dataSize)
-            {
-                Sound = new FormId<SOUNRecord>(r.ReadUInt32());
-                Type = r.ReadUInt32();
-            }
+            public FormId<SOUNRecord> Sound = new FormId<SOUNRecord>(r.ReadUInt32()); // Sound FormId
+            public uint Type = r.ReadUInt32(); // Sound Type - 0=Default, 1=Precipitation, 2=Wind, 3=Thunder
         }
 
         public override string ToString() => $"WTHR: {EDID.Value}";
@@ -112,7 +80,7 @@ namespace GameX.Bethesda.Formats.Records
         public FNAMField FNAM; // Fog Distance
         public HNAMField HNAM; // HDR Data
         public DATAField DATA; // Weather Data
-        public List<SNAMField> SNAMs = new List<SNAMField>(); // Sounds
+        public List<SNAMField> SNAMs = []; // Sounds
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

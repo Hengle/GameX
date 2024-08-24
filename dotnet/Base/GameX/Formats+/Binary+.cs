@@ -16,7 +16,7 @@ namespace GameX.Formats
 {
     #region Binary_Pal
 
-    public unsafe class Binary_Pal : IHaveMetaInfo
+    public unsafe class Binary_Pal(BinaryReader r, byte bpp) : IHaveMetaInfo
     {
         public static Task<object> Factory_3(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pal(r, 3));
         public static Task<object> Factory_4(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pal(r, 4));
@@ -32,8 +32,15 @@ namespace GameX.Formats
             public byte B;
         }
 
-        public byte Bpp;
-        public byte[][] Records;
+        #endregion
+
+        public readonly byte Bpp = bpp;
+        public readonly byte[][] Records = bpp switch
+        {
+            3 => r.ReadTArray<RGB>(sizeof(RGB), 256).Select(s => new[] { s.R, s.G, s.B, (byte)255 }).ToArray(),
+            4 => r.ReadTArray<uint>(sizeof(uint), 256).Select(BitConverter.GetBytes).ToArray(),
+            _ => throw new ArgumentOutOfRangeException(nameof(bpp), $"{bpp}"),
+        };
 
         public Binary_Pal ConvertVgaPalette()
         {
@@ -52,44 +59,29 @@ namespace GameX.Formats
             return this;
         }
 
-        #endregion
-
-        public Binary_Pal(BinaryReader r, byte bpp)
-        {
-            Bpp = bpp;
-            Records = bpp switch
-            {
-                3 => r.ReadTArray<RGB>(sizeof(RGB), 256).Select(s => new[] { s.R, s.G, s.B, (byte)255 }).ToArray(),
-                4 => r.ReadTArray<uint>(sizeof(uint), 256).Select(s => BitConverter.GetBytes(s)).ToArray(),
-                _ => throw new ArgumentOutOfRangeException(nameof(bpp), $"{bpp}"),
-            };
-        }
-
         // IHaveMetaInfo
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-            => new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "Pallet" }),
-                new MetaInfo("Pallet", items: new List<MetaInfo> {
-                    new MetaInfo($"Records: {Records.Length}"),
-                })
-            };
+            => [
+                new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "Pallet" }),
+                new("Pallet", items: [
+                    new($"Records: {Records.Length}"),
+                ])
+            ];
     }
 
     #endregion
 
     #region Binary_Bik
 
-    public class Binary_Bik : IHaveMetaInfo
+    public class Binary_Bik(BinaryReader r, int fileSize) : IHaveMetaInfo
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Bik(r, (int)f.FileSize));
 
-        public Binary_Bik(BinaryReader r, int fileSize) => Data = r.ReadBytes(fileSize);
+        public readonly byte[] Data = r.ReadBytes(fileSize);
 
-        public byte[] Data;
-
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "BIK Video" }),
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "BIK Video" }),
+        ];
     }
 
     #endregion
@@ -118,11 +110,11 @@ namespace GameX.Formats
             }
         }
 
-        DDS_HEADER Header;
-        DDS_HEADER_DXT10? HeaderDXT10;
-        (object type, int blockSize, object gl, object vulken, object unity, object unreal) Format;
-        byte[] Bytes;
-        Range[] Mips;
+        readonly DDS_HEADER Header;
+        readonly DDS_HEADER_DXT10? HeaderDXT10;
+        readonly (object type, int blockSize, object gl, object vulken, object unity, object unreal) Format;
+        readonly byte[] Bytes;
+        readonly Range[] Mips;
 
         public int Width => (int)Header.dwWidth;
         public int Height => (int)Header.dwHeight;
@@ -142,32 +134,30 @@ namespace GameX.Formats
             }, Mips);
         public void End() { }
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo("Texture", items: new List<MetaInfo> {
-                new MetaInfo($"Format: {Format.type}"),
-                new MetaInfo($"Width: {Width}"),
-                new MetaInfo($"Height: {Height}"),
-                new MetaInfo($"Mipmaps: {MipMaps}"),
-            }),
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Texture", items: [
+                new($"Format: {Format.type}"),
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+                new($"Mipmaps: {MipMaps}"),
+            ]),
+        ];
     }
 
     #endregion
 
     #region Binary_Fsb
 
-    public class Binary_Fsb : IHaveMetaInfo
+    public class Binary_Fsb(BinaryReader r, int fileSize) : IHaveMetaInfo
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Fsb(r, (int)f.FileSize));
 
-        public Binary_Fsb(BinaryReader r, int fileSize) => Data = r.ReadBytes(fileSize);
+        public readonly byte[] Data = r.ReadBytes(fileSize);
 
-        public byte[] Data;
-
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "FSB Audio" }),
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "FSB Audio" }),
+        ];
     }
 
     #endregion
@@ -234,9 +224,9 @@ namespace GameX.Formats
             Height = Image.Height;
         }
 
-        byte[] Bytes;
-        Bitmap Image;
-        (Formats type, object gl, object vulken, object unity, object unreal) Format;
+        readonly byte[] Bytes;
+        readonly Bitmap Image;
+        readonly (Formats type, object gl, object vulken, object unity, object unreal) Format;
 
         public int Width { get; }
         public int Height { get; }
@@ -266,31 +256,29 @@ namespace GameX.Formats
         }
         public void End() { }
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Img)}", items: new List<MetaInfo> {
-                new MetaInfo($"Format: {Format.type}"),
-                new MetaInfo($"Width: {Width}"),
-                new MetaInfo($"Height: {Height}"),
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new($"{nameof(Binary_Img)}", items: new List<MetaInfo> {
+                new($"Format: {Format.type}"),
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
             })
-        };
+        ];
     }
 
     #endregion
 
     #region Binary_Msg
 
-    public class Binary_Msg : IHaveMetaInfo
+    public class Binary_Msg(string message) : IHaveMetaInfo
     {
         public static Func<BinaryReader, FileSource, PakFile, Task<object>> Factory(string message) => (BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Msg(message));
 
-        public Binary_Msg(string message) => Message = message;
+        public readonly string Message = message;
 
-        public string Message;
-
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = Message }),
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = Message }),
+        ];
     }
 
     #endregion
@@ -343,10 +331,10 @@ namespace GameX.Formats
             Height = Header.YMax - Header.YMin + 1;
         }
 
-        X_Header Header;
-        int Planes;
-        byte[] Body;
-        (object gl, object vulken, object unity, object unreal) Format;
+        readonly X_Header Header;
+        readonly int Planes;
+        readonly byte[] Body;
+        readonly (object gl, object vulken, object unity, object unreal) Format;
 
         public int Width { get; }
         public int Height { get; }
@@ -492,20 +480,20 @@ namespace GameX.Formats
         }
         public void End() { }
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Pcx)}", items: new List<MetaInfo> {
-                new MetaInfo($"Width: {Width}"),
-                new MetaInfo($"Height: {Height}"),
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new($"{nameof(Binary_Pcx)}", items: new List<MetaInfo> {
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
             })
-        };
+        ];
     }
 
     #endregion
 
     #region Binary_Snd
 
-    public unsafe class Binary_Snd : IHaveMetaInfo
+    public unsafe class Binary_Snd(BinaryReader r, int fileSize, object tag) : IHaveMetaInfo
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Snd(r, (int)f.FileSize, null));
         public static Task<object> Factory_Wav(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Snd(r, (int)f.FileSize, ".wav"));
@@ -534,8 +522,8 @@ namespace GameX.Formats
             public ushort NumChannels;          // Number of Channels
             public uint SampleRate;             // Sample Rate
             public uint ByteRate;               // (Sample Rate * BitsPerSample * Channels) / 8
-            public ushort BlockAlign;             // (BitsPerSample * Channels) / 8.1 - 8 bit mono2 - 8 bit stereo/16 bit mono4 - 16 bit stereo
-            public ushort BitsPerSample;          // Bits per sample
+            public ushort BlockAlign;           // (BitsPerSample * Channels) / 8.1 - 8 bit mono2 - 8 bit stereo/16 bit mono4 - 16 bit stereo
+            public ushort BitsPerSample;        // Bits per sample
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -549,40 +537,33 @@ namespace GameX.Formats
 
         #endregion
 
-        public Binary_Snd(BinaryReader r, int fileSize, object tag)
-        {
-            Data = r.ReadBytes(fileSize);
-            Tag = tag;
-        }
+        public byte[] Data = r.ReadBytes(fileSize);
+        public object Tag = tag;
 
-        public byte[] Data;
-        public object Tag;
-
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "AudioPlayer", Name = Path.GetFileName(file.Path), Value = new MemoryStream(Data), Tag = Tag ?? Path.GetExtension(file.Path) }),
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "AudioPlayer", Name = Path.GetFileName(file.Path), Value = new MemoryStream(Data), Tag = Tag ?? Path.GetExtension(file.Path) }),
+        ];
     }
 
     #endregion
 
     #region Binary_Txt
 
-    public class Binary_Txt : IHaveMetaInfo
+    public class Binary_Txt(BinaryReader r, int fileSize) : IHaveMetaInfo
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Txt(r, (int)f.FileSize));
 
-        public Binary_Txt(BinaryReader r, int fileSize) => Data = r.ReadEncoding(fileSize);
+        public readonly string Data = r.ReadEncoding(fileSize);
 
-        public string Data;
-
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = Data }),
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = Data }),
+        ];
     }
 
     #endregion
 
     #region Binary_Tga
+
     // https://en.wikipedia.org/wiki/Truevision_TGA
     // https://github.com/cadenji/tgafunc/blob/main/tgafunc.c
     // https://www.dca.fee.unicamp.br/~martino/disciplinas/ea978/tgaffs.pdf
@@ -679,7 +660,7 @@ namespace GameX.Formats
                 ImageType == TYPE.RLE_TRUE_COLOR ||
                 ImageType == TYPE.RLE_GRAYSCALE;
 
-            public void Check()
+            public readonly void Check()
             {
                 const int MAX_IMAGE_DIMENSIONS = 65535;
                 if (MapType > 1) throw new FormatException("UNSUPPORTED_COLOR_MAP_TYPE");
@@ -688,7 +669,7 @@ namespace GameX.Formats
                 else if (ImageWidth <= 0 || ImageWidth > MAX_IMAGE_DIMENSIONS || ImageHeight <= 0 || ImageHeight > MAX_IMAGE_DIMENSIONS) throw new FormatException("INVALID_IMAGE_DIMENSIONS");
             }
 
-            public ColorMap GetColorMap(BinaryReader r)
+            public readonly ColorMap GetColorMap(BinaryReader r)
             {
                 var mapSize = MapLength * BitsToBytes(MapEntrySize);
                 var s = new ColorMap();
@@ -703,7 +684,7 @@ namespace GameX.Formats
                 return s;
             }
 
-            public PIXEL GetPixelFormat()
+            public readonly PIXEL GetPixelFormat()
             {
                 if (IS_COLOR_MAPPED)
                 {
@@ -716,22 +697,18 @@ namespace GameX.Formats
                         }
                 }
                 else if (IS_TRUE_COLOR)
-                {
                     switch (PixelDepth)
                     {
                         case 16: return PIXEL.RGB555;
                         case 24: return PIXEL.RGB24;
                         case 32: return PIXEL.ARGB32;
                     }
-                }
                 else if (IS_GRAYSCALE)
-                {
                     switch (PixelDepth)
                     {
                         case 8: return PIXEL.BW8;
                         case 16: return PIXEL.BW16;
                     }
-                }
                 throw new FormatException("UNSUPPORTED_PIXEL_FORMAT");
             }
         }
@@ -773,12 +750,12 @@ namespace GameX.Formats
             };
         }
 
-        X_Header Header;
-        ColorMap Map;
-        PIXEL PixelFormat;
-        int PixelSize;
-        MemoryStream Body;
-        (object gl, object vulken, object unity, object unreal) Format;
+        readonly X_Header Header;
+        readonly ColorMap Map;
+        readonly PIXEL PixelFormat;
+        readonly int PixelSize;
+        readonly MemoryStream Body;
+        readonly (object gl, object vulken, object unity, object unreal) Format;
 
         public int Width { get; }
         public int Height { get; }
@@ -929,51 +906,40 @@ namespace GameX.Formats
                 }
         }
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Tga)}", items: new List<MetaInfo> {
-                new MetaInfo($"PixelFormat: {PixelFormat}"),
-                new MetaInfo($"Width: {Width}"),
-                new MetaInfo($"Height: {Height}"),
-            })
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new($"{nameof(Binary_Tga)}", items: [
+                new($"PixelFormat: {PixelFormat}"),
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
     #endregion
 
     #region Binary_Xga
 
-    public unsafe class Binary_Xga : IHaveMetaInfo, ITexture
+    public unsafe class Binary_Xga(BinaryReader r, object tag) : IHaveMetaInfo, ITexture
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Xga(r, s.Tag));
 
-        public Binary_Xga(BinaryReader r, object tag)
-        {
-            Format = (
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGBA32,
-                TextureUnrealFormat.Unknown);
-            Body = r.ReadToEnd();
-            Width = 64;
-            Height = 64;
-        }
+        readonly int Type;
+        readonly byte[] Body = r.ReadToEnd();
+        readonly (object gl, object vulken, object unity, object unreal) Format = (
+            (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+            (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+            TextureUnityFormat.RGBA32,
+            TextureUnrealFormat.Unknown);
 
-        int Type;
-        byte[] Body;
-        (object gl, object vulken, object unity, object unreal) Format;
-
-        public int Width { get; }
-        public int Height { get; }
+        public int Width { get; } = 64;
+        public int Height { get; } = 64;
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags Flags { get; } = 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
-            byte[] Decode1()
-            {
-                return null;
-            }
+            static byte[] Decode1() => null;
             return (Type switch
             {
                 1 => Decode1(),
@@ -989,14 +955,14 @@ namespace GameX.Formats
         }
         public void End() { }
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Xga)}", items: new List<MetaInfo> {
-                new MetaInfo($"Type: {Type}"),
-                new MetaInfo($"Width: {Width}"),
-                new MetaInfo($"Height: {Height}"),
-            })
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new($"{nameof(Binary_Xga)}", items: [
+                new($"Type: {Type}"),
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 
     #endregion
@@ -1035,9 +1001,9 @@ namespace GameX.Formats
         }
 
         public byte[] Body;
-        byte[][] PaletteData;
+        readonly byte[][] PaletteData;
         public string Palette;
-        (object gl, object vulken, object unity, object unreal) Format;
+        readonly (object gl, object vulken, object unity, object unreal) Format;
 
         public int Width { get; set; }
         public int Height { get; set; }
@@ -1077,14 +1043,14 @@ namespace GameX.Formats
         }
         public void End() { }
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Raw)}", items: new List<MetaInfo> {
-                new MetaInfo($"Palette: {Palette}"),
-                new MetaInfo($"Width: {Width}"),
-                new MetaInfo($"Height: {Height}"),
-            })
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new($"{nameof(Binary_Raw)}", items: [
+                new($"Palette: {Palette}"),
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 
     #endregion
@@ -1170,9 +1136,9 @@ namespace GameX.Formats
         MidiEvent CurEvent;
         MidiEvent CurEventList;
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = this }),
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = this }),
+        ];
 
         #region Read
 

@@ -23,60 +23,32 @@ namespace GameX.Bethesda.Formats.Records
             MetalBlood = 0x0800
         }
 
-        public struct NPDTField
+        public struct NPDTField(BinaryReader r, int dataSize)
         {
-            public int Type; // 0 = Creature, 1 = Daedra, 2 = Undead, 3 = Humanoid
-            public int Level;
-            public int Strength;
-            public int Intelligence;
-            public int Willpower;
-            public int Agility;
-            public int Speed;
-            public int Endurance;
-            public int Personality;
-            public int Luck;
-            public int Health;
-            public int SpellPts;
-            public int Fatigue;
-            public int Soul;
-            public int Combat;
-            public int Magic;
-            public int Stealth;
-            public int AttackMin1;
-            public int AttackMax1;
-            public int AttackMin2;
-            public int AttackMax2;
-            public int AttackMin3;
-            public int AttackMax3;
-            public int Gold;
-
-            public NPDTField(BinaryReader r, int dataSize)
-            {
-                Type = r.ReadInt32();
-                Level = r.ReadInt32();
-                Strength = r.ReadInt32();
-                Intelligence = r.ReadInt32();
-                Willpower = r.ReadInt32();
-                Agility = r.ReadInt32();
-                Speed = r.ReadInt32();
-                Endurance = r.ReadInt32();
-                Personality = r.ReadInt32();
-                Luck = r.ReadInt32();
-                Health = r.ReadInt32();
-                SpellPts = r.ReadInt32();
-                Fatigue = r.ReadInt32();
-                Soul = r.ReadInt32();
-                Combat = r.ReadInt32();
-                Magic = r.ReadInt32();
-                Stealth = r.ReadInt32();
-                AttackMin1 = r.ReadInt32();
-                AttackMax1 = r.ReadInt32();
-                AttackMin2 = r.ReadInt32();
-                AttackMax2 = r.ReadInt32();
-                AttackMin3 = r.ReadInt32();
-                AttackMax3 = r.ReadInt32();
-                Gold = r.ReadInt32();
-            }
+            public int Type = r.ReadInt32(); // 0 = Creature, 1 = Daedra, 2 = Undead, 3 = Humanoid
+            public int Level = r.ReadInt32();
+            public int Strength = r.ReadInt32();
+            public int Intelligence = r.ReadInt32();
+            public int Willpower = r.ReadInt32();
+            public int Agility = r.ReadInt32();
+            public int Speed = r.ReadInt32();
+            public int Endurance = r.ReadInt32();
+            public int Personality = r.ReadInt32();
+            public int Luck = r.ReadInt32();
+            public int Health = r.ReadInt32();
+            public int SpellPts = r.ReadInt32();
+            public int Fatigue = r.ReadInt32();
+            public int Soul = r.ReadInt32();
+            public int Combat = r.ReadInt32();
+            public int Magic = r.ReadInt32();
+            public int Stealth = r.ReadInt32();
+            public int AttackMin1 = r.ReadInt32();
+            public int AttackMax1 = r.ReadInt32();
+            public int AttackMin2 = r.ReadInt32();
+            public int AttackMax2 = r.ReadInt32();
+            public int AttackMin3 = r.ReadInt32();
+            public int AttackMax3 = r.ReadInt32();
+            public int Gold = r.ReadInt32();
         }
 
         public struct AIDTField

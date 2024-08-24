@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -44,7 +43,7 @@ namespace GameX.Formats
             // http pak
             if (Host != null)
             {
-                var files = Files = new List<FileSource>();
+                var files = Files = [];
                 var set = await Host.GetSetAsync() ?? throw new NotSupportedException(".set not found");
                 foreach (var item in set) files.Add(new FileSource { Path = item });
                 return;
@@ -53,11 +52,11 @@ namespace GameX.Formats
             // read pak
             var path = PakPath;
             if (string.IsNullOrEmpty(path) || !Directory.Exists(path)) return;
-            var setPath = System.IO.Path.Combine(path, ".set");
+            var setPath = Path.Combine(path, ".set");
             if (File.Exists(setPath)) using (var r = new BinaryReader(File.Open(setPath, FileMode.Open, FileAccess.Read, FileShare.Read))) await PakBinary.Stream.Read(this, r, "Set");
-            var metaPath = System.IO.Path.Combine(path, ".meta");
+            var metaPath = Path.Combine(path, ".meta");
             if (File.Exists(metaPath)) using (var r = new BinaryReader(File.Open(setPath, FileMode.Open, FileAccess.Read, FileShare.Read))) await PakBinary.Stream.Read(this, r, "Meta");
-            var rawPath = System.IO.Path.Combine(path, ".raw");
+            var rawPath = Path.Combine(path, ".raw");
             if (File.Exists(rawPath)) using (var r = new BinaryReader(File.Open(rawPath, FileMode.Open, FileAccess.Read, FileShare.Read))) await PakBinary.Stream.Read(this, r, "Raw");
         }
 
@@ -74,11 +73,11 @@ namespace GameX.Formats
             // write pak
             var path = PakPath;
             if (!string.IsNullOrEmpty(path) && !Directory.Exists(path)) Directory.CreateDirectory(path);
-            var setPath = System.IO.Path.Combine(path, ".set");
+            var setPath = Path.Combine(path, ".set");
             using (var w = new BinaryWriter(new FileStream(setPath, FileMode.Create, FileAccess.Write))) await PakBinary.Stream.Write(this, w, "Set");
-            var metaPath = System.IO.Path.Combine(path, ".meta");
+            var metaPath = Path.Combine(path, ".meta");
             using (var w = new BinaryWriter(new FileStream(metaPath, FileMode.Create, FileAccess.Write))) await PakBinary.Stream.Write(this, w, "Meta");
-            var rawPath = System.IO.Path.Combine(path, ".raw");
+            var rawPath = Path.Combine(path, ".raw");
             if (FilesRawSet != null && FilesRawSet.Count > 0) using (var w = new BinaryWriter(new FileStream(rawPath, FileMode.Create, FileAccess.Write))) await PakBinary.Stream.Write(this, w, "Raw");
             else if (File.Exists(rawPath)) File.Delete(rawPath);
         }

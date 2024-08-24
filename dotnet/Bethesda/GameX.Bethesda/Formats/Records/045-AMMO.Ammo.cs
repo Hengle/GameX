@@ -4,22 +4,13 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class AMMORecord : Record, IHaveEDID, IHaveMODL
     {
-        public struct DATAField
+        public struct DATAField(BinaryReader r, int dataSize)
         {
-            public float Speed;
-            public uint Flags;
-            public uint Value;
-            public float Weight;
-            public ushort Damage;
-
-            public DATAField(BinaryReader r, int dataSize)
-            {
-                Speed = r.ReadSingle();
-                Flags = r.ReadUInt32();
-                Value = r.ReadUInt32();
-                Weight = r.ReadSingle();
-                Damage = r.ReadUInt16();
-            }
+            public float Speed = r.ReadSingle();
+            public uint Flags = r.ReadUInt32();
+            public uint Value = r.ReadUInt32();
+            public float Weight = r.ReadSingle();
+            public ushort Damage = r.ReadUInt16();
         }
 
         public override string ToString() => $"AMMO: {EDID.Value}";

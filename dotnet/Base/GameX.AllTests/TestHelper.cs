@@ -1,30 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using static GameX.FamilyManager;
 
 namespace GameX
 {
     public static class TestHelper
     {
-        static readonly Family familyAC = FamilyManager.GetFamily("AC");
-        static readonly Family familyArkane = FamilyManager.GetFamily("Arkane");
-        static readonly Family familyBioware = FamilyManager.GetFamily("Bioware");
-        static readonly Family familyBlizzard = FamilyManager.GetFamily("Blizzard");
-        static readonly Family familyCapcom = FamilyManager.GetFamily("Capcom");
-        static readonly Family familyCry = FamilyManager.GetFamily("Cry");
-        static readonly Family familyCryptic = FamilyManager.GetFamily("Cryptic");
-        static readonly Family familyCyanide = FamilyManager.GetFamily("Cyanide");
-        static readonly Family familyFrontier = FamilyManager.GetFamily("Frontier");
-        static readonly Family familyHpl = FamilyManager.GetFamily("Hpl");
-        static readonly Family familyId = FamilyManager.GetFamily("Id");
-        static readonly Family familyIW = FamilyManager.GetFamily("IW");
-        static readonly Family familyLith = FamilyManager.GetFamily("Lith");
-        static readonly Family familyOrigin = FamilyManager.GetFamily("Origin");
-        static readonly Family familyRed = FamilyManager.GetFamily("Red");
-        static readonly Family familyRsi = FamilyManager.GetFamily("Rsi");
-        static readonly Family familyTes = FamilyManager.GetFamily("Tes");
-        static readonly Family familyUnity = FamilyManager.GetFamily("Unity");
-        static readonly Family familyUnreal = FamilyManager.GetFamily("Unreal");
-        static readonly Family familyValve = FamilyManager.GetFamily("Valve");
+        static readonly Family familyAC = GetFamily("AC");
+        static readonly Family familyArkane = GetFamily("Arkane");
+        static readonly Family familyBioware = GetFamily("Bioware");
+        static readonly Family familyBlizzard = GetFamily("Blizzard");
+        static readonly Family familyCapcom = GetFamily("Capcom");
+        static readonly Family familyCry = GetFamily("Cry");
+        static readonly Family familyCryptic = GetFamily("Cryptic");
+        static readonly Family familyCyanide = GetFamily("Cyanide");
+        static readonly Family familyFrontier = GetFamily("Frontier");
+        static readonly Family familyHpl = GetFamily("Hpl");
+        static readonly Family familyId = GetFamily("Id");
+        static readonly Family familyIW = GetFamily("IW");
+        static readonly Family familyLith = GetFamily("Lith");
+        static readonly Family familyOrigin = GetFamily("Origin");
+        static readonly Family familyRed = GetFamily("Red");
+        static readonly Family familyRsi = GetFamily("Rsi");
+        static readonly Family familyTes = GetFamily("Tes");
+        static readonly Family familyUnity = GetFamily("Unity");
+        static readonly Family familyUnreal = GetFamily("Unreal");
+        static readonly Family familyValve = GetFamily("Valve");
 
         public static readonly Dictionary<string, Lazy<PakFile>> Paks = new()
         {

@@ -1,7 +1,6 @@
 namespace GameX.Bethesda
 {
-    public class DatabaseCell : Database
+    public class DatabaseCell(PakFile pakFile) : Database(pakFile)
     {
-        public DatabaseCell(PakFile pakFile) : base(pakFile) { }
     }
 }

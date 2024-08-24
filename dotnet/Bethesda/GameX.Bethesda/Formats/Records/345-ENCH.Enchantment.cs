@@ -84,8 +84,7 @@ namespace GameX.Bethesda.Formats.Records
             {
                 Name = "Script Effect";
                 ScriptFormId = r.ReadInt32();
-                if (dataSize == 4)
-                    return;
+                if (dataSize == 4) return;
                 School = r.ReadInt32();
                 VisualEffect = r.ReadFString(4);
                 Flags = dataSize > 12 ? r.ReadUInt32() : 0;
@@ -97,9 +96,9 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField EDID { get; set; } // Editor ID
         public STRVField FULL; // Enchant name
         public ENITField ENIT; // Enchant Data
-        public List<EFITField> EFITs = new List<EFITField>(); // Effect Data
+        public List<EFITField> EFITs = []; // Effect Data
         // TES4
-        public List<SCITField> SCITs = new List<SCITField>(); // Script effect data
+        public List<SCITField> SCITs = []; // Script effect data
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

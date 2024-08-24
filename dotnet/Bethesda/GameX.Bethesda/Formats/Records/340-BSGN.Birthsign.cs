@@ -10,8 +10,8 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField FULL; // Sign name
         public FILEField ICON; // Texture
         public STRVField DESC; // Description
-        public List<STRVField> NPCSs = new List<STRVField>(); // TES3: Spell/ability
-        public List<FMIDField<Record>> SPLOs = new List<FMIDField<Record>>(); // TES4: (points to a SPEL or LVSP record)
+        public List<STRVField> NPCSs = []; // TES3: Spell/ability
+        public List<FMIDField<Record>> SPLOs = []; // TES4: (points to a SPEL or LVSP record)
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

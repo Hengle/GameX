@@ -25,7 +25,7 @@ namespace GameX.Bullfrog
             public string Subtitle;
         }
 
-        static readonly ConcurrentDictionary<string, Event[]> Events = new ConcurrentDictionary<string, Event[]>();
+        static readonly ConcurrentDictionary<string, Event[]> Events = new();
         public static Event[] GetEvents(string path) => Events.GetOrAdd(path, x =>
         {
             if (!Entries.TryGetValue(path, out var entry)) return null;

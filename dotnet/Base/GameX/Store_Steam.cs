@@ -13,7 +13,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Steam
     {
-        internal static Dictionary<string, string> SteamPaths = [];
+        internal static readonly Dictionary<string, string> SteamPaths = [];
 
         static Store_Steam()
         {

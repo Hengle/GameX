@@ -20,7 +20,7 @@ namespace GameX.Black
         /// <param name="state">The state.</param>
         public BlackPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

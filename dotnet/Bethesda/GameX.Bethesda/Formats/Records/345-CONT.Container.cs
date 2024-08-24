@@ -30,7 +30,7 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField FULL; // Container Name
         public DATAField DATA; // Container Data
         public FMIDField<SCPTRecord>? SCRI;
-        public List<CNTOField> CNTOs = new List<CNTOField>();
+        public List<CNTOField> CNTOs = new();
         // TES4
         public FMIDField<SOUNRecord> SNAM; // Open sound
         public FMIDField<SOUNRecord> QNAM; // Close sound

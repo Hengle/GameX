@@ -21,7 +21,7 @@ namespace GameX.Crytek
         /// <param name="state">The state.</param>
         public CrytekPakFile(PakState state) : base(state, GetPakBinary(state.Game))
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

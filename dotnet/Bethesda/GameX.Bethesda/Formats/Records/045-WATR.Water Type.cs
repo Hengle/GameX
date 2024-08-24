@@ -35,13 +35,8 @@ namespace GameX.Bethesda.Formats.Records
 
             public DATAField(BinaryReader r, int dataSize)
             {
-                if (dataSize != 102 && dataSize != 86 && dataSize != 62 && dataSize != 42 && dataSize != 2)
-                    WindVelocity = 1;
-                if (dataSize == 2)
-                {
-                    Damage = r.ReadUInt16();
-                    return;
-                }
+                if (dataSize != 102 && dataSize != 86 && dataSize != 62 && dataSize != 42 && dataSize != 2) WindVelocity = 1;
+                if (dataSize == 2) { Damage = r.ReadUInt16(); return; }
                 WindVelocity = r.ReadSingle();
                 WindDirection = r.ReadSingle();
                 WaveAmplitude = r.ReadSingle();
@@ -52,22 +47,14 @@ namespace GameX.Bethesda.Formats.Records
                 ScrollXSpeed = r.ReadSingle();
                 ScrollYSpeed = r.ReadSingle();
                 FogDistance_NearPlane = r.ReadSingle();
-                if (dataSize == 42)
-                {
-                    Damage = r.ReadUInt16();
-                    return;
-                }
+                if (dataSize == 42) { Damage = r.ReadUInt16(); return; }
                 FogDistance_FarPlane = r.ReadSingle();
                 ShallowColor = r.ReadSAndVerify<ColorRef4>(dataSize);
                 DeepColor = r.ReadSAndVerify<ColorRef4>(dataSize);
                 ReflectionColor = r.ReadSAndVerify<ColorRef4>(dataSize);
                 TextureBlend = r.ReadByte();
                 r.Skip(3); // Unused
-                if (dataSize == 62)
-                {
-                    Damage = r.ReadUInt16();
-                    return;
-                }
+                if (dataSize == 62) { Damage = r.ReadUInt16(); return; }
                 RainSimulator_Force = r.ReadSingle();
                 RainSimulator_Velocity = r.ReadSingle();
                 RainSimulator_Falloff = r.ReadSingle();
@@ -88,18 +75,11 @@ namespace GameX.Bethesda.Formats.Records
             }
         }
 
-        public struct GNAMField
+        public struct GNAMField(BinaryReader r, int dataSize)
         {
-            public FormId<WATRRecord> Daytime;
-            public FormId<WATRRecord> Nighttime;
-            public FormId<WATRRecord> Underwater;
-
-            public GNAMField(BinaryReader r, int dataSize)
-            {
-                Daytime = new FormId<WATRRecord>(r.ReadUInt32());
-                Nighttime = new FormId<WATRRecord>(r.ReadUInt32());
-                Underwater = new FormId<WATRRecord>(r.ReadUInt32());
-            }
+            public FormId<WATRRecord> Daytime = new FormId<WATRRecord>(r.ReadUInt32());
+            public FormId<WATRRecord> Nighttime = new FormId<WATRRecord>(r.ReadUInt32());
+            public FormId<WATRRecord> Underwater = new FormId<WATRRecord>(r.ReadUInt32());
         }
 
         public override string ToString() => $"WATR: {EDID.Value}";

@@ -21,7 +21,7 @@ namespace GameX.Cig
         /// <param name="state">The state.</param>
         public CigPakFile(PakState state) : base(state, PakBinary_P4k.Instance)
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

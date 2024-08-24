@@ -58,7 +58,7 @@ class FileExplorer(QWidget):
         self.pakFile = pakFile
         self.filters = pakFile.getMetaFilters(self.resource)
         self.nodes = self.pakNodes = pakFile.getMetaItems(self.resource)
-        self.onReady(pakFile)
+        self.ready(pakFile)
 
     def initUI(self):
         filterLabel = QLabel(self); filterLabel.setText('File Filter:')
@@ -157,10 +157,10 @@ class FileExplorer(QWidget):
         self.parent.contentBlock.onInfo(self.pakFile, [x for x in infos if not x.name] if infos else None)
         self.infos = [x for x in infos if x.name] if infos else None
 
-    def onReady(self, pakFile):
-        if not config.ForcePath or config.ForcePath.startswith('app:'): return
-        sample = pakFile.game.getSample(config.ForcePath[7:]) if config.ForcePath.startswith('sample:') else None
-        forcePath = sample.path if sample else config.ForcePath
+    def ready(self, pakFile):
+        if not option.ForcePath or option.ForcePath.startswith('app:'): return
+        sample = pakFile.game.getSample(option.ForcePath[7:]) if option.ForcePath.startswith('sample:') else None
+        forcePath = sample.path if sample else option.ForcePath
         if not forcePath: return
         abc = MetaItem.findByPathForNodes(self.pakNodes, forcePath, self.resource)
         self.setSelectedItem(MetaItem.findByPathForNodes(self.pakNodes, forcePath, self.resource))

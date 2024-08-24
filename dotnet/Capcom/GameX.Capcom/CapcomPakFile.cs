@@ -21,7 +21,7 @@ namespace GameX.Capcom
         /// <param name="state">The state.</param>
         public CapcomPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFactoryMethod = state.Game.Engine switch
+            ObjectFactoryFunc = state.Game.Engine switch
             {
                 "Unity" => Unity.UnityPakFile.ObjectFactoryFactory,
                 _ => ObjectFactoryFactory,

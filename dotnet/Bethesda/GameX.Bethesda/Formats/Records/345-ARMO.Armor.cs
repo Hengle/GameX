@@ -9,10 +9,7 @@ namespace GameX.Bethesda.Formats.Records
         // TESX
         public struct DATAField
         {
-            public enum ARMOType
-            {
-                Helmet = 0, Cuirass, L_Pauldron, R_Pauldron, Greaves, Boots, L_Gauntlet, R_Gauntlet, Shield, L_Bracer, R_Bracer,
-            }
+            public enum ARMOType { Helmet = 0, Cuirass, L_Pauldron, R_Pauldron, Greaves, Boots, L_Gauntlet, R_Gauntlet, Shield, L_Bracer, R_Bracer, }
 
             public short Armour;
             public int Value;

@@ -16,40 +16,22 @@ namespace GameX.Bethesda.Formats.Records
             }
         }
 
-        public struct CNAMField
+        public struct CNAMField(BinaryReader r, int dataSize)
         {
-            public float LeafCurvature;
-            public float MinimumLeafAngle;
-            public float MaximumLeafAngle;
-            public float BranchDimmingValue;
-            public float LeafDimmingValue;
-            public int ShadowRadius;
-            public float RockSpeed;
-            public float RustleSpeed;
-
-            public CNAMField(BinaryReader r, int dataSize)
-            {
-                LeafCurvature = r.ReadSingle();
-                MinimumLeafAngle = r.ReadSingle();
-                MaximumLeafAngle = r.ReadSingle();
-                BranchDimmingValue = r.ReadSingle();
-                LeafDimmingValue = r.ReadSingle();
-                ShadowRadius = r.ReadInt32();
-                RockSpeed = r.ReadSingle();
-                RustleSpeed = r.ReadSingle();
-            }
+            public float LeafCurvature = r.ReadSingle();
+            public float MinimumLeafAngle = r.ReadSingle();
+            public float MaximumLeafAngle = r.ReadSingle();
+            public float BranchDimmingValue = r.ReadSingle();
+            public float LeafDimmingValue = r.ReadSingle();
+            public int ShadowRadius = r.ReadInt32();
+            public float RockSpeed = r.ReadSingle();
+            public float RustleSpeed = r.ReadSingle();
         }
 
-        public struct BNAMField
+        public struct BNAMField(BinaryReader r, int dataSize)
         {
-            public float Width;
-            public float Height;
-
-            public BNAMField(BinaryReader r, int dataSize)
-            {
-                Width = r.ReadSingle();
-                Height = r.ReadSingle();
-            }
+            public float Width = r.ReadSingle();
+            public float Height = r.ReadSingle();
         }
 
         public override string ToString() => $"TREE: {EDID.Value}";

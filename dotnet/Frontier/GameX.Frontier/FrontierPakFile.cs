@@ -20,7 +20,7 @@ namespace GameX.Frontier
         /// <param name="state">The state.</param>
         public FrontierPakFile(PakState state) : base(state, PakBinary_Frontier.Instance)
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

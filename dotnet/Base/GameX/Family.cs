@@ -40,16 +40,6 @@ namespace GameX
             AllDir,
         }
 
-        /// <summary>
-        /// Game options.
-        /// </summary>
-        [Flags]
-        public enum GameOption
-        {
-            //Paths = 0x1,
-            //Stream = 0x2,
-        }
-
         static readonly Func<string, Stream> GetManifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream;
         static string FamilyLoader(string path)
         {
@@ -813,7 +803,7 @@ namespace GameX
     /// </summary>
     public class FamilySample
     {
-        public Dictionary<string, List<File>> Samples { get; } = new Dictionary<string, List<File>>();
+        public Dictionary<string, List<File>> Samples { get; } = [];
 
         /// <summary>
         /// FamilySample
@@ -846,9 +836,7 @@ namespace GameX
             /// <param name="elem"></param>
             /// <exception cref="ArgumentNullException"></exception>
             public File(JsonElement elem)
-            {
-                Data = Parse(elem);
-            }
+                => Data = Parse(elem);
 
             /// <summary>
             /// Parse
@@ -885,7 +873,7 @@ namespace GameX
         /// <summary>
         /// An empty family game.
         /// </summary>
-        public static readonly FamilyGame Empty = new FamilyGame
+        public static readonly FamilyGame Empty = new()
         {
             Family = Family.Empty,
             Id = "Empty",
@@ -1079,21 +1067,21 @@ namespace GameX
         /// </summary>
         public SearchBy SearchBy { get; set; }
         /// <summary>
-        /// Gets or sets the pak option.
-        /// </summary>
-        //public GameOption Option { get; set; }
-        /// <summary>
         /// Gets or sets the pakFile type.
         /// </summary>
         public Type PakFileType { get; set; }
         /// <summary>
-        /// Gets or sets the pak etxs.
+        /// Gets or sets the pak exts.
         /// </summary>
         public string[] PakExts { get; set; }
         /// <summary>
         /// Gets or sets the paks.
         /// </summary>
         public Uri[] Paks { get; set; }
+        /// <summary>
+        /// Gets or sets the dat exts.
+        /// </summary>
+        public string[] DatExts { get; set; }
         /// <summary>
         /// Gets or sets the dats.
         /// </summary>
@@ -1182,6 +1170,7 @@ namespace GameX
             SearchBy = _value(elem, "searchBy", z => Enum.TryParse<SearchBy>(z.GetString(), true, out var zS) ? zS : throw new ArgumentOutOfRangeException("searchBy", $"Unknown option: {z}"), dgame.SearchBy);
             PakFileType = _value(elem, "pakFileType", z => Type.GetType(z.GetString(), false) ?? throw new ArgumentOutOfRangeException("pakFileType", $"Unknown type: {z}"), dgame.PakFileType);
             PakExts = _list(elem, "pakExt", dgame.PakExts);
+            DatExts = _list(elem, "datExt", dgame.DatExts);
             // related
             Editions = _related(elem, "editions", (k, v) => new Edition(k, v));
             Dlcs = _related(elem, "dlcs", (k, v) => new DownloadableContent(k, v));
@@ -1211,7 +1200,12 @@ namespace GameX
         /// <summary>
         /// Converts the Paks to Application Paks.
         /// </summary>
-        public IList<Uri> ToPaks(string edition) => Paks.Select(x => new Uri($"{x}#{Id}{(string.IsNullOrEmpty(edition) ? "" : "." + edition)}")).ToList();
+        public IList<Uri> ToPaks(string edition) => Paks.Select(x => new Uri($"{x}#{Id}{(string.IsNullOrEmpty(edition) ? "" : $".{edition}")}")).ToList();
+
+        /// <summary>
+        /// Converts the Paks to Application Dats.
+        /// </summary>
+        public IList<Uri> ToDats(string edition) => Dats.Select(x => new Uri($"{x}#{Id}{(string.IsNullOrEmpty(edition) ? "" : $".{edition}")}")).ToList();
 
         /// <summary>
         /// Gets a family sample
@@ -1289,7 +1283,7 @@ namespace GameX
                                 : p));
                             break;
                     }
-            return WithPlatform(CreatePakFileObj(fileSystem, edition, pakFiles));
+            return WithPlatform(pakFiles.Count == 1 ? pakFiles[0] : CreatePakFileObj(fileSystem, edition, pakFiles));
         }
 
         /// <summary>
@@ -1300,24 +1294,23 @@ namespace GameX
         /// <param name="value">The value.</param>
         /// <param name="tag">The tag.</param>
         /// <returns></returns>
-        public PakFile CreatePakFileObj(IFileSystem fileSystem, Edition edition, object value, object tag = null) => value switch
+        public PakFile CreatePakFileObj(IFileSystem fileSystem, Edition edition, object value, object tag = null)
         {
-            string s => IsPakFile(s)
-                ? CreatePakFileType(new PakState(fileSystem, this, edition, s, tag))
-                : throw new InvalidOperationException($"{Id} missing {s}"),
-            ValueTuple<string, string[]> s => s.Item2.Length == 1 && IsPakFile(s.Item2[0])
-                ? CreatePakFileObj(fileSystem, edition, s.Item2[0], tag)
-                : new ManyPakFile(
-                    CreatePakFileType(new PakState(fileSystem, this, edition, null, tag)),
-                    new PakState(fileSystem, this, edition, null, tag),
-                    s.Item1.Length > 0 ? s.Item1 : "Many", s.Item2,
-                    pathSkip: 0), //s.Item1.Length > 0 ? s.Item1.Length + 1 : 0),
-            IList<PakFile> s => s.Count == 1
-                ? s[0]
-                : new MultiPakFile(new PakState(fileSystem, this, edition, null, tag), "Multi", s),
-            null => null,
-            _ => throw new ArgumentOutOfRangeException(nameof(value), $"{value}"),
-        };
+            var pakState = new PakState(fileSystem, this, edition, value as string, tag);
+            return value switch
+            {
+                string s => IsPakFile(s) ? CreatePakFileType(pakState) : throw new InvalidOperationException($"{Id} missing {s}"),
+                ValueTuple<string, string[]> s => s.Item2.Length == 1 && IsPakFile(s.Item2[0])
+                    ? CreatePakFileObj(fileSystem, edition, s.Item2[0], tag)
+                    : new ManyPakFile(
+                        CreatePakFileType(pakState), pakState,
+                        s.Item1.Length > 0 ? s.Item1 : "Many", s.Item2,
+                        pathSkip: 0), //s.Item1.Length > 0 ? s.Item1.Length + 1 : 0),
+                IList<PakFile> s => s.Count == 1 ? s[0] : new MultiPakFile(pakState, "Multi", s),
+                null => null,
+                _ => throw new ArgumentOutOfRangeException(nameof(value), $"{value}"),
+            };
+        }
 
         /// <summary>
         /// Create pak file.
@@ -1344,7 +1337,7 @@ namespace GameX
         public IEnumerable<(string root, string[] paths)> FindPaths(IFileSystem fileSystem, Edition edition, DownloadableContent dlc, string searchPattern)
         {
             var ignores = Family.FileManager.Ignores.TryGetValue(Id, out var z) ? z : null;
-            foreach (var path in Paths ?? new[] { "" })
+            foreach (var path in Paths ?? [""])
             {
                 var searchPath = dlc != null && dlc.Path != null ? Path.Join(path, dlc.Path) : path;
                 var fileSearch = fileSystem.FindPaths(searchPath, searchPattern);

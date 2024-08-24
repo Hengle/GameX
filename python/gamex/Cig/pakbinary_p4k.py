@@ -18,7 +18,7 @@ class PakBinary_P4k(PakBinaryT):
         def __init__(self, pak: P4kFile, source: BinaryPakFile, game: FamilyGame, fileSystem: IFileSystem, filePath: str, tag: object = None):
             super().__init__(game, fileSystem, filePath, parent._instance, tag)
             self.pak = file
-            self.objectFactoryFactoryMethod = source.objectFactoryFactoryMethod
+            self.objectFactoryFunc = source.objectFactoryFunc
             self.useReader = False
             # self.open()
 

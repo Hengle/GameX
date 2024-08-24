@@ -8,7 +8,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Abandon
     {
-        internal static Dictionary<string, string> AbandonPaths = [];
+        internal static readonly Dictionary<string, string> AbandonPaths = [];
 
         static Store_Abandon()
         {

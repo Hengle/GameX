@@ -23,28 +23,21 @@ namespace GameX.Bethesda.Formats.Records
         }
 
         // TES4
-        public struct XNAMField
+        public struct XNAMField(BinaryReader r, int dataSize, BethesdaFormat format)
         {
             public override string ToString() => $"{FormId}";
-            public int FormId;
-            public int Mod;
-            public int Combat;
-
-            public XNAMField(BinaryReader r, int dataSize, BethesdaFormat format)
-            {
-                FormId = r.ReadInt32();
-                Mod = r.ReadInt32();
-                Combat = format > BethesdaFormat.TES4 ? r.ReadInt32() : 0; // 0 - Neutral, 1 - Enemy, 2 - Ally, 3 - Friend
-            }
+            public int FormId = r.ReadInt32();
+            public int Mod = r.ReadInt32();
+            public int Combat = format > BethesdaFormat.TES4 ? r.ReadInt32() : 0;
         }
 
         public override string ToString() => $"FACT: {EDID.Value}";
         public STRVField EDID { get; set; } // Editor ID
         public STRVField FNAM; // Faction name
-        public List<RNAMGroup> RNAMs = new List<RNAMGroup>(); // Rank Name
+        public List<RNAMGroup> RNAMs = []; // Rank Name
         public FADTField FADT; // Faction data
-        public List<STRVField> ANAMs = new List<STRVField>(); // Faction name
-        public List<INTVField> INTVs = new List<INTVField>(); // Faction reaction
+        public List<STRVField> ANAMs = []; // Faction name
+        public List<INTVField> INTVs = []; // Faction reaction
         // TES4
         public XNAMField XNAM; // Interfaction Relations
         public INTVField DATA; // Flags (byte, uint32)

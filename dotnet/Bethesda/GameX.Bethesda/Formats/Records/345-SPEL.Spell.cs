@@ -9,7 +9,7 @@ namespace GameX.Bethesda.Formats.Records
         // TESX
         public struct SPITField
         {
-            public override string ToString() => $"{Type}";
+            public override readonly string ToString() => $"{Type}";
             // TES3: 0 = Spell, 1 = Ability, 2 = Blight, 3 = Disease, 4 = Curse, 5 = Power
             // TES4: 0 = Spell, 1 = Disease, 2 = Power, 3 = Lesser Power, 4 = Ability, 5 = Poison
             public uint Type; 
@@ -31,9 +31,9 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField EDID { get; set; } // Editor ID
         public STRVField FULL; // Spell name
         public SPITField SPIT; // Spell data
-        public List<ENCHRecord.EFITField> EFITs = new List<ENCHRecord.EFITField>(); // Effect Data
+        public List<ENCHRecord.EFITField> EFITs = []; // Effect Data
         // TES4
-        public List<ENCHRecord.SCITField> SCITs = new List<ENCHRecord.SCITField>(); // Script effect data
+        public List<ENCHRecord.SCITField> SCITs = []; // Script effect data
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

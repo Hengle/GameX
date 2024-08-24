@@ -18,36 +18,20 @@ namespace GameX.Bethesda.Formats.Records
             }
         }
 
-        public struct PLDTField
+        public struct PLDTField(BinaryReader r, int dataSize)
         {
-            public int Type;
-            public uint Target;
-            public int Radius;
-
-            public PLDTField(BinaryReader r, int dataSize)
-            {
-                Type = r.ReadInt32();
-                Target = r.ReadUInt32();
-                Radius = r.ReadInt32();
-            }
+            public int Type = r.ReadInt32();
+            public uint Target = r.ReadUInt32();
+            public int Radius = r.ReadInt32();
         }
 
-        public struct PSDTField
+        public struct PSDTField(BinaryReader r, int dataSize)
         {
-            public byte Month;
-            public byte DayOfWeek;
-            public byte Date;
-            public sbyte Time;
-            public int Duration;
-
-            public PSDTField(BinaryReader r, int dataSize)
-            {
-                Month = r.ReadByte();
-                DayOfWeek = r.ReadByte();
-                Date = r.ReadByte();
-                Time = (sbyte)r.ReadByte();
-                Duration = r.ReadInt32();
-            }
+            public byte Month = r.ReadByte();
+            public byte DayOfWeek = r.ReadByte();
+            public byte Date = r.ReadByte();
+            public sbyte Time = (sbyte)r.ReadByte();
+            public int Duration = r.ReadInt32();
         }
 
         public struct PTDTField

@@ -28,20 +28,12 @@ namespace GameX.Meta
     #region MetaInfo
 
     [DebuggerDisplay("{Name}, items: {Items.Count} [{Tag}]")]
-    public class MetaInfo
+    public class MetaInfo(string name, object tag = null, IEnumerable<MetaInfo> items = null, bool clickable = false)
     {
-        public string Name { get; set; }
-        public object Tag { get; }
-        public IEnumerable<MetaInfo> Items { get; }
-        public bool Clickable { get; set; }
-
-        public MetaInfo(string name, object tag = null, IEnumerable<MetaInfo> items = null, bool clickable = false)
-        {
-            Name = name;
-            Tag = tag;
-            Items = items ?? [];
-            Clickable = clickable;
-        }
+        public string Name { get; set; } = name;
+        public object Tag { get; } = tag;
+        public IEnumerable<MetaInfo> Items { get; } = items ?? [];
+        public bool Clickable { get; set; } = clickable;
 
         public static MetaInfo WrapWithGroup<T>(IList<T> source, string groupName, IEnumerable<MetaInfo> body)
             => source.Count == 0 ? null
@@ -54,39 +46,23 @@ namespace GameX.Meta
     #region MetaItem
 
     [DebuggerDisplay("{Name}, items: {Items.Count}")]
-    public class MetaItem
+    public class MetaItem(object source, string name, object icon, object tag = null, PakFile pakFile = null, List<MetaItem> items = null)
     {
         [DebuggerDisplay("{Name}")]
-        public class Filter
+        public class Filter(string name, string description = "")
         {
-            public string Name;
-            public string Description;
-
-            public Filter(string name, string description = "")
-            {
-                Name = name;
-                Description = description;
-            }
+            public string Name = name;
+            public string Description = description;
 
             public override string ToString() => Name;
         }
 
-        public object Source { get; }
-        public string Name { get; }
-        public object Icon { get; }
-        public object Tag { get; }
-        public PakFile PakFile { get; }
-        public List<MetaItem> Items { get; private set; }
-
-        public MetaItem(object source, string name, object icon, object tag = null, PakFile pakFile = null, List<MetaItem> items = null)
-        {
-            Source = source;
-            Name = name;
-            Icon = icon;
-            Tag = tag;
-            PakFile = pakFile;
-            Items = items ?? [];
-        }
+        public object Source { get; } = source;
+        public string Name { get; } = name;
+        public object Icon { get; } = icon;
+        public object Tag { get; } = tag;
+        public PakFile PakFile { get; } = pakFile;
+        public List<MetaItem> Items { get; private set; } = items ?? [];
 
         public MetaItem Search(Func<MetaItem, bool> predicate)
         {
@@ -180,16 +156,16 @@ namespace GameX.Meta
             {
                 var value = GuessStringOrBytes(stream);
                 nodes = value is string text ? [
-                        new(null, new MetaContent { Type = "Text", Name = "Text", Value = text }),
-                        new("Text", items: [
-                            new($"Length: {text.Length}"),
-                        ]) ]
-                    : value is byte[] bytes ? [
-                        new(null, new MetaContent { Type = "Hex", Name = "Hex", Value = new MemoryStream(bytes) }),
-                        new("Bytes", items: [
-                            new($"Length: {bytes.Length}"),
-                        ]) ]
-                    : throw new ArgumentOutOfRangeException(nameof(value), value.GetType().Name);
+                    new(null, new MetaContent { Type = "Text", Name = "Text", Value = text }),
+                    new("Text", items: [
+                        new($"Length: {text.Length}"),
+                    ])]
+                : value is byte[] bytes ? [
+                    new(null, new MetaContent { Type = "Hex", Name = "Hex", Value = new MemoryStream(bytes) }),
+                    new("Bytes", items: [
+                        new($"Length: {bytes.Length}"),
+                    ])]
+                : throw new ArgumentOutOfRangeException(nameof(value), value.GetType().Name);
             }
             else if (obj is IDisposable disposable) disposable.Dispose();
             if (nodes == null) return null;

@@ -62,46 +62,37 @@ namespace GameX
     /// <summary>
     /// PakState
     /// </summary>
-    public class PakState
+    /// <param name="fileSystem">The file system.</param>
+    /// <param name="game">The game.</param>
+    /// <param name="edition">The edition.</param>
+    /// <param name="path">The path.</param>
+    /// <param name="tag">The tag.</param>
+    public class PakState(IFileSystem fileSystem, FamilyGame game, FamilyGame.Edition edition = null, string path = null, object tag = null)
     {
         /// <summary>
         /// Gets the filesystem.
         /// </summary>
-        public readonly IFileSystem FileSystem;
+        public readonly IFileSystem FileSystem = fileSystem;
 
         /// <summary>
         /// Gets the pak family game.
         /// </summary>
-        public readonly FamilyGame Game;
+        public readonly FamilyGame Game = game;
 
         /// <summary>
         /// Gets the filesystem.
         /// </summary>
-        public readonly FamilyGame.Edition Edition;
+        public readonly FamilyGame.Edition Edition = edition;
 
         /// <summary>
         /// Gets the path.
         /// </summary>
-        public readonly string Path;
+        public readonly string Path = path ?? string.Empty;
 
         /// <summary>
         /// Gets the tag.
         /// </summary>
-        public object Tag;
-
-        /// <param name="fileSystem">The file system.</param>
-        /// <param name="game">The game.</param>
-        /// <param name="edition">The edition.</param>
-        /// <param name="path">The path.</param>
-        /// <param name="tag">The tag.</param>
-        public PakState(IFileSystem fileSystem, FamilyGame game, FamilyGame.Edition edition = null, string path = null, object tag = null)
-        {
-            FileSystem = fileSystem;
-            Game = game;
-            Edition = edition;
-            Path = path ?? string.Empty;
-            Tag = tag;
-        }
+        public object Tag = tag;
     }
 
     #endregion
@@ -114,7 +105,7 @@ namespace GameX
     /// <seealso cref="System.IDisposable" />
     public abstract class PakFile : IDisposable
     {
-        public delegate (FileOption option, Func<BinaryReader, FileSource, PakFile, Task<object>> factory) FuncObjectFactoryFactory(FileSource source, FamilyGame game);
+        public delegate (FileOption option, Func<BinaryReader, FileSource, PakFile, Task<object>> factory) FuncObjectFactory(FileSource source, FamilyGame game);
 
         /// <summary>
         /// An empty family.
@@ -124,49 +115,54 @@ namespace GameX
         public enum PakStatus { Opening, Opened, Closing, Closed }
 
         /// <summary>
-        /// Gets the status
+        /// The status
         /// </summary>
         public volatile PakStatus Status = PakStatus.Closed;
 
         /// <summary>
-        /// Gets the filesystem.
+        /// The filesystem.
         /// </summary>
         public readonly IFileSystem FileSystem;
 
         /// <summary>
-        /// Gets the pak family.
+        /// The pak family.
         /// </summary>
         public readonly Family Family;
 
         /// <summary>
-        /// Gets the pak family game.
+        /// The pak family game.
         /// </summary>
         public readonly FamilyGame Game;
 
         /// <summary>
-        /// Gets the filesystem.
+        /// The filesystem.
         /// </summary>
         public readonly FamilyGame.Edition Edition;
 
         /// <summary>
-        /// Gets the pak path.
+        /// The pak path.
         /// </summary>
         public string PakPath;
 
         /// <summary>
-        /// Gets the pak name.
+        /// The pak name.
         /// </summary>
         public string Name;
 
         /// <summary>
-        /// Gets the tag.
+        /// The tag.
         /// </summary>
         public object Tag;
 
         /// <summary>
-        /// Gets the pak path finders.
+        /// The pak path finders.
         /// </summary>
         public readonly Dictionary<Type, Func<string, string>> PathFinders = [];
+
+        /// <summary>
+        /// The pak path finders.
+        /// </summary>
+        public FuncObjectFactory ObjectFactoryFunc;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PakFile" /> class.
@@ -388,10 +384,17 @@ namespace GameX
 
     #region BinaryPakFile
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BinaryPakFile" /> class.
+    /// </summary>
+    /// <param name="state">The state.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="pakBinary">The pak binary.</param>
+    /// <exception cref="ArgumentNullException">pakBinary</exception>
     [DebuggerDisplay("{Name}")]
-    public abstract class BinaryPakFile : PakFile
+    public abstract class BinaryPakFile(PakState state, PakBinary pakBinary) : PakFile(state)
     {
-        public readonly PakBinary PakBinary;
+        public readonly PakBinary PakBinary = pakBinary;
         // options
         public int RetainInPool = 10;
         public bool UseReader = true;
@@ -399,12 +402,11 @@ namespace GameX
         public bool UseFileId = false;
         // state
         public Func<string, string> FileMask;
-        public readonly Dictionary<string, string> Params = new Dictionary<string, string>();
+        public readonly Dictionary<string, string> Params = [];
         public uint Magic;
         public uint Version;
         // metadata/factory
         protected Dictionary<string, Func<MetaManager, BinaryPakFile, FileSource, Task<List<MetaInfo>>>> MetaInfos = [];
-        public FuncObjectFactoryFactory ObjectFactoryFactoryMethod;
 
         // binary
         public IList<FileSource> Files;
@@ -414,24 +416,14 @@ namespace GameX
         public int PathSkip;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BinaryPakFile" /> class.
-        /// </summary>
-        /// <param name="state">The state.</param>
-        /// <param name="name">The name.</param>
-        /// <param name="pakBinary">The pak binary.</param>
-        /// <exception cref="ArgumentNullException">pakBinary</exception>
-        public BinaryPakFile(PakState state, PakBinary pakBinary) : base(state)
-            => PakBinary = pakBinary;
-
-        /// <summary>
         /// Valid
         /// </summary>
         public override bool Valid => Files != null;
 
         #region Pool
 
-        readonly ConcurrentDictionary<string, GenericPool<BinaryReader>> Readers = new ConcurrentDictionary<string, GenericPool<BinaryReader>>();
-        readonly ConcurrentDictionary<string, GenericPool<BinaryWriter>> Writers = new ConcurrentDictionary<string, GenericPool<BinaryWriter>>();
+        readonly ConcurrentDictionary<string, GenericPool<BinaryReader>> Readers = new();
+        readonly ConcurrentDictionary<string, GenericPool<BinaryWriter>> Writers = new();
 
         /// <summary>
         /// Gets the binary reader.
@@ -654,8 +646,9 @@ namespace GameX
         /// <returns></returns>
         public Func<BinaryReader, FileSource, PakFile, Task<object>> EnsureCachedObjectFactory(FileSource file)
         {
+            if (ObjectFactoryFunc == null) return FileSource.EmptyObjectFactory;
             if (file.CachedObjectFactory != null) return file.CachedObjectFactory;
-            var factory = ObjectFactoryFactoryMethod(file, Game);
+            var factory = ObjectFactoryFunc(file, Game);
             file.CachedObjectOption = factory.option;
             file.CachedObjectFactory = factory.factory ?? FileSource.EmptyObjectFactory;
             return file.CachedObjectFactory;
@@ -765,8 +758,7 @@ namespace GameX
         /// <param name="pathSkip">The pathSkip.</param>
         public ManyPakFile(PakFile basis, PakState state, string name, string[] paths, int pathSkip = 0) : base(state, null)
         {
-            if (basis is BinaryPakFile b)
-                ObjectFactoryFactoryMethod = b.ObjectFactoryFactoryMethod;
+            ObjectFactoryFunc = basis.ObjectFactoryFunc;
             Name = name;
             Paths = paths;
             PathSkip = pathSkip;
@@ -1037,15 +1029,15 @@ namespace GameX
 
         protected class SubPakFile : BinaryPakFile
         {
-            FileSource File;
-            BinaryPakFile Source;
+            readonly FileSource File;
+            readonly BinaryPakFile Source;
             BinaryReader R;
 
             public SubPakFile(BinaryPakFile source, FileSource file, string path, object tag = null, PakBinary instance = null) : base(new PakState(source.FileSystem, source.Game, source.Edition, path, tag), instance ?? Instance)
             {
                 File = file;
                 Source = source;
-                ObjectFactoryFactoryMethod = source.ObjectFactoryFactoryMethod;
+                ObjectFactoryFunc = source.ObjectFactoryFunc;
                 //Open();
             }
 

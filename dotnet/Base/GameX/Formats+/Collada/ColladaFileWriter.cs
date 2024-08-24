@@ -22,13 +22,13 @@ namespace GameX.Formats.Collada
 
         public FileInfo ModelFile;
 
-        public XmlSchema schema = new XmlSchema // Get the schema from kronos.org. Needs error checking in case it's offline
+        public XmlSchema schema = new() // Get the schema from kronos.org. Needs error checking in case it's offline
         {
             ElementFormDefault = XmlSchemaForm.Qualified,
             TargetNamespace = "https://www.khronos.org/files/collada_schema_1_5",
         };
 
-        public Grendgine_Collada daeObject = new Grendgine_Collada // This is the serializable class.
+        public Grendgine_Collada daeObject = new() // This is the serializable class.
         {
             //Collada_Version = "1.5.0", // Blender doesn't like 1.5. :(
             Collada_Version = "1.4.1",

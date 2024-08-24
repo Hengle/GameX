@@ -78,6 +78,9 @@ namespace GameX
         /// </summary>
         public readonly Dictionary<string, Dictionary<string, string>> Filters = [];
 
+        /// <summary>
+        /// The LocalGames
+        /// </summary>
         public static readonly Dictionary<string, string> LocalGames;
 
         static FileManager()
@@ -294,7 +297,7 @@ namespace GameX
             if (uri == null) throw new ArgumentNullException(nameof(uri));
             var pathOrPattern = uri.LocalPath;
             var searchPattern = Path.GetFileName(pathOrPattern);
-            var path = Path.GetDirectoryName(pathOrPattern);
+            //var path = Path.GetDirectoryName(pathOrPattern);
             // file
             if (!string.IsNullOrEmpty(searchPattern)) throw new ArgumentOutOfRangeException(nameof(pathOrPattern), pathOrPattern); //: Web single file access to supported.
 
@@ -330,11 +333,11 @@ namespace GameX
     /// <summary>
     /// StandardFileSystem
     /// </summary>
-    internal class StandardFileSystem : IFileSystem
+    internal class StandardFileSystem(string root) : IFileSystem
     {
-        readonly string Root;
-        readonly int Skip;
-        public StandardFileSystem(string root) { Root = root; Skip = Root.Length + 1; }
+        readonly string Root = root;
+        readonly int Skip = root.Length + 1;
+
         public IEnumerable<string> Glob(string path, string searchPattern)
         {
             var matcher = new Matcher();
@@ -344,8 +347,8 @@ namespace GameX
         }
         public bool FileExists(string path) => File.Exists(Path.Combine(Root, path));
         public (string path, long length) FileInfo(string path) => File.Exists(path = Path.Combine(Root, path)) ? (path[Skip..], new FileInfo(Path.Combine(Root, path)).Length) : (null, 0);
-        public BinaryReader OpenReader(string path) => new BinaryReader(File.Open(Path.Combine(Root, path), FileMode.Open, FileAccess.Read, FileShare.Read));
-        public BinaryWriter OpenWriter(string path) => new BinaryWriter(File.Open(Path.Combine(Root, path), FileMode.Open, FileAccess.Write, FileShare.Write));
+        public BinaryReader OpenReader(string path) => new(File.Open(Path.Combine(Root, path), FileMode.Open, FileAccess.Read, FileShare.Read));
+        public BinaryWriter OpenWriter(string path) => new(File.Open(Path.Combine(Root, path), FileMode.Open, FileAccess.Write, FileShare.Write));
     }
 
     #endregion
@@ -355,15 +358,11 @@ namespace GameX
     /// <summary>
     /// VirtualFileSystem
     /// </summary>
-    internal class VirtualFileSystem : IFileSystem
+    internal class VirtualFileSystem(IFileSystem @base, Dictionary<string, byte[]> virtuals) : IFileSystem
     {
-        readonly IFileSystem Base;
-        readonly Dictionary<string, byte[]> Virtuals;
-        public VirtualFileSystem(IFileSystem @base, Dictionary<string, byte[]> virtuals)
-        {
-            Base = @base;
-            Virtuals = virtuals;
-        }
+        readonly IFileSystem Base = @base;
+        readonly Dictionary<string, byte[]> Virtuals = virtuals;
+
         public IEnumerable<string> Glob(string path, string searchPattern)
         {
             var matcher = FileManager.CreateMatcher(searchPattern);
@@ -382,15 +381,11 @@ namespace GameX
     /// <summary>
     /// ZipFileSystem
     /// </summary>
-    internal class ZipFileSystem : IFileSystem
+    internal class ZipFileSystem(string root, string path) : IFileSystem
     {
-        readonly ZipArchive Pak;
-        readonly string Root;
-        public ZipFileSystem(string root, string path)
-        {
-            Pak = ZipFile.Open(root, ZipArchiveMode.Read);
-            Root = string.IsNullOrEmpty(path) ? string.Empty : $"{path}{Path.AltDirectorySeparatorChar}";
-        }
+        readonly ZipArchive Pak = ZipFile.Open(root, ZipArchiveMode.Read);
+        readonly string Root = string.IsNullOrEmpty(path) ? string.Empty : $"{path}{Path.AltDirectorySeparatorChar}";
+
         public IEnumerable<string> Glob(string path, string searchPattern)
         {
             var root = Path.Combine(Root, path);
@@ -415,15 +410,11 @@ namespace GameX
     /// <summary>
     /// ZipIsoFileSystem
     /// </summary>
-    internal class ZipIsoFileSystem : IFileSystem
+    internal class ZipIsoFileSystem(string root, string path) : IFileSystem
     {
-        readonly ZipArchive Pak;
-        readonly string Path;
-        public ZipIsoFileSystem(string root, string path)
-        {
-            Pak = ZipFile.Open(root, ZipArchiveMode.Read);
-            Path = path;
-        }
+        readonly ZipArchive Pak = ZipFile.Open(root, ZipArchiveMode.Read);
+        //readonly string Root = path;
+
         public IEnumerable<string> Glob(string path, string searchPattern)
         {
             var matcher = FileManager.CreateMatcher(searchPattern);

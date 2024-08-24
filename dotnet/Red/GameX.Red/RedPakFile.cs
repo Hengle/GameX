@@ -21,7 +21,7 @@ namespace GameX.Red
         /// <param name="state">The state.</param>
         public RedPakFile(PakState state) : base(state, PakBinary_Red.Instance)
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

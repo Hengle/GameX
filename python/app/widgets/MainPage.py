@@ -120,6 +120,11 @@ class MainPage(QMainWindow):
         # show widget
         self.show()
     
+    def startup(self):
+        if option.ForcePath and option.ForcePath.startswith('app:') and self.familyApps and option.ForcePath[:4] in self.familyApps:
+            app = self.familyApps[option.ForcePath[:4]]
+        self.openPage_click()
+
     def updateTabs(self):
         self.mainTab.clear()
         for tab in self.mainTabs:
@@ -131,7 +136,7 @@ class MainPage(QMainWindow):
     def openPage_click(self):
         w = OpenWidget(self, lambda s:self.open(s.familySelected, OpenWidget.pakUris.__get__(s)))
         self.openWidgets.append(w)
-        w.onReady()
+        w.loaded()
 
     def log(self, value):
         logBar = self.logBar
@@ -162,7 +167,4 @@ class MainPage(QMainWindow):
         self.mainTabs = tabs
         self.updateTabs()
 
-    def onReady(self):
-        if config.ForcePath and config.ForcePath.startswith('app:') and self.familyApps and config.ForcePath[:4] in self.familyApps:
-            app = self.familyApps[config.ForcePath[:4]]
-        self.openPage_click()
+

@@ -1,33 +1,30 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using static OpenStack.Debug;
 using ZipFile = ICSharpCode.SharpZipLib.Zip.ZipFile;
 
 namespace GameX.Formats
 {
+    #region PakBinary_Zip
+
     /// <summary>
     /// PakBinary_Zip
     /// </summary>
     /// <seealso cref="GameEstate.Formats.PakBinary" />
-    public class PakBinary_Zip : PakBinary
+    public class PakBinary_Zip(object key = null) : PakBinary
     {
         static readonly PropertyInfo ZipFile_KeyProperty = typeof(ZipFile).GetProperty("Key", BindingFlags.NonPublic | BindingFlags.Instance);
 
         static readonly PakBinary Instance = new PakBinary_Zip();
-        static readonly ConcurrentDictionary<object, PakBinary> PakBinarys = new ConcurrentDictionary<object, PakBinary>();
+        static readonly ConcurrentDictionary<object, PakBinary> PakBinarys = new();
         public static PakBinary GetPakBinary(FamilyGame game) => game.Key == null ? Instance : PakBinarys.GetOrAdd(game.Key, x => new PakBinary_Zip(x));
 
-        readonly object Key;
+        readonly object Key = key;
         bool UseSystem => Key == null;
-
-        public PakBinary_Zip(object key = null) => Key = key;
 
         public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
         {
@@ -108,4 +105,6 @@ namespace GameX.Formats
         //    return Task.CompletedTask;
         //}
     }
+
+    #endregion
 }

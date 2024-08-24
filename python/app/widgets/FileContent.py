@@ -54,16 +54,15 @@ class FileContent(QTabWidget):
             control = TextView(self, tab) if tab.type == 'Text' else \
                 HexView(self, tab) if tab.type == 'Hex' else \
                 TestGfxView(self, tab) if tab.type == 'Texturex' else \
-                TestTriView(self, tab) if tab.type == 'Texture' else \
-                TextureView(self, tab) if tab.type == 'Texturex' else \
+                TestTriView(self, tab) if tab.type == 'TestTri' else \
+                TextureView(self, tab) if tab.type == 'Texture' else \
                 NullView(self, tab)
             self.contentTab.addTab(control, tab.name)
 
     @property
     def gfx(self): return self._gfx
     @gfx.setter
-    def gfx(self, value):
-        self._gfx = value
+    def gfx(self, value): self._gfx = value
 
     @property
     def contentTabs(self) -> list[MetaContent]: return self._contentTabs

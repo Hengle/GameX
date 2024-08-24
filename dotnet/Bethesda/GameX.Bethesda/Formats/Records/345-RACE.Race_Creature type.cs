@@ -79,8 +79,8 @@ namespace GameX.Bethesda.Formats.Records
             }
 
             public SkillBoost[] SkillBoosts = new SkillBoost[7]; // Skill Boosts
-            public RaceStats Male = new RaceStats();
-            public RaceStats Female = new RaceStats();
+            public RaceStats Male = new();
+            public RaceStats Female = new();
             public uint Flags; // 1 = Playable 2 = Beast Race
 
             public DATAField(BinaryReader r, int dataSize, BethesdaFormat format)
@@ -132,11 +132,7 @@ namespace GameX.Bethesda.Formats.Records
         // TES4
         public class FacePartGroup
         {
-            public enum Indx : uint
-            {
-                Head, Ear_Male, Ear_Female, Mouth, Teeth_Lower, Teeth_Upper, Tongue, Eye_Left, Eye_Right,
-            }
-
+            public enum Indx : uint { Head, Ear_Male, Ear_Female, Mouth, Teeth_Lower, Teeth_Upper, Tongue, Eye_Left, Eye_Right, }
             public UI32Field INDX;
             public MODLGroup MODL;
             public FILEField ICON;
@@ -144,11 +140,7 @@ namespace GameX.Bethesda.Formats.Records
 
         public class BodyPartGroup
         {
-            public enum Indx : uint
-            {
-                UpperBody, LowerBody, Hand, Foot, Tail
-            }
-
+            public enum Indx : uint { UpperBody, LowerBody, Hand, Foot, Tail }
             public UI32Field INDX;
             public FILEField ICON;
         }
@@ -157,14 +149,14 @@ namespace GameX.Bethesda.Formats.Records
         {
             public FILEField MODL;
             public FLTVField MODB;
-            public List<BodyPartGroup> BodyParts = new List<BodyPartGroup>();
+            public List<BodyPartGroup> BodyParts = [];
         }
 
         public override string ToString() => $"RACE: {EDID.Value}";
         public STRVField EDID { get; set; } // Editor ID
         public STRVField FULL; // Race name
         public STRVField DESC; // Race description
-        public List<STRVField> SPLOs = new List<STRVField>(); // NPCs: Special power/ability name
+        public List<STRVField> SPLOs = new(); // NPCs: Special power/ability name
         // TESX
         public DATAField DATA; // RADT:DATA/ATTR: Race data/Base Attributes
         // TES4
@@ -175,16 +167,16 @@ namespace GameX.Bethesda.Formats.Records
         public FLTVField UNAM; // FaceGen - Face clamp
         public UNKNField XNAM; // Unknown
         //
-        public List<FMIDField<HAIRRecord>> HNAMs = new List<FMIDField<HAIRRecord>>();
-        public List<FMIDField<EYESRecord>> ENAMs = new List<FMIDField<EYESRecord>>();
+        public List<FMIDField<HAIRRecord>> HNAMs = [];
+        public List<FMIDField<EYESRecord>> ENAMs = [];
         public BYTVField FGGS; // FaceGen Geometry-Symmetric
         public BYTVField FGGA; // FaceGen Geometry-Asymmetric
         public BYTVField FGTS; // FaceGen Texture-Symmetric
         public UNKNField SNAM; // Unknown
 
         // Parts
-        public List<FacePartGroup> FaceParts = new List<FacePartGroup>();
-        public BodyGroup[] Bodys = new[] { new BodyGroup(), new BodyGroup() };
+        public List<FacePartGroup> FaceParts = [];
+        public BodyGroup[] Bodys = [new BodyGroup(), new BodyGroup()];
         sbyte _nameState;
         sbyte _genderState;
 

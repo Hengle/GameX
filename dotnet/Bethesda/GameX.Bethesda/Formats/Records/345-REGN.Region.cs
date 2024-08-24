@@ -11,10 +11,7 @@ namespace GameX.Bethesda.Formats.Records
         // TESX
         public class RDATField
         {
-            public enum REGNType : byte
-            {
-                Objects = 2, Weather, Map, Landscape, Grass, Sound
-            }
+            public enum REGNType : byte { Objects = 2, Weather, Map, Landscape, Grass, Sound }
 
             public uint Type;
             public REGNType Flags;
@@ -39,7 +36,7 @@ namespace GameX.Bethesda.Formats.Records
 
         public struct RDOTField
         {
-            public override string ToString() => $"{Object}";
+            public override readonly string ToString() => $"{Object}";
             public FormId<Record> Object;
             public ushort ParentIdx;
             public float Density;
@@ -82,7 +79,7 @@ namespace GameX.Bethesda.Formats.Records
 
         public struct RDGSField
         {
-            public override string ToString() => $"{Grass}";
+            public override readonly string ToString() => $"{Grass}";
             public FormId<GRASRecord> Grass;
 
             public RDGSField(BinaryReader r, int dataSize)
@@ -94,7 +91,7 @@ namespace GameX.Bethesda.Formats.Records
 
         public struct RDSDField
         {
-            public override string ToString() => $"{Sound}";
+            public override readonly string ToString() => $"{Sound}";
             public FormId<SOUNRecord> Sound;
             public uint Flags;
             public uint Chance;
@@ -116,7 +113,7 @@ namespace GameX.Bethesda.Formats.Records
 
         public struct RDWTField
         {
-            public override string ToString() => $"{Weather}";
+            public override readonly string ToString() => $"{Weather}";
             public static byte SizeOf(BethesdaFormat format) => format == BethesdaFormat.TES4 ? (byte)8 : (byte)12;
             public FormId<WTHRRecord> Weather;
             public uint Chance;
@@ -159,12 +156,11 @@ namespace GameX.Bethesda.Formats.Records
         }
 
         // TES4
-        public class RPLIField
+        public class RPLIField(BinaryReader r, int dataSize)
         {
-            public uint EdgeFalloff; // (World Units)
+            public uint EdgeFalloff = r.ReadUInt32(); // (World Units)
             public Vector2[] Points; // Region Point List Data
 
-            public RPLIField(BinaryReader r, int dataSize) => EdgeFalloff = r.ReadUInt32();
             public void RPLDField(BinaryReader r, int dataSize)
             {
                 Points = new Vector2[dataSize >> 3];
@@ -177,11 +173,11 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField ICON; // Icon / Sleep creature
         public FMIDField<WRLDRecord> WNAM; // Worldspace - Region name
         public CREFField RCLR; // Map Color (COLORREF)
-        public List<RDATField> RDATs = new List<RDATField>(); // Region Data Entries / TES3: Sound Record (order determines the sound priority)
+        public List<RDATField> RDATs = []; // Region Data Entries / TES3: Sound Record (order determines the sound priority)
         // TES3
         public WEATField? WEAT; // Weather Data
         // TES4
-        public List<RPLIField> RPLIs = new List<RPLIField>(); // Region Areas
+        public List<RPLIField> RPLIs = []; // Region Areas
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

@@ -1,6 +1,7 @@
 using GameX.Meta;
 //using Microsoft.Maui.Graphics.Platform;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using IImage = Microsoft.Maui.Graphics.IImage;
 
 namespace GameX.App.Explorer

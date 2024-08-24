@@ -41,16 +41,10 @@ namespace GameX.Bethesda.Formats.Records
             }
         }
 
-        public struct PGRRField
+        public struct PGRRField(BinaryReader r, int dataSize)
         {
-            public short StartPointId;
-            public short EndPointId;
-
-            public PGRRField(BinaryReader r, int dataSize)
-            {
-                StartPointId = r.ReadInt16();
-                EndPointId = r.ReadInt16();
-            }
+            public short StartPointId = r.ReadInt16();
+            public short EndPointId = r.ReadInt16();
         }
 
         public struct PGRIField
@@ -108,7 +102,7 @@ namespace GameX.Bethesda.Formats.Records
                 case "PGRR":
                     PGRRs = new PGRRField[dataSize >> 2];
                     for (var i = 0; i < PGRRs.Length; i++) PGRRs[i] = new PGRRField(r, 4); r.Skip(dataSize % 4); return true;
-                case "PGRL": if (PGRLs == null) PGRLs = new List<PGRLField>(); PGRLs.Add(new PGRLField(r, dataSize)); return true;
+                case "PGRL": PGRLs ??= []; PGRLs.Add(new PGRLField(r, dataSize)); return true;
                 case "PGRI":
                     PGRIs = new PGRIField[dataSize >> 4];
                     for (var i = 0; i < PGRIs.Length; i++) PGRIs[i] = new PGRIField(r, 16); return true;

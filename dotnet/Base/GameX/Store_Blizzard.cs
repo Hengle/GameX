@@ -12,7 +12,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Blizzard
     {
-        internal static Dictionary<string, string> BlizzardPaths = [];
+        internal static readonly Dictionary<string, string> BlizzardPaths = [];
 
         static Store_Blizzard()
         {

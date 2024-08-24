@@ -65,8 +65,7 @@ namespace GameX.Bethesda.Formats.Records
 
             public DATAField(BinaryReader r, int dataSize)
             {
-                if (dataSize != 224 && dataSize != 96)
-                    Flags = 0;
+                if (dataSize != 224 && dataSize != 96) Flags = 0;
                 Flags = r.ReadByte();
                 r.Skip(3); // Unused
                 MembraneShader_SourceBlendMode = r.ReadUInt32();
@@ -92,8 +91,7 @@ namespace GameX.Bethesda.Formats.Records
                 FillTextureEffect_FullAlphaRatio = r.ReadSingle();
                 EdgeEffect_FullAlphaRatio = r.ReadSingle();
                 MembraneShader_DestBlendMode = r.ReadUInt32();
-                if (dataSize == 96)
-                    return;
+                if (dataSize == 96) return;
                 ParticleShader_SourceBlendMode = r.ReadUInt32();
                 ParticleShader_BlendOperation = r.ReadUInt32();
                 ParticleShader_ZTestFunction = r.ReadUInt32();

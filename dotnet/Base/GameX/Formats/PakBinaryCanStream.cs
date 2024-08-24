@@ -30,7 +30,7 @@ namespace GameX.Formats
                     }
                 case "Meta":
                     {
-                        source.Process();
+                        _ = source.Process();
 
                         var data = r.ReadToEnd();
                         var lines = Encoding.ASCII.GetString(data)?.Split('\n');
@@ -54,7 +54,7 @@ namespace GameX.Formats
                                 var files = filesByPath[line];
                                 switch (state)
                                 {
-                                    case 0: var args = line.Split(new[] { ':' }, 2); paramsx[args[0]] = args[1]; continue;
+                                    case 0: var args = line.Split([':'], 2); paramsx[args[0]] = args[1]; continue;
                                     case 1: if (files != null) files.First().Compressed = 1; continue;
                                     case 2: if (files != null) files.First().Flags = 1; continue;
                                 }
@@ -64,7 +64,7 @@ namespace GameX.Formats
                     }
                 case "Raw":
                     {
-                        var filesRawSet = source.FilesRawSet = new HashSet<string>();
+                        var filesRawSet = source.FilesRawSet = [];
                         var data = r.ReadToEnd();
                         var lines = Encoding.ASCII.GetString(data)?.Split('\n');
                         if (lines?.Length == 0) return Task.CompletedTask;

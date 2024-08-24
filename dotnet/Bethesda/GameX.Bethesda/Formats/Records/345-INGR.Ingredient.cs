@@ -29,13 +29,12 @@ namespace GameX.Bethesda.Formats.Records
         }
 
         // TES4
-        public class DATAField
+        public class DATAField(BinaryReader r, int dataSize)
         {
-            public float Weight;
+            public float Weight = r.ReadSingle();
             public int Value;
             public uint Flags;
 
-            public DATAField(BinaryReader r, int dataSize) => Weight = r.ReadSingle();
             public void ENITField(BinaryReader r, int dataSize)
             {
                 Value = r.ReadInt32();

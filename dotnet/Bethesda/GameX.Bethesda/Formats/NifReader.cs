@@ -126,12 +126,12 @@ namespace GameX.Bethesda.Formats
     {
         public NiFile(string name) => Name = name;
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Engine", Name = Name, Value = this }),
-            new MetaInfo("Nif", items: new List<MetaInfo> {
-                new MetaInfo($"NumBlocks: {Header.NumBlocks}"),
-            }),
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Engine", Name = Name, Value = this }),
+            new("Nif", items: [
+                new($"NumBlocks: {Header.NumBlocks}"),
+            ]),
+        ];
 
         public string Name;
         public NiHeader Header;

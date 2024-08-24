@@ -4,16 +4,10 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class KEYMRecord : Record, IHaveEDID, IHaveMODL
     {
-        public struct DATAField
+        public struct DATAField(BinaryReader r, int dataSize)
         {
-            public int Value;
-            public float Weight;
-
-            public DATAField(BinaryReader r, int dataSize)
-            {
-                Value = r.ReadInt32();
-                Weight = r.ReadSingle();
-            }
+            public int Value = r.ReadInt32();
+            public float Weight = r.ReadSingle();
         }
 
         public override string ToString() => $"KEYM: {EDID.Value}";

@@ -20,7 +20,7 @@ namespace GameX.Frictional
         /// <param name="state">The state.</param>
         public FrictionalPakFile(PakState state) : base(state, PakBinary_Hpl.Instance)
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

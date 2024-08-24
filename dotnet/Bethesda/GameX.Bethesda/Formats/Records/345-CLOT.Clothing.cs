@@ -9,10 +9,7 @@ namespace GameX.Bethesda.Formats.Records
         // TESX
         public struct DATAField
         {
-            public enum CLOTType
-            {
-                Pants = 0, Shoes, Shirt, Belt, Robe, R_Glove, L_Glove, Skirt, Ring, Amulet
-            }
+            public enum CLOTType { Pants = 0, Shoes, Shirt, Belt, Robe, R_Glove, L_Glove, Skirt, Ring, Amulet }
 
             public int Value;
             public float Weight;
@@ -54,7 +51,7 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField ENAM; // Enchantment Name
         public FMIDField<SCPTRecord> SCRI; // Script Name
         // TES3
-        public List<INDXFieldGroup> INDXs = new List<INDXFieldGroup>(); // Body Part Index (Moved to Race)
+        public List<INDXFieldGroup> INDXs = []; // Body Part Index (Moved to Race)
         // TES4
         public UI32Field BMDT; // Clothing Flags
         public MODLGroup MOD2; // Male world model (optional)

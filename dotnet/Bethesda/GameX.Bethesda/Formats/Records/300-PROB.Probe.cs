@@ -4,20 +4,12 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class PROBRecord : Record, IHaveEDID, IHaveMODL
     {
-        public struct PBDTField
+        public struct PBDTField(BinaryReader r, int dataSize)
         {
-            public float Weight;
-            public int Value;
-            public float Quality;
-            public int Uses;
-
-            public PBDTField(BinaryReader r, int dataSize)
-            {
-                Weight = r.ReadSingle();
-                Value = r.ReadInt32();
-                Quality = r.ReadSingle();
-                Uses = r.ReadInt32();
-            }
+            public float Weight = r.ReadSingle();
+            public int Value = r.ReadInt32();
+            public float Quality = r.ReadSingle();
+            public int Uses = r.ReadInt32();
         }
 
         public override string ToString() => $"PROB: {EDID.Value}";

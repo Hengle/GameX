@@ -20,7 +20,7 @@ namespace GameX.ID
         /// <param name="state">The state.</param>
         public IDPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

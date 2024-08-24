@@ -32,7 +32,7 @@ namespace GameX.Bethesda.Formats.Records
             public int GridX;
             public int GridY;
             public uint Flags;
-            public override string ToString() => $"{GridX}x{GridY}";
+            public override readonly string ToString() => $"{GridX}x{GridY}";
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -112,11 +112,11 @@ namespace GameX.Bethesda.Formats.Records
         public BYTEField? XCMT; // Music (optional)
         public FMIDField<CLMTRecord>? XCCM; // Climate
         public FMIDField<WATRRecord>? XCWT; // Water
-        public List<XOWNGroup> XOWNs = new List<XOWNGroup>(); // Ownership
+        public List<XOWNGroup> XOWNs = []; // Ownership
 
         // Referenced Object Data Grouping
         public bool InFRMR = false;
-        public List<RefObj> RefObjs = new List<RefObj>();
+        public List<RefObj> RefObjs = [];
         RefObj _lastRef;
 
         public bool IsInterior => (DATA.Value & 0x01) == 0x01;

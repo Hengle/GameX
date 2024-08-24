@@ -4,20 +4,12 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class REPARecord : Record, IHaveEDID, IHaveMODL
     {
-        public struct RIDTField
+        public struct RIDTField(BinaryReader r, int dataSize)
         {
-            public float Weight;
-            public int Value;
-            public int Uses;
-            public float Quality;
-
-            public RIDTField(BinaryReader r, int dataSize)
-            {
-                Weight = r.ReadSingle();
-                Value = r.ReadInt32();
-                Uses = r.ReadInt32();
-                Quality = r.ReadSingle();
-            }
+            public float Weight = r.ReadSingle();
+            public int Value = r.ReadInt32();
+            public int Uses = r.ReadInt32();
+            public float Quality = r.ReadSingle();
         }
 
         public override string ToString() => $"REPA: {EDID.Value}";

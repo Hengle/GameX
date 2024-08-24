@@ -4,10 +4,90 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace GameX.Arkane.Formats
 {
+    #region PakBinary_Danae
+
+    public unsafe class PakBinary_Danae : PakBinary<PakBinary_Danae>
+    {
+        public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
+        {
+            var files = source.Files = [];
+            var key = Encoding.ASCII.GetBytes((string)source.Game.Key); int keyLength = key.Length, keyIndex = 0;
+
+            int readInt32(ref byte* b)
+            {
+                var p = b;
+                *(p + 0) = (byte)(*(p + 0) ^ key[keyIndex++]); if (keyIndex >= keyLength) keyIndex = 0;
+                *(p + 1) = (byte)(*(p + 1) ^ key[keyIndex++]); if (keyIndex >= keyLength) keyIndex = 0;
+                *(p + 2) = (byte)(*(p + 2) ^ key[keyIndex++]); if (keyIndex >= keyLength) keyIndex = 0;
+                *(p + 3) = (byte)(*(p + 3) ^ key[keyIndex++]); if (keyIndex >= keyLength) keyIndex = 0;
+                b += 4;
+                return *(int*)p;
+            }
+
+            string readString(ref byte* b)
+            {
+                var p = b;
+                while (true)
+                {
+                    *p = (byte)(*p ^ key[keyIndex++]); if (keyIndex >= keyLength) keyIndex = 0;
+                    if (*p == 0) break;
+                    p++;
+                }
+                var length = (int)(p - b);
+                var r = Encoding.ASCII.GetString(new ReadOnlySpan<byte>(b, length));
+                b = p + 1;
+                return r;
+            }
+
+            // move to fat table
+            r.Seek(r.ReadUInt32());
+            var fatSize = (int)r.ReadUInt32();
+            var fatBytes = r.ReadBytes(fatSize);
+
+            fixed (byte* _ = fatBytes)
+            {
+                byte* c = _, end = _ + fatSize;
+                while (c < end)
+                {
+                    var dirPath = readString(ref c).Replace('\\', '/');
+                    var numFiles = readInt32(ref c);
+                    for (var i = 0; i < numFiles; i++)
+                    {
+                        var file = new FileSource
+                        {
+                            Path = dirPath + readString(ref c).Replace('\\', '/'),
+                            Offset = readInt32(ref c),
+                            Compressed = readInt32(ref c),
+                            FileSize = readInt32(ref c),
+                            PackedSize = readInt32(ref c),
+                        };
+                        if (file.Path.EndsWith(".FTL")) file.Compressed = 1;
+                        else if (file.Compressed == 0) file.FileSize = file.PackedSize;
+                        files.Add(file);
+                    }
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+        public override Task<Stream> ReadData(BinaryPakFile source, BinaryReader r, FileSource file, FileOption option = default)
+        {
+            r.Seek(file.Offset);
+            return Task.FromResult((Stream)new MemoryStream((file.Compressed & 1) != 0
+                ? r.DecompressBlast((int)file.PackedSize, (int)file.FileSize)
+                : r.ReadBytes((int)file.PackedSize)));
+        }
+    }
+
+    #endregion
+
+    #region PakBinary_Void
+
     public unsafe class PakBinary_Void : PakBinary<PakBinary_Void>
     {
         #region Headers
@@ -39,7 +119,7 @@ namespace GameX.Arkane.Formats
                 const uint SubMarker = 0x18000000;
                 const uint EndMarker = 0x01000000;
 
-                var files2 = source.Files = new List<FileSource>();
+                var files2 = source.Files = [];
                 var magic = r.ReadUInt32E();
                 if (magic != MAGIC) throw new FormatException("BAD MAGIC");
                 r.Skip(4);
@@ -121,7 +201,7 @@ namespace GameX.Arkane.Formats
         }
 
         // Bad Positions - Dishonored2
-        static HashSet<long> _badPositions = new HashSet<long> {
+        static HashSet<long> _badPositions = [
             293, //: generated/decls/renderparm/atm/worldfog/artistscatteringcolor.decl
             917004, //: generated/decls/renderparm/ocean/patchtransform.decl
             9923823, //: generated/decls/soundevent/sound_events/bsp/bsp_physmat/bsp_foosteps/bsp_fs_player/emily/fs_e_metal_chandelier/fs_e_metal_chandelier_w.decl
@@ -129,6 +209,8 @@ namespace GameX.Arkane.Formats
             32872162, //: generated/image/models/effects/textures/gameplay/blood/blood_leads_05_fl.bimage7
             32966564, //: generated/decls/material/models/effects/materials/gameplay/blood/blood_leads_05_bf.material.decl
             45704814, //: generated/decls/fx/contactsystem/pr.ar.venom_env.tile.fx.decl
-        };
+        ];
     }
+
+    #endregion
 }

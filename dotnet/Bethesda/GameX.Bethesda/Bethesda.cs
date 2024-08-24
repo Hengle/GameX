@@ -5,11 +5,43 @@ using GameX.Formats.Unknown;
 using OpenStack.Gfx;
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using static OpenStack.Debug;
 
 namespace GameX.Bethesda
 {
+    #region BethesdaFamily
+
+    /// <summary>
+    /// BethesdaFamily
+    /// </summary>
+    /// <seealso cref="GameX.Family" />
+    public class BethesdaFamily(JsonElement elem) : Family(elem)
+    {
+    }
+
+    #endregion
+
+    #region BethesdaGame
+
+    /// <summary>
+    /// BethesdaGame
+    /// </summary>
+    /// <seealso cref="GameX.FamilyGame" />
+    public class BethesdaGame(Family family, string id, JsonElement elem, FamilyGame dgame) : FamilyGame(family, id, elem, dgame)
+    {
+        /// <summary>
+        /// Ensures this instance.
+        /// </summary>
+        /// <returns></returns>
+        public override FamilyGame Ensure() => DatabaseManager.Ensure(this);
+    }
+
+    #endregion
+
+    #region BethesdaPakFile
+
     /// <summary>
     /// BethesdaPakFile
     /// </summary>
@@ -22,7 +54,7 @@ namespace GameX.Bethesda
         /// <param name="state">The state.</param>
         public BethesdaPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
             PathFinders.Add(typeof(ITexture), FindTexture);
         }
 
@@ -81,4 +113,6 @@ namespace GameX.Bethesda
 
         #endregion
     }
+
+    #endregion
 }

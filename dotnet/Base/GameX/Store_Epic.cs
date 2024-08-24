@@ -12,7 +12,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Epic
     {
-        internal static Dictionary<string, string> EpicPaths = [];
+        internal static readonly Dictionary<string, string> EpicPaths = [];
 
         static Store_Epic()
         {

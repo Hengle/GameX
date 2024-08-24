@@ -36,14 +36,12 @@ namespace GameX.Bethesda.Formats.Records
                 Volume = format == BethesdaFormat.TES3 ? r.ReadByte() : (byte)0;
                 MinRange = r.ReadByte();
                 MaxRange = r.ReadByte();
-                if (format == BethesdaFormat.TES3)
-                    return;
+                if (format == BethesdaFormat.TES3) return;
                 FrequencyAdjustment = r.ReadSByte();
                 r.ReadByte(); // Unused
                 Flags = r.ReadUInt16();
                 r.ReadUInt16(); // Unused
-                if (dataSize == 8)
-                    return;
+                if (dataSize == 8) return;
                 StaticAttenuation = r.ReadUInt16();
                 StopTime = r.ReadByte();
                 StartTime = r.ReadByte();

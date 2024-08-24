@@ -4,20 +4,12 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class LOCKRecord : Record, IHaveEDID, IHaveMODL
     {
-        public struct LKDTField
+        public struct LKDTField(BinaryReader r, int dataSize)
         {
-            public float Weight;
-            public int Value;
-            public float Quality;
-            public int Uses;
-
-            public LKDTField(BinaryReader r, int dataSize)
-            {
-                Weight = r.ReadSingle();
-                Value = r.ReadInt32();
-                Quality = r.ReadSingle();
-                Uses = r.ReadInt32();
-            }
+            public float Weight = r.ReadSingle();
+            public int Value = r.ReadInt32();
+            public float Quality = r.ReadSingle();
+            public int Uses = r.ReadInt32();
         }
 
         public override string ToString() => $"LOCK: {EDID.Value}";

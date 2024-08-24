@@ -6,17 +6,11 @@ using static OpenStack.Debug;
 
 namespace GameX.Bethesda.Formats
 {
-    public class FieldHeader
+    public class FieldHeader(BinaryReader r, BethesdaFormat format)
     {
         public override string ToString() => Type;
-        public string Type; // 4 bytes
-        public int DataSize;
-
-        public FieldHeader(BinaryReader r, BethesdaFormat format)
-        {
-            Type = r.ReadFString(4);
-            DataSize = (int)(format == BethesdaFormat.TES3 ? r.ReadUInt32() : r.ReadUInt16());
-        }
+        public string Type = r.ReadFString(4); // 4 bytes
+        public int DataSize = (int)(format == BethesdaFormat.TES3 ? r.ReadUInt32() : r.ReadUInt16());
     }
 
     public abstract class Record : IRecord

@@ -10,10 +10,8 @@ namespace GameX.Formats.Wavefront
     /// export to .obj/.mat format (WAVEFRONT)
     /// </summary>
     /// <seealso cref="UnknownFileWriter" />
-    public partial class WavefrontFileWriter : UnknownFileWriter
+    public partial class WavefrontFileWriter(IUnknownFileModel file) : UnknownFileWriter(file)
     {
-        public WavefrontFileWriter(IUnknownFileModel file) : base(file) { }
-
         public FileInfo ModelFile { get; internal set; }
         public FileInfo MaterialFile { get; internal set; }
         public int CurrentVertexPosition { get; internal set; }

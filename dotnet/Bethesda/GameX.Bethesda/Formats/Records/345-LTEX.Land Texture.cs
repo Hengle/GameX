@@ -5,18 +5,11 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class LTEXRecord : Record, IHaveEDID
     {
-        public struct HNAMField
+        public struct HNAMField(BinaryReader r, int dataSize)
         {
-            public byte MaterialType;
-            public byte Friction;
-            public byte Restitution;
-           
-            public HNAMField(BinaryReader r, int dataSize)
-            {
-                MaterialType = r.ReadByte();
-                Friction = r.ReadByte();
-                Restitution = r.ReadByte();
-            }
+            public byte MaterialType = r.ReadByte();
+            public byte Friction = r.ReadByte();
+            public byte Restitution = r.ReadByte();
         }
 
         public override string ToString() => $"LTEX: {EDID.Value}";
@@ -27,7 +20,7 @@ namespace GameX.Bethesda.Formats.Records
         // TES4
         public HNAMField HNAM; // Havok data
         public BYTEField SNAM; // Texture specular exponent
-        public List<FMIDField<GRASRecord>> GNAMs = new List<FMIDField<GRASRecord>>(); // Potential grass
+        public List<FMIDField<GRASRecord>> GNAMs = []; // Potential grass
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

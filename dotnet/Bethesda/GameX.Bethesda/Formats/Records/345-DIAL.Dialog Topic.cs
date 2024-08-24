@@ -7,17 +7,14 @@ namespace GameX.Bethesda.Formats.Records
     {
         internal static DIALRecord LastRecord;
 
-        public enum DIALType : byte
-        {
-            RegularTopic = 0, Voice, Greeting, Persuasion, Journal
-        }
+        public enum DIALType : byte { RegularTopic = 0, Voice, Greeting, Persuasion, Journal }
 
         public override string ToString() => $"DIAL: {EDID.Value}";
         public STRVField EDID { get; set; } // Editor ID
         public STRVField FULL; // Dialogue Name
         public BYTEField DATA; // Dialogue Type
         public List<FMIDField<QUSTRecord>> QSTIs; // Quests (optional)
-        public List<INFORecord> INFOs = new List<INFORecord>(); // Info Records
+        public List<INFORecord> INFOs = []; // Info Records
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {
@@ -28,7 +25,7 @@ namespace GameX.Bethesda.Formats.Records
                 case "FULL": FULL = r.ReadSTRV(dataSize); return true;
                 case "DATA": DATA = r.ReadSAndVerify<BYTEField>(dataSize); return true;
                 case "QSTI":
-                case "QSTR": if (QSTIs == null) QSTIs = new List<FMIDField<QUSTRecord>>(); QSTIs.Add(new FMIDField<QUSTRecord>(r, dataSize)); return true;
+                case "QSTR": QSTIs ??= []; QSTIs.Add(new FMIDField<QUSTRecord>(r, dataSize)); return true;
                 default: return false;
             }
         }

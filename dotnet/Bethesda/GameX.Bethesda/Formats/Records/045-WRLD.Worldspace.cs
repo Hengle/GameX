@@ -18,17 +18,12 @@ namespace GameX.Bethesda.Formats.Records
             public short SECell_Y;
         }
 
-        public struct NAM0Field
+        public struct NAM0Field(BinaryReader r, int dataSize)
         {
             public static (string, int) Struct = ("<2f2f", sizeof(NAM0Field));
-            public Vector2 Min;
-            public Vector2 Max;
+            public Vector2 Min = new(r.ReadSingle(), r.ReadSingle());
+            public Vector2 Max = Vector2.Zero;
 
-            public NAM0Field(BinaryReader r, int dataSize)
-            {
-                Min = new Vector2(r.ReadSingle(), r.ReadSingle());
-                Max = Vector2.Zero;
-            }
             public void NAM9Field(BinaryReader r, int dataSize) => Max = new Vector2(r.ReadSingle(), r.ReadSingle());
         }
 
@@ -68,7 +63,7 @@ namespace GameX.Bethesda.Formats.Records
         public NAM0Field NAM0; // Object Bounds
         public UI32Field? SNAM; // Music
         // TES5
-        public List<RNAMField> RNAMs = new List<RNAMField>(); // Large References
+        public List<RNAMField> RNAMs = []; // Large References
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

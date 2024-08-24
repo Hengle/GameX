@@ -5,16 +5,10 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class QUSTRecord : Record
     {
-        public struct DATAField
+        public struct DATAField(BinaryReader r, int dataSize)
         {
-            public byte Flags;
-            public byte Priority;
-
-            public DATAField(BinaryReader r, int dataSize)
-            {
-                Flags = r.ReadByte();
-                Priority = r.ReadByte();
-            }
+            public byte Flags = r.ReadByte();
+            public byte Priority = r.ReadByte();
         }
 
         public override string ToString() => $"QUST: {EDID.Value}";

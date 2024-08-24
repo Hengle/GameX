@@ -4,18 +4,11 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class SBSPRecord : Record
     {
-        public struct DNAMField
+        public struct DNAMField(BinaryReader r, int dataSize)
         {
-            public float X; // X dimension
-            public float Y; // Y dimension
-            public float Z; // Z dimension
-
-            public DNAMField(BinaryReader r, int dataSize)
-            {
-                X = r.ReadSingle();
-                Y = r.ReadSingle();
-                Z = r.ReadSingle();
-            }
+            public float X = r.ReadSingle(); // X dimension
+            public float Y = r.ReadSingle(); // Y dimension
+            public float Z = r.ReadSingle(); // Z dimension
         }
 
         public override string ToString() => $"SBSP: {EDID.Value}";

@@ -1,10 +1,10 @@
 ﻿using GameX.App.Explorer.Controls;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static GameX.FamilyManager;
 
 namespace GameX.App.Explorer.Views
 {
@@ -151,7 +151,7 @@ namespace GameX.App.Explorer.Views
             Family.SelectedIndex = FamilyManager.Families.Keys.ToList().IndexOf(Option.Family);
             if (string.IsNullOrEmpty(Option.Game)) return;
             Game.SelectedIndex = ((List<FamilyGame>)Games).FindIndex(x => x.Id == Option.Game);
-            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == (Option.Edition ?? string.Empty));
+            if (Editions != null) Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == (Option.Edition ?? string.Empty));
             if (Option.ForceOpen) Open_Click(null, null);
         }
     }

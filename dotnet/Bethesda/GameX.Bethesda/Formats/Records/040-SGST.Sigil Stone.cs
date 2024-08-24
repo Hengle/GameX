@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -7,18 +6,11 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class SGSTRecord : Record, IHaveEDID, IHaveMODL
     {
-        public struct DATAField
+        public struct DATAField(BinaryReader r, int dataSize)
         {
-            public byte Uses;
-            public int Value;
-            public float Weight;
-
-            public DATAField(BinaryReader r, int dataSize)
-            {
-                Uses = r.ReadByte();
-                Value = r.ReadInt32();
-                Weight = r.ReadSingle();
-            }
+            public byte Uses = r.ReadByte();
+            public int Value = r.ReadInt32();
+            public float Weight = r.ReadSingle();
         }
 
         public override string ToString() => $"SGST: {EDID.Value}";

@@ -30,7 +30,7 @@ namespace GameX.Bethesda.Formats.Records
         public BYTEField LVLD; // Chance
         public BYTEField LVLF; // Flags - 0x01 = Calculate from all levels <= player's level, 0x02 = Calculate for each item in count
         public BYTEField? DATA; // Data (optional)
-        public List<LVLOField> LVLOs = new List<LVLOField>();
+        public List<LVLOField> LVLOs = [];
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

@@ -8,7 +8,7 @@ namespace GameX.Bethesda.Formats.Records
         public override string ToString() => $"IDLE: {EDID.Value}";
         public STRVField EDID { get; set; } // Editor ID
         public MODLGroup MODL { get; set; }
-        public List<SCPTRecord.CTDAField> CTDAs = new List<SCPTRecord.CTDAField>(); // Conditions
+        public List<SCPTRecord.CTDAField> CTDAs = []; // Conditions
         public BYTEField ANAM;
         public FMIDField<IDLERecord>[] DATAs;
 

@@ -20,7 +20,7 @@ namespace GameX.Blizzard
         /// <param name="state">The state.</param>
         public BlizzardPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
             UseReader = false;
         }
 

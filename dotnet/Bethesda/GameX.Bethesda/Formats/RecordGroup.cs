@@ -1,6 +1,5 @@
 ﻿using GameX.Formats;
 using GameX.Bethesda.Formats.Records;
-//using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -108,7 +107,7 @@ namespace GameX.Bethesda.Formats
             public Func<int, bool> L;
         }
 
-        static Dictionary<string, RecordType> CreateMap = new Dictionary<string, RecordType>
+        static readonly Dictionary<string, RecordType> CreateMap = new()
         {
             { "TES3", new RecordType { F = () => new TES3Record(), L = x => true }},
             { "TES4", new RecordType { F = () => new TES4Record(), L = x => true }},
@@ -212,27 +211,19 @@ namespace GameX.Bethesda.Formats
         }
     }
 
-    public partial class RecordGroup
+    public partial class RecordGroup(GenericPoolAction<BinaryReader> poolAction, string filePath, BethesdaFormat format, int recordLevel)
     {
         public byte[] Label => Headers.First.Value.Label;
         public override string ToString() => Headers.First.Value.ToString();
-        public LinkedList<Header> Headers = new LinkedList<Header>();
-        public List<Record> Records = new List<Record>();
+        public LinkedList<Header> Headers = [];
+        public List<Record> Records = [];
         public List<RecordGroup> Groups;
         public Dictionary<byte[], RecordGroup[]> GroupsByLabel;
-        readonly GenericPoolAction<BinaryReader> _poolAction;
-        readonly string _filePath;
-        readonly BethesdaFormat _format;
-        readonly int _recordLevel;
+        readonly GenericPoolAction<BinaryReader> _poolAction = poolAction;
+        readonly string _filePath = filePath;
+        readonly BethesdaFormat _format = format;
+        readonly int _recordLevel = recordLevel;
         int _headerSkip;
-
-        public RecordGroup(GenericPoolAction<BinaryReader> poolAction, string filePath, BethesdaFormat format, int recordLevel)
-        {
-            _poolAction = poolAction;
-            _filePath = filePath;
-            _format = format;
-            _recordLevel = recordLevel;
-        }
 
         public void AddHeader(Header header, bool load = true)
         {
@@ -288,8 +279,7 @@ namespace GameX.Bethesda.Formats
         RecordGroup ReadGRUP(BinaryReader r, Header header, Header recordHeader)
         {
             var nextPosition = r.Tell() + recordHeader.DataSize;
-            if (Groups == null)
-                Groups = new List<RecordGroup>();
+            Groups ??= [];
             var group = new RecordGroup(_poolAction, _filePath, _format, _recordLevel);
             group.AddHeader(recordHeader);
             Groups.Add(group);
@@ -316,8 +306,7 @@ namespace GameX.Bethesda.Formats
             // read record
             record.Header.Position = 0;
             record.Header.DataSize = newDataSize;
-            using (var s = new MemoryStream(newData))
-            using (var r2 = new BinaryReader(s)) record.Read(r2, _filePath, _format);
+            using var r2 = new BinaryReader(new MemoryStream(newData)); record.Read(r2, _filePath, _format);
         }
     }
 }

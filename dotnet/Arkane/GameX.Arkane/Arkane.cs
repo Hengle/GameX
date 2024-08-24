@@ -10,19 +10,21 @@ using System.Threading.Tasks;
 
 namespace GameX.Arkane
 {
+    #region ArkanePakFile
+
     /// <summary>
     /// ArkanePakFile
     /// </summary>
     /// <seealso cref="GameEstate.Formats.BinaryPakFile" />
-    public class ArkanePakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
+    public class Arkane : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArkanePakFile" /> class.
+        /// Initializes a new instance of the <see cref="Arkane" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public ArkanePakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
+        public Arkane(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFactoryMethod = state.Game.Engine switch
+            ObjectFactoryFunc = state.Game.Engine switch
             {
                 "CryEngine" => Crytek.CrytekPakFile.ObjectFactoryFactory,
                 "Unreal" => Epic.EpicPakFile.ObjectFactoryFactory,
@@ -35,7 +37,7 @@ namespace GameX.Arkane
 
         #region Factories
 
-        static readonly ConcurrentDictionary<string, PakBinary> PakBinarys = new ConcurrentDictionary<string, PakBinary>();
+        static readonly ConcurrentDictionary<string, PakBinary> PakBinarys = new();
 
         static PakBinary GetPakBinary(FamilyGame game, string extension)
             => PakBinarys.GetOrAdd(game.Id, _ => game.Engine switch
@@ -75,4 +77,6 @@ namespace GameX.Arkane
 
         #endregion
     }
+
+    #endregion
 }

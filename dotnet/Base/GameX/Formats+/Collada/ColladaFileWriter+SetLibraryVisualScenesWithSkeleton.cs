@@ -27,11 +27,11 @@ namespace GameX.Formats.Collada
                 ID = firstModel.Path,
                 Name = firstModel.Path,
                 Type = Grendgine_Collada_Node_Type.NODE,
-                Matrix = new[] { new Grendgine_Collada_Matrix { Value_As_String = CreateStringFromMatrix44(Matrix4x4.Identity) } },
-                Instance_Controller = new[] { new Grendgine_Collada_Instance_Controller {
+                Matrix = [new Grendgine_Collada_Matrix { Value_As_String = CreateStringFromMatrix44(Matrix4x4.Identity) }],
+                Instance_Controller = [ new Grendgine_Collada_Instance_Controller {
                     URL = "#Controller",
-                    Skeleton = new[] { new Grendgine_Collada_Skeleton { Value = "#Armature" } },
-                    Bind_Material = new[] { new Grendgine_Collada_Bind_Material {
+                    Skeleton = [new Grendgine_Collada_Skeleton { Value = "#Armature" }],
+                    Bind_Material = [ new Grendgine_Collada_Bind_Material {
                         // This gets complicated. We need to make one instance_material for each material used in this node chunk.
                         // The mat IDs used in this node chunk are stored in meshsubsets, so for each subset we need to grab the mat, get the target (id), and make an instance_material for it.
                         Technique_Common = new Grendgine_Collada_Technique_Common_Bind_Material {
@@ -42,14 +42,14 @@ namespace GameX.Formats.Collada
                                 Symbol = $"{material.Name}-material"
                             }).ToArray()
                         }
-                    }},
-                }}
+                    }],
+                }]
             });
 
             // Set up the library
             daeObject.Library_Visual_Scene = new Grendgine_Collada_Library_Visual_Scenes
             {
-                Visual_Scene = new[] { new Grendgine_Collada_Visual_Scene { Node = nodes.ToArray(), ID = "Scene" } }
+                Visual_Scene = [new Grendgine_Collada_Visual_Scene { Node = [.. nodes], ID = "Scene" }]
             };
         }
     }

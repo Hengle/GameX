@@ -1,4 +1,4 @@
-import os, re, pathlib, platform, psutil, winreg
+import os, io, re, pathlib, platform, psutil, winreg
 from typing import Callable
 from zipfile import ZipFile
 from openstk.poly import Reader, findType
@@ -229,8 +229,8 @@ class VirtualFileSystem(IFileSystem):
         matcher = FileManager.createMatcher(searchPattern)
         return [x for x in self.virtuals.keys() if matcher(x)] + self.base.glob(path, searchPattern)
     def fileExists(self, path: str) -> bool: return path in self.virtuals or self.base.fileExists(path)
-    def fileInfo(self, path: str) -> (str, int): return (path, x.size() if (x := self.virtuals[path]) else 0) if path in self.virtuals else self.base.fileInfo(path)
-    def openReader(self, path: str, mode: str = 'rb') -> Reader: return Reader(x if (x := self.virtuals[path]) else []) if path in self.virtuals else self.base.openReader(path)
+    def fileInfo(self, path: str) -> (str, int): return (path, x.size() if (x := self.virtuals[path] and x) else 0) if path in self.virtuals else self.base.fileInfo(path)
+    def openReader(self, path: str, mode: str = 'rb') -> Reader: return Reader(self.virtuals[path] or io.BytesIO()) if path in self.virtuals else self.base.openReader(path)
 
 # ZipFileSystem
 class ZipFileSystem(IFileSystem):

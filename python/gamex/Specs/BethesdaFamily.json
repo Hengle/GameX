@@ -21,6 +21,7 @@
       "url": "https://store.steampowered.com/app/22320",
       "date": "2002-04-29",
       "pakExt": ".bsa",
+      "datExt": ".esm",
       "pak": "game:/Morrowind.bsa",
       "dat": "game:/Morrowind.esm"
     },
@@ -35,6 +36,7 @@
       "url": "https://store.steampowered.com/app/22330",
       "date": "2007-09-11",
       "pakExt": ".bsa",
+      "datExt": ".esm",
       "pak": "game:/Oblivion*.bsa",
       "pakx": "game:/Oblivion - Meshes.bsa",
       "dat": "game:/Oblivion.esm"
@@ -44,6 +46,7 @@
       "url": "https://store.steampowered.com/app/22370",
       "date": "2009-10-13",
       "pakExt": ".bsa",
+      "datExt": ".esm",
       "pak": "game:/Fallout*.bsa",
       "dat": "game:/Fallout3.esm"
     },
@@ -52,13 +55,16 @@
       "url": "https://store.steampowered.com/app/22380",
       "date": "2010-10-19",
       "pakExt": ".bsa",
-      "pak": "game:/Fallout*.bsa"
+      "datExt": ".esm",
+      "pak": "game:/Fallout*.bsa",
+      "dat": "game:/FalloutNV.esm"
     },
     "Skyrim": {
       "name": "The Elder Scrolls V: Skyrim",
       "url": "https://store.steampowered.com/app/72850",
       "date": "2011-11-10",
       "pakExt": ".bsa",
+      "datExt": ".esm",
       "pak": "game:/Skyrim*.bsa",
       "dat": "game:/Skyrim.esm"
     },
@@ -67,6 +73,7 @@
       "url": "https://store.steampowered.com/app/377160",
       "date": "2015-11-09",
       "pakExt": ".ba2",
+      "datExt": ".esm",
       "pak": "game:/Fallout4*.ba2",
       "dat": "game:/Fallout4.esm"
     },
@@ -75,6 +82,7 @@
       "url": "https://store.steampowered.com/app/489830",
       "date": "2016-10-27",
       "pakExt": ".bsa",
+      "datExt": ".esm",
       "pak": "game:/Skyrim*.bsa",
       "dat": "game:/Skyrim.esm"
     },
@@ -88,6 +96,7 @@
       "url": "https://store.steampowered.com/app/611660",
       "date": "2017-12-11",
       "pakExt": ".ba2",
+      "datExt": ".esm",
       "pak": "game:/Fallout4*.ba2",
       "dat": "game:/Fallout4.esm"
     },
@@ -96,6 +105,7 @@
       "url": "https://store.steampowered.com/app/611670",
       "date": "2018-04-02",
       "pakExt": ".bsa",
+      "datExt": ".esm",
       "pak": "game:/Skyrim*.bsa",
       "dat": "game:/Skyrim.esm"
     },
@@ -110,6 +120,7 @@
       "url": "https://store.steampowered.com/app/1151340",
       "date": "2020-04-14",
       "pakExt": ".ba2",
+      "datExt": ".esm",
       "pak": "game:/SeventySix.ba2",
       "dat": "game:/SeventySix.esm"
     },
@@ -118,6 +129,7 @@
       "url": "https://store.steampowered.com/app/1716740",
       "date": "2023-09-05",
       "pakExt": ".ba2",
+      "datExt": ".esm",
       "pak": "game:/Starfield*.ba2",
       "dat": "game:/Starfield.esm"
     },

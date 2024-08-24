@@ -22,7 +22,7 @@ namespace GameX
         [DataRow("Tes", $"{HTTP_Oblivion}/Oblivion*.bsa#Oblivion")]
 #endif
         public void ShouldThrow(string familyName, string uri)
-            => Assert.ThrowsException<ArgumentOutOfRangeException>(() => FamilyManager.GetFamily(familyName).ParseResource(new Uri(uri)));
+            => Assert.ThrowsException<ArgumentOutOfRangeException>(() => GetFamily(familyName).ParseResource(new Uri(uri)));
 
         [DataTestMethod]
         [DataRow("Tes", $"{GAME}/Oblivion*.bsa#Oblivion", "Oblivion", 0, 6, "Oblivion - Meshes.bsa", "trees/treeginkgo.spt", 6865)]
@@ -34,12 +34,11 @@ namespace GameX
         [DataRow("Tes", $"{HTTP_Oblivion}/Oblivion*.bsa/#Oblivion", "Oblivion", PakOption.Stream, 6, "Oblivion - Meshes.bsa", "trees/treeginkgo.spt", 6865)]
         [DataRow("Tes", $"{HTTP_Oblivion}/Oblivion%20-%20Meshes.bsa/#Oblivion", "Oblivion", PakOption.Stream, 1, "Oblivion - Meshes.bsa", "trees/treeginkgo.spt", 6865)]
 #endif
-        public void Resource(string familyName, string uri, string game, GameOption options, int pathsFound, string firstPak, string sampleFile, int sampleFileSize)
+        public void Resource(string familyName, string uri, string game, int pathsFound, string firstPak, string sampleFile, int sampleFileSize)
         {
-            var family = FamilyManager.GetFamily(familyName);
+            var family = GetFamily(familyName);
             var resource = family.ParseResource(new Uri(uri));
             Assert.AreEqual(game, resource.Game.Id);
-            //Assert.AreEqual(options, resource.Options);
             //Assert.AreEqual(pathsFound, resource.Paths.Length);
             var pakFile = family.OpenPakFile(new Uri(uri));
             if (pakFile is MultiPakFile multiPakFile)

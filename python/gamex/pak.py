@@ -55,6 +55,7 @@ class PakFile:
         self.pakPath = state.path
         self.name = z if not state.path or (z := os.path.basename(state.path)) else os.path.basename(os.path.dirname(state.path))
         self.tag = state.tag
+        self.objectFactoryFunc = None
         self.gfx = None
     def __enter__(self): return self
     def __exit__(self, type, value, traceback): self.close()
@@ -112,7 +113,6 @@ class BinaryPakFile(PakFile):
         self.version = None
         # metadata/factory
         self.metadataInfos = {}
-        self.objectFactoryFactoryMethod = None
         # binary
         self.files = None
         self.filesById = None
@@ -196,8 +196,9 @@ class BinaryPakFile(PakFile):
                 _throw(f'Stream not returned for {f.path} with {type}')
 
     def _ensureCachedObjectFactory(self, file: FileSource) -> Callable:
+        if not self.objectFactoryFunc: return FileSource.emptyObjectFactory
         if file.cachedObjectFactory: return file.cachedObjectFactory
-        option, factory = self.objectFactoryFactoryMethod(file, self.game)
+        option, factory = self.objectFactoryFunc(file, self.game)
         file.cachedObjectOption = option
         file.cachedObjectFactory = factory or FileSource.emptyObjectFactory
         return file.cachedObjectFactory
@@ -233,8 +234,7 @@ class BinaryPakFile(PakFile):
 class ManyPakFile(BinaryPakFile):
     def __init__(self, basis: PakFile, state: PakState, name: str, paths: list[str], pathSkip: int = 0):
         super().__init__(state, None)
-        if isinstance(basis, BinaryPakFile):
-            self.objectFactoryFactoryMethod = basis.objectFactoryFactoryMethod
+        self.objectFactoryFunc = basis.objectFactoryFunc
         self.name = name
         self.paths = paths
         self.pathSkip = pathSkip
@@ -355,7 +355,7 @@ class PakBinaryT(PakBinary):
             super().__init__(state, parent._instance)
             self.file = file
             self.source = source
-            self.objectFactoryFactoryMethod = source.objectFactoryFactoryMethod
+            self.objectFactoryFunc = source.objectFactoryFunc
             self.useReader = file == None
             # self.open()
 

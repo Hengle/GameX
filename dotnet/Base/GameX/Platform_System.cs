@@ -15,16 +15,10 @@ namespace GameX.Platforms
     /// <summary>
     /// SystemSfx
     /// </summary>
-    public class SystemSfx : ISystemSfx
+    public class SystemSfx(PakFile source) : ISystemSfx
     {
-        readonly PakFile _source;
-        readonly AudioManager<object> _audioManager;
-
-        public SystemSfx(PakFile source)
-        {
-            _source = source;
-            _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
-        }
+        readonly PakFile _source = source;
+        readonly AudioManager<object> _audioManager = new AudioManager<object>(source, new SystemAudioBuilder());
 
         public PakFile Source => _source;
         public IAudioManager<object> AudioManager => _audioManager;

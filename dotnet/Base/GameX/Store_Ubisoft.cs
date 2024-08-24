@@ -11,7 +11,7 @@ namespace GameX.Store
     /// </summary>
     internal static class Store_Ubisoft
     {
-        internal static Dictionary<string, string> UbisoftPaths = [];
+        internal static readonly Dictionary<string, string> UbisoftPaths = [];
 
         static Store_Ubisoft()
         {

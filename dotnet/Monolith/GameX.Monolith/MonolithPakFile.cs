@@ -20,7 +20,7 @@ namespace GameX.Monolith
         /// <param name="state">The state.</param>
         public MonolithPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

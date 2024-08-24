@@ -40,7 +40,7 @@ namespace GameX.Formats.Unknown
         public (Vector3 scale, Vector3 offset) ScaleOffset3;
         public (Vector4 scale, Vector4 offset) ScaleOffset4;
 
-        public SubsetMesh this[Subset i] => new SubsetMesh
+        public SubsetMesh this[Subset i] => new()
         {
             Vertexs = Vertexs.AsSpan(i.Vertexs),
             UVs = UVs.AsSpan(i.Vertexs),

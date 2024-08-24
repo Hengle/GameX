@@ -20,7 +20,7 @@ namespace GameX.Unity
         /// <param name="state">The state.</param>
         public UnityPakFile(PakState state) : base(state, PakBinary_Unity.Instance)
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

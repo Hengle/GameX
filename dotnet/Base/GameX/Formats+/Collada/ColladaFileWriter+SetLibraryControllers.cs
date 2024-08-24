@@ -66,10 +66,10 @@ namespace GameX.Formats.Collada
             // JOINTS
             var joints = new Grendgine_Collada_Joints
             {
-                Input = new[] {
+                Input = [
                     new Grendgine_Collada_Input_Unshared { Semantic = Grendgine_Collada_Input_Semantic.JOINT, source = "#Controller-joints" },
                     new Grendgine_Collada_Input_Unshared { Semantic = Grendgine_Collada_Input_Semantic.INV_BIND_MATRIX, source = "#Controller-bind_poses" }
-                }
+                ]
             };
 
             // VERTEX WEIGHTS
@@ -101,10 +101,10 @@ namespace GameX.Formats.Collada
                 Count = boneMaps.Length,
                 VCount = new Grendgine_Collada_Int_Array_String { Value_As_String = vcounts.ToString().TrimEnd() },
                 V = new Grendgine_Collada_Int_Array_String { Value_As_String = vertexs.ToString().TrimEnd() },
-                Input = new[] {
+                Input = [
                     new Grendgine_Collada_Input_Shared { Semantic = Grendgine_Collada_Input_Semantic.JOINT, source = "#Controller-joints", Offset = 0 },
                     new Grendgine_Collada_Input_Shared { Semantic = Grendgine_Collada_Input_Semantic.WEIGHT, source = "#Controller-weights", Offset = 1 }
-                }
+                ]
             };
 
             // CONTROLLER
@@ -112,9 +112,9 @@ namespace GameX.Formats.Collada
             {
                 ID = "Controller",
                 // create the extra element for the FCOLLADA profile
-                Extra = new[] { new Grendgine_Collada_Extra {
-                    Technique = new[] { new Grendgine_Collada_Technique { profile = "FCOLLADA", UserProperties = "SkinController" }}
-                }},
+                Extra = [ new Grendgine_Collada_Extra {
+                    Technique = [new Grendgine_Collada_Technique { profile = "FCOLLADA", UserProperties = "SkinController" }]
+                }],
                 // Create the skin object and assign to the controller
                 Skin = new Grendgine_Collada_Skin
                 {
@@ -122,7 +122,7 @@ namespace GameX.Formats.Collada
                     // We will assume the BSM is the identity matrix for now
                     Bind_Shape_Matrix = new Grendgine_Collada_Float_Array_String { Value_As_String = CreateStringFromMatrix44(Matrix4x4.Identity) },
                     // Add the 3 sources for this controller: joints, bind poses, and weights
-                    Source = sources.ToArray(),
+                    Source = [.. sources],
                     Joints = joints,
                     Vertex_Weights = vertexWeights,
                 }
@@ -133,7 +133,7 @@ namespace GameX.Formats.Collada
             {
                 // There can be multiple controllers in the controller library.  But for Cryengine files, there is only one rig.
                 // So if a rig exists, make that the controller.  This applies mostly to .chr files, which will have a rig and geometry.
-                Controller = new[] { controller }
+                Controller = [controller]
             };
         }
     }

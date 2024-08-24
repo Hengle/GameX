@@ -20,7 +20,7 @@ namespace GameX.Epic
         /// <param name="state">The state.</param>
         public EpicPakFile(PakState state) : base(state, PakBinary_Pck.Instance)
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

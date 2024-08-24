@@ -22,7 +22,7 @@ namespace GameX.Bethesda.Formats.Records
                 case "EDID": EDID = r.ReadSTRV(dataSize); return true;
                 case "NAME": NAME = new FMIDField<Record>(r, dataSize); return true;
                 case "DATA": DATA = new REFRRecord.DATAField(r, dataSize); return true;
-                case "XOWN": if (XOWNs == null) XOWNs = new List<CELLRecord.XOWNGroup>(); XOWNs.Add(new CELLRecord.XOWNGroup { XOWN = new FMIDField<Record>(r, dataSize) }); return true;
+                case "XOWN": XOWNs ??= []; XOWNs.Add(new CELLRecord.XOWNGroup { XOWN = new FMIDField<Record>(r, dataSize) }); return true;
                 case "XRNK": XOWNs.Last().XRNK = r.ReadSAndVerify<IN32Field>(dataSize); return true;
                 case "XGLB": XOWNs.Last().XGLB = new FMIDField<Record>(r, dataSize); return true;
                 case "XESP": XESP = new REFRRecord.XESPField(r, dataSize); return true;

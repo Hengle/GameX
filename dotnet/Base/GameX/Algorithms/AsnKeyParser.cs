@@ -12,11 +12,9 @@ namespace GameX.Algorithms
         public override string Message => $"{base.Message} (Position {_position})";
     }
 
-    public class AsnKeyParser
+    public class AsnKeyParser(ICollection<byte> contents)
     {
-        readonly AsnParser _parser;
-
-        public AsnKeyParser(ICollection<byte> contents) => _parser = new AsnParser(contents);
+        readonly AsnParser _parser = new(contents);
 
         public static byte[] TrimLeadingZero(byte[] values)
         {
@@ -88,8 +86,7 @@ namespace GameX.Algorithms
 
         public AsnParser(ICollection<byte> values)
         {
-            _octets = new List<byte>(values.Count);
-            _octets.AddRange(values);
+            _octets = [.. values];
             _initialCount = _octets.Count;
         }
 
@@ -120,11 +117,7 @@ namespace GameX.Algorithms
             var position = CurrentPosition();
             try
             {
-#pragma warning disable 168
-#pragma warning disable 219
                 var b = GetNextOctet();
-#pragma warning restore 219
-#pragma warning restore 168
                 var length = GetLength();
                 if (length > RemainingBytes()) throw new BerDecodeException($"Incorrect Size. Specified: {length}, Remaining: {RemainingBytes()}", position);
                 return GetOctets(length);

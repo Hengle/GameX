@@ -48,36 +48,24 @@ namespace GameX.Bethesda.Formats.Records
                 FunctionId = r.ReadFString(4);
                 Parameter1 = r.ReadInt32();
                 Parameter2 = r.ReadInt32();
-                if (dataSize != 24)
-                    r.Skip(4); // Unused
+                if (dataSize != 24) r.Skip(4); // Unused
                 Index = Type = 0;
                 Name = null;
             }
         }
 
         // TES3
-        public class SCHDField
+        public class SCHDField(BinaryReader r, int dataSize)
         {
             public override string ToString() => $"{Name}";
-            public string Name;
-            public int NumShorts;
-            public int NumLongs;
-            public int NumFloats;
-            public int ScriptDataSize;
-            public int LocalVarSize;
-            public string[] Variables;
+            public string Name = r.ReadZString(32);
+            public int NumShorts = r.ReadInt32();
+            public int NumLongs = r.ReadInt32();
+            public int NumFloats = r.ReadInt32();
+            public int ScriptDataSize = r.ReadInt32();
+            public int LocalVarSize = r.ReadInt32();
+            public string[] Variables = null;
 
-            public SCHDField(BinaryReader r, int dataSize)
-            {
-                Name = r.ReadZString(32);
-                NumShorts = r.ReadInt32();
-                NumLongs = r.ReadInt32();
-                NumFloats = r.ReadInt32();
-                ScriptDataSize = r.ReadInt32();
-                LocalVarSize = r.ReadInt32();
-                // SCVRField
-                Variables = null;
-            }
             public void SCVRField(BinaryReader r, int dataSize) => Variables = r.ReadZAStringList(dataSize).ToArray();
         }
 
@@ -97,8 +85,7 @@ namespace GameX.Bethesda.Formats.Records
                 CompiledSize = r.ReadUInt32();
                 VariableCount = r.ReadUInt32();
                 Type = r.ReadUInt32();
-                if (dataSize == 20)
-                    return;
+                if (dataSize == 20) return;
                 r.Skip(dataSize - 20);
             }
         }
@@ -132,9 +119,9 @@ namespace GameX.Bethesda.Formats.Records
         public SCHDField SCHD; // Script Data
         // TES4
         public SCHRField SCHR; // Script Data
-        public List<SLSDField> SLSDs = new List<SLSDField>(); // Variable data
-        public List<SLSDField> SCRVs = new List<SLSDField>(); // Ref variable data (one for each ref declared)
-        public List<FMIDField<Record>> SCROs = new List<FMIDField<Record>>(); // Global variable reference
+        public List<SLSDField> SLSDs = []; // Variable data
+        public List<SLSDField> SCRVs = []; // Ref variable data (one for each ref declared)
+        public List<FMIDField<Record>> SCROs = []; // Global variable reference
 
         public override bool CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize)
         {

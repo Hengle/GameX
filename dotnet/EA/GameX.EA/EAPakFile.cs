@@ -20,7 +20,7 @@ namespace GameX.EA
         /// <param name="state">The state.</param>
         public EAPakFile(PakState state) : base(state, PakBinary_Hpl.Instance)
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
         }
 
         #region Factories

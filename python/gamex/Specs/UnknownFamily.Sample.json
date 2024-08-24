@@ -1,9 +1,9 @@
 ﻿{
-  "T": {
-    "name": "Test",
+  "APP": {
+    "name": "Application",
     "files": [
       {
-        "path": "_testtri",
+        "path": "testtri.gfx",
         "type": "Test"
       }
     ]

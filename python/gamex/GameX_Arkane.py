@@ -19,11 +19,11 @@ class ArkanePakFile(BinaryPakFile):
     def __init__(self, state: PakState):
         super().__init__(state, self.getPakBinary(state.game, _pathExtension(state.path).lower()))
         match state.game.engine:
-            # case 'CryEngine': self.objectFactoryFactoryMethod = Crytek.CrytekPakFile.ObjectFactoryFactory
-            # case 'Unreal': self.objectFactoryFactoryMethod = Epic.EpicPakFile.ObjectFactoryFactory
-            # case 'Valve': self.objectFactoryFactoryMethod = Valve.ValvePakFile.ObjectFactoryFactory
-            # case 'idTech7': self.objectFactoryFactoryMethod = Id.IdPakFile.ObjectFactoryFactory
-            case _: self.objectFactoryFactoryMethod = self.objectFactoryFactory
+            # case 'CryEngine': self.objectFactoryFunc = Crytek.CrytekPakFile.ObjectFactoryFactory
+            # case 'Unreal': self.objectFactoryFunc = Epic.EpicPakFile.ObjectFactoryFactory
+            # case 'Valve': self.objectFactoryFunc = Valve.ValvePakFile.ObjectFactoryFactory
+            # case 'idTech7': self.objectFactoryFunc = Id.IdPakFile.ObjectFactoryFactory
+            case _: self.objectFactoryFunc = self.objectFactoryFactory
         self.useFileId = True
 
     #region Factories

@@ -24,7 +24,7 @@ namespace GameX.Valve
         /// <param name="state">The state.</param>
         public ValvePakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
         {
-            ObjectFactoryFactoryMethod = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactoryFactory;
             PathFinders.Add(typeof(object), FindBinary);
         }
 

@@ -18,7 +18,7 @@ class FileOption: pass
 class OriginPakFile(BinaryPakFile):
     def __init__(self, state: PakState):
         super().__init__(state, self.getPakBinary(state.game))
-        self.objectFactoryFactoryMethod = self.objectFactoryFactory
+        self.objectFactoryFunc = self.objectFactoryFactory
 
     #region Factories
 

@@ -4,20 +4,12 @@ namespace GameX.Bethesda.Formats.Records
 {
     public class BODYRecord : Record, IHaveEDID, IHaveMODL
     {
-        public struct BYDTField
+        public struct BYDTField(BinaryReader r, int dataSize)
         {
-            public byte Part;
-            public byte Vampire;
-            public byte Flags;
-            public byte PartType;
-
-            public BYDTField(BinaryReader r, int dataSize)
-            {
-                Part = r.ReadByte();
-                Vampire = r.ReadByte();
-                Flags = r.ReadByte();
-                PartType = r.ReadByte();
-            }
+            public byte Part = r.ReadByte();
+            public byte Vampire = r.ReadByte();
+            public byte Flags = r.ReadByte();
+            public byte PartType = r.ReadByte();
         }
 
         public override string ToString() => $"BODY: {EDID.Value}";

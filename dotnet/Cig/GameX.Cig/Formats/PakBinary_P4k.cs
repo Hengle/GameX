@@ -25,7 +25,7 @@ namespace GameX.Cig.Formats
             public SubPakFileP4k(BinaryPakFile source, P4kFile pak, string path, object tag) : base(new PakState(source.FileSystem, source.Game, source.Edition, path, tag), Instance)
             {
                 Pak = pak;
-                ObjectFactoryFactoryMethod = source.ObjectFactoryFactoryMethod;
+                ObjectFactoryFunc = source.ObjectFactoryFunc;
                 UseReader = false;
                 //Open();
             }
