@@ -1,10 +1,6 @@
 ﻿using GameX.Meta;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -68,7 +64,6 @@ namespace GameX.App.Explorer.Views
 
         public Task OnOpenedAsync(Family family, string path = null)
         {
-            MainTabControl.SelectedIndex = 0; // family.Apps != null ? 1 : 0;
             var tabs = PakFiles.Select(pakFile => new MainPageTab
             {
                 Name = pakFile.Name,
@@ -90,6 +85,9 @@ namespace GameX.App.Explorer.Views
                     Text = family.Description,
                 });
             MainTabs = tabs;
+
+            // default main tab to first / second
+            MainTabControl.SelectedIndex = 0; // family.Apps != null ? 1 : 0;
             return Task.CompletedTask;
         }
 

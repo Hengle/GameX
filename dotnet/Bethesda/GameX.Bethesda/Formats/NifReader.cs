@@ -122,10 +122,8 @@ namespace GameX.Bethesda.Formats
         public static Matrix4x4 Read3x3RotationMatrix(BinaryReader r) => r.ReadRowMajorMatrix3x3();
     }
 
-    public class NiFile : IHaveMetaInfo
+    public class NiFile(string name) : IHaveMetaInfo
     {
-        public NiFile(string name) => Name = name;
-
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Engine", Name = Name, Value = this }),
             new("Nif", items: [
@@ -133,7 +131,7 @@ namespace GameX.Bethesda.Formats
             ]),
         ];
 
-        public string Name;
+        public string Name = name;
         public NiHeader Header;
         public NiObject[] Blocks;
         public NiFooter Footer;

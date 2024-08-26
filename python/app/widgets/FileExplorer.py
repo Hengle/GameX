@@ -5,7 +5,7 @@ from PyQt6.QtCore import Qt, QObject, QBuffer, QByteArray, QUrl, QMimeData, pyqt
 from PyQt6.QtMultimedia import QMediaPlayer
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6 import QtCore, QtMultimedia
-from gamex import config
+from gamex import option
 from gamex.pak import PakFile
 from gamex.filesrc import FileSource
 from gamex.meta import MetaItem, MetaInfo

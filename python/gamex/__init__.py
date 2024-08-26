@@ -1,4 +1,4 @@
-from ._config import __title__, __version__, option as config, familyKeys
+from ._config import __title__, __version__, option, familyKeys
 from .family import *
 from .platform import Platform
 # from .util import _value

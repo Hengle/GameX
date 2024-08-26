@@ -378,11 +378,11 @@ class FamilyGame:
 
     # converts the Paks to Application Paks
     def toPaks(self, edition: str) -> list[str]:
-        return [f'{x}#{self.id}' + f'.{edition}' if edition else '' for x in self.paks] # if self.paks else []
+        return [f'{x}#{self.id}{'.' + edition if edition else ''}' for x in self.paks] # if self.paks else []
 
     # converts the Dats to Application Dats
     def toDats(self, edition: str) -> list[str]:
-        return [f'{x}#{self.id}' + f'.{edition}' if edition else '' for x in self.dats] # if self.dats else []
+        return [f'{x}#{self.id}{'.' + edition if edition else ''}' for x in self.dats] # if self.dats else []
 
     # gets a family sample
     def getSample(self, id: str) -> FamilySample.File:

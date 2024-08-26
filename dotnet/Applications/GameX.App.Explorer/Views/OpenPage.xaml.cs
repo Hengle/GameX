@@ -1,8 +1,5 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,7 +16,7 @@ namespace GameX.App.Explorer.Views
         {
             InitializeComponent();
             DataContext = this;
-            Loaded += OnLoaded;
+            Loaded += Loadedx;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -153,13 +150,13 @@ namespace GameX.App.Explorer.Views
 
         void Open_Click(object sender, RoutedEventArgs e) { DialogResult = true; Close(); }
 
-        void OnLoaded(object sender, RoutedEventArgs e)
+        void Loadedx(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(Option.Family)) return;
             Family.SelectedIndex = FamilyManager.Families.Keys.ToList().IndexOf(Option.Family);
             if (string.IsNullOrEmpty(Option.Game)) return;
-            Game.SelectedIndex = ((List<FamilyGame>)Games).FindIndex(x => x.Id == Option.Game);
-            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == (Option.Edition ?? string.Empty));
+            Game.SelectedIndex = ((List<FamilyGame>)Games)?.FindIndex(x => x.Id == Option.Game) ?? -1;
+            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions)?.FindIndex(x => x.Id == (Option.Edition ?? string.Empty)) ?? -1;
             if (Option.ForceOpen) Open_Click(null, null);
         }
     }

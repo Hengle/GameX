@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt, QBuffer, QByteArray, QUrl, QMimeData, pyqtSignal
 from PyQt6.QtMultimedia import QMediaPlayer
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6 import QtCore, QtMultimedia
-from gamex import Family, config
+from gamex import Family, option
 from .HexViewWidget import HexViewWidget
 from .SaveFileWidget import SaveFileWidget
 from .OpenWidget import OpenWidget
@@ -74,7 +74,7 @@ class MainPage(QMainWindow):
         for h in self.openWidgets:
             if isinstance(h, HexViewWidget) and h.tmp_file is not None: os.unlink(h.tmp_file)
             h.closeEvent(None)
-        self.openWidgets=None
+        self.openWidgets = None
         if os.path.exists('tmp') and len(os.listdir('tmp'))==0: os.rmdir('tmp')
 
     def initUI(self):

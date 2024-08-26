@@ -1,7 +1,7 @@
 import os, pathlib
 from PyQt6.QtWidgets import QWidget, QGridLayout, QFileDialog, QLabel, QComboBox, QLineEdit, QPushButton
 from PyQt6.QtCore import Qt
-from gamex import families, getFamily, config
+from gamex import families, getFamily, option
 from gamex.util import _find
 
 familyValues = list(families.values())

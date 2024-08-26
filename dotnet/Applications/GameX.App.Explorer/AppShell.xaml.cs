@@ -1,6 +1,4 @@
 ﻿using GameX.App.Explorer.Views;
-using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using static GameX.FamilyManager;

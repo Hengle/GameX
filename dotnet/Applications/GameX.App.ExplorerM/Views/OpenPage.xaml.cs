@@ -8,7 +8,7 @@ namespace GameX.App.Explorer.Views
         {
             InitializeComponent();
             BindingContext = this;
-            Loaded += OnLoaded;
+            Loaded += Loadedx;
         }
 
         public IList<Family> Families { get; } = [.. FamilyManager.Families.Values];
@@ -139,13 +139,13 @@ namespace GameX.App.Explorer.Views
             await Shell.Current.GoToAsync("//home");
         }
 
-        void OnLoaded(object sender, EventArgs e)
+        void Loadedx(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(Option.Family)) return;
             Family.SelectedIndex = FamilyManager.Families.Keys.ToList().IndexOf(Option.Family);
             if (string.IsNullOrEmpty(Option.Game)) return;
-            Game.SelectedIndex = ((List<FamilyGame>)Games).FindIndex(x => x.Id == Option.Game);
-            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions).FindIndex(x => x.Id == (Option.Edition ?? string.Empty));
+            Game.SelectedIndex = ((List<FamilyGame>)Games)?.FindIndex(x => x.Id == Option.Game) ?? -1;
+            Edition.SelectedIndex = ((List<FamilyGame.Edition>)Editions)?.FindIndex(x => x.Id == (Option.Edition ?? string.Empty)) ?? -1;
             if (Option.ForceOpen) Open_Click(null, null);
         }
     }

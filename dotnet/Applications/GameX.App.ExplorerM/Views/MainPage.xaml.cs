@@ -62,7 +62,6 @@ namespace GameX.App.Explorer.Views
 
         public Task OnOpenedAsync(Family family, string path = null)
         {
-            //MainTabControl.SelectedIndex = 0; // family.Apps != null ? 1 : 0
             var tabs = PakFiles.Select(pakFile => new MainPageTab
             {
                 Name = pakFile.Name,
@@ -84,6 +83,9 @@ namespace GameX.App.Explorer.Views
                     Text = family.Description,
                 });
             MainTabs = tabs;
+
+            // default main tab to first / second
+            //MainTabContent.BindingContext = Tabs ...Children.FirstOrDefault(). s.LastOrDefault(); //.SelectedIndex = 0; // family.Apps != null ? 1 : 0
             return Task.CompletedTask;
         }
 

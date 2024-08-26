@@ -16,13 +16,13 @@ namespace GameX.Arkane
     /// ArkanePakFile
     /// </summary>
     /// <seealso cref="GameEstate.Formats.BinaryPakFile" />
-    public class Arkane : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
+    public class ArkanePakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Arkane" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public Arkane(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
+        public ArkanePakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
             ObjectFactoryFunc = state.Game.Engine switch
             {
