@@ -8,9 +8,7 @@
 //    /// <summary>
 //    /// GL Render control with world controls (render mode, camera selection).
 //    /// </summary>
-//#pragma warning disable CA1001 // Types that own disposable fields should be disposable
-//    public class GLWorldViewer : GLSceneViewer
-//#pragma warning restore CA1001 // Types that own disposable fields should be disposable
+//    public class WorldView : ViewScene
 //    {
 //        readonly World _world;
 //        readonly WorldNode _worldNode;
@@ -18,12 +16,12 @@
 //        ComboBox _cameraComboBox;
 //        SavedCameraPositionsControl _savedCameraPositionsControl;
 
-//        public GLWorldViewer(GuiContext guiContext, World world) : base(guiContext)
+//        public WorldView(GuiContext guiContext, World world) : base(guiContext)
 //        {
 //            _world = world;
 //        }
 
-//        public GLWorldViewer(GuiContext guiContext, WorldNode worldNode) : base(guiContext)
+//        public WorldView(GuiContext guiContext, WorldNode worldNode) : base(guiContext)
 //        {
 //            _worldNode = worldNode;
 //        }

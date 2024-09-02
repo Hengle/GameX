@@ -12,7 +12,7 @@ using static OpenStack.Debug;
 
 namespace GameX.Bullfrog.Formats
 {
-    public unsafe class Binary_Fli : IDisposable, ITextureVideo, IHaveMetaInfo
+    public unsafe class Binary_Fli : IDisposable, ITextureFrames, IHaveMetaInfo
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Fli(r, f));
 
@@ -165,10 +165,10 @@ namespace GameX.Bullfrog.Formats
             {
                 var data = r.ReadBytes(256 * 3);
                 for (int i = 0, j = 0; i < data.Length; i += 3, j++)
-                    Palette[j] = new[] {
+                    Palette[j] = [
                         (byte)((data[i + 0] << 2) | (data[i + 0] & 3)),
                         (byte)((data[i + 1] << 2) | (data[i + 1] & 3)),
-                        (byte)((data[i + 2] << 2) | (data[i + 2] & 3)) };
+                        (byte)((data[i + 2] << 2) | (data[i + 2] & 3)) ];
                 return;
             }
             r.Skip(-2);
@@ -179,10 +179,10 @@ namespace GameX.Bullfrog.Formats
                 var change = r.ReadByte();
                 var data = r.ReadBytes(change * 3);
                 for (int i = 0, j = 0; i < data.Length; i += 3, j++)
-                    Palette[palPos + j] = new[] {
+                    Palette[palPos + j] = [
                         (byte)((data[i + 0] << 2) | (data[i + 0] & 3)),
                         (byte)((data[i + 1] << 2) | (data[i + 1] & 3)),
-                        (byte)((data[i + 2] << 2) | (data[i + 2] & 3)) };
+                        (byte)((data[i + 2] << 2) | (data[i + 2] & 3)) ];
                 palPos += change;
             }
         }
@@ -267,15 +267,15 @@ namespace GameX.Bullfrog.Formats
         // IHaveMetaInfo
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
         {
-            return new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "TextureVideo", Name = Path.GetFileName(file.Path), Value = this }),
-                new MetaInfo("Video", items: new List<MetaInfo> {
-                    new MetaInfo($"Width: {Width}"),
-                    new MetaInfo($"Height: {Height}"),
-                    new MetaInfo($"Frames: {Frames}"),
-                    new MetaInfo($"Mipmaps: {MipMaps}"),
-                })
-            };
+            return [
+                new(null, new MetaContent { Type = "VideoTexture", Name = Path.GetFileName(file.Path), Value = this }),
+                new("Video", items: [
+                    new($"Width: {Width}"),
+                    new($"Height: {Height}"),
+                    new($"Frames: {Frames}"),
+                    new($"Mipmaps: {MipMaps}"),
+                ])
+            ];
         }
     }
 }

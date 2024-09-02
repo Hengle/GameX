@@ -1,7 +1,6 @@
 ﻿using OpenStack;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
-using OpenStack.Sfx;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -31,8 +30,7 @@ namespace GameX.Platforms
     public class OpenGLShaderBuilder : ShaderBuilderBase<Shader>
     {
         static readonly ShaderLoader _loader = new ShaderDebugLoader();
-        public override Shader CreateShader(object path, IDictionary<string, bool> args) => _loader.CreateShader(path, args);
-        public override Shader CreatePlaneShader(object path, IDictionary<string, bool> args) => _loader.CreatePlaneShader(path, args);
+        public override Shader CreateShader(object path, IDictionary<string, bool> args = null) => _loader.CreateShader(path, args);
     }
 
     /// <summary>
@@ -48,8 +46,7 @@ namespace GameX.Platforms
             if (_defaultTexture > -1) { GL.DeleteTexture(_defaultTexture); _defaultTexture = -1; }
         }
 
-        int CreateDefaultTexture() => CreateSolidTexture(4, 4, new[]
-        {
+        int CreateDefaultTexture() => CreateSolidTexture(4, 4, [
             0.9f, 0.2f, 0.8f, 1f,
             0f, 0.9f, 0f, 1f,
             0.9f, 0.2f, 0.8f, 1f,
@@ -69,7 +66,7 @@ namespace GameX.Platforms
             0.9f, 0.2f, 0.8f, 1f,
             0f, 0.9f, 0f, 1f,
             0.9f, 0.2f, 0.8f, 1f,
-        });
+        ]);
 
         public override int CreateTexture(int reuse, ITexture source, Range? level = null)
         {
@@ -168,12 +165,10 @@ namespace GameX.Platforms
     /// <summary>
     /// OpenGLMaterialBuilder
     /// </summary>
-    public class OpenGLMaterialBuilder : MaterialBuilderBase<GLRenderMaterial, int>
+    public class OpenGLMaterialBuilder(TextureManager<int> textureManager) : MaterialBuilderBase<GLRenderMaterial, int>(textureManager)
     {
         GLRenderMaterial _defaultMaterial;
         public override GLRenderMaterial DefaultMaterial => _defaultMaterial ??= CreateDefaultMaterial(-1);
-
-        public OpenGLMaterialBuilder(TextureManager<int> textureManager) : base(textureManager) { }
 
         GLRenderMaterial CreateDefaultMaterial(int type)
         {

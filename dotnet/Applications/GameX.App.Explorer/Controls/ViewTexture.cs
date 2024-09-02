@@ -1,9 +1,9 @@
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
 
-namespace GameX.App.Explorer.Controls1
+namespace GameX.App.Explorer.Controls
 {
-    public class GLTextureViewer : GLBaseViewer<ITexture>
+    public class ViewTexture : ViewBase<ITexture>
     {
         protected override void SetViewportSize(int x, int y, int width, int height)
         {

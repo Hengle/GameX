@@ -115,7 +115,6 @@ class TextureManager(ITextureManager):
 # ShaderBuilderBase
 class ShaderBuilderBase:
     def createShader(self, path: object, args: dict[str, bool]) -> Shader: pass
-    def createPlaneShader(self, path: object, args: dict[str, bool]) -> Shader: pass
 
 # ShaderManager
 class ShaderManager(IShaderManager):
@@ -129,9 +128,6 @@ class ShaderManager(IShaderManager):
     
     def createShader(self, path: object, args: dict[str, bool] = None) -> (Shader, object):
         return (self._builder.createShader(path, args or self.emptyArgs), None)
-
-    def createPlaneShader(self, path: object, args: dict[str, bool] = None) -> (Shader, object):
-        return (self._builder.createPlaneShader(path, args or self.emptyArgs), None) 
 
 # ObjectBuilderBase
 class ObjectBuilderBase:

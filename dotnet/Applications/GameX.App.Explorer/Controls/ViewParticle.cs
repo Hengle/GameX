@@ -7,17 +7,17 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
-namespace GameX.App.Explorer.Controls1
+namespace GameX.App.Explorer.Controls
 {
-    public class GLParticleViewer : GLViewerControl
+    public class ViewParticle : GLViewerControl
     {
         ParticleGridRenderer particleGrid;
        
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public static readonly DependencyProperty GfxProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(GLParticleViewer),
-            new PropertyMetadata((d, e) => (d as GLParticleViewer).OnProperty()));
+        public static readonly DependencyProperty GfxProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(ViewParticle),
+            new PropertyMetadata((d, e) => (d as ViewParticle).OnProperty()));
 
         public IOpenGfx Gfx
         {
@@ -25,8 +25,8 @@ namespace GameX.App.Explorer.Controls1
             set => SetValue(GfxProperty, value);
         }
 
-        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(GLParticleViewer),
-            new PropertyMetadata((d, e) => (d as GLParticleViewer).OnProperty()));
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(ViewParticle),
+            new PropertyMetadata((d, e) => (d as ViewParticle).OnProperty()));
 
         public object Source
         {

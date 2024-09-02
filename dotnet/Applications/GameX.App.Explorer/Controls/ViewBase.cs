@@ -4,9 +4,9 @@ using OpenTK.Input;
 using System.Windows;
 using Key = OpenTK.Input.Key;
 
-namespace GameX.App.Explorer.Controls1
+namespace GameX.App.Explorer.Controls
 {
-    public abstract class GLBaseViewer<TObj> : GLViewerControl
+    public abstract class ViewBase<TObj> : GLViewerControl
     {
         protected const int FACTOR = 1;
         protected bool ToggleValue;
@@ -19,8 +19,8 @@ namespace GameX.App.Explorer.Controls1
         readonly HashSet<Key> KeyDowns = [];
         int Id = 0;
 
-        public static readonly DependencyProperty GfxProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(GLBaseViewer<TObj>),
-            new PropertyMetadata((d, e) => (d as GLBaseViewer<TObj>).OnSourceChanged()));
+        public static readonly DependencyProperty GfxProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(ViewBase<TObj>),
+            new PropertyMetadata((d, e) => (d as ViewBase<TObj>).OnSourceChanged()));
 
         public IOpenGfx Gfx
         {
@@ -28,8 +28,8 @@ namespace GameX.App.Explorer.Controls1
             set => SetValue(GfxProperty, value);
         }
 
-        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(GLBaseViewer<TObj>),
-            new PropertyMetadata((d, e) => (d as GLBaseViewer<TObj>).OnSourceChanged()));
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(ViewBase<TObj>),
+            new PropertyMetadata((d, e) => (d as ViewBase<TObj>).OnSourceChanged()));
 
         public object Source
         {

@@ -1,0 +1,13 @@
+Write a section of the introductory chapter for the following:
+
+Binary
+As humans we read word by word with some cultures reading left-to-right and others cultures reading right-to-left, this is similiar to how computers read.
+Computers read byte by byte with some architectures reading left-to-right and other architectures reading right-to-left, the being called little endian and big endian respectively.
+As an example the following bytes: 10 and 00 can be read as 1000 or 0010 wich result in two very different values.
+
+A Reader canonizes these concepts
+
+Table:
+ReadInt32
+ReadInt16
+ReadInt8

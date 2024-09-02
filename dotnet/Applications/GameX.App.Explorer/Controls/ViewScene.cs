@@ -8,9 +8,9 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
-namespace GameX.App.Explorer.Controls1
+namespace GameX.App.Explorer.Controls
 {
-    public abstract class GLSceneViewer : GLViewerControl
+    public abstract class ViewScene : GLViewerControl
     {
         public Scene Scene { get; private set; }
         public Scene SkyboxScene { get; protected set; }
@@ -31,7 +31,7 @@ namespace GameX.App.Explorer.Controls1
         OctreeDebugRenderer<SceneNode> StaticOctreeRenderer;
         OctreeDebugRenderer<SceneNode> DynamicOctreeRenderer;
 
-        protected GLSceneViewer(Frustum cullFrustum = null)
+        protected ViewScene(Frustum cullFrustum = null)
         {
             CullFrustum = cullFrustum;
             InitializeControl();
@@ -44,8 +44,8 @@ namespace GameX.App.Explorer.Controls1
         public event PropertyChangedEventHandler PropertyChanged;
         void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(GLSceneViewer),
-            new PropertyMetadata((d, e) => (d as GLSceneViewer).OnProperty()));
+        public static readonly DependencyProperty GraphicProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(ViewScene),
+            new PropertyMetadata((d, e) => (d as ViewScene).OnProperty()));
 
         public IOpenGfx Gfx
         {
@@ -53,8 +53,8 @@ namespace GameX.App.Explorer.Controls1
             set => SetValue(GraphicProperty, value);
         }
 
-        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(GLSceneViewer),
-            new PropertyMetadata((d, e) => (d as GLSceneViewer).OnProperty()));
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(object), typeof(ViewScene),
+            new PropertyMetadata((d, e) => (d as ViewScene).OnProperty()));
 
         public object Source
         {

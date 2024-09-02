@@ -25,8 +25,9 @@ namespace GameX.Bethesda.Formats.Records
         public int DataSize = (int)(format == BethesdaFormat.TES3 ? r.ReadUInt32() : r.ReadUInt16());
     }
 
-    public abstract class Record : IRecord
+    public class Record : IRecord
     {
+        public static readonly Record Empty = new();
         public override string ToString() => $"XXXX: {EDID.Value}";
         internal Header Header;
         public uint Id => Header.FormId;
@@ -36,7 +37,7 @@ namespace GameX.Bethesda.Formats.Records
         /// Return an uninitialized subrecord to deserialize, or null to skip.
         /// </summary>
         /// <returns>Return an uninitialized subrecord to deserialize, or null to skip.</returns>
-        public abstract object CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize);
+        public virtual object CreateField(BinaryReader r, BethesdaFormat format, string type, int dataSize) => Empty;
 
         public void Read(BinaryReader r, string filePath, BethesdaFormat format)
         {
@@ -52,7 +53,7 @@ namespace GameX.Bethesda.Formats.Records
                 }
                 else if (fieldHeader.Type == "OFST" && Header.Type == "WRLD") { r.Seek(endPosition); continue; }
                 var position = r.BaseStream.Position;
-                if (CreateField(r, format, fieldHeader.Type, fieldHeader.DataSize) == null) { Log($"Unsupported ESM record type: {Header.Type}:{fieldHeader.Type}"); r.Skip(fieldHeader.DataSize); continue; }
+                if (CreateField(r, format, fieldHeader.Type, fieldHeader.DataSize) == Empty) { Log($"Unsupported ESM record type: {Header.Type}:{fieldHeader.Type}"); r.Skip(fieldHeader.DataSize); continue; }
                 // check full read
                 if (r.BaseStream.Position != position + fieldHeader.DataSize) throw new FormatException($"Failed reading {Header.Type}:{fieldHeader.Type} field data at offset {position} in {filePath} of {r.BaseStream.Position - position - fieldHeader.DataSize}");
             }
@@ -196,7 +197,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "CNAME" => CNAME = r.ReadSAndVerify<CREFField>(size: dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -212,7 +213,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "CNAME" => CNAME = r.ReadSAndVerify<CREFField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -241,7 +242,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "CNAME" => CNAME = r.ReadSAndVerify<CREFField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -257,7 +258,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "CNAME" => CNAME = r.ReadSAndVerify<CREFField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -273,7 +274,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "CNAME" => CNAME = r.ReadSAndVerify<CREFField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -289,7 +290,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "CNAME" => CNAME = r.ReadSAndVerify<CREFField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -305,7 +306,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "CNAME" => CNAME = r.ReadSAndVerify<CREFField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -321,7 +322,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "CNAME" => CNAME = r.ReadSAndVerify<CREFField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -337,7 +338,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "CNAME" => CNAME = r.ReadSAndVerify<CREFField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -365,7 +366,7 @@ namespace GameX.Bethesda.Formats.Records
             "XESP" => XESP = new REFRRecord.XESPField(r, dataSize),
             "XSCL" => XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
             "XRGD" => XRGD = r.ReadBYTV(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -388,7 +389,7 @@ namespace GameX.Bethesda.Formats.Records
             "MODB" => MODL.MODBField(r, dataSize),
             "ICON" => ICON = r.ReadFILE(dataSize),
             "DATA" => DATA = r.ReadSAndVerify<BYTEField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -444,7 +445,7 @@ namespace GameX.Bethesda.Formats.Records
             "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             "TNAM" => TNAM = new FMIDField<CREARecord>(r, dataSize),
             "LVLO" => LVLOs.AddX(new LVLIRecord.LVLOField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -486,7 +487,7 @@ namespace GameX.Bethesda.Formats.Records
             "LVLF" => LVLF = r.ReadSAndVerify<BYTEField>(dataSize),
             "DATA" => DATA = r.ReadSAndVerify<BYTEField>(dataSize),
             "LVLO" => LVLOs.AddX(new LVLOField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -506,7 +507,7 @@ namespace GameX.Bethesda.Formats.Records
             "LVLD" => LVLD = r.ReadSAndVerify<BYTEField>(dataSize),
             "LVLF" => LVLF = r.ReadSAndVerify<BYTEField>(dataSize),
             "LVLO" => LVLOs.AddX(new LVLIRecord.LVLOField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -523,7 +524,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "PGRP" => PGRPs = [.. Enumerable.Range(0, dataSize >> 4).Select(x => new PGRDRecord.PGRPField(r, dataSize))],
             "PGRR" => PGRR = r.ReadUNKN(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -546,7 +547,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "DNAM" => DNAM = new DNAMField(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -584,7 +585,7 @@ namespace GameX.Bethesda.Formats.Records
             "EFID" => r.Skip(dataSize),
             "EFIT" => EFITs.AddX(new ENCHRecord.EFITField(r, dataSize, format)),
             "SCIT" => SCITs.AddX(new ENCHRecord.SCITField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -617,7 +618,7 @@ namespace GameX.Bethesda.Formats.Records
             "XHRS" => XHRS = new FMIDField<ACRERecord>(r, dataSize),
             "XSCL" => XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
             "XRGD" => XRGD = r.ReadBYTV(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -654,7 +655,7 @@ namespace GameX.Bethesda.Formats.Records
             "ENAM" => ENAM = new FMIDField<ENCHRecord>(r, dataSize),
             "ANAM" => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
             "DATA" => DATA = new DATAField(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -673,7 +674,7 @@ namespace GameX.Bethesda.Formats.Records
             "MODL" => MODL = new MODLGroup(r, dataSize),
             "MODB" => MODL.MODBField(r, dataSize),
             "DATA" => DATA = new FMIDField<IDLERecord>(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -714,7 +715,7 @@ namespace GameX.Bethesda.Formats.Records
             "GNAM" => GNAM = r.ReadFILE(dataSize),
             "WLST" => WLSTs.AddRangeX(Enumerable.Range(0, dataSize >> 3).Select(x => new WLSTField(r, dataSize))),
             "TNAM" => TNAM = new TNAMField(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -847,7 +848,7 @@ namespace GameX.Bethesda.Formats.Records
             "EDID" => EDID = r.ReadSTRV(dataSize),
             "CSTD" => CSTD = new CSTDField(r, dataSize),
             "CSAD" => CSAD = new CSADField(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -990,7 +991,7 @@ namespace GameX.Bethesda.Formats.Records
             "ICON" => ICON = r.ReadFILE(dataSize),
             "ICO2" => ICO2 = r.ReadFILE(dataSize),
             "DATA" => DATA = new DATAField(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1010,7 +1011,7 @@ namespace GameX.Bethesda.Formats.Records
             "FULL" => FULL = r.ReadSTRV(dataSize),
             "ICON" => ICON = r.ReadFILE(dataSize),
             "DATA" => DATA = r.ReadSAndVerify<BYTEField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1036,7 +1037,7 @@ namespace GameX.Bethesda.Formats.Records
             "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             "PFIG" => PFIG = new FMIDField<INGRRecord>(r, dataSize),
             "PFPC" => PFPC = r.ReadBYTV(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1060,7 +1061,7 @@ namespace GameX.Bethesda.Formats.Records
             "FULL" => FULL = r.ReadSTRV(dataSize),
             "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             "MNAM" => MNAM = r.ReadSAndVerify<IN32Field>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1119,7 +1120,7 @@ namespace GameX.Bethesda.Formats.Records
             "MODB" => MODL.MODBField(r, dataSize),
             "MODT" => MODL.MODTField(r, dataSize),
             "DATA" => DATA = new DATAField(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1142,7 +1143,7 @@ namespace GameX.Bethesda.Formats.Records
             "CTDA" or "CTDT" => CTDAs.AddX(new SCPTRecord.CTDAField(r, dataSize, format)),
             "ANAM" => ANAM = r.ReadSAndVerify<BYTEField>(dataSize),
             "DATA" => DATAs = [.. Enumerable.Range(0, dataSize >> 2).Select(x => new FMIDField<IDLERecord>(r, 4))],
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1170,7 +1171,7 @@ namespace GameX.Bethesda.Formats.Records
             "ICON" => ICON = r.ReadFILE(dataSize),
             "DESC" => DESC = r.ReadSTRV(dataSize),
             "LNAM" => (LNAMs ??= []).AddX(new LNAMField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1230,7 +1231,7 @@ namespace GameX.Bethesda.Formats.Records
             "PSDT" => PSDT = new PSDTField(r, dataSize),
             "PTDT" => PTDT = new PTDTField(r, dataSize),
             "CTDA" or "CTDT" => CTDAs.AddX(new SCPTRecord.CTDAField(r, dataSize, format)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1271,7 +1272,7 @@ namespace GameX.Bethesda.Formats.Records
             "SCDA" => SCDA = r.ReadBYTV(dataSize),
             "SCTX" => SCTX = r.ReadSTRV(dataSize),
             "SCRO" => SCROs.AddX(new FMIDField<Record>(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1398,7 +1399,7 @@ namespace GameX.Bethesda.Formats.Records
             "XRGD" => XRGD = r.ReadBYTV(dataSize),
             "XSCL" => XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
             "XSOL" => XSOL = r.ReadSAndVerify<BYTEField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1434,7 +1435,7 @@ namespace GameX.Bethesda.Formats.Records
             "ICON" => ICON = r.ReadFILE(dataSize),
             "SOUL" => SOUL = r.ReadSAndVerify<BYTEField>(dataSize),
             "SLCP" => SLCP = r.ReadSAndVerify<BYTEField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1477,7 +1478,7 @@ namespace GameX.Bethesda.Formats.Records
             "INCC" => INCC = r.ReadSAndVerify<IN32Field>(dataSize),
             // TES5
             "TNAM" => TNAM = r.ReadUNKN(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1533,7 +1534,7 @@ namespace GameX.Bethesda.Formats.Records
             "SNAM" => SNAM = new SNAMField(r, dataSize),
             "CNAM" => CNAM = new CNAMField(r, dataSize),
             "BNAM" => BNAM = new BNAMField(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1639,7 +1640,7 @@ namespace GameX.Bethesda.Formats.Records
             "SNAM" => SNAM = new FMIDField<SOUNRecord>(r, dataSize),
             "DATA" => DATA = new DATAField(r, dataSize),
             "GNAM" => GNAM = new GNAMField(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1720,7 +1721,7 @@ namespace GameX.Bethesda.Formats.Records
             "OFST" => r.Skip(dataSize),
             // TES5
             "RNAM" => RNAMs.AddX(new RNAMField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1817,7 +1818,7 @@ namespace GameX.Bethesda.Formats.Records
             "HNAM" => HNAM = new HNAMField(r, dataSize),
             "DATA" => DATA = new DATAField(r, dataSize),
             "SNAM" => SNAMs.AddX(new SNAMField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -1846,7 +1847,7 @@ namespace GameX.Bethesda.Formats.Records
                 "MODL" => MODL = new MODLGroup(r, dataSize),
                 "FNAM" => FNAM = r.ReadSTRV(dataSize),
                 "BYDT" => BYDT = new BYDTField(r, dataSize),
-                _ => null,
+                _ => Empty,
             }
             : null;
     }
@@ -1873,7 +1874,7 @@ namespace GameX.Bethesda.Formats.Records
                 "INDX" => INDX = r.ReadSAndVerify<IN32Field>(dataSize),
                 "CNAM" => CNAMs.AddX(r.ReadSTRV(dataSize)),
                 "INTV" => INTVs.AddX(r.ReadSAndVerify<IN16Field>(dataSize)),
-                _ => null,
+                _ => Empty,
             }
             : null;
     }
@@ -1900,7 +1901,7 @@ namespace GameX.Bethesda.Formats.Records
                 "INDX" => INDX = r.ReadSAndVerify<IN32Field>(dataSize),
                 "INAM" => INAMs.AddX(r.ReadSTRV(dataSize)),
                 "INTV" => INTVs.AddX(r.ReadSAndVerify<IN16Field>(dataSize)),
-                _ => null,
+                _ => Empty,
             }
             : null;
     }
@@ -1934,7 +1935,7 @@ namespace GameX.Bethesda.Formats.Records
                 "PBDT" => PBDT = new PBDTField(r, dataSize),
                 "ITEX" => ICON = r.ReadFILE(dataSize),
                 "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
-                _ => null,
+                _ => Empty,
             }
             : null;
     }
@@ -1968,7 +1969,7 @@ namespace GameX.Bethesda.Formats.Records
                 "RIDT" => RIDT = new RIDTField(r, dataSize),
                 "ITEX" => ICON = r.ReadFILE(dataSize),
                 "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
-                _ => null,
+                _ => Empty,
             }
             : null;
     }
@@ -2002,7 +2003,7 @@ namespace GameX.Bethesda.Formats.Records
                 "DATA" => DATA = r.ReadSAndVerify<IN32Field>(dataSize),
                 "SNAM" => SNAM = r.ReadSTRV(dataSize),
                 "CNAM" => CNAM = r.ReadSTRV(dataSize),
-                _ => null,
+                _ => Empty,
             }
             : null;
     }
@@ -2020,7 +2021,7 @@ namespace GameX.Bethesda.Formats.Records
             {
                 "NAME" => EDID = r.ReadSTRV(dataSize),
                 "DATA" => DATA = r.ReadSTRV(dataSize),
-                _ => null,
+                _ => Empty,
             }
             : null;
     }
@@ -2049,7 +2050,7 @@ namespace GameX.Bethesda.Formats.Records
             "HEDR" => HEDR = new HEDRField(r, dataSize),
             "MAST" => (MASTs ??= []).AddX(r.ReadSTRV(dataSize)),
             "DATA" => (DATAs ??= []).AddX(r.ReadINTV(dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -2073,7 +2074,7 @@ namespace GameX.Bethesda.Formats.Records
             "DESC" => DESC = r.ReadSTRV(dataSize),
             "SPLO" => (SPLOs ??= []).AddX(new FMIDField<Record>(r, dataSize)),
             "NPCS" => (NPCSs ??= []).AddX(r.ReadSTRV(dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -2230,7 +2231,7 @@ namespace GameX.Bethesda.Formats.Records
                 "BSND" => BSND = r.ReadSTRV(dataSize),
                 "HSND" => HSND = r.ReadSTRV(dataSize),
                 "ASND" => ASND = r.ReadSTRV(dataSize),
-                _ => null,
+                _ => Empty,
             }
             : type switch
             {
@@ -2242,7 +2243,7 @@ namespace GameX.Bethesda.Formats.Records
                 "MODB" => MODL.MODBField(r, dataSize),
                 "DATA" => DATA = new DATAField(r, dataSize),
                 "ESCE" => ESCEs = [.. Enumerable.Range(0, dataSize >> 2).Select(x => r.ReadSTRV(4))],
-                _ => null,
+                _ => Empty,
             };
     }
 
@@ -2341,7 +2342,7 @@ namespace GameX.Bethesda.Formats.Records
             "PGRR" => (PGRRs = [.. Enumerable.Range(0, dataSize >> 2).Select(x => new PGRRField(r, 4))], r.Skip(dataSize % 4)),
             "PGRL" => (PGRLs ??= []).AddX(new PGRLField(r, dataSize)),
             "PGRI" => PGRIs = [.. Enumerable.Range(0, dataSize >> 4).Select(x => new PGRIField(r, 16))],
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -2479,7 +2480,7 @@ namespace GameX.Bethesda.Formats.Records
                 "SLSD" => SLSDs.AddX(new SLSDField(r, dataSize)),
                 "SCRO" => SCROs.AddX(new FMIDField<Record>(r, dataSize)),
                 "SCRV" => SCRVs.AddX(this.Then(r.ReadUInt32(), idx => SLSDs.Single(x => x.Idx == idx))),
-                _ => null,
+                _ => Empty,
             };
         }
     }
@@ -2505,7 +2506,7 @@ namespace GameX.Bethesda.Formats.Records
             "FULL" or "FNAM" => FULL = r.ReadSTRV(dataSize),
             "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             "SNAM" => SNAM = new FMIDField<SOUNRecord>(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -2580,7 +2581,7 @@ namespace GameX.Bethesda.Formats.Records
             "EFID" => r.Skip(dataSize),
             "EFIT" => EFITs.AddX(new ENCHRecord.EFITField(r, dataSize, format)),
             "SCIT" => SCITs.AddX(new ENCHRecord.SCITField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -2631,7 +2632,7 @@ namespace GameX.Bethesda.Formats.Records
             "DATA" or "AADT" => DATA = new DATAField(r, dataSize, format),
             "ICON" or "ITEX" => ICON = r.ReadFILE(dataSize),
             "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -2717,7 +2718,7 @@ namespace GameX.Bethesda.Formats.Records
             "MO4T" => MOD4.MODTField(r, dataSize),
             "ICO2" => ICO2 = r.ReadFILE(dataSize),
             "ANAM" => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -2778,7 +2779,7 @@ namespace GameX.Bethesda.Formats.Records
             "DESC" or "TEXT" => DESC = r.ReadSTRV(dataSize),
             "ENAM" => ENAM = new FMIDField<ENCHRecord>(r, dataSize),
             "ANAM" => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -2923,7 +2924,7 @@ namespace GameX.Bethesda.Formats.Records
                     "XOWN" => XOWNs.AddX(new XOWNGroup { XOWN = new FMIDField<Record>(r, dataSize) }),
                     "XRNK" => XOWNs.Last().XRNK = r.ReadSAndVerify<IN32Field>(dataSize),
                     "XGLB" => XOWNs.Last().XGLB = new FMIDField<Record>(r, dataSize),
-                    _ => null,
+                    _ => Empty,
                 };
             // Referenced Object Data Grouping
             else return type switch
@@ -2949,7 +2950,7 @@ namespace GameX.Bethesda.Formats.Records
                 "NAM0" => _lastRef.NAM0 = r.ReadSAndVerify<UI32Field>(dataSize),
                 "XCHG" => _lastRef.XCHG = r.ReadSAndVerify<IN32Field>(dataSize),
                 "INDX" => _lastRef.INDX = r.ReadSAndVerify<IN32Field>(dataSize),
-                _ => null,
+                _ => Empty,
             };
         }
     }
@@ -2985,7 +2986,7 @@ namespace GameX.Bethesda.Formats.Records
                 "FNAM" => FULL = r.ReadSTRV(dataSize),
                 "CLDT" => r.Skip(dataSize),
                 "DESC" => DESC = r.ReadSTRV(dataSize),
-                _ => null,
+                _ => Empty,
             }
             : type switch
             {
@@ -2994,7 +2995,7 @@ namespace GameX.Bethesda.Formats.Records
                 "DESC" => DESC = r.ReadSTRV(dataSize),
                 "ICON" => ICON = r.ReadSTRV(dataSize),
                 "DATA" => DATA = new DATAField(r, dataSize),
-                _ => null,
+                _ => Empty,
             };
     }
 
@@ -3082,7 +3083,7 @@ namespace GameX.Bethesda.Formats.Records
             "MO4T" => MOD4.MODTField(r, dataSize),
             "ICO2" => ICO2 = r.ReadFILE(dataSize),
             "ANAM" => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -3133,7 +3134,7 @@ namespace GameX.Bethesda.Formats.Records
             "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             "SNAM" => SNAM = new FMIDField<SOUNRecord>(r, dataSize),
             "QNAM" => QNAM = new FMIDField<SOUNRecord>(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -3290,7 +3291,7 @@ namespace GameX.Bethesda.Formats.Records
                 "XSCL" => XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
                 "CNAM" => CNAM = r.ReadSTRV(dataSize),
                 "NPCS" => NPCSs.AddX(r.ReadSTRV_ZPad(dataSize)),
-                _ => null,
+                _ => Empty,
             }
             : null;
     }
@@ -3316,7 +3317,7 @@ namespace GameX.Bethesda.Formats.Records
             "FULL" => FULL = r.ReadSTRV(dataSize),
             "DATA" => DATA = r.ReadSAndVerify<BYTEField>(dataSize),
             "QSTI" or "QSTR" => (QSTIs ??= []).AddX(new FMIDField<QUSTRecord>(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -3349,7 +3350,7 @@ namespace GameX.Bethesda.Formats.Records
             "ANAM" => ANAM = new FMIDField<SOUNRecord>(r, dataSize),
             "BNAM" => ANAM = new FMIDField<SOUNRecord>(r, dataSize),
             "TNAM" => TNAM = new FMIDField<Record>(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -3458,7 +3459,7 @@ namespace GameX.Bethesda.Formats.Records
             "EFID" => r.Skip(dataSize),
             "EFIT" or "ENAM" => EFITs.AddX(new EFITField(r, dataSize, format)),
             "SCIT" => SCITs.AddX(new SCITField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -3512,7 +3513,7 @@ namespace GameX.Bethesda.Formats.Records
                 "FADT" => FADT = new FADTField(r, dataSize),
                 "ANAM" => ANAMs.AddX(r.ReadSTRV(dataSize)),
                 "INTV" => INTVs.AddX(r.ReadINTV(dataSize)),
-                _ => null,
+                _ => Empty,
             }
             : type switch
             {
@@ -3525,7 +3526,7 @@ namespace GameX.Bethesda.Formats.Records
                 "MNAM" => RNAMs.Last().MNAM = r.ReadSTRV(dataSize),
                 "FNAM" => RNAMs.Last().FNAM = r.ReadSTRV(dataSize),
                 "INAM" => RNAMs.Last().INAM = r.ReadSTRV(dataSize),
-                _ => null,
+                _ => Empty,
             };
     }
 
@@ -3543,7 +3544,7 @@ namespace GameX.Bethesda.Formats.Records
             "EDID" or "NAME" => EDID = r.ReadSTRV(dataSize),
             "FNAM" => FNAM = r.ReadT<BYTEField>(dataSize),
             "FLTV" => FLTV = r.ReadT<FLTVField>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -3562,13 +3563,13 @@ namespace GameX.Bethesda.Formats.Records
                 "STRV" => DATA = r.ReadDATV(dataSize, 's'),
                 "INTV" => DATA = r.ReadDATV(dataSize, 'i'),
                 "FLTV" => DATA = r.ReadDATV(dataSize, 'f'),
-                _ => null,
+                _ => Empty,
             }
             : type switch
             {
                 "EDID" => EDID = r.ReadSTRV(dataSize),
                 "DATA" => DATA = r.ReadDATV(dataSize, EDID.Value[0]),
-                _ => null,
+                _ => Empty,
             };
     }
 
@@ -3680,7 +3681,7 @@ namespace GameX.Bethesda.Formats.Records
                 "INTV" => TES3.INTV = r.ReadUNKN(dataSize),
                 "FLTV" => TES3.FLTV = r.ReadUNKN(dataSize),
                 "BNAM" => TES3.BNAM = r.ReadSTRV(dataSize),
-                _ => null,
+                _ => Empty,
             }
             : type switch
             {
@@ -3698,7 +3699,7 @@ namespace GameX.Bethesda.Formats.Records
                 "SCDA" => TES4.SCDA = r.ReadBYTV(dataSize),
                 "SCTX" => TES4.SCTX = r.ReadSTRV(dataSize),
                 "SCRO" => TES4.SCROs.AddX(new FMIDField<Record>(r, dataSize)),
-                _ => null,
+                _ => Empty,
             };
     }
 
@@ -3772,7 +3773,7 @@ namespace GameX.Bethesda.Formats.Records
             "EFID" => r.Skip(dataSize),
             "EFIT" => EFITs.AddX(new ENCHRecord.EFITField(r, dataSize, format)),
             "SCIT" => SCITs.AddX(new ENCHRecord.SCITField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -3905,7 +3906,7 @@ namespace GameX.Bethesda.Formats.Records
             "BTXT" => this.Then(r.ReadSAndVerify<BTXTField>(dataSize), btxt => BTXTs[btxt.Quadrant] = btxt),
             "ATXT" => (ATXTs ??= new ATXTGroup[4], this.Then(r.ReadSAndVerify<BTXTField>(dataSize), atxt => _lastATXT = ATXTs[atxt.Quadrant] = new ATXTGroup { ATXT = atxt })),
             "VTXT" => _lastATXT.VTXTs = r.ReadTArray<VTXTField>(dataSize, dataSize >> 3),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -3988,7 +3989,7 @@ namespace GameX.Bethesda.Formats.Records
             "MODB" => MODL.MODBField(r, dataSize),
             "MODT" => MODL.MODTField(r, dataSize),
             "SNAM" => SNAM = new FMIDField<SOUNRecord>(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -4021,7 +4022,7 @@ namespace GameX.Bethesda.Formats.Records
                 "LKDT" => LKDT = new LKDTField(r, dataSize),
                 "ITEX" => ICON = r.ReadFILE(dataSize),
                 "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
-                _ => null,
+                _ => Empty,
             }
             : null;
     }
@@ -4056,7 +4057,7 @@ namespace GameX.Bethesda.Formats.Records
             "HNAM" => HNAM = new HNAMField(r, dataSize),
             "SNAM" => SNAM = r.ReadT<BYTEField>(dataSize),
             "GNAM" => GNAMs.AddX(new FMIDField<GRASRecord>(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -4107,7 +4108,7 @@ namespace GameX.Bethesda.Formats.Records
             "ICON" or "ITEX" => ICON = r.ReadFILE(dataSize),
             "ENAM" => ENAM = new FMIDField<ENCHRecord>(r, dataSize),
             "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -4258,7 +4259,7 @@ namespace GameX.Bethesda.Formats.Records
             "DNAM" => DNAM = r.ReadSTRV(dataSize),
             "XSCL" => XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
             "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -4449,7 +4450,7 @@ namespace GameX.Bethesda.Formats.Records
                 "RADT" => DATA = new DATAField(r, dataSize, format),
                 "NPCS" => SPLOs.AddX(r.ReadSTRV(dataSize)),
                 "DESC" => DESC = r.ReadSTRV(dataSize),
-                _ => null,
+                _ => Empty,
             }
             : format == BethesdaFormat.TES4 ? _nameState switch
             {
@@ -4469,7 +4470,7 @@ namespace GameX.Bethesda.Formats.Records
                     "XNAM" => XNAM = r.ReadUNKN(dataSize),
                     "ATTR" => DATA.ATTRField(r, dataSize),
                     "NAM0" => _nameState++,
-                    _ => null,
+                    _ => Empty,
                 },
                 // face data
                 1 => type switch
@@ -4479,7 +4480,7 @@ namespace GameX.Bethesda.Formats.Records
                     "ICON" => FaceParts.Last().ICON = r.ReadFILE(dataSize),
                     "MODB" => FaceParts.Last().MODL.MODBField(r, dataSize),
                     "NAM1" => _nameState++,
-                    _ => null,
+                    _ => Empty,
                 },
                 // body data
                 2 => type switch
@@ -4491,7 +4492,7 @@ namespace GameX.Bethesda.Formats.Records
                     "INDX" => Bodys[_genderState].BodyParts.AddX(new BodyPartGroup { INDX = r.ReadSAndVerify<UI32Field>(dataSize) }),
                     "ICON" => Bodys[_genderState].BodyParts.Last().ICON = r.ReadFILE(dataSize),
                     "HNAM" => (_nameState++, HNAMs.AddRangeX(Enumerable.Range(0, dataSize >> 2).Select(x => new FMIDField<HAIRRecord>(r, 4)))),
-                    _ => null,
+                    _ => Empty,
                 },
                 // postamble
                 3 => type switch
@@ -4502,9 +4503,9 @@ namespace GameX.Bethesda.Formats.Records
                     "FGGA" => FGGA = r.ReadBYTV(dataSize),
                     "FGTS" => FGTS = r.ReadBYTV(dataSize),
                     "SNAM" => SNAM = r.ReadUNKN(dataSize),
-                    _ => null,
+                    _ => Empty,
                 },
-                _ => null,
+                _ => Empty,
             }
             : null;
     }
@@ -4695,7 +4696,7 @@ namespace GameX.Bethesda.Formats.Records
             "RDMD" => RDATs.Last().RDMD = r.ReadSAndVerify<UI32Field>(dataSize),
             "RDSD" => RDATs.Last().RDSDs = [.. Enumerable.Range(0, dataSize / 12).Select(x => new RDSDField(r, dataSize, format))],
             "RDWT" => RDATs.Last().RDWTs = [.. Enumerable.Range(0, dataSize / RDWTField.SizeOf(format)).Select(x => new RDWTField(r, dataSize, format))],
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -4745,7 +4746,7 @@ namespace GameX.Bethesda.Formats.Records
             "JNAM" => JNAM = r.ReadSTRV(dataSize),
             "ENAM" => ENAM = r.ReadSTRV(dataSize),
             "MNAM" => MNAM = r.ReadSTRV(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -4808,7 +4809,7 @@ namespace GameX.Bethesda.Formats.Records
             "SNDX" => DATA = new DATAField(r, dataSize, format),
             "SNDD" => DATA = new DATAField(r, dataSize, format),
             "DATA" => DATA = new DATAField(r, dataSize, format),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -4846,7 +4847,7 @@ namespace GameX.Bethesda.Formats.Records
             "EFID" => r.Skip(dataSize),
             "EFIT" or "ENAM" => EFITs.AddX(new ENCHRecord.EFITField(r, dataSize, format)),
             "SCIT" => SCITs.AddX(new ENCHRecord.SCITField(r, dataSize)),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -4864,7 +4865,7 @@ namespace GameX.Bethesda.Formats.Records
             "MODL" => MODL = new MODLGroup(r, dataSize),
             "MODB" => MODL.MODBField(r, dataSize),
             "MODT" => MODL.MODTField(r, dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 
@@ -4925,7 +4926,7 @@ namespace GameX.Bethesda.Formats.Records
             }
         }
 
-        public MODLGroup MODL; // Model
+        public MODLGroup MODL { get; set; } // Model
         public STRVField FULL; // Item Name
         public DATAField DATA; // Weapon Data
         public FILEField ICON; // Male Icon (optional)
@@ -4946,7 +4947,7 @@ namespace GameX.Bethesda.Formats.Records
             "ENAM" => ENAM = new FMIDField<ENCHRecord>(r, dataSize),
             "SCRI" => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             "ANAM" => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
-            _ => null,
+            _ => Empty,
         };
     }
 

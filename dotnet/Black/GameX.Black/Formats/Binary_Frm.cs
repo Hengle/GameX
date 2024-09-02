@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace GameX.Black.Formats
 {
-    public class Binary_Frm : IHaveMetaInfo, ITexture, ITextureMultiple
+    public class Binary_Frm : IHaveMetaInfo, ITextureFramesSelect
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Frm(r, f, s));
 
@@ -75,7 +75,7 @@ namespace GameX.Black.Formats
                 frames.Add((f: frame, b: image));
             }
             Header = header;
-            Frames = frames.ToArray();
+            Frames = [.. frames];
             Format = ((TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnrealFormat.R8G8B8A8);
 
             // select a frame
@@ -115,24 +115,26 @@ namespace GameX.Black.Formats
             }, null);
         public void End() { }
 
-        // ITextureMultiple
+        // ITextureFrames
         public int Fps => Header.Fps;
-        public int FrameMaxIndex => Frames.Length == 1 ? 1 : Header.FramesPerDirection;
-        public void FrameSelect(int index)
+        public int FrameMax => Frames.Length == 1 ? 1 : Header.FramesPerDirection;
+        public void FrameSelect(int id)
         {
-            Bytes = Frames[index].b;
-            Width = Frames[index].f.Width;
-            Height = Frames[index].f.Height;
+            Bytes = Frames[id].b;
+            Width = Frames[id].f.Width;
+            Height = Frames[id].f.Height;
         }
+        public bool HasFrames => false;
+        public bool DecodeFrame() => false;
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Frm)}", items: new List<MetaInfo> {
-                new MetaInfo($"Frames: {Frames.Length}"),
-                new MetaInfo($"Width: {Width}"),
-                new MetaInfo($"Height: {Height}"),
-            })
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new($"{nameof(Binary_Frm)}", items: [
+                new($"Frames: {Frames.Length}"),
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 }

@@ -6,16 +6,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GameX.App.Explorer.Controls1
+namespace GameX.App.Explorer.Controls
 {
-    public class GLModelViewer : GLSceneViewer
+    public class ViewModel : ViewScene
     {
         //ComboBox _animationComboBox;
         //CheckedListBox _meshGroupListBox;
         ModelSceneNode _modelSceneNode;
         MeshSceneNode _meshSceneNode;
 
-        public GLModelViewer() : base(Frustum.CreateEmpty()) { }
+        public ViewModel() : base(Frustum.CreateEmpty()) { }
 
         protected override void InitializeControl()
         {

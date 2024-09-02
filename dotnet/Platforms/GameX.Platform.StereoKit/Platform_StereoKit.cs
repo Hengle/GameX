@@ -29,8 +29,7 @@ namespace GameX.Platforms
     /// </summary>
     public class StereoKitShaderBuilder : ShaderBuilderBase<Shader>
     {
-        public override Shader CreateShader(object path, IDictionary<string, bool> args) => Shader.FromFile((string)path);
-        public override Shader CreatePlaneShader(object path, IDictionary<string, bool> args) => Shader.FromFile((string)path);
+        public override Shader CreateShader(object path, IDictionary<string, bool> args = null) => Shader.FromFile((string)path);
     }
 
     /// <summary>

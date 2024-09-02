@@ -5,52 +5,55 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:views="clr-namespace:GameX.App.Explorer.Views"
-             xmlns:control1="clr-namespace:GameX.App.Explorer.Controls1"
+             xmlns:controls="clr-namespace:GameX.App.Explorer.Controls"
              xmlns:model="clr-namespace:GameX.Meta;assembly=GameX"
-             xmlns:control="clr-namespace:WpfHexaEditor;assembly=WPFHexaEditor"
+             xmlns:hexEditor="clr-namespace:WpfHexaEditor;assembly=WPFHexaEditor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.Resources>
-            <DataTemplate x:Key="NullTemplate" DataType="{x:Type model:MetaContent}">
+            <DataTemplate x:Key="TNull" DataType="{x:Type model:MetaContent}">
                 <TextBlock Text="Null" Margin="5,5,5,5" FontFamily="GenericMonospace" />
             </DataTemplate>
-            <DataTemplate x:Key="TextTemplate" DataType="{x:Type model:MetaContent}">
+            <DataTemplate x:Key="TText" DataType="{x:Type model:MetaContent}">
                 <ScrollViewer>
                     <TextBlock TextWrapping="Wrap" Text="{Binding Value}" Margin="5,5,5,5" FontFamily="Courier New" />
                 </ScrollViewer>
             </DataTemplate>
-            <DataTemplate x:Key="DataGridTemplate" DataType="{x:Type model:MetaContent}">
+            <DataTemplate x:Key="TDataGrid" DataType="{x:Type model:MetaContent}">
                 <DataGrid VerticalAlignment="Top" ItemsSource="{Binding Value}" Margin="5,5,5,5" />
             </DataTemplate>
-            <DataTemplate x:Key="ImageTemplate" DataType="{x:Type model:MetaContent}">
+            <DataTemplate x:Key="TImage" DataType="{x:Type model:MetaContent}">
                 <Image MaxWidth="{Binding MaxWidth}" MaxHeight="{Binding MaxHeight}" Margin="5,5,5,5" />
             </DataTemplate>
-            <DataTemplate x:Key="HexTemplate" DataType="{x:Type model:MetaContent}">
-                <control:HexEditor Margin="5,5,5,5" Stream="{Binding Value}"/>
+            <DataTemplate x:Key="THex" DataType="{x:Type model:MetaContent}">
+                <hexEditor:HexEditor Margin="5,5,5,5" Stream="{Binding Value}"/>
             </DataTemplate>
-            <DataTemplate x:Key="AudioPlayerTemplate" DataType="{x:Type model:MetaContent}">
+            <DataTemplate x:Key="TAudioPlayer" DataType="{x:Type model:MetaContent}">
                 <views:AudioPlayer Source="{Binding Value}" Format="{Binding Tag}" Margin="5,5,5,5" />
             </DataTemplate>
-            <DataTemplate x:Key="MaterialTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLMaterialViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
+            <DataTemplate x:Key="TMaterial" DataType="{x:Type model:MetaContent}">
+                <controls:ViewMaterial Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
-            <DataTemplate x:Key="ParticleTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLParticleViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
+            <DataTemplate x:Key="TParticle" DataType="{x:Type model:MetaContent}">
+                <controls:ViewParticle Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
-            <DataTemplate x:Key="TextureTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLTextureViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
+            <DataTemplate x:Key="TTestTri" DataType="{x:Type model:MetaContent}">
+                <controls:ViewTestTri Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
-            <DataTemplate x:Key="TextureVideoTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLTextureVideoViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
+            <DataTemplate x:Key="TTexture" DataType="{x:Type model:MetaContent}">
+                <controls:ViewTexture Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
-            <DataTemplate x:Key="ModelTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLModelViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
+            <DataTemplate x:Key="TVideoTexture" DataType="{x:Type model:MetaContent}">
+                <controls:ViewVideoTexture Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
-            <DataTemplate x:Key="WorldTemplate" DataType="{x:Type model:MetaContent}">
-                <control1:GLModelViewer Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
+            <DataTemplate x:Key="TModel" DataType="{x:Type model:MetaContent}">
+                <controls:ViewModel Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
             </DataTemplate>
-            <DataTemplate x:Key="CustomTemplate" DataType="{x:Type model:MetaContent}">
+            <DataTemplate x:Key="TWorld" DataType="{x:Type model:MetaContent}">
+                <controls:ViewModel Source="{Binding Value}" Gfx="{Binding RelativeSource={RelativeSource AncestorType={x:Type views:FileContent}}, Path=Gfx}" Margin="3,3,3,3" />
+            </DataTemplate>
+            <DataTemplate x:Key="TCustom" DataType="{x:Type model:MetaContent}">
                 <views:Custom Source="{Binding Value}" Margin="3,3,3,3" />
             </DataTemplate>
         </Grid.Resources>
@@ -66,46 +69,49 @@
                     <ContentControl Content="{Binding}">
                         <ContentControl.Style>
                             <Style TargetType="ContentControl">
-                                <Setter Property="ContentTemplate" Value="{StaticResource TextTemplate}" />
+                                <Setter Property="ContentTemplate" Value="{StaticResource TText}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Type}" Value="Hex">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource HexTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource THex}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="Text">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource TextTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TText}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="DataGrid">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource DataGridTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TDataGrid}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="AudioPlayer">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource AudioPlayerTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TAudioPlayer}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="Image">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource ImageTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TImage}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="Material">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource MaterialTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TMaterial}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="Particle">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource ParticleTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TParticle}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Type}" Value="TestTri">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TTestTri}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="Texture">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource TextureTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TTexture}" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding Type}" Value="TextureVideo">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource TextureVideoTemplate}" />
+                                    <DataTrigger Binding="{Binding Type}" Value="VideoTexture">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TVideoTexture}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="Model">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource ModelTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TModel}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="World">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource WorldTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TWorld}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding EngineType}" Value="{x:Type sys:ICustomFormatter}">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource CustomTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TCustom}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Value}" Value="{x:Null}">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource NullTemplate}" />
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TNull}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

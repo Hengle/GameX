@@ -2,7 +2,7 @@
 
 //namespace GameEstate.Explorer.Views
 //{
-//    public class EngineView : GLViewerControl
+//    public class ViewEngine : GLViewerControl
 //    {
 //        public Player Player;
 

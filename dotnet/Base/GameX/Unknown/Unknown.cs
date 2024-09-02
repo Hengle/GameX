@@ -69,7 +69,7 @@ namespace GameX.Unknown
             // IHaveMetaInfo
             List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
                 => [
-                    new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "Pallet" }),
+                    new(null, new MetaContent { Type = "TestTri", Name = Path.GetFileName(file.Path), Value = this }),
                 ];
         }
 

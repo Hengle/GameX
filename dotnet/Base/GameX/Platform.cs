@@ -146,8 +146,7 @@ namespace GameX.Platforms
 
     public abstract class ShaderBuilderBase<Shader>
     {
-        public abstract Shader CreateShader(object path, IDictionary<string, bool> args);
-        public abstract Shader CreatePlaneShader(object path, IDictionary<string, bool> args);
+        public abstract Shader CreateShader(object path, IDictionary<string, bool> args = null);
     }
 
     #endregion
@@ -162,9 +161,6 @@ namespace GameX.Platforms
 
         public (Shader sha, object tag) CreateShader(object path, IDictionary<string, bool> args = null)
             => (Builder.CreateShader(path, args ?? EmptyArgs), null);
-
-        public (Shader sha, object tag) CreatePlaneShader(object path, IDictionary<string, bool> args = null)
-            => (Builder.CreatePlaneShader(path, args ?? EmptyArgs), null);
     }
 
     #endregion

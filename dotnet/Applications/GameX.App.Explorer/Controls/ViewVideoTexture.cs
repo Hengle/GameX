@@ -1,9 +1,9 @@
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
 
-namespace GameX.App.Explorer.Controls1
+namespace GameX.App.Explorer.Controls
 {
-    public class GLTextureVideoViewer : GLBaseViewer<ITextureVideo>
+    public class ViewVideoTexture : ViewBase<ITextureFrames>
     {
         int FrameDelay;
 
@@ -14,11 +14,11 @@ namespace GameX.App.Explorer.Controls1
             else base.SetViewportSize(x, y, Obj.Width << FACTOR, Obj.Height << FACTOR);
         }
 
-        protected override (ITextureVideo, IList<IRenderer>) GetObj(object source)
+        protected override (ITextureFrames, IList<IRenderer>) GetObj(object source)
         {
             //Camera.SetLocation(new Vector3(200));
             //Camera.LookAt(new Vector3(0));
-            var obj = (ITextureVideo)source;
+            var obj = (ITextureFrames)source;
             GL.TextureManager.DeleteTexture(obj);
             var (texture, _) = GL.TextureManager.CreateTexture(obj, Level);
             return (obj, [new TextureRenderer(GL, texture, ToggleValue)]);

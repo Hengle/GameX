@@ -102,7 +102,6 @@ namespace GameX.Bethesda.Formats
             return Task.CompletedTask;
         }
 
-
         // TES3
         Dictionary<string, IRecord> MANYsById;
         Dictionary<long, LTEXRecord> LTEXsById;
@@ -119,7 +118,7 @@ namespace GameX.Bethesda.Formats
             if (Format == BethesdaFormat.TES3)
             {
                 var statGroups = new List<Record>[] { Groups.ContainsKey("STAT") ? Groups["STAT"].Load() : null };
-                MANYsById = statGroups.SelectMany(x => x).Cast<IHaveEDID>().Where(x => x != null).ToDictionary(x => x.EDID.Value, x => (IRecord)x);
+                MANYsById = statGroups.SelectMany(x => x).Where(x => x != null).ToDictionary(x => x.EDID.Value, x => (IRecord)x);
                 LTEXsById = Groups["LTEX"].Load().Cast<LTEXRecord>().ToDictionary(x => x.INTV.Value);
                 var lands = Groups["LAND"].Load().Cast<LANDRecord>().ToList();
                 foreach (var land in lands) land.GridId = new Int3(land.INTV.CellX, land.INTV.CellY, 0);

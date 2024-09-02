@@ -27,7 +27,6 @@ class OpenGLObjectBuilder(ObjectBuilderBase):
 class OpenGLShaderBuilder(ShaderBuilderBase):
     _loader: ShaderLoader = ShaderDebugLoader()
     def createShader(self, path: object, args: dict[str, bool]) -> Shader: return self._loader.createShader(path, args)
-    def createPlaneShader(self, path: object, args: dict[str, bool]) -> Shader: return self._loader.createPlaneShader(path, args)
 
 # OpenGLTextureBuilder
 class OpenGLTextureBuilder(TextureBuilderBase):

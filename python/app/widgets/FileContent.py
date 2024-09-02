@@ -8,8 +8,9 @@ from PyQt6 import QtCore, QtMultimedia
 from gamex.pak import PakFile
 from gamex.meta import MetaContent
 from .HexView import HexView
-from .TextureView import TextureView
-from .TestGfxView import TestGfxView
+from .ViewTestGfx import ViewTestGfx
+from .ViewTestTri import ViewTestTri
+from .ViewTexture import ViewTexture
 
 # typedefs
 class MetaInfo: pass
@@ -20,8 +21,9 @@ class TextView(QWidget):
         super().__init__()
         mainWidget = QScrollArea(self)
         mainWidget.setStyleSheet('border:0px;')
+        value = tab.value
         label = QLabel(mainWidget)
-        label.setText(tab.value.decode('utf8', 'ignore'))
+        label.setText(value if isinstance(value, str) else str.decode('utf8', 'ignore'))
         label.setWordWrap(True)
         label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 
@@ -53,9 +55,9 @@ class FileContent(QTabWidget):
         for tab in self.contentTabs:
             control = TextView(self, tab) if tab.type == 'Text' else \
                 HexView(self, tab) if tab.type == 'Hex' else \
-                TestGfxView(self, tab) if tab.type == 'Texturex' else \
-                TestTriView(self, tab) if tab.type == 'TestTri' else \
-                TextureView(self, tab) if tab.type == 'Texture' else \
+                ViewTestGfx(self, tab) if tab.type == 'TestTrix' else \
+                ViewTestTri(self, tab) if tab.type == 'TestTri' else \
+                ViewTexture(self, tab) if tab.type == 'Texture' else \
                 NullView(self, tab)
             self.contentTab.addTab(control, tab.name)
 

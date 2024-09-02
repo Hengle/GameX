@@ -76,9 +76,9 @@ class TestGfxView(OpenGLView):
 
         # x, y, z, r, g, b
         self.vertices = np.array((
-                -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
-                 0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
-                 0.0,  0.5, 0.0, 0.0, 0.0, 1.0), dtype=np.float32)
+           -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
+            0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
+            0.0,  0.5, 0.0, 0.0, 0.0, 1.0), dtype=np.float32)
 
         self.vao = glGenVertexArrays(1); 
         glBindVertexArray(self.vao)

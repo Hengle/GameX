@@ -32,8 +32,7 @@ namespace GameX.Platforms
     public class VulkenShaderBuilder : ShaderBuilderBase<Shader>
     {
         static readonly ShaderLoader _loader = new ShaderDebugLoader();
-        public override Shader CreateShader(object path, IDictionary<string, bool> args) => _loader.CreateShader(path, args);
-        public override Shader CreatePlaneShader(object path, IDictionary<string, bool> args) => _loader.CreatePlaneShader(path, args);
+        public override Shader CreateShader(object path, IDictionary<string, bool> args = null) => _loader.CreateShader(path, args);
     }
 
     /// <summary>

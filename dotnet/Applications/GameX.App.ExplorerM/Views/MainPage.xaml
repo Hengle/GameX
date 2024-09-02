@@ -32,7 +32,8 @@
                 </Grid>
             </ControlTemplate>
             <ControlTemplate x:Key="TFileExplorer">
-                <views:FileExplorer PakFile="{TemplateBinding Content.PakFile}" Margin="0,0,10,10" />
+                <Label Text="{Binding PakFile}" Margin="5,5,5,5" />
+                <!--<views:FileExplorer PakFile="{TemplateBinding BindingContext.PakFile}" Margin="0,0,10,10" />-->
             </ControlTemplate>
             <ControlTemplate x:Key="TAppList" x:DataType="{x:Type views:MainPageTab}">
                 <VerticalStackLayout BindableLayout.ItemsSource="{Binding AppList}">

@@ -32,47 +32,55 @@
                     <BoxView x:Name="Indicator" Grid.Row="1" Color="Transparent"/>
                 </Grid>
             </ControlTemplate>
-            <ControlTemplate x:Key="NullTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="TNull" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="Null" Margin="5,5,5,5" FontFamily="GenericMonospace" />
             </ControlTemplate>
-            <ControlTemplate x:Key="HexTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="THex" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="Hex" />
                 <!--<control:HexEditor Margin="5,5,5,5" Stream="{Binding Value}"/>-->
             </ControlTemplate>
-            <ControlTemplate x:Key="TextTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="TText" x:DataType="{x:Type model:MetaContent}">
                 <ScrollView>
                     <Label Text="{Binding Value}" Margin="5,5,5,5" FontFamily="Courier New" />
                 </ScrollView>
             </ControlTemplate>
-            <ControlTemplate x:Key="DataGridTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="TDataGrid" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="DataGrid" />
                 <!--<DataGrid VerticalAlignment="Top" ItemsSource="{Binding Value}" Margin="5,5,5,5" />-->
             </ControlTemplate>
-            <ControlTemplate x:Key="AudioPlayerTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="TAudioPlayer" x:DataType="{x:Type model:MetaContent}">
                 <local:AudioPlayer Stream="{Binding Value}" Format="{Binding Tag}" />
             </ControlTemplate>
-            <ControlTemplate x:Key="ImageTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="TImage" x:DataType="{x:Type model:MetaContent}">
                 <Image MaximumWidthRequest="{Binding MaxWidth}" MaximumHeightRequest="{Binding MaxHeight}" Margin="5,5,5,5" />
             </ControlTemplate>
-            <ControlTemplate x:Key="MaterialTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="TMaterial" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="Material" />
-                <!--<control1:GLMaterialViewer Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+                <!--<control:ViewMaterial Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
             </ControlTemplate>
-            <ControlTemplate x:Key="ParticleTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="TParticle" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="Particle" />
-                <!--<control1:GLParticleViewer Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+                <!--<control:ViewParticle Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
             </ControlTemplate>
-            <ControlTemplate x:Key="TextureTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="TTestTri" x:DataType="{x:Type model:MetaContent}">
+                <Label Text="TestTri" />
+                <!--<control:ViewTestTri Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+            </ControlTemplate>
+            <ControlTemplate x:Key="TVideoTexture" x:DataType="{x:Type model:MetaContent}">
+                <Label Text="VideoTexture" />
+                <!--<control:ViewVideoTexture Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+            </ControlTemplate>
+            <ControlTemplate x:Key="TTexture" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="Texture" />
-                <!--<control1:GLTextureViewer Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+                <!--<control:ViewTexture Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
             </ControlTemplate>
-            <ControlTemplate x:Key="ModelTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="TModel" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="Model" />
-                <!--<control1:GLModelViewer Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+                <!--<control:ViewModel Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
             </ControlTemplate>
-            <ControlTemplate x:Key="WorldTemplate" x:DataType="{x:Type model:MetaContent}">
+            <ControlTemplate x:Key="TWorld" x:DataType="{x:Type model:MetaContent}">
                 <Label Text="World" />
-                <!--<control1:GLModelViewer Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
+                <!--<control:ViewModel Source="{Binding Value}" Gfx="{Binding Gfx, RelativeSource={RelativeSource AncestorType={x:Type local:FileContent}}}" Margin="3,3,3,3" />-->
             </ControlTemplate>
         </Grid.Resources>
         <HorizontalStackLayout x:Name="ContentTab" Grid.Row="0" BindableLayout.ItemsSource="{Binding ContentTabs}" VerticalOptions="StartAndExpand" RadioButtonGroup.GroupName="Tabs" BackgroundColor="LightGrey">
@@ -85,40 +93,46 @@
         <ContentView x:Name="ContentTabContent" Grid.Row="1" BackgroundColor="DarkGrey">
             <ContentView.Style>
                 <Style TargetType="ContentView">
-                    <Setter Property="ControlTemplate" Value="{StaticResource TextTemplate}" />
+                    <Setter Property="ControlTemplate" Value="{StaticResource TText}" />
                     <Style.Triggers>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="Hex">
-                            <Setter Property="ControlTemplate" Value="{StaticResource HexTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource THex}" />
                         </DataTrigger>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="Text">
-                            <Setter Property="ControlTemplate" Value="{StaticResource TextTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource TText}" />
                         </DataTrigger>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="DataGrid">
-                            <Setter Property="ControlTemplate" Value="{StaticResource DataGridTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource TDataGrid}" />
                         </DataTrigger>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="AudioPlayer">
-                            <Setter Property="ControlTemplate" Value="{StaticResource AudioPlayerTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource TAudioPlayer}" />
                         </DataTrigger>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="Image">
-                            <Setter Property="ControlTemplate" Value="{StaticResource ImageTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource TImage}" />
                         </DataTrigger>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="Material">
-                            <Setter Property="ControlTemplate" Value="{StaticResource MaterialTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource TMaterial}" />
                         </DataTrigger>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="Particle">
-                            <Setter Property="ControlTemplate" Value="{StaticResource ParticleTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource TParticle}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="TestTri">
+                            <Setter Property="ControlTemplate" Value="{StaticResource TTestTri}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="VideoTexture">
+                            <Setter Property="ControlTemplate" Value="{StaticResource TVideoTexture}" />
                         </DataTrigger>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="Texture">
-                            <Setter Property="ControlTemplate" Value="{StaticResource TextureTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource TTexture}" />
                         </DataTrigger>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="Model">
-                            <Setter Property="ControlTemplate" Value="{StaticResource ModelTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource TModel}" />
                         </DataTrigger>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Type}" Value="World">
-                            <Setter Property="ControlTemplate" Value="{StaticResource WorldTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource TWorld}" />
                         </DataTrigger>
                         <DataTrigger TargetType="ContentView" Binding="{Binding Value}" Value="{x:Null}">
-                            <Setter Property="ControlTemplate" Value="{StaticResource NullTemplate}" />
+                            <Setter Property="ControlTemplate" Value="{StaticResource TNull}" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
