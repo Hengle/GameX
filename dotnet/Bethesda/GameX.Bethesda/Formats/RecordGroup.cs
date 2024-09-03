@@ -6,16 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using static OpenStack.Debug;
+//using static GameX.Bethesda.Formats.Records.FormType;
 
 namespace GameX.Bethesda.Formats
 {
-    public enum BethesdaFormat
-    {
-        TES3 = 3,
-        TES4,
-        TES5,
-    }
-
     public class Header
     {
         [Flags]
@@ -63,39 +57,39 @@ namespace GameX.Bethesda.Formats
 
         public override string ToString() => $"{Type}:{GroupType}";
         public Header Parent;
-        public string Type; // 4 bytes
+        public FormType Type; // 4 bytes
         public uint DataSize;
         public HeaderFlags Flags;
         public bool Compressed => (Flags & HeaderFlags.Compressed) != 0;
         public uint FormId;
         public long Position;
         // group
-        public byte[] Label;
+        public FormType Label;
         public HeaderGroupType GroupType;
 
         public Header() { }
-        public Header(BinaryReader r, BethesdaFormat format, Header parent)
+        public Header(BinaryReader r, FormFormat format, Header parent)
         {
             Parent = parent;
-            Type = r.ReadFString(4);
-            if (Type == "GRUP")
+            Type = (FormType)r.ReadUInt32();
+            if (Type == FormType.GRUP)
             {
-                DataSize = (uint)(r.ReadUInt32() - (format == BethesdaFormat.TES4 ? 20 : 24));
-                Label = r.ReadBytes(4);
+                DataSize = (uint)(r.ReadUInt32() - (format == FormFormat.TES4 ? 20 : 24));
+                Label = (FormType)r.ReadUInt32();
                 GroupType = (HeaderGroupType)r.ReadInt32();
                 r.ReadUInt32(); // stamp | stamp + uknown
-                if (format != BethesdaFormat.TES4) r.ReadUInt32(); // version + uknown
+                if (format != FormFormat.TES4) r.ReadUInt32(); // version + uknown
                 Position = r.Tell();
                 return;
             }
             DataSize = r.ReadUInt32();
-            if (format == BethesdaFormat.TES3) r.ReadUInt32(); // Unknown
+            if (format == FormFormat.TES3) r.ReadUInt32(); // Unknown
             Flags = (HeaderFlags)r.ReadUInt32();
-            if (format == BethesdaFormat.TES3) { Position = r.Tell(); return; }
+            if (format == FormFormat.TES3) { Position = r.Tell(); return; }
             // tes4
             FormId = r.ReadUInt32();
             r.ReadUInt32();
-            if (format == BethesdaFormat.TES4) { Position = r.Tell(); return; }
+            if (format == FormFormat.TES4) { Position = r.Tell(); return; }
             // tes5
             r.ReadUInt32();
             Position = r.Tell();
@@ -107,98 +101,98 @@ namespace GameX.Bethesda.Formats
             public Func<int, bool> L;
         }
 
-        static readonly Dictionary<string, RecordType> CreateMap = new()
+        static readonly Dictionary<FormType, RecordType> CreateMap = new()
         {
-            { "TES3", new RecordType { F = () => new TES3Record(), L = x => true }},
-            { "TES4", new RecordType { F = () => new TES4Record(), L = x => true }},
+            { FormType.TES3, new RecordType { F = () => new TES3Record(), L = x => true }},
+            { FormType.TES4, new RecordType { F = () => new TES4Record(), L = x => true }},
             // 0                                 
-            { "LTEX", new RecordType { F = () => new LTEXRecord(), L = x => x > 0 }},
-            { "STAT", new RecordType { F = () => new STATRecord(), L = x => x > 0 }},
-            { "CELL", new RecordType { F = () => new CELLRecord(), L = x => x > 0 }},
-            { "LAND", new RecordType { F = () => new LANDRecord(), L = x => x > 0 }},
+            { FormType.LTEX, new RecordType { F = () => new LTEXRecord(), L = x => x > 0 }},
+            { FormType.STAT, new RecordType { F = () => new STATRecord(), L = x => x > 0 }},
+            { FormType.CELL, new RecordType { F = () => new CELLRecord(), L = x => x > 0 }},
+            { FormType.LAND, new RecordType { F = () => new LANDRecord(), L = x => x > 0 }},
             // 1                                 
-            { "DOOR", new RecordType { F = () => new DOORRecord(), L = x => x > 1 }},
-            { "MISC", new RecordType { F = () => new MISCRecord(), L = x => x > 1 }},
-            { "WEAP", new RecordType { F = () => new WEAPRecord(), L = x => x > 1 }},
-            { "CONT", new RecordType { F = () => new CONTRecord(), L = x => x > 1 }},
-            { "LIGH", new RecordType { F = () => new LIGHRecord(), L = x => x > 1 }},
-            { "ARMO", new RecordType { F = () => new ARMORecord(), L = x => x > 1 }},
-            { "CLOT", new RecordType { F = () => new CLOTRecord(), L = x => x > 1 }},
-            { "REPA", new RecordType { F = () => new REPARecord(), L = x => x > 1 }},
-            { "ACTI", new RecordType { F = () => new ACTIRecord(), L = x => x > 1 }},
-            { "APPA", new RecordType { F = () => new APPARecord(), L = x => x > 1 }},
-            { "LOCK", new RecordType { F = () => new LOCKRecord(), L = x => x > 1 }},
-            { "PROB", new RecordType { F = () => new PROBRecord(), L = x => x > 1 }},
-            { "INGR", new RecordType { F = () => new INGRRecord(), L = x => x > 1 }},
-            { "BOOK", new RecordType { F = () => new BOOKRecord(), L = x => x > 1 }},
-            { "ALCH", new RecordType { F = () => new ALCHRecord(), L = x => x > 1 }},
-            { "CREA", new RecordType { F = () => new CREARecord(), L = x => x > 1 && true }},
-            { "NPC_", new RecordType { F = () => new NPC_Record(), L = x => x > 1 && true }},
+            { FormType.DOOR, new RecordType { F = () => new DOORRecord(), L = x => x > 1 }},
+            { FormType.MISC, new RecordType { F = () => new MISCRecord(), L = x => x > 1 }},
+            { FormType.WEAP, new RecordType { F = () => new WEAPRecord(), L = x => x > 1 }},
+            { FormType.CONT, new RecordType { F = () => new CONTRecord(), L = x => x > 1 }},
+            { FormType.LIGH, new RecordType { F = () => new LIGHRecord(), L = x => x > 1 }},
+            { FormType.ARMO, new RecordType { F = () => new ARMORecord(), L = x => x > 1 }},
+            { FormType.CLOT, new RecordType { F = () => new CLOTRecord(), L = x => x > 1 }},
+            { FormType.REPA, new RecordType { F = () => new REPARecord(), L = x => x > 1 }},
+            { FormType.ACTI, new RecordType { F = () => new ACTIRecord(), L = x => x > 1 }},
+            { FormType.APPA, new RecordType { F = () => new APPARecord(), L = x => x > 1 }},
+            { FormType.LOCK, new RecordType { F = () => new LOCKRecord(), L = x => x > 1 }},
+            { FormType.PROB, new RecordType { F = () => new PROBRecord(), L = x => x > 1 }},
+            { FormType.INGR, new RecordType { F = () => new INGRRecord(), L = x => x > 1 }},
+            { FormType.BOOK, new RecordType { F = () => new BOOKRecord(), L = x => x > 1 }},
+            { FormType.ALCH, new RecordType { F = () => new ALCHRecord(), L = x => x > 1 }},
+            { FormType.CREA, new RecordType { F = () => new CREARecord(), L = x => x > 1 && true }},
+            { FormType.NPC_, new RecordType { F = () => new NPC_Record(), L = x => x > 1 && true }},
             // 2                                 
-            { "GMST", new RecordType { F = () => new GMSTRecord(), L = x => x > 2 }},
-            { "GLOB", new RecordType { F = () => new GLOBRecord(), L = x => x > 2 }},
-            { "SOUN", new RecordType { F = () => new SOUNRecord(), L = x => x > 2 }},
-            { "REGN", new RecordType { F = () => new REGNRecord(), L = x => x > 2 }},
+            { FormType.GMST, new RecordType { F = () => new GMSTRecord(), L = x => x > 2 }},
+            { FormType.GLOB, new RecordType { F = () => new GLOBRecord(), L = x => x > 2 }},
+            { FormType.SOUN, new RecordType { F = () => new SOUNRecord(), L = x => x > 2 }},
+            { FormType.REGN, new RecordType { F = () => new REGNRecord(), L = x => x > 2 }},
             // 3                                 
-            { "CLAS", new RecordType { F = () => new CLASRecord(), L = x => x > 3 }},
-            { "SPEL", new RecordType { F = () => new SPELRecord(), L = x => x > 3 }},
-            { "BODY", new RecordType { F = () => new BODYRecord(), L = x => x > 3 }},
-            { "PGRD", new RecordType { F = () => new PGRDRecord(), L = x => x > 3 }},
-            { "INFO", new RecordType { F = () => new INFORecord(), L = x => x > 3 }},
-            { "DIAL", new RecordType { F = () => new DIALRecord(), L = x => x > 3 }},
-            { "SNDG", new RecordType { F = () => new SNDGRecord(), L = x => x > 3 }},
-            { "ENCH", new RecordType { F = () => new ENCHRecord(), L = x => x > 3 }},
-            { "SCPT", new RecordType { F = () => new SCPTRecord(), L = x => x > 3 }},
-            { "SKIL", new RecordType { F = () => new SKILRecord(), L = x => x > 3 }},
-            { "RACE", new RecordType { F = () => new RACERecord(), L = x => x > 3 }},
-            { "MGEF", new RecordType { F = () => new MGEFRecord(), L = x => x > 3 }},
-            { "LEVI", new RecordType { F = () => new LEVIRecord(), L = x => x > 3 }},
-            { "LEVC", new RecordType { F = () => new LEVCRecord(), L = x => x > 3 }},
-            { "BSGN", new RecordType { F = () => new BSGNRecord(), L = x => x > 3 }},
-            { "FACT", new RecordType { F = () => new FACTRecord(), L = x => x > 3 }},
-            { "SSCR", new RecordType { F = () => new SSCRRecord(), L = x => x > 3 }},
+            { FormType.CLAS, new RecordType { F = () => new CLASRecord(), L = x => x > 3 }},
+            { FormType.SPEL, new RecordType { F = () => new SPELRecord(), L = x => x > 3 }},
+            { FormType.BODY, new RecordType { F = () => new BODYRecord(), L = x => x > 3 }},
+            { FormType.PGRD, new RecordType { F = () => new PGRDRecord(), L = x => x > 3 }},
+            { FormType.INFO, new RecordType { F = () => new INFORecord(), L = x => x > 3 }},
+            { FormType.DIAL, new RecordType { F = () => new DIALRecord(), L = x => x > 3 }},
+            { FormType.SNDG, new RecordType { F = () => new SNDGRecord(), L = x => x > 3 }},
+            { FormType.ENCH, new RecordType { F = () => new ENCHRecord(), L = x => x > 3 }},
+            { FormType.SCPT, new RecordType { F = () => new SCPTRecord(), L = x => x > 3 }},
+            { FormType.SKIL, new RecordType { F = () => new SKILRecord(), L = x => x > 3 }},
+            { FormType.RACE, new RecordType { F = () => new RACERecord(), L = x => x > 3 }},
+            { FormType.MGEF, new RecordType { F = () => new MGEFRecord(), L = x => x > 3 }},
+            { FormType.LEVI, new RecordType { F = () => new LEVIRecord(), L = x => x > 3 }},
+            { FormType.LEVC, new RecordType { F = () => new LEVCRecord(), L = x => x > 3 }},
+            { FormType.BSGN, new RecordType { F = () => new BSGNRecord(), L = x => x > 3 }},
+            { FormType.FACT, new RecordType { F = () => new FACTRecord(), L = x => x > 3 }},
+            { FormType.SSCR, new RecordType { F = () => new SSCRRecord(), L = x => x > 3 }},
             // 4 - Oblivion                      
-            { "WRLD", new RecordType { F = () => new WRLDRecord(), L = x => x > 0 }},
-            { "ACRE", new RecordType { F = () => new ACRERecord(), L = x => x > 1 }},
-            { "ACHR", new RecordType { F = () => new ACHRRecord(), L = x => x > 1 }},
-            { "REFR", new RecordType { F = () => new REFRRecord(), L = x => x > 1 }},
+            { FormType.WRLD, new RecordType { F = () => new WRLDRecord(), L = x => x > 0 }},
+            { FormType.ACRE, new RecordType { F = () => new ACRERecord(), L = x => x > 1 }},
+            { FormType.ACHR, new RecordType { F = () => new ACHRRecord(), L = x => x > 1 }},
+            { FormType.REFR, new RecordType { F = () => new REFRRecord(), L = x => x > 1 }},
             //                                   
-            { "AMMO", new RecordType { F = () => new AMMORecord(), L = x => x > 4 }},
-            { "ANIO", new RecordType { F = () => new ANIORecord(), L = x => x > 4 }},
-            { "CLMT", new RecordType { F = () => new CLMTRecord(), L = x => x > 4 }},
-            { "CSTY", new RecordType { F = () => new CSTYRecord(), L = x => x > 4 }},
-            { "EFSH", new RecordType { F = () => new EFSHRecord(), L = x => x > 4 }},
-            { "EYES", new RecordType { F = () => new EYESRecord(), L = x => x > 4 }},
-            { "FLOR", new RecordType { F = () => new FLORRecord(), L = x => x > 4 }},
-            { "FURN", new RecordType { F = () => new FURNRecord(), L = x => x > 4 }},
-            { "GRAS", new RecordType { F = () => new GRASRecord(), L = x => x > 4 }},
-            { "HAIR", new RecordType { F = () => new HAIRRecord(), L = x => x > 4 }},
-            { "IDLE", new RecordType { F = () => new IDLERecord(), L = x => x > 4 }},
-            { "KEYM", new RecordType { F = () => new KEYMRecord(), L = x => x > 4 }},
-            { "LSCR", new RecordType { F = () => new LSCRRecord(), L = x => x > 4 }},
-            { "LVLC", new RecordType { F = () => new LVLCRecord(), L = x => x > 4 }},
-            { "LVLI", new RecordType { F = () => new LVLIRecord(), L = x => x > 4 }},
-            { "LVSP", new RecordType { F = () => new LVSPRecord(), L = x => x > 4 }},
-            { "PACK", new RecordType { F = () => new PACKRecord(), L = x => x > 4 }},
-            { "QUST", new RecordType { F = () => new QUSTRecord(), L = x => x > 4 }},
-            { "ROAD", new RecordType { F = () => new ROADRecord(), L = x => x > 4 }},
-            { "SBSP", new RecordType { F = () => new SBSPRecord(), L = x => x > 4 }},
-            { "SGST", new RecordType { F = () => new SGSTRecord(), L = x => x > 4 }},
-            { "SLGM", new RecordType { F = () => new SLGMRecord(), L = x => x > 4 }},
-            { "TREE", new RecordType { F = () => new TREERecord(), L = x => x > 4 }},
-            { "WATR", new RecordType { F = () => new WATRRecord(), L = x => x > 4 }},
-            { "WTHR", new RecordType { F = () => new WTHRRecord(), L = x => x > 4 }},
+            { FormType.AMMO, new RecordType { F = () => new AMMORecord(), L = x => x > 4 }},
+            { FormType.ANIO, new RecordType { F = () => new ANIORecord(), L = x => x > 4 }},
+            { FormType.CLMT, new RecordType { F = () => new CLMTRecord(), L = x => x > 4 }},
+            { FormType.CSTY, new RecordType { F = () => new CSTYRecord(), L = x => x > 4 }},
+            { FormType.EFSH, new RecordType { F = () => new EFSHRecord(), L = x => x > 4 }},
+            { FormType.EYES, new RecordType { F = () => new EYESRecord(), L = x => x > 4 }},
+            { FormType.FLOR, new RecordType { F = () => new FLORRecord(), L = x => x > 4 }},
+            { FormType.FURN, new RecordType { F = () => new FURNRecord(), L = x => x > 4 }},
+            { FormType.GRAS, new RecordType { F = () => new GRASRecord(), L = x => x > 4 }},
+            { FormType.HAIR, new RecordType { F = () => new HAIRRecord(), L = x => x > 4 }},
+            { FormType.IDLE, new RecordType { F = () => new IDLERecord(), L = x => x > 4 }},
+            { FormType.KEYM, new RecordType { F = () => new KEYMRecord(), L = x => x > 4 }},
+            { FormType.LSCR, new RecordType { F = () => new LSCRRecord(), L = x => x > 4 }},
+            { FormType.LVLC, new RecordType { F = () => new LVLCRecord(), L = x => x > 4 }},
+            { FormType.LVLI, new RecordType { F = () => new LVLIRecord(), L = x => x > 4 }},
+            { FormType.LVSP, new RecordType { F = () => new LVSPRecord(), L = x => x > 4 }},
+            { FormType.PACK, new RecordType { F = () => new PACKRecord(), L = x => x > 4 }},
+            { FormType.QUST, new RecordType { F = () => new QUSTRecord(), L = x => x > 4 }},
+            { FormType.ROAD, new RecordType { F = () => new ROADRecord(), L = x => x > 4 }},
+            { FormType.SBSP, new RecordType { F = () => new SBSPRecord(), L = x => x > 4 }},
+            { FormType.SGST, new RecordType { F = () => new SGSTRecord(), L = x => x > 4 }},
+            { FormType.SLGM, new RecordType { F = () => new SLGMRecord(), L = x => x > 4 }},
+            { FormType.TREE, new RecordType { F = () => new TREERecord(), L = x => x > 4 }},
+            { FormType.WATR, new RecordType { F = () => new WATRRecord(), L = x => x > 4 }},
+            { FormType.WTHR, new RecordType { F = () => new WTHRRecord(), L = x => x > 4 }},
             // 5 - Skyrim                        
-            { "AACT", new RecordType { F = () => new AACTRecord(), L = x => x > 5 }},
-            { "ADDN", new RecordType { F = () => new ADDNRecord(), L = x => x > 5 }},
-            { "ARMA", new RecordType { F = () => new ARMARecord(), L = x => x > 5 }},
-            { "ARTO", new RecordType { F = () => new ARTORecord(), L = x => x > 5 }},
-            { "ASPC", new RecordType { F = () => new ASPCRecord(), L = x => x > 5 }},
-            { "ASTP", new RecordType { F = () => new ASTPRecord(), L = x => x > 5 }},
-            { "AVIF", new RecordType { F = () => new AVIFRecord(), L = x => x > 5 }},
-            { "DLBR", new RecordType { F = () => new DLBRRecord(), L = x => x > 5 }},
-            { "DLVW", new RecordType { F = () => new DLVWRecord(), L = x => x > 5 }},
-            { "SNDR", new RecordType { F = () => new SNDRRecord(), L = x => x > 5 }},
+            { FormType.AACT, new RecordType { F = () => new AACTRecord(), L = x => x > 5 }},
+            { FormType.ADDN, new RecordType { F = () => new ADDNRecord(), L = x => x > 5 }},
+            { FormType.ARMA, new RecordType { F = () => new ARMARecord(), L = x => x > 5 }},
+            { FormType.ARTO, new RecordType { F = () => new ARTORecord(), L = x => x > 5 }},
+            { FormType.ASPC, new RecordType { F = () => new ASPCRecord(), L = x => x > 5 }},
+            { FormType.ASTP, new RecordType { F = () => new ASTPRecord(), L = x => x > 5 }},
+            { FormType.AVIF, new RecordType { F = () => new AVIFRecord(), L = x => x > 5 }},
+            { FormType.DLBR, new RecordType { F = () => new DLBRRecord(), L = x => x > 5 }},
+            { FormType.DLVW, new RecordType { F = () => new DLVWRecord(), L = x => x > 5 }},
+            { FormType.SNDR, new RecordType { F = () => new SNDRRecord(), L = x => x > 5 }},
         };
 
         public Record CreateRecord(long position, int recordLevel)
@@ -211,17 +205,17 @@ namespace GameX.Bethesda.Formats
         }
     }
 
-    public partial class RecordGroup(GenericPoolAction<BinaryReader> poolAction, string filePath, BethesdaFormat format, int recordLevel)
+    public partial class RecordGroup(GenericPoolAction<BinaryReader> poolAction, string filePath, FormFormat format, int recordLevel)
     {
-        public byte[] Label => Headers.First.Value.Label;
+        public FormType Label => Headers.First.Value.Label;
         public override string ToString() => Headers.First.Value.ToString();
         public LinkedList<Header> Headers = [];
         public List<Record> Records = [];
         public List<RecordGroup> Groups;
-        public Dictionary<byte[], RecordGroup[]> GroupsByLabel;
+        public Dictionary<uint, RecordGroup[]> GroupsByLabel;
         readonly GenericPoolAction<BinaryReader> _poolAction = poolAction;
         readonly string _filePath = filePath;
-        readonly BethesdaFormat _format = format;
+        readonly FormFormat _format = format;
         readonly int _recordLevel = recordLevel;
         int _headerSkip;
 
@@ -229,10 +223,10 @@ namespace GameX.Bethesda.Formats
         {
             //Console.WriteLine($"Read: {header.Label}");
             Headers.AddLast(header);
-            if (load && header.Label != null && header.GroupType == Header.HeaderGroupType.Top)
-                switch (Encoding.ASCII.GetString(header.Label))
+            if (load && header.Label != 0 && header.GroupType == Header.HeaderGroupType.Top)
+                switch (header.Label)
                 {
-                    case "CELL": case "WRLD": Load(); break; // "DIAL"
+                    case FormType.CELL: case FormType.WRLD: Load(); break; // "DIAL"
                 }
         }
 
@@ -259,21 +253,21 @@ namespace GameX.Bethesda.Formats
             while (r.BaseStream.Position < endPosition)
             {
                 var recordHeader = new Header(r, _format, header);
-                if (recordHeader.Type == "GRUP")
+                if (recordHeader.Type == FormType.GRUP)
                 {
                     var group = ReadGRUP(r, header, recordHeader);
                     if (loadAll) group.Load(loadAll);
                     continue;
                 }
                 // HACK to limit cells loading
-                if (recordHeader.Type == "CELL" && _cellsLoaded > int.MaxValue) { r.Skip(recordHeader.DataSize); continue; }
+                if (recordHeader.Type == FormType.CELL && _cellsLoaded > int.MaxValue) { r.Skip(recordHeader.DataSize); continue; }
                 var record = recordHeader.CreateRecord(r.BaseStream.Position, _recordLevel);
                 if (record == null) { r.Skip(recordHeader.DataSize); continue; }
                 ReadRecord(r, record, recordHeader.Compressed);
                 Records.Add(record);
-                if (recordHeader.Type == "CELL") { _cellsLoaded++; }
+                if (recordHeader.Type == FormType.CELL) { _cellsLoaded++; }
             }
-            GroupsByLabel = Groups?.GroupBy(x => x.Label, ByteArrayComparer.Default).ToDictionary(x => x.Key, x => x.ToArray(), ByteArrayComparer.Default);
+            GroupsByLabel = Groups?.GroupBy(x => (uint)x.Label).ToDictionary(x => x.Key, x => x.ToArray());
         }
 
         RecordGroup ReadGRUP(BinaryReader r, Header header, Header recordHeader)
@@ -293,7 +287,7 @@ namespace GameX.Bethesda.Formats
         static List<string> GetHeaderPath(List<string> b, Header header)
         {
             if (header.Parent != null) GetHeaderPath(b, header.Parent);
-            b.Add(header.GroupType != Header.HeaderGroupType.Top ? BitConverter.ToString(header.Label).Replace("-", string.Empty) : Encoding.ASCII.GetString(header.Label));
+            //b.Add(header.GroupType != Header.HeaderGroupType.Top ? BitConverter.ToString(header.Label).Replace("-", string.Empty) : Encoding.ASCII.GetString(header.Label));
             return b;
         }
 
