@@ -87,9 +87,9 @@ namespace GameX.Bethesda
         static PakBinary GetPakBinary(FamilyGame game, string extension)
             => extension switch
             {
-                "" => PakBinary_Bsa.Instance,
-                ".bsa" => PakBinary_Bsa.Instance,
-                ".ba2" => PakBinary_Ba2.Instance,
+                "" => PakBinary_Bsa.Current,
+                ".bsa" => PakBinary_Bsa.Current,
+                ".ba2" => PakBinary_Ba2.Current,
                 ".esm" => PakBinary_Esm.Instance,
                 _ => throw new ArgumentOutOfRangeException(nameof(extension)),
             };

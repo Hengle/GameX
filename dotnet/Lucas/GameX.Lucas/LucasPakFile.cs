@@ -28,8 +28,8 @@ namespace GameX.Lucas
         static PakBinary GetPakBinary(FamilyGame game, string extension)
             => game.Engine switch
             {
-                "SPUTM" => PakBinary_Scumm.Instance,
-                "Jedi" => PakBinary_Jedi.Instance,
+                "SPUTM" => PakBinary_Scumm.Current,
+                "Jedi" => PakBinary_Jedi.Current,
                 _ => null,
             };
 

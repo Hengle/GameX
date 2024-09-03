@@ -26,11 +26,11 @@ namespace GameX.Bullfrog
         static PakBinary GetPakBinary(FamilyGame game, string filePath)
             => game.Id switch
             {
-                var x when x == "DK" || x == "DK2" => PakBinary_Bullfrog.Instance, // Keeper
-                var x when x == "P" || x == "P2" || x == "P3" => PakBinary_Populus.Instance,
-                var x when x == "S" || x == "S2" => PakBinary_Bullfrog.Instance, // Syndicate
-                var x when x == "MC" || x == "MC2" => PakBinary_Bullfrog.Instance, // Carpet
-                var x when x == "TP" || x == "TH" => PakBinary_Bullfrog.Instance, // Theme
+                var x when x == "DK" || x == "DK2" => PakBinary_Bullfrog.Current, // Keeper
+                var x when x == "P" || x == "P2" || x == "P3" => PakBinary_Populus.Current,
+                var x when x == "S" || x == "S2" => PakBinary_Bullfrog.Current, // Syndicate
+                var x when x == "MC" || x == "MC2" => PakBinary_Bullfrog.Current, // Carpet
+                var x when x == "TP" || x == "TH" => PakBinary_Bullfrog.Current, // Theme
                 _ => throw new ArgumentOutOfRangeException(),
             };
 

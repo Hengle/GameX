@@ -19,7 +19,7 @@ namespace GameX.Red
         /// Initializes a new instance of the <see cref="RedPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public RedPakFile(PakState state) : base(state, PakBinary_Red.Instance)
+        public RedPakFile(PakState state) : base(state, PakBinary_Red.Current)
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
         }

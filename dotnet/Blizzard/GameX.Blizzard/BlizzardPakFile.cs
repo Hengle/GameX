@@ -27,7 +27,7 @@ namespace GameX.Blizzard
         #region Factories
 
         static PakBinary GetPakBinary(FamilyGame game, string extension)
-            => PakBinary_Blizzard.Instance;
+            => PakBinary_Blizzard.Current;
 
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch

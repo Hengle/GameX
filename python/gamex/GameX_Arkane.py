@@ -2,9 +2,8 @@ import os
 from typing import Callable
 from gamex.pak import BinaryPakFile
 from .Base.binary import Binary_Dds, Binary_Img, Binary_Snd, Binary_Txt
-from .Arkane.binary_danae import Binary_Ftl, Binary_Fts, Binary_Tea
-from .Arkane.pakbinary_danae import PakBinary_Danae
-from .Arkane.pakbinary_void import PakBinary_Void
+from .Arkane.danae.binary import Binary_Ftl, Binary_Fts, Binary_Tea
+from .Arkane.pakbinary import PakBinary_Danae, PakBinary_Void
 from .util import _pathExtension
 
 # typedefs

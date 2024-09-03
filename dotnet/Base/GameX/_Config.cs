@@ -49,7 +49,7 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            ForcePath = "sample:1",
+            ForcePath = "sample:2",
             Family = "Arkane",
             Game = "AF", // Arx Fatalis [open, read, texture:GL]
             //Game = "DOM", // Dark Messiah of Might and Magic [open, read]

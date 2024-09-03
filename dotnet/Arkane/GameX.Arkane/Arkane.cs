@@ -42,12 +42,12 @@ namespace GameX.Arkane
         static PakBinary GetPakBinary(FamilyGame game, string extension)
             => PakBinarys.GetOrAdd(game.Id, _ => game.Engine switch
             {
-                "Danae" => PakBinary_Danae.Instance,
-                "Void" => PakBinary_Void.Instance,
-                "CryEngine" => Crytek.Formats.PakBinary_Cry3.Instance,
-                "Unreal" => Epic.Formats.PakBinary_Pck.Instance,
-                "Valve" => Valve.Formats.PakBinary_Vpk.Instance,
-                //"idTech7" => Id.Formats.PakBinaryVpk.Instance,
+                "Danae" => PakBinary_Danae.Current,
+                "Void" => PakBinary_Void.Current,
+                "CryEngine" => Crytek.Formats.PakBinary_Cry3.Current,
+                "Unreal" => Epic.Formats.PakBinary_Pck.Current,
+                "Valve" => Valve.Formats.PakBinary_Vpk.Current,
+                //"idTech7" => Id.Formats.PakBinaryVpk.Current,
                 _ => throw new ArgumentOutOfRangeException(nameof(game.Engine)),
             });
 

@@ -26,7 +26,7 @@ namespace GameX.Cryptic
         #region Factories
 
         static PakBinary GetPakBinary(FamilyGame game, string extension)
-            => PakBinary_Hogg.Instance;
+            => PakBinary_Hogg.Current;
 
         //ref https://github.com/PlumberTaskForce/Datamining-Guide/blob/master/README.md
         internal static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)

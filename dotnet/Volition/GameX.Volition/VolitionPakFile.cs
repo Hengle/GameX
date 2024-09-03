@@ -32,10 +32,10 @@ namespace GameX.Volition
         static PakBinary GetPakBinary(FamilyGame game, string extension)
             => PakBinarys.GetOrAdd(game.Id, _ => game.Engine switch
             {
-                "Descent" => PakBinary_Descent.Instance,
-                "CTG" => PakBinary_Ctg.Instance,
-                "Geo-Mod" => PakBinary_GeoMod.Instance,
-                "Geo-Mod2" => PakBinary_GeoMod.Instance,
+                "Descent" => PakBinary_Descent.Current,
+                "CTG" => PakBinary_Ctg.Current,
+                "Geo-Mod" => PakBinary_GeoMod.Current,
+                "Geo-Mod2" => PakBinary_GeoMod.Current,
                 _ => throw new ArgumentOutOfRangeException(nameof(game.Engine)),
             });
 

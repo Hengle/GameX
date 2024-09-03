@@ -18,7 +18,7 @@ namespace GameX.Epic
         /// Initializes a new instance of the <see cref="EpicPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public EpicPakFile(PakState state) : base(state, PakBinary_Pck.Instance)
+        public EpicPakFile(PakState state) : base(state, PakBinary_Pck.Current)
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
         }

@@ -22,7 +22,7 @@ namespace GameX.Cig.Formats
         {
             P4kFile Pak;
 
-            public SubPakFileP4k(BinaryPakFile source, P4kFile pak, string path, object tag) : base(new PakState(source.FileSystem, source.Game, source.Edition, path, tag), Instance)
+            public SubPakFileP4k(BinaryPakFile source, P4kFile pak, string path, object tag) : base(new PakState(source.FileSystem, source.Game, source.Edition, path, tag), Current)
             {
                 Pak = pak;
                 ObjectFactoryFunc = source.ObjectFactoryFunc;

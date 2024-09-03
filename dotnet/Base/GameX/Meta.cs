@@ -156,12 +156,12 @@ namespace GameX.Meta
             {
                 var value = GuessStringOrBytes(stream);
                 nodes = value is string text ? [
-                    new(null, new MetaContent { Type = "Text", Name = "Text", Value = text }),
+                    new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = text }),
                     new("Text", items: [
                         new($"Length: {text.Length}"),
                     ])]
                 : value is byte[] bytes ? [
-                    new(null, new MetaContent { Type = "Hex", Name = "Hex", Value = new MemoryStream(bytes) }),
+                    new(null, new MetaContent { Type = "Hex", Name = Path.GetFileName(file.Path), Value = new MemoryStream(bytes) }),
                     new("Bytes", items: [
                         new($"Length: {bytes.Length}"),
                     ])]

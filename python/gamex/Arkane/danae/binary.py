@@ -10,6 +10,8 @@ class BinaryPakFile: pass
 class PakFile: pass
 class MetaManager: pass
 
+#region Binary_Ftl
+
 # Binary_Ftl
 class Binary_Ftl(IHaveMetaInfo):
     @staticmethod
@@ -21,6 +23,10 @@ class Binary_Ftl(IHaveMetaInfo):
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         # MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = self.data))
         ]
+
+#endregion
+
+#region Binary_Fts
 
 # Binary_Fts
 class Binary_Fts(IHaveMetaInfo):
@@ -34,6 +40,10 @@ class Binary_Fts(IHaveMetaInfo):
         # MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = self.data))
         ]
 
+#endregion
+
+#region Binary_Tea
+
 # Binary_Tea
 class Binary_Tea(IHaveMetaInfo):
     @staticmethod
@@ -45,3 +55,5 @@ class Binary_Tea(IHaveMetaInfo):
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         # MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = self.data))
         ]
+
+#endregion

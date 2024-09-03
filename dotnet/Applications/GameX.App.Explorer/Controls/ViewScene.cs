@@ -71,7 +71,7 @@ namespace GameX.App.Explorer.Controls
             Scene = new Scene(gfx, MeshBatchRenderer.Render);
             BaseGrid = new ParticleGridRenderer(gfx, 20, 5);
 
-            Camera.SetViewportSize(0, 0, (int)ActualWidth, (int)ActualHeight); //: HandleResize()
+            Camera.SetViewport(0, 0, (int)ActualWidth, (int)ActualHeight); //: HandleResize()
             Camera.SetLocation(new Vector3(256));
             Camera.LookAt(new Vector3(0));
 

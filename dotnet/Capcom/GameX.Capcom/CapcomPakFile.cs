@@ -38,14 +38,14 @@ namespace GameX.Capcom
             => game.Engine switch
             {
                 "Zip" => PakBinary_Zip.GetPakBinary(game),
-                "Unity" => Unity.Formats.PakBinary_Unity.Instance,
+                "Unity" => Unity.Formats.PakBinary_Unity.Current,
                 _ => extension switch
                 {
-                    ".pak" => PakBinary_Kpka.Instance,
-                    ".arc" => PakBinary_Arc.Instance,
-                    ".big" => PakBinary_Big.Instance,
-                    ".bundle" => PakBinary_Bundle.Instance,
-                    ".mbundle" => PakBinary_Plist.Instance,
+                    ".pak" => PakBinary_Kpka.Current,
+                    ".arc" => PakBinary_Arc.Current,
+                    ".big" => PakBinary_Big.Current,
+                    ".bundle" => PakBinary_Bundle.Current,
+                    ".mbundle" => PakBinary_Plist.Current,
                     _ => throw new ArgumentOutOfRangeException(nameof(extension)),
                 },
             };

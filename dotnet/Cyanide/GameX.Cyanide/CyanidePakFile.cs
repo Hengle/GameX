@@ -18,7 +18,7 @@ namespace GameX.Cyanide
         /// Initializes a new instance of the <see cref="CyanidePakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public CyanidePakFile(PakState state) : base(state, PakBinary_Cpk.Instance)
+        public CyanidePakFile(PakState state) : base(state, PakBinary_Cpk.Current)
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
         }

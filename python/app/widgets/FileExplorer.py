@@ -162,5 +162,5 @@ class FileExplorer(QWidget):
         sample = pakFile.game.getSample(option.ForcePath[7:]) if option.ForcePath.startswith('sample:') else None
         forcePath = sample.path if sample else option.ForcePath
         if not forcePath: return
-        abc = MetaItem.findByPathForNodes(self.pakNodes, forcePath, self.resource)
+        # abc = MetaItem.findByPathForNodes(self.pakNodes, forcePath, self.resource)
         self.setSelectedItem(MetaItem.findByPathForNodes(self.pakNodes, forcePath, self.resource))

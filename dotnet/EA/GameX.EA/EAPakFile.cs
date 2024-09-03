@@ -18,7 +18,7 @@ namespace GameX.EA
         /// Initializes a new instance of the <see cref="EAPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public EAPakFile(PakState state) : base(state, PakBinary_Hpl.Instance)
+        public EAPakFile(PakState state) : base(state, PakBinary_Hpl.Current)
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
         }

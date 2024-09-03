@@ -1,4 +1,4 @@
-import os, re, pathlib
+import sys, os, re, pathlib
 from io import BytesIO
 from gamex.filesrc import FileSource
 from gamex.util import _throw
@@ -90,14 +90,14 @@ class MetaManager:
             case s if isinstance(obj, BytesIO):
                 value = MetaManager._guessStringOrBytes(s)
                 nodes = [
-                    MetaInfo(None, MetaContent(type = 'Text', name = 'Text', value = obj)),
+                    MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = obj)),
                     MetaInfo('Text', items = [
                         MetaInfo(f'Length: {len(obj)}')
                         ])
                 ] if isinstance(obj, str) else [
-                    MetaInfo(None, MetaContent(type = 'Hex', name = 'Hex', value = obj)),
+                    MetaInfo(None, MetaContent(type = 'Hex', name = os.path.basename(file.path), value = obj)),
                     MetaInfo('Bytes', items = [
-                        MetaInfo(f'Length: {len(obj)}')
+                        MetaInfo(f'Length: {sys.getsizeof(obj)}')
                         ])
                 ] if isinstance(obj, BytesIO) else \
                     _throw(f'Unknown {obj}')

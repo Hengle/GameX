@@ -18,7 +18,7 @@ namespace GameX.IW
         /// Initializes a new instance of the <see cref="IWPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public IWPakFile(PakState state) : base(state, PakBinary_IW.Instance)
+        public IWPakFile(PakState state) : base(state, PakBinary_IW.Current)
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
             UseReader = false;

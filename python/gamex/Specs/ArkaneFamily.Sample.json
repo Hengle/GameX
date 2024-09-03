@@ -7,12 +7,16 @@
         "type": "Text"
       },
       {
+        "path": "Graph/interface/misc/quit1.bmp",
+        "type": "Texture"
+      },
+      {
         "path": "data.pak:GRAPH/particles/DEFAULT.jpg",
-        "type": "Texture.jpg"
+        "type": "Texture"
       },
       {
         "path": "data.pak:GRAPH/particles/Boom.bmp",
-        "type": "Texture.bmp"
+        "type": "Texture"
       },
       {
         "path": "data.pak:GAME/GRAPH/INTERFACE/BOOK/RUNES/LACET.FTL",

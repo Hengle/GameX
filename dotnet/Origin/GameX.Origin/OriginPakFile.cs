@@ -27,9 +27,9 @@ namespace GameX.Origin
         static PakBinary GetPakBinary(FamilyGame game)
             => game.Id switch
             {
-                "U8" => PakBinary_U8.Instance,
-                "UO" => PakBinary_UO.Instance,
-                "U9" => PakBinary_U9.Instance,
+                "U8" => PakBinary_U8.Current,
+                "UO" => PakBinary_UO.Current,
+                "U9" => PakBinary_U9.Current,
                 _ => throw new ArgumentOutOfRangeException(),
             };
 

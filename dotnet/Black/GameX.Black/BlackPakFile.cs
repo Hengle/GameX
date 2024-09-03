@@ -26,7 +26,7 @@ namespace GameX.Black
         #region Factories
 
         static PakBinary GetPakBinary(FamilyGame game, string extension)
-            => PakBinary_Dat.Instance;
+            => PakBinary_Dat.Current;
 
         //string.IsNullOrEmpty(extension)
         //? PakBinary_Dat.Instance

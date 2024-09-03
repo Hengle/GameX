@@ -7,7 +7,6 @@ from PyQt6.QtMultimedia import QMediaPlayer
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6 import QtCore, QtMultimedia
 from gamex import Family, option
-from .HexViewWidget import HexViewWidget
 from .SaveFileWidget import SaveFileWidget
 from .OpenWidget import OpenWidget
 from .FileContent import FileContent
@@ -71,11 +70,9 @@ class MainPage(QMainWindow):
         w.deleteLater()
 
     def closeEvent(self, e):
-        for h in self.openWidgets:
-            if isinstance(h, HexViewWidget) and h.tmp_file is not None: os.unlink(h.tmp_file)
-            h.closeEvent(None)
+        for h in self.openWidgets: h.closeEvent(None)
         self.openWidgets = None
-        if os.path.exists('tmp') and len(os.listdir('tmp'))==0: os.rmdir('tmp')
+        if os.path.exists('tmp') and len(os.listdir('tmp')) == 0: os.rmdir('tmp')
 
     def initUI(self):
         self.setWindowTitle(self.title)

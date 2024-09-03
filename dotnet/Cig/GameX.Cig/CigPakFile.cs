@@ -19,7 +19,7 @@ namespace GameX.Cig
         /// Initializes a new instance of the <see cref="CigPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public CigPakFile(PakState state) : base(state, PakBinary_P4k.Instance)
+        public CigPakFile(PakState state) : base(state, PakBinary_P4k.Current)
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
         }

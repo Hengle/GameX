@@ -37,8 +37,8 @@ namespace GameX.Bioware
             => game.Engine switch
             {
                 //"Infinity" => PakBinary_Infinity.Instance,
-                "Aurora" => PakBinary_Aurora.Instance,
-                "HeroEngine" => PakBinary_Myp.Instance,
+                "Aurora" => PakBinary_Aurora.Current,
+                "HeroEngine" => PakBinary_Myp.Current,
                 _ => throw new ArgumentOutOfRangeException(nameof(game.Engine))
             };
 

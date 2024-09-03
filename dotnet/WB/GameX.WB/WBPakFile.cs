@@ -23,7 +23,7 @@ namespace GameX.WB
         /// Initializes a new instance of the <see cref="WBPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public WBPakFile(PakState state) : base(state, PakBinary_AC.Instance)
+        public WBPakFile(PakState state) : base(state, PakBinary_AC.Current)
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
             UseFileId = true;

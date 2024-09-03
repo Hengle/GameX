@@ -1,5 +1,5 @@
-import os, numpy as np, imageio as iio
-from io import BytesIO
+import os, numpy as np
+from PIL import Image
 from enum import Enum
 from openstk.gfx.gfx_dds import DDS_HEADER
 from openstk.gfx.gfx_texture import ITexture, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
@@ -16,6 +16,8 @@ class TextureFlags: pass
 class MetaManager: pass
 class MetaManager: pass
 
+#region Binary_Bik
+
 # Binary_Bik
 class Binary_Bik(IHaveMetaInfo):
     @staticmethod
@@ -27,6 +29,10 @@ class Binary_Bik(IHaveMetaInfo):
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = 'BIK Video'))
         ]
+
+#endregion
+
+#region Binary_Dds
 
 # Binary_Dds
 class Binary_Dds(IHaveMetaInfo, ITexture):
@@ -70,11 +76,15 @@ class Binary_Dds(IHaveMetaInfo, ITexture):
         MetaInfo(None, MetaContent(type = 'Texture', name = os.path.basename(file.path), value = self)),
         MetaInfo('Texture', items = [
             MetaInfo(f'Format: {self.format[0]}'),
-            MetaInfo(f'Width: {self.width()}'),
-            MetaInfo(f'Height: {self.height()}'),
-            MetaInfo(f'Mipmaps: {self.mipMaps()}')
+            MetaInfo(f'Width: {self.width}'),
+            MetaInfo(f'Height: {self.height}'),
+            MetaInfo(f'Mipmaps: {self.mipMaps}')
             ])
         ]
+
+#endregion
+
+#region Binary_Fsb
 
 # Binary_Fsb
 class Binary_Fsb(IHaveMetaInfo):
@@ -88,18 +98,22 @@ class Binary_Fsb(IHaveMetaInfo):
         MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = 'FSB Audio'))
         ]
 
+#endregion
+
+#region Binary_Img
+
 # Binary_Img
 class Binary_Img(IHaveMetaInfo, ITexture):
-    class Formats(Enum):
-        Bmp = 1
-        Gif = 2
-        Exif = 3
-        Jpg = 4
-        Png = 5
-        Tiff = 6
-
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Img(r, f)
+
+    # class Formats(Enum):
+    #     Bmp = 1
+    #     Gif = 2
+    #     Exif = 3
+    #     Jpg = 4
+    #     Png = 5
+    #     Tiff = 6
 
     data: dict[str, object] = None
     width: int = 0
@@ -109,21 +123,40 @@ class Binary_Img(IHaveMetaInfo, ITexture):
     flags: TextureFlags = 0
 
     def __init__(self, r: Reader, f: FileSource):
-        match _pathExtension(f.path).lower():
-            case '.bmp': formatType = self.Formats.Bmp
-            case '.gif': formatType = self.Formats.Gif
-            case '.exif': formatType = self.Formats.Exif
-            case '.jpg': formatType = self.Formats.Jpg
-            case '.png': formatType = self.Formats.Png
-            case '.tiff': formatType = self.Formats.Tiff
-            case _: raise Exception(f'Unknown {_pathExtension(f.path)}')
-        self.format = (formatType, 
-            (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-            (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-            TextureUnityFormat.RGB24,
-            TextureUnrealFormat.Unknown)
-        self.image = iio.imread(r.read(f.fileSize))
-        self.width, self.height, _ = self.image.shape
+        self.image = Image.open(r)
+        self.width, self.height = self.image.size
+        formatType = self.image.format
+        match self.image.mode:
+            case '1': # 1-bit pixels, black and white
+                self.format = (formatType,
+                (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGB24,
+                TextureUnrealFormat.Unknown)
+            case 'L': # 8-bit pixels, Grayscale
+                self.format = (formatType,
+                (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGB24,
+                TextureUnrealFormat.Unknown)
+            case 'P': # 8-bit pixels, mapped to any other mode using a color palette
+                self.format = (formatType,
+                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGB24,
+                TextureUnrealFormat.Unknown)
+            case 'RGB': # 3×8-bit pixels, true color
+                self.format = (formatType,
+                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGB24,
+                TextureUnrealFormat.Unknown)
+            case 'RGBA': # 4×8-bit pixels, true color with transparency mask
+                self.format = (formatType,
+                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGBA32,
+                TextureUnrealFormat.Unknown)
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
         match platform:
@@ -131,7 +164,7 @@ class Binary_Img(IHaveMetaInfo, ITexture):
             case Platform.Type.Vulken: format = self.format[2]
             case Platform.Type.Unity: format = self.format[3]
             case Platform.Type.Unreal: format = self.format[4]
-            case _: raise Exception('Unknown {platform}')
+            case _: raise Exception(f'Unknown {platform}')
         return self.image.tobytes(), format, None
     def end(self): pass
 
@@ -145,6 +178,34 @@ class Binary_Img(IHaveMetaInfo, ITexture):
             ])
         ]
 
+    # print(r.read(f.fileSize))
+    # self.image = iio.imread(r.read(f.fileSize))
+    # self.image = iio.imread('imageio:chelsea.bsdf')
+    # match len(self.image.shape):
+    #     case 2: self.width, self.height = self.image.shape; self.channels = 1
+    #     case 3: self.width, self.height, self.channels = self.image.shape
+    #     case 4: _, self.width, self.height, self.channels = self.image.shape
+    # match self.channels:
+    #     case 1: self.format = (formatType,
+    #         (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
+    #         (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
+    #         TextureUnityFormat.RGB24,
+    #         TextureUnrealFormat.Unknown)
+    #     case 3: self.format = (formatType,
+    #         (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+    #         (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+    #         TextureUnityFormat.RGB24,
+    #         TextureUnrealFormat.Unknown)
+    #     case 4: self.format = (formatType,
+    #         (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+    #         (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+    #         TextureUnityFormat.RGB24,
+    #         TextureUnrealFormat.Unknown)
+
+#endregion
+
+#region Binary_Msg
+
 # Binary_Msg
 class Binary_Msg(IHaveMetaInfo):
     @staticmethod
@@ -156,6 +217,10 @@ class Binary_Msg(IHaveMetaInfo):
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = self.message))
         ]
+
+#endregion
+
+#region Binary_Snd
     
 # Binary_Snd
 class Binary_Snd(IHaveMetaInfo):
@@ -169,14 +234,20 @@ class Binary_Snd(IHaveMetaInfo):
         MetaInfo(None, MetaContent(type = 'AudioPlayer', name = os.path.basename(file.path), value = self.data, tag = _pathExtension(file.path)))
         ]
 
+#endregion
+
+#region Binary_Txt
+
 # Binary_Txt
 class Binary_Txt(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Txt(r, f.fileSize)
 
     def __init__(self, r: Reader, fileSize: int):
-        self.data = r.read(fileSize)
+        self.data = r.read(fileSize).decode('utf8', 'ignore')
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = self.data))
         ]
+
+#endregion

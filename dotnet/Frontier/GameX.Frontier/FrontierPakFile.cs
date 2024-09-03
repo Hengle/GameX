@@ -18,7 +18,7 @@ namespace GameX.Frontier
         /// Initializes a new instance of the <see cref="FrontierPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public FrontierPakFile(PakState state) : base(state, PakBinary_Frontier.Instance)
+        public FrontierPakFile(PakState state) : base(state, PakBinary_Frontier.Current)
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
         }

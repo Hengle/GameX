@@ -27,7 +27,7 @@ namespace GameX.Monolith
 
         static PakBinary GetPakBinary(FamilyGame game, string filePath)
             => filePath == null || Path.GetExtension(filePath).ToLowerInvariant() != ".zip"
-                ? PakBinary_Lith.Instance
+                ? PakBinary_Lith.Current
                 : PakBinary_Zip.GetPakBinary(game);
 
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)

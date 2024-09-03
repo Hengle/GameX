@@ -18,7 +18,7 @@ namespace GameX.Frictional
         /// Initializes a new instance of the <see cref="FrictionalPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public FrictionalPakFile(PakState state) : base(state, PakBinary_Hpl.Instance)
+        public FrictionalPakFile(PakState state) : base(state, PakBinary_Hpl.Current)
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
         }

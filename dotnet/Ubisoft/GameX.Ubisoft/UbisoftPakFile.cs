@@ -27,7 +27,7 @@ namespace GameX.Ubisoft
 
         static PakBinary GetPakBinary(FamilyGame game, string filePath)
             => filePath == null || Path.GetExtension(filePath).ToLowerInvariant() != ".zip"
-                ? PakBinary_Ubi.Instance
+                ? PakBinary_Ubi.Current
                 : PakBinary_Zip.GetPakBinary(game);
 
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)

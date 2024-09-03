@@ -18,7 +18,7 @@ namespace GameX.Unity
         /// Initializes a new instance of the <see cref="UnityPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public UnityPakFile(PakState state) : base(state, PakBinary_Unity.Instance)
+        public UnityPakFile(PakState state) : base(state, PakBinary_Unity.Current)
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
         }

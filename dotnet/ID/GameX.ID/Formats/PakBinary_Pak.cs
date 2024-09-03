@@ -72,7 +72,7 @@ namespace GameX.ID.Formats
                     Offset = s.Offset,
                     FileSize = s.FileSize,
                 };
-                if (file.Path.EndsWith(".wad", StringComparison.OrdinalIgnoreCase)) file.Pak = new SubPakFile(source, file, file.Path, instance: PakBinary_Wad.Instance);
+                if (file.Path.EndsWith(".wad", StringComparison.OrdinalIgnoreCase)) file.Pak = new SubPakFile(source, file, file.Path, instance: PakBinary_Wad.Current);
                 return file;
             }).ToArray();
             return Task.CompletedTask;

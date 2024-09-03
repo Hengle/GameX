@@ -192,8 +192,8 @@ class BinaryPakFile(PakFile):
                     value = task
                     return value
             except: print(sys.exc_info()[1]); raise
-            return data if type == BytesIO or type == object else \
-                _throw(f'Stream not returned for {f.path} with {type}')
+        return data if type == BytesIO or type == object else \
+            _throw(f'Stream not returned for {f.path} with {type}')
 
     def _ensureCachedObjectFactory(self, file: FileSource) -> Callable:
         if not self.objectFactoryFunc: return FileSource.emptyObjectFactory

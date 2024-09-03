@@ -30,8 +30,8 @@ namespace GameX.ID
              {
                  "" => null,
                  var x when x == ".pk3" || x == ".pk4" || x == ".zip" => PakBinary_Zip.GetPakBinary(game),
-                 ".pak" => PakBinary_Pak.Instance,
-                 ".wad" => PakBinary_Wad.Instance,
+                 ".pak" => PakBinary_Pak.Current,
+                 ".wad" => PakBinary_Wad.Current,
                  _ => throw new ArgumentOutOfRangeException(),
              };
 

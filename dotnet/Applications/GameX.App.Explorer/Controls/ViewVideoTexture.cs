@@ -7,11 +7,11 @@ namespace GameX.App.Explorer.Controls
     {
         int FrameDelay;
 
-        protected override void SetViewportSize(int x, int y, int width, int height)
+        protected override void SetViewport(int x, int y, int width, int height)
         {
             if (Obj == null) return;
-            if (Obj.Width > 1024 || Obj.Height > 1024 || false) base.SetViewportSize(x, y, width, height);
-            else base.SetViewportSize(x, y, Obj.Width << FACTOR, Obj.Height << FACTOR);
+            if (Obj.Width > 1024 || Obj.Height > 1024 || false) base.SetViewport(x, y, width, height);
+            else base.SetViewport(x, y, Obj.Width << FACTOR, Obj.Height << FACTOR);
         }
 
         protected override (ITextureFrames, IList<IRenderer>) GetObj(object source)

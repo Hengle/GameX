@@ -40,7 +40,7 @@ class OpenGLTextureBuilder(TextureBuilderBase):
     def release(self) -> None:
         if self._defaultTexture > -1: glDeleteTexture(self._defaultTexture); self._defaultTexture = -1
 
-    def _createDefaultTexture(self) -> int: return self.createSolidTexture(4, 4, [
+    def _createDefaultTexture(self) -> int: return self.createSolidTexture(4, 4, np.array([
         0.9, 0.2, 0.8, 1.0,
         0.0, 0.9, 0.0, 1.0,
         0.9, 0.2, 0.8, 1.0,
@@ -59,10 +59,10 @@ class OpenGLTextureBuilder(TextureBuilderBase):
         0.0, 0.9, 0.0, 1.0,
         0.9, 0.2, 0.8, 1.0,
         0.0, 0.9, 0.0, 1.0,
-        0.9, 0.2, 0.8, 1.0])
+        0.9, 0.2, 0.8, 1.0
+        ], dtype = np.float32))
 
     def createTexture(self, reuse: int, source: ITexture, level: range = None) -> int:
-        # return self.defaultTexture
         id = reuse if reuse != None else glGenTextures(1)
         numMipMaps = max(1, source.mipMaps)
         levelStart = level[0] or 0 if level else 0
@@ -76,14 +76,16 @@ class OpenGLTextureBuilder(TextureBuilderBase):
 
         # decode
         def compressedTexImage2D(source: ITexture, i: int, internalFormat: int) -> bool:
+            print('compressedTexImage2D')
             nonlocal pixels
             span = spans[i] if spans else None
             if span and span[0] < 0: return False
             width = source.width >> i
             height = source.height >> i
             pixels = bytes[span[0]:span[1]] if span else bytes
-            arrayType = GLbyte * len(pixels)
-            glCompressedTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, len(pixels), arrayType(*pixels))
+            glCompressedTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, pixels.nbytes, pixels)
+            # arrayType = GLbyte * len(pixels)
+            # glCompressedTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, len(pixels), arrayType(*pixels))
             return True
         def texImage2D(source: ITexture, i: int, internalFormat: int, format: int, type: int) -> bool:
             nonlocal pixels
@@ -92,8 +94,9 @@ class OpenGLTextureBuilder(TextureBuilderBase):
             width = source.width >> i
             height = source.height >> i
             pixels = bytes[span[0]:span[1]] if span else bytes
-            arrayType = GLbyte * len(pixels)
-            abc = glTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, format, type, arrayType(*pixels))
+            glTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, format, type, pixels)
+            # arrayType = GLbyte * len(pixels)
+            # glTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, format, type, arrayType(*pixels))
             return True
         match fmt:
             case glFormat if isinstance(fmt, TextureGLFormat):
@@ -120,21 +123,19 @@ class OpenGLTextureBuilder(TextureBuilderBase):
             glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP if (source.flags & TextureFlags.SUGGEST_CLAMPS.value) != 0 else GL_REPEAT)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP if (source.flags & TextureFlags.SUGGEST_CLAMPT.value) != 0 else GL_REPEAT)
-        glBindTexture(GL_TEXTURE_2D, 0)
+        glBindTexture(GL_TEXTURE_2D, 0) # unbind texture
         return id
 
-    def createSolidTexture(self, width: int, height: int, pixels: list[float]) -> int:
-        pixels = np.array(pixels, dtype = np.float32)
+    def createSolidTexture(self, width: int, height: int, pixels: np.array) -> int:
         id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, id)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, pixels.tobytes())
-        # glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, (GLfloat * len(pixels))(*pixels))
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, pixels)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-        glBindTexture(GL_TEXTURE_2D, 0)
+        glBindTexture(GL_TEXTURE_2D, 0) # unbind texture
         return id
 
     def createNormalMap(self, source: int, strength: float) -> int: raise NotImplementedError()
@@ -145,7 +146,10 @@ class OpenGLTextureBuilder(TextureBuilderBase):
 class OpenGLMaterialBuilder(MaterialBuilderBase):
     _defaultMaterial: GLRenderMaterial
     @property
-    def defaultMaterial(self) -> int: return self._defaultMaterial if self._defaultMaterial else (_defaultMaterial := self._createDefaultMaterial(-1))
+    def defaultMaterial(self) -> int:
+        if self._defaultMaterial: return self._defaultMaterial
+        self._defaultMaterial = self._createDefaultMaterial(-1)
+        return self._defaultMaterial
 
     def __init__(self, textureManager: TextureManager):
         super().__init__(textureManager)

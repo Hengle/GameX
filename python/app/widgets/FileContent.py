@@ -1,5 +1,5 @@
 import sys, os
-from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QSizePolicy, QProgressBar, QScrollArea, QTableView, QTableWidget, QTableWidgetItem, QGridLayout, QHeaderView, QAbstractItemView, QLabel, QTextEdit, QHBoxLayout, QMenu, QFileDialog, QSplitter, QTabWidget
+from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QSizePolicy, QProgressBar, QScrollArea, QTableView, QTableWidget, QTableWidgetItem, QGridLayout, QHeaderView, QAbstractItemView, QLabel, QTextEdit, QHBoxLayout, QMenu, QFileDialog, QSplitter, QTabWidget, QPlainTextEdit
 from PyQt6.QtGui import QIcon, QFont, QDrag, QPixmap, QPainter, QColor, QBrush, QAction
 from PyQt6.QtCore import Qt, QBuffer, QByteArray, QUrl, QMimeData, pyqtSignal
 from PyQt6.QtMultimedia import QMediaPlayer
@@ -7,28 +7,32 @@ from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6 import QtCore, QtMultimedia
 from gamex.pak import PakFile
 from gamex.meta import MetaContent
-from .HexView import HexView
-from .ViewTestGfx import ViewTestGfx
+from .ViewHex import ViewHex
 from .ViewTestTri import ViewTestTri
 from .ViewTexture import ViewTexture
+from .ViewVideoTexture import ViewVideoTexture
 
 # typedefs
 class MetaInfo: pass
 
-# TextView
-class TextView(QWidget):
+# ViewText
+class ViewText(QWidget):
     def __init__(self, parent, tab):
         super().__init__()
-        mainWidget = QScrollArea(self)
-        mainWidget.setStyleSheet('border:0px;')
-        value = tab.value
-        label = QLabel(mainWidget)
-        label.setText(value if isinstance(value, str) else str.decode('utf8', 'ignore'))
-        label.setWordWrap(True)
-        label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.parent = parent
+        self.initUI(tab.value)
+    def initUI(self, value: str):
+        self.text = QPlainTextEdit(self)
+        self.text.setPlainText(value)
+        self.text.setFont(QFont('Courier New', 10))
+        self.text.setReadOnly(True)
+        self.text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.layout = QHBoxLayout()
+        self.layout.addWidget(self.text)
+        self.setLayout(self.layout)
 
-# NullView
-class NullView(QWidget):
+# ViewNull
+class ViewNull(QWidget):
     def __init__(self, parent, tab):
         super().__init__()
 
@@ -40,6 +44,12 @@ class FileContent(QTabWidget):
         self._gfx = []
         self._contentTabs = []
         self.initUI()
+    
+    # def closeEvent(self, e):
+    #     for h in self.openWidgets:
+    #         if isinstance(h, ViewHex) and h.tmp_file is not None: os.unlink(h.tmp_file)
+    #         h.closeEvent(None)
+    #     self.openWidgets = None
 
     def initUI(self):
         # self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -53,12 +63,13 @@ class FileContent(QTabWidget):
         self.contentTab.clear()
         if not self.contentTabs: return
         for tab in self.contentTabs:
-            control = TextView(self, tab) if tab.type == 'Text' else \
-                HexView(self, tab) if tab.type == 'Hex' else \
-                ViewTestGfx(self, tab) if tab.type == 'TestTrix' else \
+            control = \
+                ViewText(self, tab) if tab.type == 'Text' else \
+                ViewHex(self, tab) if tab.type == 'Hex' else \
                 ViewTestTri(self, tab) if tab.type == 'TestTri' else \
                 ViewTexture(self, tab) if tab.type == 'Texture' else \
-                NullView(self, tab)
+                ViewVideoTexture(self, tab) if tab.type == 'VideoTexture' else \
+                ViewNull(self, tab)
             self.contentTab.addTab(control, tab.name)
 
     @property

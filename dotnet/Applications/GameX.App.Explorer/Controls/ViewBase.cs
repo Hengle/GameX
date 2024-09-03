@@ -8,7 +8,7 @@ namespace GameX.App.Explorer.Controls
 {
     public abstract class ViewBase<TObj> : GLViewerControl
     {
-        protected const int FACTOR = 1;
+        protected const int FACTOR = 0;
         protected bool ToggleValue;
         protected IOpenGLGfx GL;
         protected TObj Obj;
@@ -37,11 +37,11 @@ namespace GameX.App.Explorer.Controls
             set => SetValue(SourceProperty, value);
         }
 
-        //protected override void SetViewportSize(int x, int y, int width, int height)
+        //protected override void SetViewport(int x, int y, int width, int height)
         //{
         //    if (Obj == null) return;
-        //    if (Obj.Width > 1024 || Obj.Height > 1024 || false) base.SetViewportSize(x, y, width, height);
-        //    else base.SetViewportSize(x, y, Obj.Width << FACTOR, Obj.Height << FACTOR);
+        //    if (Obj.Width > 1024 || Obj.Height > 1024 || false) base.SetViewport(x, y, width, height);
+        //    else base.SetViewport(x, y, Obj.Width << FACTOR, Obj.Height << FACTOR);
         //}
 
         protected abstract (TObj, IList<IRenderer>) GetObj(object source);

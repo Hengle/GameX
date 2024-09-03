@@ -46,7 +46,7 @@ namespace GameX.App.Explorer.Controls
             if (source == null) return;
 
             particleGrid = new ParticleGridRenderer(gfx, 20, 5);
-            Camera.SetViewportSize(0, 0, (int)ActualWidth, (int)ActualHeight);
+            Camera.SetViewport(0, 0, (int)ActualWidth, (int)ActualHeight);
             Camera.SetLocation(new Vector3(200));
             Camera.LookAt(new Vector3(0));
 

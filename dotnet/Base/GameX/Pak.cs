@@ -1025,7 +1025,7 @@ namespace GameX
 
     public class PakBinary<Self> : PakBinary where Self : PakBinary, new()
     {
-        public static readonly PakBinary Instance = new Self();
+        public static readonly PakBinary Current = new Self();
 
         protected class SubPakFile : BinaryPakFile
         {
@@ -1033,7 +1033,7 @@ namespace GameX
             readonly BinaryPakFile Source;
             BinaryReader R;
 
-            public SubPakFile(BinaryPakFile source, FileSource file, string path, object tag = null, PakBinary instance = null) : base(new PakState(source.FileSystem, source.Game, source.Edition, path, tag), instance ?? Instance)
+            public SubPakFile(BinaryPakFile source, FileSource file, string path, object tag = null, PakBinary instance = null) : base(new PakState(source.FileSystem, source.Game, source.Edition, path, tag), instance ?? Current)
             {
                 File = file;
                 Source = source;
