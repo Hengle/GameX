@@ -1,6 +1,6 @@
-import os
-import numpy as np
+import os, io, numpy as np
 from OpenGL.GL import *
+from OpenGL.GL.EXT import texture_compression_s3tc
 from openstk.gfx.gfx import IFixedMaterial, IParamMaterial
 from openstk.gfx.gl import IOpenGLGfx, QuadIndexBuffer, GLMeshBufferCache
 from openstk.gfx.gl_shader import ShaderDebugLoader
@@ -29,6 +29,7 @@ class OpenGLShaderBuilder(ShaderBuilderBase):
     def createShader(self, path: object, args: dict[str, bool]) -> Shader: return self._loader.createShader(path, args)
 
 # OpenGLTextureBuilder
+#  @see https://github.com/jcteng/python-opengl-tutorial/blob/master/utils/textureLoader.py
 class OpenGLTextureBuilder(TextureBuilderBase):
     _defaultTexture: int = -1
     @property
@@ -62,54 +63,45 @@ class OpenGLTextureBuilder(TextureBuilderBase):
         0.9, 0.2, 0.8, 1.0
         ], dtype = np.float32))
 
-    def createTexture(self, reuse: int, source: ITexture, level: range = None) -> int:
+    def createTexture(self, reuse: int, source: ITexture, level2: range = None) -> int:
         id = reuse if reuse != None else glGenTextures(1)
         numMipMaps = max(1, source.mipMaps)
-        levelStart = level[0] or 0 if level else 0
-        levelEnd = numMipMaps - 1
+        level = range(level2.start if level2 else 0, numMipMaps - 1)
         
         # bind
         glBindTexture(GL_TEXTURE_2D, id)
-        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, levelEnd - levelStart)
+        if level.start > 0: glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level.start)
+        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, level.stop - level.start)
         bytes, fmt, spans = source.begin(Platform.Type.OpenGL)
         pixels = []
 
         # decode
-        def compressedTexImage2D(source: ITexture, i: int, internalFormat: int) -> bool:
-            print('compressedTexImage2D')
+        def compressedTexImage2D(source: ITexture, level: range, internalFormat: int) -> bool:
             nonlocal pixels
-            span = spans[i] if spans else None
-            if span and span[0] < 0: return False
-            width = source.width >> i
-            height = source.height >> i
-            pixels = bytes[span[0]:span[1]] if span else bytes
-            glCompressedTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, pixels.nbytes, pixels)
-            # arrayType = GLbyte * len(pixels)
-            # glCompressedTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, len(pixels), arrayType(*pixels))
+            width = source.width; height = source.height
+            for l in level:
+                span = spans[l]
+                if span and span[0] < 0: return False
+                pixels = bytes[span.start:span.stop] if span else bytes
+                glCompressedTexImage2D(GL_TEXTURE_2D, l, internalFormat, width >> l, height >> l, 0, pixels)
             return True
-        def texImage2D(source: ITexture, i: int, internalFormat: int, format: int, type: int) -> bool:
-            nonlocal pixels
-            span = spans[i] if spans else None
-            if span and span[0] < 0: return False
-            width = source.width >> i
-            height = source.height >> i
-            pixels = bytes[span[0]:span[1]] if span else bytes
-            glTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, format, type, pixels)
-            # arrayType = GLbyte * len(pixels)
-            # glTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, format, type, arrayType(*pixels))
+        def texImage2D(source: ITexture, level: range, internalFormat: int, format: int, type: int) -> bool:
+            nonlocal pixels, spans
+            width = source.width; height = source.height
+            for l in level:
+                span = spans[l]
+                if span and span[0] < 0: return False
+                pixels = bytes[span.start:span.stop] if span else bytes
+                glTexImage2D(GL_TEXTURE_2D, l, internalFormat, width >> l, height >> l, 0, format, type, pixels)
             return True
         match fmt:
             case glFormat if isinstance(fmt, TextureGLFormat):
-                internalFormat = glFormat.value
-                if not internalFormat: print('Unsupported texture, using default'); return self.defaultTexture
-                for i in range(levelStart, levelEnd):
-                    if not compressedTexImage2D(source, i, internalFormat): return self.defaultTexture
+                internalFormat = glFormat
+                if not internalFormat or not compressedTexImage2D(source, level, internalFormat.value): return self.defaultTexture
             case glPixelFormat if isinstance(fmt, tuple):
-                internalFormat, format, type = glPixelFormat[0].value, glPixelFormat[1].value, glPixelFormat[2].value
-                if not internalFormat: print('Unsupported texture, using default'); return self.defaultTexture
-                for i in range(levelStart, numMipMaps):
-                    if not texImage2D(source, i, internalFormat, format, type): return self.defaultTexture
-            case _: raise Exception(f'Uknown {fmt}')
+                internalFormat, format, type = glPixelFormat, glPixelFormat, glPixelFormat
+                if not internalFormat or not texImage2D(source, level, internalFormat.value, format.value, type.value): return self.defaultTexture
+            case _: raise Exception(f'Unknown format: {fmt}')
 
         source.end()
 

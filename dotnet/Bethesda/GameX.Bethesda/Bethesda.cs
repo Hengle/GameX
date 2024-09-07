@@ -17,9 +17,7 @@ namespace GameX.Bethesda
     /// BethesdaFamily
     /// </summary>
     /// <seealso cref="GameX.Family" />
-    public class BethesdaFamily(JsonElement elem) : Family(elem)
-    {
-    }
+    public class BethesdaFamily(JsonElement elem) : Family(elem) { }
 
     #endregion
 
@@ -90,7 +88,7 @@ namespace GameX.Bethesda
                 "" => PakBinary_Bsa.Current,
                 ".bsa" => PakBinary_Bsa.Current,
                 ".ba2" => PakBinary_Ba2.Current,
-                ".esm" => PakBinary_Esm.Instance,
+                ".esm" => PakBinary_Esm.Current,
                 _ => throw new ArgumentOutOfRangeException(nameof(extension)),
             };
 

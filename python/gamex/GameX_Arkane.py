@@ -13,6 +13,8 @@ class PakState: pass
 class FileSource: pass
 class FileOption: pass
 
+#region ArkanePakFile
+
 # ArkanePakFile
 class ArkanePakFile(BinaryPakFile):
     def __init__(self, state: PakState):
@@ -51,3 +53,5 @@ class ArkanePakFile(BinaryPakFile):
             case _: return (0, None)
 
     #endregion
+
+#endregion

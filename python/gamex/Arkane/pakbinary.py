@@ -90,7 +90,7 @@ class PakBinary_Void(PakBinaryT):
     #region Headers
 
     class V_File:
-        struct = ('>QIIIIH', 26)
+        struct = ('>Q4IH', 26)
         def __init__(self, tuple):
             self.offset, \
             self.fileSize, \

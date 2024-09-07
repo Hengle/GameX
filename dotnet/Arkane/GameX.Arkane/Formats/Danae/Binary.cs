@@ -17,7 +17,7 @@ namespace GameX.Arkane.Formats.Danae
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Ftl(r));
 
-        #region FTL Headers
+        #region Headers
 
         const int FTL_MAGIC = 0x004c5446;
         const float FTL_VERSION = 0.83257f;
@@ -73,18 +73,17 @@ namespace GameX.Arkane.Formats.Danae
         [StructLayout(LayoutKind.Sequential)]
         struct FTL_VERTEX
         {
-            public static (string, int) Struct = ($"<{"4f2I3f"}f3f3", sizeof(FTL_VERTEX));
+            public static (string, int) Struct = ($"<{TLVERTEX.Struct.Item1}6f", sizeof(FTL_VERTEX));
             public TLVERTEX Vert;
             public Vector3 V;
             public Vector3 Norm;
-            public static implicit operator E_VERTEX(FTL_VERTEX s)
-                => new E_VERTEX
-                {
-                    Vert = s.Vert,
-                    V = s.V,
-                    Norm = s.Norm,
-                    VWorld = default,
-                };
+            public static implicit operator E_VERTEX(FTL_VERTEX s) => new()
+            {
+                Vert = s.Vert,
+                V = s.V,
+                Norm = s.Norm,
+                VWorld = default,
+            };
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -116,7 +115,7 @@ namespace GameX.Arkane.Formats.Danae
         [StructLayout(LayoutKind.Sequential)]
         struct FTL_FACE
         {
-            public static (string, int) Struct = ("<?", sizeof(FTL_FACE));
+            public static (string, int) Struct = ("<4i3Hh6f6h14f", sizeof(FTL_FACE));
             public int FaceType;  // 0 = flat, 1 = text, 2 = Double-Side
             public Vector3<int> Rgb;
             public Vector3<ushort> Vid;
@@ -129,20 +128,19 @@ namespace GameX.Arkane.Formats.Danae
             public Vector3 Norm;
             public Vector3 Nrmls0; public Vector3 Nrmls1; public Vector3 Nrmls2;
             public float Temp;
-            public static implicit operator E_FACE(FTL_FACE s)
-                => new E_FACE
-                {
-                    FaceType = s.FaceType,
-                    TexId = s.TexId,
-                    U = s.U,
-                    V = s.V,
-                    Ou = s.Ou,
-                    Ov = s.Ov,
-                    TransVal = s.TransVal,
-                    Norm = s.Norm,
-                    Nrmls = new[] { s.Nrmls0, s.Nrmls1, s.Nrmls2 },
-                    Temp = s.Temp,
-                };
+            public static implicit operator E_FACE(FTL_FACE s) => new()
+            {
+                FaceType = s.FaceType,
+                TexId = s.TexId,
+                U = s.U,
+                V = s.V,
+                Ou = s.Ou,
+                Ov = s.Ov,
+                TransVal = s.TransVal,
+                Norm = s.Norm,
+                Nrmls = new[] { s.Nrmls0, s.Nrmls1, s.Nrmls2 },
+                Temp = s.Temp,
+            };
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -155,14 +153,13 @@ namespace GameX.Arkane.Formats.Danae
             public int NumIndex;
             public int Trash; // Indexes;
             public float Size;
-            public static implicit operator E_GROUPLIST(FTL_GROUPLIST s)
-                => new E_GROUPLIST
-                {
-                    Name = s.Name,
-                    Origin = s.Origin,
-                    NumIndex = s.NumIndex,
-                    Size = s.Size,
-                };
+            public static implicit operator E_GROUPLIST(FTL_GROUPLIST s) => new()
+            {
+                Name = s.Name,
+                Origin = s.Origin,
+                NumIndex = s.NumIndex,
+                Size = s.Size,
+            };
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -173,14 +170,13 @@ namespace GameX.Arkane.Formats.Danae
             public int Idx; //index vertex;
             public int Act; //action
             public int Sfx; //sfx
-            public static implicit operator E_ACTIONLIST(FTL_ACTIONLIST s)
-                => new E_ACTIONLIST
-                {
-                    Name = s.Name,
-                    Idx = s.Idx,
-                    Act = s.Act,
-                    Sfx = s.Sfx,
-                };
+            public static implicit operator E_ACTIONLIST(FTL_ACTIONLIST s) => new()
+            {
+                Name = s.Name,
+                Idx = s.Idx,
+                Act = s.Act,
+                Sfx = s.Sfx,
+            };
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -190,12 +186,11 @@ namespace GameX.Arkane.Formats.Danae
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)] string Name;
             public int NumSelected;
             public int Trash; //Selected;
-            public static implicit operator E_SELECTIONS(FTL_SELECTIONS s)
-                => new E_SELECTIONS
-                {
-                    Name = s.Name,
-                    NumSelected = s.NumSelected,
-                };
+            public static implicit operator E_SELECTIONS(FTL_SELECTIONS s) => new()
+            {
+                Name = s.Name,
+                NumSelected = s.NumSelected,
+            };
         }
 
         #endregion
@@ -344,11 +339,11 @@ namespace GameX.Arkane.Formats.Danae
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Fts(r));
 
-        #region E Struct
+        #region Headers : Struct
 
         struct ANCHOR_DATA
         {
-            public static (string, int) Struct = ("<?", sizeof(ANCHOR_DATA));
+            public static (string, int) Struct = ("<3f2h?2f", sizeof(ANCHOR_DATA));
             public Vector3 Pos;
             public short NumLinked;
             public short Flags;
@@ -449,7 +444,7 @@ namespace GameX.Arkane.Formats.Danae
 
         #endregion
 
-        #region FTS Headers
+        #region Headers
 
         const float NON_PORTAL_VERSION = 0.136f;
         const float FTS_VERSION = 0.141f;
@@ -457,7 +452,7 @@ namespace GameX.Arkane.Formats.Danae
         [StructLayout(LayoutKind.Sequential)]
         struct FTS_HEADER
         {
-            public static (string, int) Struct = ("<256cifi3i", 256 + 24);
+            public static (string, int) Struct = ("<256sifi3i", 256 + 24);
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)] public string Path;
             public int Count;
             public float Version;
@@ -468,7 +463,7 @@ namespace GameX.Arkane.Formats.Danae
         [StructLayout(LayoutKind.Sequential)]
         struct FTS_HEADER2
         {
-            public static (string, int) Struct = ("<256c", 256);
+            public static (string, int) Struct = ("<256s", 256);
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)] public string Path;
         }
 
@@ -499,7 +494,7 @@ namespace GameX.Arkane.Formats.Danae
         [StructLayout(LayoutKind.Sequential)]
         struct FAST_EERIEPOLY
         {
-            public static (string, int) Struct = ("<?", sizeof(FAST_EERIEPOLY));
+            public static (string, int) Struct = ("<20fi20f?2h", sizeof(FAST_EERIEPOLY));
             public FAST_VERTEX V0; public FAST_VERTEX V1; public FAST_VERTEX V2; public FAST_VERTEX V3;
             public int TexPtr;
             public Vector3 Norm;
@@ -530,7 +525,7 @@ namespace GameX.Arkane.Formats.Danae
         [StructLayout(LayoutKind.Sequential)]
         struct FAST_TEXTURE_CONTAINER
         {
-            public static (string, int) Struct = ("<2i256c", 8 + 256);
+            public static (string, int) Struct = ("<2i256s", 8 + 256);
             public int TcPtr;
             public int TempPtr;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)] public string Fic;

@@ -47,29 +47,30 @@ class Binary_Dds(IHaveMetaInfo, ITexture):
     flags: TextureFlags = 0
 
     def __init__(self, r: Reader, readMagic: bool = True):
-        self.bytes, self.header, self.headerDXT10, self.format = DDS_HEADER.read(r, readMagic)
-        numMipMaps = max(1, self.header.dwMipMapCount)
+        self.header, self.headerDXT10, self.format, self.bytes = DDS_HEADER.read(r, readMagic)
+        width = self.header.dwWidth; height = self.header.dwHeight; mipMaps = max(1, self.header.dwMipMapCount)
         offset = 0
-        self.mips = [range(-1, 0)] * numMipMaps
-        for i in range(numMipMaps):
-            w = self.header.dwWidth >> i; h = self.header.dwHeight >> i
-            if w == 0 or h == 0: self.mips[i] = range(-1, 0); continue
-            size = int(((w + 3) / 4) * ((h + 3) / 4)) * self.format[1]
+        self.spans = [range(-1, 0)] * mipMaps
+        for i in range(mipMaps):
+            w = width >> i; h = height >> i
+            if w == 0 or h == 0: self.spans[i] = range(-1, 0); continue
+            size = int(((w + 3) / 4)) * int((h + 3) / 4) * self.format[1]
             remains = min(size, len(self.bytes) - offset)
-            self.mips[i] = range(offset, (offset + remains)) if remains > 0 else range(-1, 0)
+            # print(f'w: {w}, h: {h}, s: {size}, r: {remains}')
+            self.spans[i] = range(offset, (offset + remains)) if remains > 0 else range(-1, 0)
             offset += remains
-        self.width = self.header.dwWidth
-        self.height = self.header.dwHeight
-        self.mipMaps = self.header.dwMipMapCount
+        self.width = width
+        self.height = height
+        self.mipMaps = mipMaps
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
         match platform:
-            case Platform.Type.OpenGL: format = self.format[1]
-            case Platform.Type.Vulken: format = self.format[2]
-            case Platform.Type.Unity: format = self.format[3]
-            case Platform.Type.Unreal: format = self.format[4]
+            case Platform.Type.OpenGL: format = self.format[2]
+            case Platform.Type.Vulken: format = self.format[3]
+            case Platform.Type.Unity: format = self.format[4]
+            case Platform.Type.Unreal: format = self.format[5]
             case _: raise Exception('Unknown {platform}')
-        return self.bytes, format, self.mips
+        return self.bytes, format, self.spans
     def end(self): pass
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
@@ -106,14 +107,6 @@ class Binary_Fsb(IHaveMetaInfo):
 class Binary_Img(IHaveMetaInfo, ITexture):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Img(r, f)
-
-    # class Formats(Enum):
-    #     Bmp = 1
-    #     Gif = 2
-    #     Exif = 3
-    #     Jpg = 4
-    #     Png = 5
-    #     Tiff = 6
 
     data: dict[str, object] = None
     width: int = 0

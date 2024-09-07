@@ -431,7 +431,7 @@ class FamilyGame:
 
     # create createPakFileObj
     def createPakFileObj(self, fileSystem: IFileSystem, edition: Edition, value: object, tag: object = None) -> PakFile:
-        pakState = PakState(fileSystem, self, edition, value if value is isinstance(value, str) else None, tag)
+        pakState = PakState(fileSystem, self, edition, value if isinstance(value, str) else None, tag)
         match value:
             case s if isinstance(value, str): return self.createPakFileType(pakState) if self.isPakFile(s) else _throw(f'{self.id} missing {s}')
             case p, l if isinstance(value, tuple):

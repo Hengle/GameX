@@ -335,8 +335,7 @@ namespace GameX
     /// </summary>
     internal class StandardFileSystem(string root) : IFileSystem
     {
-        readonly string Root = root;
-        readonly int Skip = root.Length + 1;
+        readonly string Root = root; readonly int Skip = root.Length + 1;
 
         public IEnumerable<string> Glob(string path, string searchPattern)
         {

@@ -123,6 +123,7 @@ class BinaryPakFile(PakFile):
 
     def getReader(self, path: str = None, retainInPool: int = 10) -> Reader:
         path = path or self.pakPath
+        if not path: raise Exception('No Path')
         if not self.fileSystem.fileExists(path): return None
         return self.fileSystem.openReader(path)
     

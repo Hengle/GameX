@@ -229,8 +229,9 @@ namespace GameX.Arkane.Formats.Danae
     //}
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct TLVERTEX
+    public unsafe struct TLVERTEX
     {
+        public static (string, int) Struct = ("4f2I3f", sizeof(TLVERTEX));
         public Vector3 S;           // Screen coordinates
         public float Rhw;           // Reciprocal of homogeneous w
         public uint Color;          // Vertex color

@@ -68,59 +68,58 @@ namespace GameX.Platforms
             0.9f, 0.2f, 0.8f, 1f,
         ]);
 
-        public override int CreateTexture(int reuse, ITexture source, Range? level = null)
+        public override int CreateTexture(int reuse, ITexture source, Range? level2 = null)
         {
-            var id = reuse != default ? reuse : GL.GenTexture();
+            var id = reuse != 0 ? reuse : GL.GenTexture();
             var numMipMaps = Math.Max(1, source.MipMaps);
-            var levelStart = level?.Start.Value ?? 0;
-            var levelEnd = numMipMaps - 1;
+            (int start, int stop) level = (level2?.Start.Value ?? 0, numMipMaps - 1);
 
             // bind
             GL.BindTexture(TextureTarget.Texture2D, id);
-            if (levelStart > 0) GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, levelStart);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, levelEnd - levelStart);
+            if (level.start > 0) GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, level.start);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, level.stop - level.start);
             var (bytes, fmt, spans) = source.Begin((int)Platform.Type.OpenGL);
             if (bytes == null) return DefaultTexture;
 
             // decode
-            bool CompressedTexImage2D(ITexture source, int i, InternalFormat internalFormat)
+            bool CompressedTexImage2D(ITexture source, (int start, int stop) level, InternalFormat internalFormat)
             {
-                var span = spans != null ? spans[i] : Range.All;
-                if (span.Start.Value < 0) return false;
-                var width = source.Width >> i;
-                var height = source.Height >> i;
-                var pixels = bytes.AsSpan(span);
-                fixed (byte* data = pixels) GL.CompressedTexImage2D(TextureTarget.Texture2D, i, internalFormat, width, height, 0, pixels.Length, (IntPtr)data);
+                int width = source.Width, height = source.Height;
+                for (var l = level.start; l <= level.stop; l++)
+                {
+                    var span = spans[l];
+                    if (span.Start.Value < 0) return false;
+                    var pixels = bytes.AsSpan(span);
+                    fixed (byte* data = pixels) GL.CompressedTexImage2D(TextureTarget.Texture2D, l, internalFormat, width >> l, height >> l, 0, pixels.Length, (IntPtr)data);
+                }
                 return true;
             }
-            bool TexImage2D(ITexture source, int i, PixelInternalFormat internalFormat, PixelFormat format, PixelType type)
+            bool TexImage2D(ITexture source, (int start, int stop) level, PixelInternalFormat internalFormat, PixelFormat format, PixelType type)
             {
-                var span = spans != null ? spans[i] : Range.All;
-                if (span.Start.Value < 0) return false;
-                var width = source.Width >> i;
-                var height = source.Height >> i;
-                var pixels = bytes.AsSpan(span);
-                fixed (byte* data = pixels) GL.TexImage2D(TextureTarget.Texture2D, i, internalFormat, width, height, 0, format, type, (IntPtr)data);
+                int width = source.Width, height = source.Height;
+                for (var l = level.start; l < level.stop; l++)
+                {
+                    var span = spans[l];
+                    if (span.Start.Value < 0) return false;
+                    var pixels = bytes.AsSpan(span);
+                    fixed (byte* data = pixels) GL.TexImage2D(TextureTarget.Texture2D, l, internalFormat, width >> l, height >> l, 0, format, type, (IntPtr)data);
+                }
                 return true;
             }
             if (fmt is TextureGLFormat glFormat)
             {
+                var internalFormat = glFormat;
                 //if (glFormat == TextureGLFormat.CompressedRgbaS3tcDxt3Ext)
                 //{
                 //    glFormat = TextureGLFormat.CompressedRgbaS3tcDxt5Ext;
                 //    DxtUtil2.ConvertDxt3ToDtx5(bytes, info.Width, info.Height, info.MipMaps);
                 //}
-                var internalFormat = (InternalFormat)glFormat;
-                if (internalFormat == 0) { Console.Error.WriteLine("Unsupported texture, using default"); return DefaultTexture; }
-                for (var i = levelStart; i <= levelEnd; i++) { if (!CompressedTexImage2D(source, i, internalFormat)) return DefaultTexture; }
+                if (internalFormat == 0 || !CompressedTexImage2D(source, level, (InternalFormat)internalFormat)) return DefaultTexture;
             }
             else if (fmt is ValueTuple<TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType> glPixelFormat)
             {
-                var internalFormat = (PixelInternalFormat)glPixelFormat.Item1;
-                if (internalFormat == 0) { Console.Error.WriteLine("Unsupported texture, using default"); return DefaultTexture; }
-                var format = (PixelFormat)glPixelFormat.Item2;
-                var type = (PixelType)glPixelFormat.Item3;
-                for (var i = levelStart; i < numMipMaps; i++) { if (!TexImage2D(source, i, internalFormat, format, type)) return DefaultTexture; }
+                var (internalFormat, format, type) = glPixelFormat;
+                if (internalFormat == 0 || !TexImage2D(source, level, (PixelInternalFormat)internalFormat, (PixelFormat)format, (PixelType)type)) return DefaultTexture;
             }
             else throw new NotImplementedException();
             source.End();

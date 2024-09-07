@@ -95,8 +95,7 @@ namespace GameX.Arkane.Formats
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct V_File
         {
-            //public static string Map = "B8B4B4B4B4B2";
-            public static (string, int) Struct = (">QIIIIH", sizeof(V_File));
+            public static (string, int) Struct = (">Q4IH", sizeof(V_File));
             public ulong Offset;
             public uint FileSize;
             public uint PackedSize;

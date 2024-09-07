@@ -40,30 +40,34 @@ namespace GameX.Formats
         public Binary_Dds(BinaryReader r, bool readMagic = true)
         {
             (Header, HeaderDXT10, Format, Bytes) = DDS_HEADER.Read(r, readMagic);
-            var numMipMaps = Math.Max(1, Header.dwMipMapCount);
+            var mipMaps = Math.Max(1, (int)Header.dwMipMapCount);
             var offset = 0;
-            Mips = new Range[numMipMaps];
-            for (var i = 0; i < numMipMaps; i++)
+            Spans = new Range[mipMaps];
+            int width = (int)Header.dwWidth, height = (int)Header.dwHeight;
+            for (var i = 0; i < mipMaps; i++)
             {
-                int w = (int)Header.dwWidth >> i, h = (int)Header.dwHeight >> i;
-                if (w == 0 || h == 0) { Mips[i] = -1..; continue; }
+                int w = width >> i, h = height >> i;
+                if (w == 0 || h == 0) { Spans[i] = -1..; continue; }
                 var size = ((w + 3) / 4) * ((h + 3) / 4) * Format.blockSize;
                 var remains = Math.Min(size, Bytes.Length - offset);
-                Mips[i] = remains > 0 ? offset..(offset + remains) : -1..;
+                Spans[i] = remains > 0 ? offset..(offset + remains) : -1..;
                 offset += remains;
             }
+            Width = width;
+            Height = height;
+            MipMaps = mipMaps;
         }
 
         readonly DDS_HEADER Header;
         readonly DDS_HEADER_DXT10? HeaderDXT10;
         readonly (object type, int blockSize, object gl, object vulken, object unity, object unreal) Format;
         readonly byte[] Bytes;
-        readonly Range[] Mips;
+        readonly Range[] Spans;
 
-        public int Width => (int)Header.dwWidth;
-        public int Height => (int)Header.dwHeight;
+        public int Width { get; }
+        public int Height { get; }
         public int Depth => 0;
-        public int MipMaps => (int)Header.dwMipMapCount;
+        public int MipMaps { get; }
         public TextureFlags Flags => 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
@@ -75,7 +79,7 @@ namespace GameX.Formats
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, Mips);
+            }, Spans);
         public void End() { }
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [

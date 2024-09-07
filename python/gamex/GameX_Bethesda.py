@@ -3,8 +3,7 @@ from typing import Callable
 from gamex import Family, FamilyGame
 from gamex.pak import BinaryPakFile
 from .Base.binary import Binary_Dds
-from .Bethesda.pakbinary_bsa import PakBinary_Bsa
-from .Bethesda.pakbinary_ba2 import PakBinary_Ba2
+from .Bethesda.pakbinary import PakBinary_Ba2, PakBinary_Bsa, PakBinary_Esm
 from .util import _pathExtension
 
 # typedefs
@@ -13,15 +12,25 @@ class PakState: pass
 class FileSource: pass
 class FileOption: pass
 
+#region BethesdaFamily
+
 # BethesdaFamily
 class BethesdaFamily(Family):
     def __init__(self, elem: dict[str, object]):
         super().__init__(elem)
 
+#endregion
+
+#region BethesdaGame
+
 # BethesdaGame
 class BethesdaGame(FamilyGame):
     def __init__(self, family: Family, id: str, elem: dict[str, object], dgame: FamilyGame):
         super().__init__(family, id, elem, dgame)
+
+#endregion
+
+#region BethesdaPakFile
 
 # BethesdaPakFile
 class BethesdaPakFile(BinaryPakFile):
@@ -36,6 +45,7 @@ class BethesdaPakFile(BinaryPakFile):
             case '': return PakBinary_Bsa()
             case '.bsa': return PakBinary_Bsa()
             case '.ba2': return PakBinary_Ba2()
+            case '.esm': return PakBinary_Esm()
             case _: raise Exception(f'Unknown: {extension}')
 
     # @staticmethod
@@ -48,3 +58,5 @@ class BethesdaPakFile(BinaryPakFile):
             # case '.nif': return (0, NiFactory)
             case _: return (0, None)
     #endregion
+
+#endregion
