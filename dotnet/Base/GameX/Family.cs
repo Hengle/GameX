@@ -1079,14 +1079,6 @@ namespace GameX
         /// </summary>
         public Uri[] Paks { get; set; }
         /// <summary>
-        /// Gets or sets the dat exts.
-        /// </summary>
-        public string[] DatExts { get; set; }
-        /// <summary>
-        /// Gets or sets the dats.
-        /// </summary>
-        public Uri[] Dats { get; set; }
-        /// <summary>
         /// Gets or sets the Paths.
         /// </summary>
         public string[] Paths { get; set; }
@@ -1160,7 +1152,6 @@ namespace GameX
             Date = _value(elem, "date", z => DateTime.Parse(z.GetString()));
             //Option = _value(elem, "option", z => Enum.TryParse<GameOption>(z.GetString(), true, out var zT) ? zT : throw new ArgumentOutOfRangeException("option", $"Unknown option: {z}"), dgame.Option);
             Paks = _list(elem, "pak", x => new Uri(x), dgame.Paks);
-            Dats = _list(elem, "dat", x => new Uri(x), dgame.Dats);
             Paths = _list(elem, "path", dgame.Paths);
             Key = _method(elem, "key", CreateKey, dgame.Key);
             //Status = _value(elem, "status");
@@ -1170,7 +1161,6 @@ namespace GameX
             SearchBy = _value(elem, "searchBy", z => Enum.TryParse<SearchBy>(z.GetString(), true, out var zS) ? zS : throw new ArgumentOutOfRangeException("searchBy", $"Unknown option: {z}"), dgame.SearchBy);
             PakFileType = _value(elem, "pakFileType", z => Type.GetType(z.GetString(), false) ?? throw new ArgumentOutOfRangeException("pakFileType", $"Unknown type: {z}"), dgame.PakFileType);
             PakExts = _list(elem, "pakExt", dgame.PakExts);
-            DatExts = _list(elem, "datExt", dgame.DatExts);
             // related
             Editions = _related(elem, "editions", (k, v) => new Edition(k, v));
             Dlcs = _related(elem, "dlcs", (k, v) => new DownloadableContent(k, v));
@@ -1201,11 +1191,6 @@ namespace GameX
         /// Converts the Paks to Application Paks.
         /// </summary>
         public IList<Uri> ToPaks(string edition) => Paks.Select(x => new Uri($"{x}#{Id}{(string.IsNullOrEmpty(edition) ? "" : $".{edition}")}")).ToList();
-
-        /// <summary>
-        /// Converts the Paks to Application Dats.
-        /// </summary>
-        public IList<Uri> ToDats(string edition) => Dats.Select(x => new Uri($"{x}#{Id}{(string.IsNullOrEmpty(edition) ? "" : $".{edition}")}")).ToList();
 
         /// <summary>
         /// Gets a family sample

@@ -20,10 +20,16 @@
       "name": "The Elder Scrolls III: Morrowind",
       "url": "https://store.steampowered.com/app/22320",
       "date": "2002-04-29",
-      "pakExt": ".bsa",
-      "datExt": ".esm",
-      "pak": "game:/Morrowind.bsa",
-      "dat": "game:/Morrowind.esm"
+      "pakExt": [
+        ".bsa",
+        ".esm"
+      ],
+      "pak": "game:/Morrowind.esm",
+      "paky": "game:/Morrowind.bsa",
+      "pakx": [
+        "game:/Morrowind.bsa",
+        "game:/Morrowind.esm"
+      ]
     },
     "IHRA": {
       "n/a": true,

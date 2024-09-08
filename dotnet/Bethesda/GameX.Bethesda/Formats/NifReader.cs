@@ -1,10 +1,8 @@
 ﻿using GameX.Meta;
-using GameX.Formats;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using System.Text;
 using static OpenStack.Debug;
 
 namespace GameX.Bethesda.Formats

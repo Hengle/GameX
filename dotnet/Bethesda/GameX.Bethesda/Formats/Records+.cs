@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using static GameX.Bethesda.Formats.Records.FormType;
 using static OpenStack.Debug;
 using static System.IO.Polyfill;
 
@@ -18,416 +19,208 @@ namespace GameX.Bethesda.Formats.Records
         MODLGroup MODL { get; }
     }
 
-    public class FieldHeader(BinaryReader r, FormFormat format)
+    public class Header
     {
-        public override string ToString() => Type.ToString();
+        [Flags]
+        public enum HeaderFlags : uint
+        {
+            EsmFile = 0x00000001,               // ESM file. (TES4.HEDR record only.)
+            Deleted = 0x00000020,               // Deleted
+            R00 = 0x00000040,                   // Constant / (REFR) Hidden From Local Map (Needs Confirmation: Related to shields)
+            R01 = 0x00000100,                   // Must Update Anims / (REFR) Inaccessible
+            R02 = 0x00000200,                   // (REFR) Hidden from local map / (ACHR) Starts dead / (REFR) MotionBlurCastsShadows
+            R03 = 0x00000400,                   // Quest item / Persistent reference / (LSCR) Displays in Main Menu
+            InitiallyDisabled = 0x00000800,     // Initially disabled
+            Ignored = 0x00001000,               // Ignored
+            VisibleWhenDistant = 0x00008000,    // Visible when distant
+            R04 = 0x00010000,                   // (ACTI) Random Animation Start
+            R05 = 0x00020000,                   // (ACTI) Dangerous / Off limits (Interior cell) Dangerous Can't be set withough Ignore Object Interaction
+            Compressed = 0x00040000,            // Data is compressed
+            CantWait = 0x00080000,              // Can't wait
+                                                // tes5
+            R06 = 0x00100000,                   // (ACTI) Ignore Object Interaction Ignore Object Interaction Sets Dangerous Automatically
+            IsMarker = 0x00800000,              // Is Marker
+            R07 = 0x02000000,                   // (ACTI) Obstacle / (REFR) No AI Acquire
+            NavMesh01 = 0x04000000,             // NavMesh Gen - Filter
+            NavMesh02 = 0x08000000,             // NavMesh Gen - Bounding Box
+            R08 = 0x10000000,                   // (FURN) Must Exit to Talk / (REFR) Reflected By Auto Water
+            R09 = 0x20000000,                   // (FURN/IDLM) Child Can Use / (REFR) Don't Havok Settle
+            R10 = 0x40000000,                   // NavMesh Gen - Ground / (REFR) NoRespawn
+            R11 = 0x80000000,                   // (REFR) MultiBound
+        }
+
+        public enum HeaderGroupType : int
+        {
+            Top = 0,                    // Label: Record type
+            WorldChildren,              // Label: Parent (WRLD)
+            InteriorCellBlock,          // Label: Block number
+            InteriorCellSubBlock,       // Label: Sub-block number
+            ExteriorCellBlock,          // Label: Grid Y, X (Note the reverse order)
+            ExteriorCellSubBlock,       // Label: Grid Y, X (Note the reverse order)
+            CellChildren,               // Label: Parent (CELL)
+            TopicChildren,              // Label: Parent (DIAL)
+            CellPersistentChilden,      // Label: Parent (CELL)
+            CellTemporaryChildren,      // Label: Parent (CELL)
+            CellVisibleDistantChildren, // Label: Parent (CELL)
+        }
+
+        public override string ToString() => $"{Type}:{GroupType}";
+        public Header Parent;
+        public FormType Type; // 4 bytes
+        public uint DataSize;
+        public HeaderFlags Flags;
+        public bool Compressed => (Flags & HeaderFlags.Compressed) != 0;
+        public uint FormId;
+        public long Position;
+        // group
+        public FormType Label;
+        public HeaderGroupType GroupType;
+
+        public Header() { }
+        public Header(BinaryReader r, FormType format, Header parent)
+        {
+            Parent = parent;
+            Type = (FormType)r.ReadUInt32();
+            if (Type == GRUP)
+            {
+                DataSize = (uint)(r.ReadUInt32() - (format == TES4 ? 20 : 24));
+                Label = (FormType)r.ReadUInt32();
+                GroupType = (HeaderGroupType)r.ReadInt32();
+                r.ReadUInt32(); // stamp | stamp + uknown
+                if (format != TES4) r.ReadUInt32(); // version + uknown
+                Position = r.Tell();
+                return;
+            }
+            DataSize = r.ReadUInt32();
+            if (format == TES3) r.ReadUInt32(); // Unknown
+            Flags = (HeaderFlags)r.ReadUInt32(); if (format == TES3) { Position = r.Tell(); return; }
+            // tes4
+            FormId = r.ReadUInt32();
+            r.ReadUInt32(); if (format == TES4) { Position = r.Tell(); return; }
+            // tes5
+            r.ReadUInt32();
+            Position = r.Tell();
+        }
+
+        static readonly Dictionary<FormType, (Func<Record> f, Func<int, bool> l)> CreateMap = new()
+        {
+            { TES3, (() => new TES3Record(), x => true) },
+            { TES4, (() => new TES4Record(), x => true) },
+            // 0                                 
+            { LTEX, (() => new LTEXRecord(), x => x > 0) },
+            { STAT, (() => new STATRecord(), x => x > 0) },
+            { CELL, (() => new CELLRecord(), x => x > 0) },
+            { LAND, (() => new LANDRecord(), x => x > 0) },
+            // 1                                 
+            { DOOR, (() => new DOORRecord(), x => x > 1) },
+            { MISC, (() => new MISCRecord(), x => x > 1) },
+            { WEAP, (() => new WEAPRecord(), x => x > 1) },
+            { CONT, (() => new CONTRecord(), x => x > 1) },
+            { LIGH, (() => new LIGHRecord(), x => x > 1) },
+            { ARMO, (() => new ARMORecord(), x => x > 1) },
+            { CLOT, (() => new CLOTRecord(), x => x > 1) },
+            { REPA, (() => new REPARecord(), x => x > 1) },
+            { ACTI, (() => new ACTIRecord(), x => x > 1) },
+            { APPA, (() => new APPARecord(), x => x > 1) },
+            { LOCK, (() => new LOCKRecord(), x => x > 1) },
+            { PROB, (() => new PROBRecord(), x => x > 1) },
+            { INGR, (() => new INGRRecord(), x => x > 1) },
+            { BOOK, (() => new BOOKRecord(), x => x > 1) },
+            { ALCH, (() => new ALCHRecord(), x => x > 1) },
+            { CREA, (() => new CREARecord(), x => x > 1 && true) },
+            { NPC_, (() => new NPC_Record(), x => x > 1 && true) },
+            // 2                                 
+            { GMST, (() => new GMSTRecord(), x => x > 2) },
+            { GLOB, (() => new GLOBRecord(), x => x > 2) },
+            { SOUN, (() => new SOUNRecord(), x => x > 2) },
+            { REGN, (() => new REGNRecord(), x => x > 2) },
+            // 3                                 
+            { CLAS, (() => new CLASRecord(), x => x > 3) },
+            { SPEL, (() => new SPELRecord(), x => x > 3) },
+            { BODY, (() => new BODYRecord(), x => x > 3) },
+            { PGRD, (() => new PGRDRecord(), x => x > 3) },
+            { INFO, (() => new INFORecord(), x => x > 3) },
+            { DIAL, (() => new DIALRecord(), x => x > 3) },
+            { SNDG, (() => new SNDGRecord(), x => x > 3) },
+            { ENCH, (() => new ENCHRecord(), x => x > 3) },
+            { SCPT, (() => new SCPTRecord(), x => x > 3) },
+            { SKIL, (() => new SKILRecord(), x => x > 3) },
+            { RACE, (() => new RACERecord(), x => x > 3) },
+            { MGEF, (() => new MGEFRecord(), x => x > 3) },
+            { LEVI, (() => new LEVIRecord(), x => x > 3) },
+            { LEVC, (() => new LEVCRecord(), x => x > 3) },
+            { BSGN, (() => new BSGNRecord(), x => x > 3) },
+            { FACT, (() => new FACTRecord(), x => x > 3) },
+            { SSCR, (() => new SSCRRecord(), x => x > 3) },
+            // 4 - Oblivion                      
+            { WRLD, (() => new WRLDRecord(), x => x > 0) },
+            { ACRE, (() => new ACRERecord(), x => x > 1) },
+            { ACHR, (() => new ACHRRecord(), x => x > 1) },
+            { REFR, (() => new REFRRecord(), x => x > 1) },
+            //                                   
+            { AMMO, (() => new AMMORecord(), x => x > 4) },
+            { ANIO, (() => new ANIORecord(), x => x > 4) },
+            { CLMT, (() => new CLMTRecord(), x => x > 4) },
+            { CSTY, (() => new CSTYRecord(), x => x > 4) },
+            { EFSH, (() => new EFSHRecord(), x => x > 4) },
+            { EYES, (() => new EYESRecord(), x => x > 4) },
+            { FLOR, (() => new FLORRecord(), x => x > 4) },
+            { FURN, (() => new FURNRecord(), x => x > 4) },
+            { GRAS, (() => new GRASRecord(), x => x > 4) },
+            { HAIR, (() => new HAIRRecord(), x => x > 4) },
+            { IDLE, (() => new IDLERecord(), x => x > 4) },
+            { KEYM, (() => new KEYMRecord(), x => x > 4) },
+            { LSCR, (() => new LSCRRecord(), x => x > 4) },
+            { LVLC, (() => new LVLCRecord(), x => x > 4) },
+            { LVLI, (() => new LVLIRecord(), x => x > 4) },
+            { LVSP, (() => new LVSPRecord(), x => x > 4) },
+            { PACK, (() => new PACKRecord(), x => x > 4) },
+            { QUST, (() => new QUSTRecord(), x => x > 4) },
+            { ROAD, (() => new ROADRecord(), x => x > 4) },
+            { SBSP, (() => new SBSPRecord(), x => x > 4) },
+            { SGST, (() => new SGSTRecord(), x => x > 4) },
+            { SLGM, (() => new SLGMRecord(), x => x > 4) },
+            { TREE, (() => new TREERecord(), x => x > 4) },
+            { WATR, (() => new WATRRecord(), x => x > 4) },
+            { WTHR, (() => new WTHRRecord(), x => x > 4) },
+            // 5 - Skyrim                        
+            { AACT, (() => new AACTRecord(), x => x > 5) },
+            { ADDN, (() => new ADDNRecord(), x => x > 5) },
+            { ARMA, (() => new ARMARecord(), x => x > 5) },
+            { ARTO, (() => new ARTORecord(), x => x > 5) },
+            { ASPC, (() => new ASPCRecord(), x => x > 5) },
+            { ASTP, (() => new ASTPRecord(), x => x > 5) },
+            { AVIF, (() => new AVIFRecord(), x => x > 5) },
+            { DLBR, (() => new DLBRRecord(), x => x > 5) },
+            { DLVW, (() => new DLVWRecord(), x => x > 5) },
+            { SNDR, (() => new SNDRRecord(), x => x > 5) },
+        };
+
+        public Record CreateRecord(long position, int recordLevel)
+        {
+            if (!CreateMap.TryGetValue(Type, out var recordType)) { Log($"Unsupported ESM record type: {Type}"); return null; }
+            if (!recordType.l(recordLevel)) return null;
+            var record = recordType.f();
+            record.Header = this;
+            return record;
+        }
+    }
+
+    public class FieldHeader(BinaryReader r, FormType format)
+    {
+        public override string ToString() => $"{Type}";
         public FieldType Type = (FieldType)r.ReadUInt32();
-        public int DataSize = (int)(format == FormFormat.TES3 ? r.ReadUInt32() : r.ReadUInt16());
+        public int DataSize = (int)(format == TES3 ? r.ReadUInt32() : r.ReadUInt16());
     }
 
-    public enum FormFormat { TES3 = 3, TES4, TES5, TES6 }
+    #endregion
 
-    public enum FormType : uint
-    {
-        NONE = 0x454E4F4E,
-        TES3 = 0x33534554,
-        TES4 = 0x34534554,
-        GRUP = 0x50555247,
-        GMST = 0x54534D47,
-        KYWD = 0x4457594B,
-        LCRT = 0x5452434C,
-        AACT = 0x54434141,
-        TRNS = 0x534E5254,
-        CMPO = 0x4F504D43,
-        TXST = 0x54535854,
-        MICN = 0x4E43494D,
-        GLOB = 0x424F4C47,
-        DMGT = 0x54474D44,
-        CLAS = 0x53414C43,
-        FACT = 0x54434146,
-        HDPT = 0x54504448,
-        EYES = 0x53455945,
-        RACE = 0x45434152,
-        SOUN = 0x4E554F53,
-        ASPC = 0x43505341,
-        SKIL = 0x4C494B53,
-        MGEF = 0x4645474D,
-        SCPT = 0x54504353,
-        LTEX = 0x5845544C,
-        ENCH = 0x48434E45,
-        SPEL = 0x4C455053,
-        SCRL = 0x4C524353,
-        ACTI = 0x49544341,
-        TACT = 0x54434154,
-        ARMO = 0x4F4D5241,
-        BOOK = 0x4B4F4F42,
-        CONT = 0x544E4F43,
-        DOOR = 0x524F4F44,
-        INGR = 0x52474E49,
-        LIGH = 0x4847494C,
-        MISC = 0x4353494D,
-        STAT = 0x54415453,
-        SCOL = 0x4C4F4353,
-        MSTT = 0x5454534D,
-        GRAS = 0x53415247,
-        TREE = 0x45455254,
-        FLOR = 0x524F4C46,
-        FURN = 0x4E525546,
-        WEAP = 0x50414557,
-        AMMO = 0x4F4D4D41,
-        NPC_ = 0x5F43504E,
-        LVLN = 0x4E4C564C,
-        KEYM = 0x4D59454B,
-        ALCH = 0x48434C41,
-        IDLM = 0x4D4C4449,
-        NOTE = 0x45544F4E,
-        PROJ = 0x4A4F5250,
-        HAZD = 0x445A4148,
-        BNDS = 0x53444E42,
-        SLGM = 0x4D474C53,
-        TERM = 0x4D524554,
-        LVLI = 0x494C564C,
-        WTHR = 0x52485457,
-        CLMT = 0x544D4C43,
-        SPGD = 0x44475053,
-        RFCT = 0x54434652,
-        REGN = 0x4E474552,
-        NAVI = 0x4956414E,
-        CELL = 0x4C4C4543,
-        REFR = 0x52464552,
-        ACHR = 0x52484341,
-        PMIS = 0x53494D50,
-        PARW = 0x57524150,
-        PGRE = 0x45524750,
-        PBEA = 0x41454250,
-        PFLA = 0x414C4650,
-        PCON = 0x4E4F4350,
-        PBAR = 0x52414250,
-        PHZD = 0x445A4850,
-        WRLD = 0x444C5257,
-        LAND = 0x444E414C,
-        NAVM = 0x4D56414E,
-        TLOD = 0x444F4C54,
-        DIAL = 0x4C414944,
-        INFO = 0x4F464E49,
-        QUST = 0x54535551,
-        IDLE = 0x454C4449,
-        PACK = 0x4B434150,
-        CSTY = 0x59545343,
-        LSCR = 0x5243534C,
-        LVSP = 0x5053564C,
-        ANIO = 0x4F494E41,
-        WATR = 0x52544157,
-        EFSH = 0x48534645,
-        TOFT = 0x54464F54,
-        EXPL = 0x4C505845,
-        DEBR = 0x52424544,
-        IMGS = 0x53474D49,
-        IMAD = 0x44414D49,
-        FLST = 0x54534C46,
-        PERK = 0x4B524550,
-        BPTD = 0x44545042,
-        ADDN = 0x4E444441,
-        AVIF = 0x46495641,
-        CAMS = 0x534D4143,
-        CPTH = 0x48545043,
-        VTYP = 0x50595456,
-        MATT = 0x5454414D,
-        IPCT = 0x54435049,
-        IPDS = 0x53445049,
-        ARMA = 0x414D5241,
-        ECZN = 0x4E5A4345,
-        LCTN = 0x4E54434C,
-        MESG = 0x4753454D,
-        RGDL = 0x4C444752,
-        DOBJ = 0x4A424F44,
-        DFOB = 0x424F4644,
-        LGTM = 0x4D54474C,
-        MUSC = 0x4353554D,
-        FSTP = 0x50545346,
-        FSTS = 0x53545346,
-        SMBN = 0x4E424D53,
-        SMQN = 0x4E514D53,
-        SMEN = 0x4E454D53,
-        DLBR = 0x52424C44,
-        MUST = 0x5453554D,
-        DLVW = 0x57564C44,
-        WOOP = 0x504F4F57,
-        SHOU = 0x554F4853,
-        EQUP = 0x50555145,
-        RELA = 0x414C4552,
-        SCEN = 0x4E454353,
-        ASTP = 0x50545341,
-        OTFT = 0x5446544F,
-        ARTO = 0x4F545241,
-        MATO = 0x4F54414D,
-        MOVT = 0x54564F4D,
-        SNDR = 0x52444E53,
-        DUAL = 0x4C415544,
-        SNCT = 0x54434E53,
-        SOPM = 0x4D504F53,
-        COLL = 0x4C4C4F43,
-        CLFM = 0x4D464C43,
-        REVB = 0x42564552,
-        PKIN = 0x4E494B50,
-        RFGP = 0x50474652,
-        AMDL = 0x4C444D41,
-        LAYR = 0x5259414C,
-        COBJ = 0x4A424F43,
-        OMOD = 0x444F4D4F,
-        MSWP = 0x5057534D,
-        ZOOM = 0x4D4F4F5A,
-        INNR = 0x524E4E49,
-        KSSM = 0x4D53534B,
-        AECH = 0x48434541,
-        SCCO = 0x4F434353,
-        AORU = 0x55524F41,
-        SCSN = 0x4E534353,
-        STAG = 0x47415453,
-        NOCM = 0x4D434F4E,
-        LENS = 0x534E454C,
-        LSPR = 0x5250534C,
-        GDRY = 0x59524447,
-        OVIS = 0x5349564F,
-        //
-        CLOT = 0x00000001,
-        REPA = 0x00000002,
-        LOCK = 0x00000003,
-        PROB = 0x00000004,
-        CREA = 0x00000005,
-        BODY = 0x00000006,
-        PGRD = 0x00000007,
-        SNDG = 0x00000008,
-        LEVI = 0x00000009,
-        LEVC = 0x0000000A,
-        BSGN = 0x0000000B,
-        SSCR = 0x0000000C,
-        ACRE = 0x0000000D,
-        HAIR = 0x0000000E,
-        LVLC = 0x0000000F,
-        ROAD = 0x00000010,
-        SBSP = 0x00000021,
-        SGST = 0x00000032,
-        APPA = 0x00000033,
-    }
-
-    public enum FieldType : uint
-    {
-        XXXX = 0x00000001,
-        OFST = 0x00000002,
-        EDID = 0x00000003,
-        CNAM = 0x00000004,
-        FULL = 0x00000005,
-        NAME = 0x00000006,
-        DATA = 0x00000007,
-        XOWN = 0x00000008,
-        XRNK = 0x00000009,
-        XGLB = 0x00000010,
-        XESP = 0x00000011,
-        XSCL = 0x00000012,
-        XRGD = 0x00000013,
-        MODL = 0x00000014,
-        MODB = 0x00000015,
-        MODT = 0x00000016,
-        ICON = 0x00000017,
-        LVLD = 0x00000018,
-        LVLF = 0x00000019,
-        SCRI = 0x00000020,
-        TNAM = 0x00000021,
-        LVLO = 0x00000022,
-        PGRP = 0x00000023,
-        PGRR = 0x00000024,
-        DNAM = 0x00000025,
-        EFID = 0x00000026,
-        EFIT = 0x00000027,
-        SCIT = 0x00000028,
-        XPCI = 0x00000029,
-        XLOD = 0x00000030,
-        XMRC = 0x00000031,
-        XHRS = 0x00000032,
-        ENAM = 0x00000033,
-        ANAM = 0x00000034,
-        FNAM = 0x00000035,
-        GNAM = 0x00000036,
-        WLST = 0x00000037,
-        ICO2 = 0x00000038,
-        PFIG = 0x00000039,
-        PFPC = 0x00000040,
-        MNAM = 0x00000041,
-        CTDA = 0x00000042,
-        CTDT = 0x00000043,
-        DESC = 0x00000044,
-        LNAM = 0x00000045,
-        PKDT = 0x00000046,
-        PLDT = 0x00000047,
-        PSDT = 0x00000048,
-        PTDT = 0x00000049,
-        INDX = 0x00000050,
-        QSDT = 0x00000051,
-        QSTA = 0x00000052,
-        SCHR = 0x00000053,
-        SCDA = 0x00000054,
-        SCTX = 0x00000055,
-        SCRO = 0x00000056,
-        XTEL = 0x00000057,
-        XLOC = 0x00000058,
-        XTRG = 0x00000059,
-        XSED = 0x00000060,
-        XCHG = 0x00000061,
-        XHLT = 0x00000062,
-        XLCM = 0x00000063,
-        XRTM = 0x00000064,
-        XACT = 0x00000065,
-        XCNT = 0x00000066,
-        XMRK = 0x00000067,
-        ONAM = 0x00000068,
-        XSOL = 0x00000069,
-        SOUL = 0x00000060,
-        SLCP = 0x00000071,
-        HEDR = 0x00000072,
-        DELE = 0x00000073,
-        SNAM = 0x00000074,
-        MAST = 0x00000075,
-        INTV = 0x00000076,
-        INCC = 0x00000078,
-        BNAM = 0x00000079,
-        WNAM = 0x00000070,
-        NAM2 = 0x00000081,
-        NAM0 = 0x00000082,
-        NAM9 = 0x00000083,
-        RNAM = 0x00000084,
-        CSTD = 0x00000085,
-        CSAD = 0x00000086,
-        HNAM = 0x00000087,
-        BYDT = 0x00000088,
-        NNAM = 0x00000089,
-        INAM = 0x00000090,
-        PBDT = 0x00000091,
-        ITEX = 0x00000092,
-        RIDT = 0x00000093,
-        SPLO = 0x00000094,
-        NPCS = 0x00000095,
-        MEDT = 0x00000096,
-        PTEX = 0x00000097,
-        CVFX = 0x00000098,
-        BVFX = 0x00000099,
-        HVFX = 0x000000A0,
-        AVFX = 0x000000A1,
-        CSND = 0x000000A2,
-        BSND = 0x000000A3,
-        HSND = 0x000000A4,
-        ASND = 0x000000A5,
-        ESCE = 0x000000A6,
-        PGRC = 0x000000A7,
-        PGAG = 0x000000A8,
-        PGRL = 0x000000A9,
-        PGRI = 0x000000B0,
-        SCHD = 0x000000B1,
-        SCVR = 0x000000B2,
-        SCDT = 0x000000B3,
-        SLSD = 0x000000B4,
-        SCRV = 0x000000B5,
-        ALDT = 0x000000B6,
-        TEXT = 0x000000B7,
-        ENIT = 0x000000B8,
-        AADT = 0x000000B9,
-        AODT = 0x000000C1,
-        BMDT = 0x000000C2,
-        MOD2 = 0x000000C3,
-        MO2B = 0x000000C4,
-        MO2T = 0x000000C5,
-        MOD3 = 0x000000C6,
-        MO3B = 0x000000C7,
-        MO3T = 0x000000C8,
-        MOD4 = 0x000000C9,
-        MO4B = 0x000000D0,
-        MO4T = 0x000000D1,
-        BKDT = 0x000000D2,
-        FRMR = 0x000000D3,
-        RGNN = 0x000000D4,
-        XCLC = 0x000000D5,
-        XCLL = 0x000000D6,
-        XCLW = 0x000000D7,
-        CLDT = 0x000000D8,
-        AMBI = 0x000000D9,
-        WHGT = 0x000000E0,
-        NAM5 = 0x000000E1,
-        XCLR = 0x000000E2,
-        XCMT = 0x000000E3,
-        XCCM = 0x000000E4,
-        XCWT = 0x000000E5,
-        DODT = 0x000000E6,
-        FLTV = 0x000000E7,
-        KNAM = 0x000000E8,
-        UNAM = 0x000000E9,
-        CNDT = 0x000000F0,
-        FLAG = 0x000000F1,
-        CNTO = 0x000000F2,
-        NPCO = 0x000000F3,
-        QNAM = 0x000000F4,
-        NPDT = 0x000000F5,
-        AIDT = 0x000000F6,
-        AI_W = 0x000000F7,
-        AI_T = 0x000000F8,
-        AI_F = 0x000000F9,
-        AI_E = 0x00000100,
-        AI_A = 0x00000101,
-        QSTI = 0x00000102,
-        QSTR = 0x00000103,
-        ENDT = 0x00000104,
-        FADT = 0x00000105,
-        XNAM = 0x00000106,
-        STRV = 0x00000107,
-        PNAM = 0x00000108,
-        QSTN = 0x00000109,
-        QSTF = 0x00000110,
-        TPIC = 0x00000111,
-        TRDT = 0x00000112,
-        NAM1 = 0x00000113,
-        TCLT = 0x00000114,
-        TCLF = 0x00000115,
-        IRDT = 0x00000116,
-        VNML = 0x00000117,
-        VHGT = 0x00000118,
-        VCLR = 0x00000119,
-        VTEX = 0x00000120,
-        BTXT = 0x00000121,
-        ATXT = 0x00000122,
-        VTXT = 0x00000123,
-        LHDT = 0x00000124,
-        SCPT = 0x00000125,
-        LKDT = 0x00000126,
-        MCDT = 0x00000127,
-        VNAM = 0x00000128,
-        ATTR = 0x00000129,
-        FGGS = 0x00000130,
-        FGGA = 0x00000131,
-        FGTS = 0x00000132,
-        WEAT = 0x00000133,
-        RCLR = 0x00000134,
-        RPLI = 0x00000135,
-        RPLD = 0x00000136,
-        RDAT = 0x00000137,
-        RDOT = 0x00000138,
-        RDMP = 0x00000139,
-        RDGS = 0x00000140,
-        RDMD = 0x00000141,
-        RDSD = 0x00000142,
-        RDWT = 0x00000143,
-        SKDT = 0x00000144,
-        JNAM = 0x00000145,
-        SNDX = 0x00000146,
-        SNDD = 0x00000147,
-        SPIT = 0x00000148,
-        SPDT = 0x00000149,
-        WPDT = 0x00000150,
-        RADT = 0x000001510,
-    }
+    #region Base : Record
 
     public class Record : IRecord
     {
         public static readonly Record Empty = new();
-        public override string ToString() => $"XXXX: {EDID.Value}";
+        public override string ToString() => $"{GetType().Name[..4]}: {EDID.Value}";
         internal Header Header;
         public uint Id => Header.FormId;
         public STRVField EDID;  // Editor ID
@@ -436,9 +229,9 @@ namespace GameX.Bethesda.Formats.Records
         /// Return an uninitialized subrecord to deserialize, or null to skip.
         /// </summary>
         /// <returns>Return an uninitialized subrecord to deserialize, or null to skip.</returns>
-        public virtual object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => Empty;
+        public virtual object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => Empty;
 
-        public void Read(BinaryReader r, string filePath, FormFormat format)
+        public void Read(BinaryReader r, string filePath, FormType format)
         {
             long startPosition = r.Tell(), endPosition = startPosition + Header.DataSize;
             while (r.BaseStream.Position < endPosition)
@@ -450,7 +243,7 @@ namespace GameX.Bethesda.Formats.Records
                     fieldHeader.DataSize = (int)r.ReadUInt32();
                     continue;
                 }
-                else if (fieldHeader.Type == FieldType.OFST && Header.Type == FormType.WRLD) { r.Seek(endPosition); continue; }
+                else if (fieldHeader.Type == FieldType.OFST && Header.Type == WRLD) { r.Seek(endPosition); continue; }
                 var position = r.BaseStream.Position;
                 if (CreateField(r, format, fieldHeader.Type, fieldHeader.DataSize) == Empty) { Log($"Unsupported ESM record type: {Header.Type}:{fieldHeader.Type}"); r.Skip(fieldHeader.DataSize); continue; }
                 // check full read
@@ -458,6 +251,174 @@ namespace GameX.Bethesda.Formats.Records
             }
             // check full read
             if (r.Tell() != endPosition) throw new FormatException($"Failed reading {Header.Type} record data at offset {startPosition} in {filePath}");
+        }
+    }
+
+    #endregion
+
+    #region Base : RecordGroup
+
+    public partial class RecordGroup(GenericPoolAction<BinaryReader> poolAction, string filePath, FormType format, int recordLevel)
+    {
+        public FormType Label => Headers.First.Value.Label;
+        public override string ToString() => Headers.First.Value.ToString();
+        public LinkedList<Header> Headers = [];
+        public List<Record> Records = [];
+        public List<RecordGroup> Groups;
+        public Dictionary<uint, RecordGroup[]> GroupsByLabel;
+        readonly GenericPoolAction<BinaryReader> poolAction = poolAction;
+        readonly string filePath = filePath;
+        readonly FormType format = format;
+        readonly int recordLevel = recordLevel;
+        int headerSkip;
+
+        public void AddHeader(Header header, bool load = true)
+        {
+            //Console.WriteLine($"Read: {header.Label}");
+            Headers.AddLast(header);
+            if (load && header.Label != 0 && header.GroupType == Header.HeaderGroupType.Top)
+                switch (header.Label)
+                {
+                    case CELL: case WRLD: Load(); break; // "DIAL"
+                }
+        }
+
+        public List<Record> Load(bool loadAll = false)
+        {
+            if (headerSkip == Headers.Count) return Records;
+            lock (Records)
+            {
+                if (headerSkip == Headers.Count) return Records;
+                poolAction?.Invoke(r =>
+                {
+                    foreach (var header in Headers.Skip(headerSkip)) ReadGroup(r, header, loadAll);
+                });
+                headerSkip = Headers.Count;
+                return Records;
+            }
+        }
+
+        static int cellsLoaded = 0;
+        void ReadGroup(BinaryReader r, Header header, bool loadAll)
+        {
+            r.Seek(header.Position);
+            var endPosition = header.Position + header.DataSize;
+            while (r.BaseStream.Position < endPosition)
+            {
+                var recordHeader = new Header(r, format, header);
+                if (recordHeader.Type == GRUP)
+                {
+                    var group = ReadGRUP(r, header, recordHeader);
+                    if (loadAll) group.Load(loadAll);
+                    continue;
+                }
+                // HACK to limit cells loading
+                if (recordHeader.Type == CELL && cellsLoaded > int.MaxValue) { r.Skip(recordHeader.DataSize); continue; }
+                var record = recordHeader.CreateRecord(r.BaseStream.Position, recordLevel);
+                if (record == null) { r.Skip(recordHeader.DataSize); continue; }
+                ReadRecord(r, record, recordHeader.Compressed);
+                Records.Add(record);
+                if (recordHeader.Type == CELL) cellsLoaded++;
+            }
+            GroupsByLabel = Groups?.GroupBy(x => (uint)x.Label).ToDictionary(x => x.Key, x => x.ToArray());
+        }
+
+        RecordGroup ReadGRUP(BinaryReader r, Header header, Header recordHeader)
+        {
+            var nextPosition = r.Tell() + recordHeader.DataSize;
+            Groups ??= [];
+            var group = new RecordGroup(poolAction, filePath, format, recordLevel);
+            group.AddHeader(recordHeader);
+            Groups.Add(group);
+            r.Seek(nextPosition);
+            // print header path
+            var headerPath = string.Join("/", [.. GetHeaderPath([], header)]);
+            Console.WriteLine($"Grup: {headerPath} {header.GroupType}");
+            return group;
+        }
+
+        static List<string> GetHeaderPath(List<string> b, Header header)
+        {
+            if (header.Parent != null) GetHeaderPath(b, header.Parent);
+            //b.Add(header.GroupType != Header.HeaderGroupType.Top ? BitConverter.ToString(header.Label).Replace("-", string.Empty) : Encoding.ASCII.GetString(header.Label));
+            return b;
+        }
+
+        void ReadRecord(BinaryReader r, Record record, bool compressed)
+        {
+            //Console.WriteLine($"Recd: {record.Header.Type}");
+            if (!compressed) { record.Read(r, filePath, format); return; }
+            var newDataSize = r.ReadUInt32();
+            var newData = r.DecompressZlib2((int)record.Header.DataSize - 4, (int)newDataSize);
+            // read record
+            record.Header.Position = 0;
+            record.Header.DataSize = newDataSize;
+            using var r2 = new BinaryReader(new MemoryStream(newData)); record.Read(r2, filePath, format);
+        }
+    }
+
+    // RecordGroup+WrldAndCell
+    partial class RecordGroup
+    {
+        internal HashSet<uint> _ensureCELLsByLabel;
+        internal Dictionary<Int3, CELLRecord> CELLsById;
+        internal Dictionary<Int3, LANDRecord> LANDsById;
+
+        public RecordGroup[] EnsureWrldAndCell(Int3 cellId)
+        {
+            var cellBlockX = (short)(cellId.X >> 5);
+            var cellBlockY = (short)(cellId.Y >> 5);
+            var cellBlockIdx = new byte[4];
+            Buffer.BlockCopy(BitConverter.GetBytes(cellBlockY), 0, cellBlockIdx, 0, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(cellBlockX), 0, cellBlockIdx, 2, 2);
+            Load();
+            var cellBlockId = BitConverter.ToUInt32(cellBlockIdx);
+            if (GroupsByLabel.TryGetValue(cellBlockId, out var cellBlocks))
+                return cellBlocks.Select(x => x.EnsureCell(cellId)).ToArray();
+            return null;
+        }
+
+        //= nxn[nbits] + 4x4[2bits] + 8x8[3bit]
+        public RecordGroup EnsureCell(Int3 cellId)
+        {
+            _ensureCELLsByLabel ??= new HashSet<uint>();
+            var cellBlockX = (short)(cellId.X >> 5);
+            var cellBlockY = (short)(cellId.Y >> 5);
+            var cellSubBlockX = (short)(cellId.X >> 3);
+            var cellSubBlockY = (short)(cellId.Y >> 3);
+            var cellSubBlockIdx = new byte[4];
+            Buffer.BlockCopy(BitConverter.GetBytes(cellSubBlockY), 0, cellSubBlockIdx, 0, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(cellSubBlockX), 0, cellSubBlockIdx, 2, 2);
+            var cellSubBlockId = BitConverter.ToUInt32(cellSubBlockIdx);
+            if (_ensureCELLsByLabel.Contains(cellSubBlockId)) return this;
+            Load();
+            CELLsById ??= [];
+            LANDsById ??= cellId.Z >= 0 ? [] : null;
+            if (GroupsByLabel.TryGetValue(cellSubBlockId, out var cellSubBlocks))
+            {
+                // find cell
+                var cellSubBlock = cellSubBlocks.Single();
+                cellSubBlock.Load(true);
+                foreach (var cell in cellSubBlock.Records.Cast<CELLRecord>())
+                {
+                    cell.GridId = new Int3(cell.XCLC.Value.GridX, cell.XCLC.Value.GridY, !cell.IsInterior ? cellId.Z : -1);
+                    CELLsById.Add(cell.GridId, cell);
+                    // find children
+                    if (cellSubBlock.GroupsByLabel.TryGetValue(cell.Id, out var cellChildren))
+                    {
+                        var cellChild = cellChildren.Single();
+                        var cellTemporaryChildren = cellChild.Groups.Single(x => x.Headers.First().GroupType == Header.HeaderGroupType.CellTemporaryChildren);
+                        foreach (var land in cellTemporaryChildren.Records.Cast<LANDRecord>())
+                        {
+                            land.GridId = new Int3(cell.XCLC.Value.GridX, cell.XCLC.Value.GridY, !cell.IsInterior ? cellId.Z : -1);
+                            LANDsById.Add(land.GridId, land);
+                        }
+                    }
+                }
+                _ensureCELLsByLabel.Add(cellSubBlockId);
+                return this;
+            }
+            return null;
         }
     }
 
@@ -569,9 +530,9 @@ namespace GameX.Bethesda.Formats.Records
         public override readonly string ToString() => $"{Item}";
         public uint ItemCount; // Number of the item
         public FormId<Record> Item; // The ID of the item
-        public CNTOField(BinaryReader r, int dataSize, FormFormat format)
+        public CNTOField(BinaryReader r, int dataSize, FormType format)
         {
-            if (format == FormFormat.TES3)
+            if (format == TES3)
             {
                 ItemCount = r.ReadUInt32();
                 Item = new FormId<Record>(r.ReadZString(32));
@@ -592,7 +553,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public CREFField CNAM; // RGB color
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(size: dataSize),
@@ -608,7 +569,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public CREFField CNAM; // RGB color
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
@@ -622,7 +583,7 @@ namespace GameX.Bethesda.Formats.Records
 
     public class ARMARecord : Record
     {
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             _ => false,
@@ -637,7 +598,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public CREFField CNAM; // RGB color
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
@@ -653,7 +614,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public CREFField CNAM; // RGB color
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
@@ -669,7 +630,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public CREFField CNAM; // RGB color
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
@@ -685,7 +646,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public CREFField CNAM; // RGB color
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
@@ -701,7 +662,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public CREFField CNAM; // RGB color
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
@@ -717,7 +678,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public CREFField CNAM; // RGB color
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
@@ -733,7 +694,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public CREFField CNAM; // RGB color
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
@@ -754,7 +715,7 @@ namespace GameX.Bethesda.Formats.Records
         public FLTVField XSCL; // Scale (optional)
         public BYTVField? XRGD; // Ragdoll Data (optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.NAME => NAME = new FMIDField<Record>(r, dataSize),
@@ -780,7 +741,7 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField ICON;
         public BYTEField DATA; // Playable, Not Male, Not Female, Fixed
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
@@ -810,7 +771,7 @@ namespace GameX.Bethesda.Formats.Records
         public DATAField DATA; // Type of soul contained in the gem
         public FILEField ICON; // Icon (optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -836,7 +797,7 @@ namespace GameX.Bethesda.Formats.Records
         public FMIDField<CREARecord> TNAM; // Creature Template (optional)
         public List<LVLIRecord.LVLOField> LVLOs = [];
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.LVLD => LVLD = r.ReadSAndVerify<BYTEField>(dataSize),
@@ -879,7 +840,7 @@ namespace GameX.Bethesda.Formats.Records
         public BYTEField? DATA; // Data (optional)
         public List<LVLOField> LVLOs = [];
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.LVLD => LVLD = r.ReadSAndVerify<BYTEField>(dataSize),
@@ -900,7 +861,7 @@ namespace GameX.Bethesda.Formats.Records
         public BYTEField LVLF; // Flags
         public List<LVLIRecord.LVLOField> LVLOs = []; // Number of items in list
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.LVLD => LVLD = r.ReadSAndVerify<BYTEField>(dataSize),
@@ -919,7 +880,7 @@ namespace GameX.Bethesda.Formats.Records
         public PGRDRecord.PGRPField[] PGRPs;
         public UNKNField PGRR;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.PGRP => PGRPs = [.. Enumerable.Range(0, dataSize >> 4).Select(x => new PGRDRecord.PGRPField(r, dataSize))],
             FieldType.PGRR => PGRR = r.ReadUNKN(dataSize),
@@ -942,7 +903,7 @@ namespace GameX.Bethesda.Formats.Records
 
         public DNAMField DNAM;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.DNAM => DNAM = new DNAMField(r, dataSize),
@@ -971,7 +932,7 @@ namespace GameX.Bethesda.Formats.Records
         public List<ENCHRecord.EFITField> EFITs = []; // Effect Data
         public List<ENCHRecord.SCITField> SCITs = []; // Script Effect Data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -1004,7 +965,7 @@ namespace GameX.Bethesda.Formats.Records
         public FLTVField? XSCL; // Scale (optional)
         public BYTVField? XRGD; // Ragdoll Data (optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.NAME => NAME = new FMIDField<Record>(r, dataSize),
@@ -1043,7 +1004,7 @@ namespace GameX.Bethesda.Formats.Records
         public IN16Field? ANAM; // Enchantment points (optional)
         public DATAField DATA; // Ammo Data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -1067,7 +1028,7 @@ namespace GameX.Bethesda.Formats.Records
         public MODLGroup MODL { get; set; } // Model
         public FMIDField<IDLERecord> DATA; // IDLE animation
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -1105,7 +1066,7 @@ namespace GameX.Bethesda.Formats.Records
         public List<WLSTField> WLSTs = []; // Climate
         public TNAMField TNAM; // Timing
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -1242,7 +1203,7 @@ namespace GameX.Bethesda.Formats.Records
         public CSTDField CSTD; // Standard
         public CSADField CSAD; // Advanced
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.CSTD => CSTD = new CSTDField(r, dataSize),
@@ -1384,7 +1345,7 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField ICO2; // Particle Shader Texture
         public DATAField DATA; // Data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.ICON => ICON = r.ReadFILE(dataSize),
@@ -1404,7 +1365,7 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField ICON;
         public BYTEField DATA; // Playable
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
@@ -1426,7 +1387,7 @@ namespace GameX.Bethesda.Formats.Records
         public FMIDField<INGRRecord> PFIG; // The ingredient the plant produces (optional)
         public BYTVField PFPC; // Spring, Summer, Fall, Winter Ingredient Production (byte)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -1451,7 +1412,7 @@ namespace GameX.Bethesda.Formats.Records
         public FMIDField<SCPTRecord> SCRI; // Script (optional)
         public IN32Field MNAM; // Active marker flags, required. A bit field with a bit value of 1 indicating that the matching marker position in the NIF file is active.
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -1512,7 +1473,7 @@ namespace GameX.Bethesda.Formats.Records
         public MODLGroup MODL;
         public DATAField DATA;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -1534,7 +1495,7 @@ namespace GameX.Bethesda.Formats.Records
         public BYTEField ANAM;
         public FMIDField<IDLERecord>[] DATAs;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -1564,7 +1525,7 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField DESC; // Description
         public List<LNAMField> LNAMs; // LoadForm
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.ICON => ICON = r.ReadFILE(dataSize),
@@ -1622,7 +1583,7 @@ namespace GameX.Bethesda.Formats.Records
         public PTDTField PTDT; // Target
         public List<SCPTRecord.CTDAField> CTDAs = []; // Conditions
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.PKDT => PKDT = new PKDTField(r, dataSize),
@@ -1655,7 +1616,7 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField SCTX; // Script Source
         public List<FMIDField<Record>> SCROs = []; // Global variable reference
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
@@ -1769,7 +1730,7 @@ namespace GameX.Bethesda.Formats.Records
         public BYTEField? XSOL; // Contained Soul (optional)
         int _nextFull;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.NAME => NAME = new FMIDField<Record>(r, dataSize),
@@ -1822,7 +1783,7 @@ namespace GameX.Bethesda.Formats.Records
         public BYTEField SOUL; // Type of soul contained in the gem
         public BYTEField SLCP; // Soul gem maximum capacity
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -1863,7 +1824,7 @@ namespace GameX.Bethesda.Formats.Records
         // TES5
         public UNKNField? TNAM; // overrides (Optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.HEDR => HEDR = r.ReadSAndVerify<HEDRField>(dataSize),
             FieldType.OFST => r.Skip(dataSize),
@@ -1923,7 +1884,7 @@ namespace GameX.Bethesda.Formats.Records
         public CNAMField CNAM; // Tree Parameters
         public BNAMField BNAM; // Billboard Dimensions
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -2029,7 +1990,7 @@ namespace GameX.Bethesda.Formats.Records
         public DATAField DATA; // DATA
         public GNAMField GNAM; // GNAM
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.TNAM => TNAM = r.ReadSTRV(dataSize),
@@ -2104,7 +2065,7 @@ namespace GameX.Bethesda.Formats.Records
         // TES5
         public List<RNAMField> RNAMs = []; // Large References
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
@@ -2205,7 +2166,7 @@ namespace GameX.Bethesda.Formats.Records
         public DATAField DATA; // Weather Data
         public List<SNAMField> SNAMs = []; // Sounds
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -2239,7 +2200,7 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField FNAM; // Body name
         public BYDTField BYDT;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -2264,7 +2225,7 @@ namespace GameX.Bethesda.Formats.Records
         public List<IN16Field> INTVs = []; // PC level for previous CNAM
         // The CNAM/INTV can occur many times in pairs
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -2291,7 +2252,7 @@ namespace GameX.Bethesda.Formats.Records
         public List<IN16Field> INTVs = []; // PC level for previous INAM
         // The CNAM/INTV can occur many times in pairs
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -2325,7 +2286,7 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField ICON; // Inventory Icon
         public FMIDField<SCPTRecord> SCRI; // Script Name
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -2359,7 +2320,7 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField ICON; // Inventory Icon
         public FMIDField<SCPTRecord> SCRI; // Script Name
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -2395,7 +2356,7 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField SNAM; // Sound ID
         public STRVField? CNAM; // Creature name (optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -2415,7 +2376,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public STRVField DATA; // Digits
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -2444,7 +2405,7 @@ namespace GameX.Bethesda.Formats.Records
         public List<STRVField> MASTs;
         public List<INTVField> DATAs;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.HEDR => HEDR = new HEDRField(r, dataSize),
             FieldType.MAST => (MASTs ??= []).AddX(r.ReadSTRV(dataSize)),
@@ -2465,7 +2426,7 @@ namespace GameX.Bethesda.Formats.Records
         public List<STRVField> NPCSs = []; // TES3: Spell/ability
         public List<FMIDField<Record>> SPLOs = []; // TES4: (points to a SPEL or LVSP record)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL or FieldType.FNAM => FULL = r.ReadSTRV(dataSize),
@@ -2614,7 +2575,7 @@ namespace GameX.Bethesda.Formats.Records
         public DATAField DATA;
         public STRVField[] ESCEs;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.INDX => INDX = r.ReadINTV(dataSize),
@@ -2659,9 +2620,9 @@ namespace GameX.Bethesda.Formats.Records
             public short Granularity;
             public short PointCount;
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format != FormFormat.TES3)
+                if (format != FormType.TES3)
                 {
                     X = Y = Granularity = 0;
                     PointCount = r.ReadInt16();
@@ -2731,7 +2692,7 @@ namespace GameX.Bethesda.Formats.Records
         public List<PGRLField> PGRLs; // Point-to-Reference Mappings
         public PGRIField[] PGRIs; // Inter-Cell Connections
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.DATA => DATA = new DATAField(r, dataSize, format),
@@ -2774,9 +2735,9 @@ namespace GameX.Bethesda.Formats.Records
             public int Parameter1; // Parameter #1
             public int Parameter2; // Parameter #2
 
-            public CTDAField(BinaryReader r, int dataSize, FormFormat format)
+            public CTDAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Index = r.ReadByte();
                     Type = r.ReadByte();
@@ -2865,13 +2826,13 @@ namespace GameX.Bethesda.Formats.Records
         public List<SLSDField> SCRVs = []; // Ref variable data (one for each ref declared)
         public List<FMIDField<Record>> SCROs = []; // Global variable reference
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize)
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize)
         {
             return type switch
             {
                 FieldType.EDID => EDID = r.ReadSTRV(dataSize),
                 FieldType.SCHD => SCHD = new SCHDField(r, dataSize),
-                FieldType.SCVR => format != FormFormat.TES3 ? SLSDs.Last().SCVRField(r, dataSize) : SCHD.SCVRField(r, dataSize),
+                FieldType.SCVR => format != FormType.TES3 ? SLSDs.Last().SCVRField(r, dataSize) : SCHD.SCVRField(r, dataSize),
                 FieldType.SCDA or FieldType.SCDT => SCDA = r.ReadBYTV(dataSize),
                 FieldType.SCTX => SCTX = r.ReadSTRV(dataSize),
                 // TES4
@@ -2896,7 +2857,7 @@ namespace GameX.Bethesda.Formats.Records
                                            // TES4
         public FMIDField<SOUNRecord> SNAM; // Sound (Optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -2922,10 +2883,10 @@ namespace GameX.Bethesda.Formats.Records
             public int Value;
             public int Flags; //: AutoCalc
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
                 Weight = r.ReadSingle();
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Value = r.ReadInt32();
                     Flags = r.ReadInt32();
@@ -2963,7 +2924,7 @@ namespace GameX.Bethesda.Formats.Records
         public List<ENCHRecord.EFITField> EFITs = []; // Effect Data
         public List<ENCHRecord.SCITField> SCITs = []; // Script Effect Data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -2998,9 +2959,9 @@ namespace GameX.Bethesda.Formats.Records
             public float Weight;
             public int Value;
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Type = (byte)r.ReadInt32();
                     Quality = r.ReadSingle();
@@ -3021,7 +2982,7 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField ICON; // Inventory Icon
         public FMIDField<SCPTRecord> SCRI; // Script Name
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -3054,9 +3015,9 @@ namespace GameX.Bethesda.Formats.Records
             public int Type;
             public int EnchantPts;
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Type = r.ReadInt32();
                     Weight = r.ReadSingle();
@@ -3091,7 +3052,7 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField? ICO2; // Female icon (optional)
         public IN16Field? ANAM; // Enchantment points (optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -3136,9 +3097,9 @@ namespace GameX.Bethesda.Formats.Records
             //
             public int EnchantPts;
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Weight = r.ReadSingle();
                     Value = r.ReadInt32();
@@ -3165,7 +3126,7 @@ namespace GameX.Bethesda.Formats.Records
                                            // TES4
         public IN16Field? ANAM; // Enchantment points (optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -3205,7 +3166,7 @@ namespace GameX.Bethesda.Formats.Records
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct XCLCField
         {
-            public static (string, int) StructN = ("<2iI", -1);
+            public static (string, int) Struct = ("<2iI", 12);
             public int GridX;
             public int GridY;
             public uint Flags;
@@ -3215,12 +3176,12 @@ namespace GameX.Bethesda.Formats.Records
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct XCLLField
         {
-            public static (string, int) StructN = ("<12c2f2i3f", -1);
+            public static (string, int) Struct = ("<12c2f2i3f", -1);
             public ColorRef4 AmbientColor;
             public ColorRef4 DirectionalColor; //: SunlightColor
             public ColorRef4 FogColor;
             public float FogNear; //: FogDensity
-                                  // TES4
+            // TES4
             public float FogFar;
             public int DirectionalRotationXY;
             public int DirectionalRotationZ;
@@ -3298,7 +3259,7 @@ namespace GameX.Bethesda.Formats.Records
         public Int3 GridId; // => new Int3(XCLC.Value.GridX, XCLC.Value.GridY, !IsInterior ? 0 : -1);
         public GXColor? AmbientLight => XCLL != null ? (GXColor?)XCLL.Value.AmbientColor.AsColor32 : null;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize)
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize)
         {
             //Console.WriteLine($"   {type}");
             if (!InFRMR && type == FieldType.FRMR) InFRMR = true;
@@ -3307,8 +3268,8 @@ namespace GameX.Bethesda.Formats.Records
                 {
                     FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
                     FieldType.FULL or FieldType.RGNN => FULL = r.ReadSTRV(dataSize),
-                    FieldType.DATA => (DATA = r.ReadINTV(format == FormFormat.TES3 ? 4 : dataSize).AsUI16Field, format == FormFormat.TES3 ? XCLC = r.ReadSAndVerify<XCLCField>(format == FormFormat.TES3 ? 8 : dataSize) : null),
-                    FieldType.XCLC => XCLC = r.ReadSAndVerify<XCLCField>(format == FormFormat.TES3 ? 8 : dataSize),
+                    FieldType.DATA => (DATA = r.ReadINTV(format == TES3 ? 4 : dataSize).AsUI16Field, format == TES3 ? XCLC = r.ReadSAndVerify<XCLCField>(format == TES3 ? 8 : dataSize) : null),
+                    FieldType.XCLC => XCLC = r.ReadSAndVerify<XCLCField>(format == TES3 ? 8 : dataSize),
                     FieldType.XCLL or FieldType.AMBI => XCLL = r.ReadSAndVerify<XCLLField>(dataSize),
                     FieldType.XCLW or FieldType.WHGT => XCLW = r.ReadSAndVerify<FLTVField>(dataSize),
                     // TES3
@@ -3378,7 +3339,7 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField? ICON; // Icon (Optional)
         public DATAField DATA; // Data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -3415,9 +3376,9 @@ namespace GameX.Bethesda.Formats.Records
             public int Type;
             public short EnchantPts;
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Type = r.ReadInt32();
                     Weight = r.ReadSingle();
@@ -3456,7 +3417,7 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField? ICO2; // Female icon (optional)
         public IN16Field? ANAM; // Enchantment points (optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -3498,9 +3459,9 @@ namespace GameX.Bethesda.Formats.Records
             public byte Flags; // flags 0x0001 = Organic, 0x0002 = Respawns, organic only, 0x0008 = Default, unknown
             public float Weight;
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Weight = r.ReadSingle();
                     return;
@@ -3520,7 +3481,7 @@ namespace GameX.Bethesda.Formats.Records
         public FMIDField<SOUNRecord> SNAM; // Open sound
         public FMIDField<SOUNRecord> QNAM; // Close sound
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -3671,7 +3632,7 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField? CNAM;
         public List<STRVField> NPCSs = [];
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -3710,7 +3671,7 @@ namespace GameX.Bethesda.Formats.Records
         public List<FMIDField<QUSTRecord>> QSTIs; // Quests (optional)
         public List<INFORecord> INFOs = []; // Info Records
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => (LastRecord = this, EDID = r.ReadSTRV(dataSize)),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
@@ -3736,11 +3697,11 @@ namespace GameX.Bethesda.Formats.Records
         public BYTEField FNAM; // Flags
         public FMIDField<Record> TNAM; // Random teleport destination
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
-            FieldType.FNAM => format != FormFormat.TES3 ? FNAM = r.ReadT<BYTEField>(dataSize) : FULL = r.ReadSTRV(dataSize),
+            FieldType.FNAM => format != FormType.TES3 ? FNAM = r.ReadT<BYTEField>(dataSize) : FULL = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
             FieldType.MODB => MODL.MODBField(r, dataSize),
             FieldType.MODT => MODL.MODTField(r, dataSize),
@@ -3769,10 +3730,10 @@ namespace GameX.Bethesda.Formats.Records
             public int ChargeAmount; //: Charge
             public int Flags; //: AutoCalc
 
-            public ENITField(BinaryReader r, int dataSize, FormFormat format)
+            public ENITField(BinaryReader r, int dataSize, FormType format)
             {
                 Type = r.ReadInt32();
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     EnchantCost = r.ReadInt32();
                     ChargeAmount = r.ReadInt32();
@@ -3800,9 +3761,9 @@ namespace GameX.Bethesda.Formats.Records
             // TES4
             public int ActorValue;
 
-            public EFITField(BinaryReader r, int dataSize, FormFormat format)
+            public EFITField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     EffectId = r.ReadFString(2);
                     SkillId = r.ReadByte();
@@ -3850,7 +3811,7 @@ namespace GameX.Bethesda.Formats.Records
                                            // TES4
         public List<SCITField> SCITs = []; // Script effect data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => SCITs.Count == 0 ? FULL = r.ReadSTRV(dataSize) : SCITs.Last().FULLField(r, dataSize),
@@ -3885,12 +3846,12 @@ namespace GameX.Bethesda.Formats.Records
         }
 
         // TES4
-        public struct XNAMField(BinaryReader r, int dataSize, FormFormat format)
+        public struct XNAMField(BinaryReader r, int dataSize, FormType format)
         {
             public override string ToString() => $"{FormId}";
             public int FormId = r.ReadInt32();
             public int Mod = r.ReadInt32();
-            public int Combat = format > FormFormat.TES4 ? r.ReadInt32() : 0;
+            public int Combat = format > FormType.TES4 ? r.ReadInt32() : 0;
         }
 
         public STRVField FNAM; // Faction name
@@ -3903,7 +3864,7 @@ namespace GameX.Bethesda.Formats.Records
         public INTVField DATA; // Flags (byte, uint32)
         public UI32Field CNAM;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -3938,7 +3899,7 @@ namespace GameX.Bethesda.Formats.Records
         public BYTEField? FNAM; // Type of global (s, l, f)
         public FLTVField? FLTV; // Float data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.FNAM => FNAM = r.ReadT<BYTEField>(dataSize),
@@ -3955,7 +3916,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public DATVField DATA; // Data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -4058,7 +4019,7 @@ namespace GameX.Bethesda.Formats.Records
         public TES3Group TES3 = new();
         public TES4Group TES4 = new();
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.INAM => (DIALRecord.LastRecord?.INFOs.AddX(this), EDID = r.ReadSTRV(dataSize)),
@@ -4155,7 +4116,7 @@ namespace GameX.Bethesda.Formats.Records
         public List<ENCHRecord.EFITField> EFITs = []; // Effect Data
         public List<ENCHRecord.SCITField> SCITs = []; // Script effect data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -4212,9 +4173,9 @@ namespace GameX.Bethesda.Formats.Records
             public ushort[] TextureIndicesT3;
             public uint[] TextureIndicesT4;
 
-            public VTEXField(BinaryReader r, int dataSize, FormFormat format)
+            public VTEXField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     TextureIndicesT3 = r.ReadTArray<ushort>(dataSize, dataSize >> 1);
                     TextureIndicesT4 = null;
@@ -4291,7 +4252,7 @@ namespace GameX.Bethesda.Formats.Records
 
         public Int3 GridId; // => new Int3(INTV.CellX, INTV.CellY, 0);
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.DATA => DATA = r.ReadSAndVerify<IN32Field>(dataSize),
             FieldType.VNML => VNML = new VNMLField(r, dataSize),
@@ -4341,9 +4302,9 @@ namespace GameX.Bethesda.Formats.Records
             public float FalloffExponent;
             public float FOV;
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Weight = r.ReadSingle();
                     Value = r.ReadInt32();
@@ -4375,11 +4336,11 @@ namespace GameX.Bethesda.Formats.Records
         public FLTVField FNAM; // Fade Value
         public FMIDField<SOUNRecord> SNAM; // Sound FormId (optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
-            FieldType.FNAM => format != FormFormat.TES3 ? FNAM = r.ReadSAndVerify<FLTVField>(dataSize) : FULL = r.ReadSTRV(dataSize),
+            FieldType.FNAM => format != FormType.TES3 ? FNAM = r.ReadSAndVerify<FLTVField>(dataSize) : FULL = r.ReadSTRV(dataSize),
             FieldType.DATA or FieldType.LHDT => DATA = new DATAField(r, dataSize, format),
             FieldType.SCPT => SCPT = r.ReadSTRV(dataSize),
             FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
@@ -4412,7 +4373,7 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField ICON; // Inventory Icon
         public FMIDField<SCPTRecord> SCRI; // Script Name
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => format == FormFormat.TES3
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => format == FormType.TES3
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
@@ -4447,7 +4408,7 @@ namespace GameX.Bethesda.Formats.Records
         public BYTEField SNAM; // Texture specular exponent
         public List<FMIDField<GRASRecord>> GNAMs = []; // Potential grass
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.INTV => INTV = r.ReadINTV(dataSize),
@@ -4473,9 +4434,9 @@ namespace GameX.Bethesda.Formats.Records
             public uint Value;
             public uint Unknown;
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Weight = r.ReadSingle();
                     Value = r.ReadUInt32();
@@ -4496,7 +4457,7 @@ namespace GameX.Bethesda.Formats.Records
         // TES3
         public FMIDField<ENCHRecord> ENAM; // enchantment ID
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -4632,7 +4593,7 @@ namespace GameX.Bethesda.Formats.Records
         public FLTVField? XSCL; // Scale (optional) Only present if the scale is not 1.0
         public FMIDField<SCPTRecord>? SCRI; // Unknown
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL or FieldType.FNAM => FULL = r.ReadSTRV(dataSize),
@@ -4712,9 +4673,9 @@ namespace GameX.Bethesda.Formats.Records
                 public byte SkillId;
                 public sbyte Bonus;
 
-                public SkillBoost(BinaryReader r, int dataSize, FormFormat format)
+                public SkillBoost(BinaryReader r, int dataSize, FormType format)
                 {
-                    if (format == FormFormat.TES3)
+                    if (format == FormType.TES3)
                     {
                         SkillId = (byte)r.ReadInt32();
                         Bonus = (sbyte)r.ReadInt32();
@@ -4745,9 +4706,9 @@ namespace GameX.Bethesda.Formats.Records
             public RaceStats Female = new();
             public uint Flags; // 1 = Playable 2 = Beast Race
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     for (var i = 0; i < SkillBoosts.Length; i++) SkillBoosts[i] = new SkillBoost(r, 8, format);
                     Male.Strength = (byte)r.ReadInt32(); Female.Strength = (byte)r.ReadInt32();
@@ -4841,8 +4802,8 @@ namespace GameX.Bethesda.Formats.Records
         sbyte _nameState;
         sbyte _genderState;
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) =>
-            format == FormFormat.TES3 ? type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) =>
+            format == FormType.TES3 ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
                 FieldType.FNAM => FULL = r.ReadSTRV(dataSize),
@@ -4851,7 +4812,7 @@ namespace GameX.Bethesda.Formats.Records
                 FieldType.DESC => DESC = r.ReadSTRV(dataSize),
                 _ => Empty,
             }
-            : format == FormFormat.TES4 ? _nameState switch
+            : format == FormType.TES4 ? _nameState switch
             {
                 // preamble
                 0 => type switch
@@ -5003,9 +4964,9 @@ namespace GameX.Bethesda.Formats.Records
             public uint Flags;
             public uint Chance;
 
-            public RDSDField(BinaryReader r, int dataSize, FormFormat format)
+            public RDSDField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Sound = new FormId<SOUNRecord>(r.ReadZString(32));
                     Flags = 0;
@@ -5018,13 +4979,13 @@ namespace GameX.Bethesda.Formats.Records
             }
         }
 
-        public struct RDWTField(BinaryReader r, int dataSize, FormFormat format)
+        public struct RDWTField(BinaryReader r, int dataSize, FormType format)
         {
             public override readonly string ToString() => $"{Weather}";
-            public static byte SizeOf(FormFormat format) => format == FormFormat.TES4 ? (byte)8 : (byte)12;
+            public static byte SizeOf(FormType format) => format == FormType.TES4 ? (byte)8 : (byte)12;
             public FormId<WTHRRecord> Weather = new FormId<WTHRRecord>(r.ReadUInt32());
             public uint Chance = r.ReadUInt32();
-            public FormId<GLOBRecord> Global = format == FormFormat.TES5 ? new FormId<GLOBRecord>(r.ReadUInt32()) : new FormId<GLOBRecord>();
+            public FormId<GLOBRecord> Global = format == FormType.TES5 ? new FormId<GLOBRecord>(r.ReadUInt32()) : new FormId<GLOBRecord>();
         }
 
         // TES3
@@ -5078,7 +5039,7 @@ namespace GameX.Bethesda.Formats.Records
         // TES4
         public List<RPLIField> RPLIs = []; // Region Areas
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.WNAM or FieldType.FNAM => WNAM = new FMIDField<WRLDRecord>(r, dataSize),
@@ -5113,12 +5074,12 @@ namespace GameX.Bethesda.Formats.Records
             public uint Specialization; // 0 = Combat, 1 = Magic, 2 = Stealth
             public float[] UseValue; // The use types for each skill are hard-coded.
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                Action = format == FormFormat.TES3 ? 0 : r.ReadInt32();
+                Action = format == FormType.TES3 ? 0 : r.ReadInt32();
                 Attribute = r.ReadInt32();
                 Specialization = r.ReadUInt32();
-                UseValue = new float[format == FormFormat.TES3 ? 4 : 2];
+                UseValue = new float[format == FormType.TES3 ? 4 : 2];
                 for (var i = 0; i < UseValue.Length; i++) UseValue[i] = r.ReadSingle();
             }
         }
@@ -5134,7 +5095,7 @@ namespace GameX.Bethesda.Formats.Records
         public STRVField ENAM; // Expert Text
         public STRVField MNAM; // Master Text
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.INDX => INDX = r.ReadT<IN32Field>(dataSize),
@@ -5181,12 +5142,12 @@ namespace GameX.Bethesda.Formats.Records
             public byte StopTime; // Stop time
             public byte StartTime; // Start time
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                Volume = format == FormFormat.TES3 ? r.ReadByte() : (byte)0;
+                Volume = format == FormType.TES3 ? r.ReadByte() : (byte)0;
                 MinRange = r.ReadByte();
                 MaxRange = r.ReadByte();
-                if (format == FormFormat.TES3) return;
+                if (format == FormType.TES3) return;
                 FrequencyAdjustment = r.ReadSByte();
                 r.ReadByte(); // Unused
                 Flags = r.ReadUInt16();
@@ -5201,7 +5162,7 @@ namespace GameX.Bethesda.Formats.Records
         public FILEField FNAM; // Sound Filename (relative to Sounds\)
         public DATAField DATA; // Sound Data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.FNAM => FNAM = r.ReadFILE(dataSize),
@@ -5219,7 +5180,7 @@ namespace GameX.Bethesda.Formats.Records
     public class SPELRecord : Record
     {
         // TESX
-        public struct SPITField(BinaryReader r, int dataSize, FormFormat format)
+        public struct SPITField(BinaryReader r, int dataSize, FormType format)
         {
             public override readonly string ToString() => $"{Type}";
             // TES3: 0 = Spell, 1 = Ability, 2 = Blight, 3 = Disease, 4 = Curse, 5 = Power
@@ -5228,7 +5189,7 @@ namespace GameX.Bethesda.Formats.Records
             public int SpellCost = r.ReadInt32();
             public uint Flags = r.ReadUInt32(); // 0x0001 = AutoCalc, 0x0002 = PC Start, 0x0004 = Always Succeeds
             // TES4
-            public int SpellLevel = format != FormFormat.TES3 ? r.ReadInt32() : 0;
+            public int SpellLevel = format != FormType.TES3 ? r.ReadInt32() : 0;
         }
 
         public STRVField FULL; // Spell name
@@ -5237,7 +5198,7 @@ namespace GameX.Bethesda.Formats.Records
         // TES4
         public List<ENCHRecord.SCITField> SCITs = []; // Script effect data
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => SCITs.Count == 0 ? FULL = r.ReadSTRV(dataSize) : SCITs.Last().FULLField(r, dataSize),
@@ -5258,7 +5219,7 @@ namespace GameX.Bethesda.Formats.Records
     {
         public MODLGroup MODL { get; set; } // Model
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -5293,9 +5254,9 @@ namespace GameX.Bethesda.Formats.Records
             public byte ThrustMax;
             public int Flags; // 0 = ?, 1 = Ignore Normal Weapon Resistance?
 
-            public DATAField(BinaryReader r, int dataSize, FormFormat format)
+            public DATAField(BinaryReader r, int dataSize, FormType format)
             {
-                if (format == FormFormat.TES3)
+                if (format == FormType.TES3)
                 {
                     Weight = r.ReadSingle();
                     Value = r.ReadInt32();
@@ -5334,7 +5295,7 @@ namespace GameX.Bethesda.Formats.Records
                                            // TES4
         public IN16Field? ANAM; // Enchantment points (optional)
 
-        public override object CreateField(BinaryReader r, FormFormat format, FieldType type, int dataSize) => type switch
+        public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
@@ -5348,6 +5309,409 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.ANAM => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
             _ => Empty,
         };
+    }
+
+    #endregion
+
+    #region Enums
+
+    public enum FormType : uint
+    {
+        APPA = 0x41505041,
+        ARMA = 0x414D5241,
+        AACT = 0x54434141,
+        ASPC = 0x43505341,
+        ACTI = 0x49544341,
+        ARMO = 0x4F4D5241,
+        AMMO = 0x4F4D4D41,
+        ASTP = 0x50545341,
+        ARTO = 0x4F545241,
+        AMDL = 0x4C444D41,
+        AECH = 0x48434541,
+        ACRE = 0x45524341,
+        AORU = 0x55524F41,
+        ALCH = 0x48434C41,
+        ACHR = 0x52484341,
+        ANIO = 0x4F494E41,
+        AVIF = 0x46495641,
+        ADDN = 0x4E444441,
+        BOOK = 0x4B4F4F42,
+        BSGN = 0x4E475342,
+        BODY = 0x59444F42,
+        BNDS = 0x53444E42,
+        BPTD = 0x44545042,
+        CMPO = 0x4F504D43,
+        CLAS = 0x53414C43,
+        CSTY = 0x59545343,
+        CONT = 0x544E4F43,
+        CLMT = 0x544D4C43,
+        CELL = 0x4C4C4543,
+        CAMS = 0x534D4143,
+        CPTH = 0x48545043,
+        CREA = 0x41455243,
+        CLFM = 0x4D464C43,
+        COLL = 0x4C4C4F43,
+        CLOT = 0x544F4C43,
+        COBJ = 0x4A424F43,
+        DMGT = 0x54474D44,
+        DOOR = 0x524F4F44,
+        DOBJ = 0x4A424F44,
+        DFOB = 0x424F4644,
+        DUAL = 0x4C415544,
+        DLBR = 0x52424C44,
+        DEBR = 0x52424544,
+        DLVW = 0x57564C44,
+        DIAL = 0x4C414944,
+        EQUP = 0x50555145,
+        EYES = 0x53455945,
+        EFSH = 0x48534645,
+        ECZN = 0x4E5A4345,
+        EXPL = 0x4C505845,
+        ENCH = 0x48434E45,
+        FACT = 0x54434146,
+        FURN = 0x4E525546,
+        FLOR = 0x524F4C46,
+        FSTP = 0x50545346,
+        FSTS = 0x53545346,
+        FLST = 0x54534C46,
+        GRUP = 0x50555247,
+        GMST = 0x54534D47,
+        GLOB = 0x424F4C47,
+        GRAS = 0x53415247,
+        GDRY = 0x59524447,
+        HAZD = 0x445A4148,
+        HDPT = 0x54504448,
+        HAIR = 0x52494148,
+        INGR = 0x52474E49,
+        IDLM = 0x4D4C4449,
+        INFO = 0x4F464E49,
+        IDLE = 0x454C4449,
+        IPCT = 0x54435049,
+        IPDS = 0x53445049,
+        IMGS = 0x53474D49,
+        IMAD = 0x44414D49,
+        INNR = 0x524E4E49,
+        KYWD = 0x4457594B,
+        KEYM = 0x4D59454B,
+        KSSM = 0x4D53534B,
+        LIGH = 0x4847494C,
+        LCTN = 0x4E54434C,
+        LCRT = 0x5452434C,
+        LTEX = 0x5845544C,
+        LVLN = 0x4E4C564C,
+        LVLI = 0x494C564C,
+        LAND = 0x444E414C,
+        LSCR = 0x5243534C,
+        LVSP = 0x5053564C,
+        LGTM = 0x4D54474C,
+        LVLC = 0x434C564C,
+        LEVC = 0x4356454C,
+        LOCK = 0x4B434F4C,
+        LENS = 0x534E454C,
+        LSPR = 0x5250534C,
+        LEVI = 0x4956454C,
+        LAYR = 0x5259414C,
+        MATT = 0x5454414D,
+        MSTT = 0x5454534D,
+        MGEF = 0x4645474D,
+        MICN = 0x4E43494D,
+        MISC = 0x4353494D,
+        MESG = 0x4753454D,
+        MUSC = 0x4353554D,
+        MUST = 0x5453554D,
+        MOVT = 0x54564F4D,
+        MATO = 0x4F54414D,
+        MSWP = 0x5057534D,
+        NONE = 0x454E4F4E,
+        NPC_ = 0x5F43504E,
+        NOTE = 0x45544F4E,
+        NAVI = 0x4956414E,
+        NAVM = 0x4D56414E,
+        NOCM = 0x4D434F4E,
+        OTFT = 0x5446544F,
+        OMOD = 0x444F4D4F,
+        OVIS = 0x5349564F,
+        PROJ = 0x4A4F5250,
+        PMIS = 0x53494D50,
+        PARW = 0x57524150,
+        PGRE = 0x45524750,
+        PBEA = 0x41454250,
+        PFLA = 0x414C4650,
+        PCON = 0x4E4F4350,
+        PBAR = 0x52414250,
+        PHZD = 0x445A4850,
+        PACK = 0x4B434150,
+        PERK = 0x4B524550,
+        PKIN = 0x4E494B50,
+        PROB = 0x424F5250,
+        PGRD = 0x44524750,
+        QUST = 0x54535551,
+        RFCT = 0x54434652,
+        REGN = 0x4E474552,
+        RACE = 0x45434152,
+        REFR = 0x52464552,
+        RGDL = 0x4C444752,
+        REVB = 0x42564552,
+        ROAD = 0x44414F52,
+        REPA = 0x41504552,
+        RFGP = 0x50474652,
+        RELA = 0x414C4552,
+        SPGD = 0x44475053,
+        SLGM = 0x4D474C53,
+        STAT = 0x54415453,
+        SCOL = 0x4C4F4353,
+        SOUN = 0x4E554F53,
+        SKIL = 0x4C494B53,
+        SCPT = 0x54504353,
+        SPEL = 0x4C455053,
+        SCRL = 0x4C524353,
+        SMBN = 0x4E424D53,
+        SMQN = 0x4E514D53,
+        SMEN = 0x4E454D53,
+        SHOU = 0x554F4853,
+        SBSP = 0x50534253,
+        SNDR = 0x52444E53,
+        SNCT = 0x54434E53,
+        SOPM = 0x4D504F53,
+        SCCO = 0x4F434353,
+        SCSN = 0x4E534353,
+        STAG = 0x47415453,
+        SGST = 0x54534753,
+        SSCR = 0x52435353,
+        SCEN = 0x4E454353,
+        SNDG = 0x47444E53,
+        TOFT = 0x54464F54,
+        TERM = 0x4D524554,
+        TREE = 0x45455254,
+        TLOD = 0x444F4C54,
+        TES3 = 0x33534554,
+        TES4 = 0x34534554,
+        TES5 = 0x35534554,
+        TES6 = 0x36534554,
+        TRNS = 0x534E5254,
+        TXST = 0x54535854,
+        TACT = 0x54434154,
+        VTYP = 0x50595456,
+        WRLD = 0x444C5257,
+        WEAP = 0x50414557,
+        WTHR = 0x52485457,
+        WATR = 0x52544157,
+        WOOP = 0x504F4F57,
+        ZOOM = 0x4D4F4F5A,
+    }
+
+    // $"0x{BitConverter.ToUInt32(Encoding.ASCII.GetBytes("FULL")):X}"
+    public enum FieldType : uint
+    {
+        ANAM = 0x4D414E41,
+        AVFX = 0x58465641,
+        ASND = 0x444E5341,
+        AADT = 0x54444141,
+        AODT = 0x54444F41,
+        ALDT = 0x54444C41,
+        AMBI = 0x49424D41,
+        ATXT = 0x54585441,
+        ATTR = 0x52545441,
+        AIDT = 0x54444941,
+        AI_W = 0x575F4941,
+        AI_T = 0x545F4941,
+        AI_F = 0x465F4941,
+        AI_E = 0x455F4941,
+        AI_A = 0x415F4941,
+        BTXT = 0x54585442,
+        BVFX = 0x58465642,
+        BSND = 0x444E5342,
+        BMDT = 0x54444D42,
+        BKDT = 0x54444B42,
+        BNAM = 0x4D414E42,
+        BYDT = 0x54445942,
+        CSTD = 0x44545343,
+        CSAD = 0x44415343,
+        CNAM = 0x4D414E43,
+        CTDA = 0x41445443,
+        CTDT = 0x54445443,
+        CVFX = 0x58465643,
+        CSND = 0x444E5343,
+        CNDT = 0x54444E43,
+        CLDT = 0x54444C43,
+        CNTO = 0x4F544E43,
+        DATA = 0x41544144,
+        DNAM = 0x4D414E44,
+        DESC = 0x43534544,
+        DELE = 0x454C4544,
+        DODT = 0x54444F44,
+        ENDT = 0x54444E45,
+        ESCE = 0x45435345,
+        ENIT = 0x54494E45,
+        EFID = 0x44494645,
+        EFIT = 0x54494645,
+        EDID = 0x44494445,
+        ENAM = 0x4D414E45,
+        FADT = 0x54444146,
+        FGGS = 0x53474746,
+        FGGA = 0x41474746,
+        FGTS = 0x53544746,
+        FRMR = 0x524D5246,
+        FLAG = 0x47414C46,
+        FLTV = 0x56544C46,
+        FULL = 0x4C4C5546,
+        FNAM = 0x4D414E46,
+        GNAM = 0x4D414E47,
+        HEDR = 0x52444548,
+        HSND = 0x444E5348,
+        HVFX = 0x58465648,
+        HNAM = 0x4D414E48,
+        ICON = 0x4E4F4349,
+        ICO2 = 0x324F4349,
+        INDX = 0x58444E49,
+        INTV = 0x56544E49,
+        INCC = 0x43434E49,
+        INAM = 0x4D414E49,
+        ITEX = 0x58455449,
+        IRDT = 0x54445249,
+        JNAM = 0x4D414E4A,
+        KNAM = 0x4D414E4B,
+        LVLD = 0x444C564C,
+        LVLF = 0x464C564C,
+        LVLO = 0x4F4C564C,
+        LNAM = 0x4D414E4C,
+        LKDT = 0x54444B4C,
+        LHDT = 0x5444484C,
+        MODL = 0x4C444F4D,
+        MODB = 0x42444F4D,
+        MODT = 0x54444F4D,
+        MNAM = 0x4D414E4D,
+        MAST = 0x5453414D,
+        MEDT = 0x5444454D,
+        MOD2 = 0x32444F4D,
+        MO2B = 0x42324F4D,
+        MO2T = 0x54324F4D,
+        MOD3 = 0x33444F4D,
+        MO3B = 0x42334F4D,
+        MO3T = 0x54334F4D,
+        MOD4 = 0x34444F4D,
+        MO4B = 0x42344F4D,
+        MO4T = 0x54344F4D,
+        MCDT = 0x5444434D,
+        NPCS = 0x5343504E,
+        NAM1 = 0x314D414E,
+        NAME = 0x454D414E,
+        NAM2 = 0x324D414E,
+        NAM0 = 0x304D414E,
+        NAM9 = 0x394D414E,
+        NNAM = 0x4D414E4E,
+        NAM5 = 0x354D414E,
+        NPCO = 0x4F43504E,
+        NPDT = 0x5444504E,
+        OFST = 0x5453464F,
+        ONAM = 0x4D414E4F,
+        PGRP = 0x50524750,
+        PGRR = 0x52524750,
+        PFIG = 0x47494650,
+        PFPC = 0x43504650,
+        PKDT = 0x54444B50,
+        PLDT = 0x54444C50,
+        PSDT = 0x54445350,
+        PTDT = 0x54445450,
+        PBDT = 0x54444250,
+        PTEX = 0x58455450,
+        PGRC = 0x43524750,
+        PGAG = 0x47414750,
+        PGRL = 0x4C524750,
+        PGRI = 0x49524750,
+        PNAM = 0x4D414E50,
+        QSDT = 0x54445351,
+        QSTA = 0x41545351,
+        QSTI = 0x49545351,
+        QSTR = 0x52545351,
+        QSTN = 0x4E545351,
+        QSTF = 0x46545351,
+        QNAM = 0x4D414E51,
+        RIDT = 0x54444952,
+        RNAM = 0x4D414E52,
+        RCLR = 0x524C4352,
+        RPLI = 0x494C5052,
+        RPLD = 0x444C5052,
+        RDAT = 0x54414452,
+        RDOT = 0x544F4452,
+        RDMP = 0x504D4452,
+        RDGS = 0x53474452,
+        RDMD = 0x444D4452,
+        RDSD = 0x44534452,
+        RDWT = 0x54574452,
+        RADT = 0x54444152,
+        RGNN = 0x4E4E4752,
+        SCIT = 0x54494353,
+        SCRI = 0x49524353,
+        SCHR = 0x52484353,
+        SCDA = 0x41444353,
+        SCTX = 0x58544353,
+        SCRO = 0x4F524353,
+        SOUL = 0x4C554F53,
+        SLCP = 0x50434C53,
+        SNAM = 0x4D414E53,
+        SPLO = 0x4F4C5053,
+        SCHD = 0x44484353,
+        SCVR = 0x52564353,
+        SCDT = 0x54444353,
+        SLSD = 0x44534C53,
+        SCRV = 0x56524353,
+        SCPT = 0x54504353,
+        STRV = 0x56525453,
+        SKDT = 0x54444B53,
+        SNDX = 0x58444E53,
+        SNDD = 0x44444E53,
+        SPIT = 0x54495053,
+        SPDT = 0x54445053,
+        TNAM = 0x4D414E54,
+        TPIC = 0x43495054,
+        TRDT = 0x54445254,
+        TCLT = 0x544C4354,
+        TCLF = 0x464C4354,
+        TEXT = 0x54584554,
+        UNAM = 0x4D414E55,
+        VNAM = 0x4D414E56,
+        VTXT = 0x54585456,
+        VNML = 0x4C4D4E56,
+        VHGT = 0x54474856,
+        VCLR = 0x524C4356,
+        VTEX = 0x58455456,
+        WLST = 0x54534C57,
+        WNAM = 0x4D414E57,
+        WHGT = 0x54474857,
+        WPDT = 0x54445057,
+        WEAT = 0x54414557,
+        XTEL = 0x4C455458,
+        XLOC = 0x434F4C58,
+        XTRG = 0x47525458,
+        XSED = 0x44455358,
+        XCHG = 0x47484358,
+        XHLT = 0x544C4858,
+        XLCM = 0x4D434C58,
+        XRTM = 0x4D545258,
+        XACT = 0x54434158,
+        XCNT = 0x544E4358,
+        XMRK = 0x4B524D58,
+        XXXX = 0x58585858,
+        XOWN = 0x4E574F58,
+        XRNK = 0x4B4E5258,
+        XGLB = 0x424C4758,
+        XESP = 0x50534558,
+        XSCL = 0x4C435358,
+        XRGD = 0x44475258,
+        XPCI = 0x49435058,
+        XLOD = 0x444F4C58,
+        XMRC = 0x43524D58,
+        XHRS = 0x53524858,
+        XSOL = 0x4C4F5358,
+        XCLC = 0x434C4358,
+        XCLL = 0x4C4C4358,
+        XCLW = 0x574C4358,
+        XCLR = 0x524C4358,
+        XCMT = 0x544D4358,
+        XCCM = 0x4D434358,
+        XCWT = 0x54574358,
+        XNAM = 0x4D414E58,
     }
 
     #endregion
