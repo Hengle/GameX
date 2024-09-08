@@ -4,6 +4,7 @@ from enum import Enum
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinaryT
 from gamex.compression import decompressLz4, decompressZlib2
+from gamex.Bethesda.records import FormType, Header
 
 # typedefs
 class Reader: pass
@@ -352,8 +353,60 @@ class PakBinary_Bsa(PakBinaryT):
 
 #region PakBinary_Esm
 
+# typedefs
+class RecordGroup: pass
+
 # PakBinary_Esm
 class PakBinary_Esm(PakBinaryT):
-    pass
+    RecordHeaderSizeInBytes: int = 16
+    format: FormType
+    groups: dict[FormType, RecordGroup]
+
+    @staticmethod
+    def getFormat(game: str) -> FormType:
+        match game:
+            # tes
+            case 'Morrowind': return FormType.TES3
+            case 'Oblivion': return FormType.TES4
+            case 'Skyrim' | 'SkyrimSE' | 'SkyrimVR': return FormType.TES5
+            # fallout
+            case 'Fallout3' | 'FalloutNV': return FormType.TES4
+            case 'Fallout4' | 'Fallout4VR': return FormType.TES5
+            case 'Starfield': return FormType.TES6
+            case _: raise Exception(f'Unknown: {game}')
+
+    # read
+    def read(self, source: BinaryPakFile, r: Reader, tag: object = None) -> None:
+        format = self.getFormat(source.game.id)
+        recordLevel = 1
+        filePath = source.pakPath
+        poolAction = None #(GenericPoolAction<BinaryReader>)source.GetReader().Action; //: Leak
+        rootHeader = Header(r, format, None)
+        rootRecord = rootHeader.createRecord(rootHeader.position, recordLevel)
+        rootRecord.read(r, filePath, format)
+
+        # morrowind hack
+        if format == FormType.TES3:
+            group = RecordGroup(poolAction, filePath, format, recordLevel)
+            group.addHeader(Header(label = 0, dataSize = (r.length - r.tell()), position = r.tell()))
+            group.load()
+            groups = self.groups = {}
+            for k, g in groupby(group.records, lambda x: x.header.type):
+                s = RecordGroup(None, filePath, format, recordLevel)
+                s.records = list(g)
+                s.addHeader(Header(label = x.key), False)
+                groups.add(k, s)
+            return
+        
+        # read groups
+        groups = self.groups = {}
+        endPosition = r.length
+        while r.position < endPosition:
+            header = Header(r, format, None)
+            if header.Type != FormType.GRUP: raise Exception(f'{header.type} not GRUP')
+            nextPosition = r.tell() + header.dataSize
+            if not (group := groups.get(header.label)): group = RecordGroup(poolAction, filePath, format, recordLevel); groups.add(header.label, group)
+            group.addHeader(header)
+            r.seek(nextPosition)
     
 #endregion

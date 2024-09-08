@@ -633,6 +633,7 @@ namespace GameX.Bethesda.Formats
             //if ((Format == FormFormat.TES3 && rootHeader.Type != FormType.TES3) || (Format != FormFormat.TES3 && rootHeader.Type != FormType.TES4)) throw new FormatException($"{filePath} record header {rootHeader.Type} is not valid for this {Format}");
             var rootRecord = rootHeader.CreateRecord(rootHeader.Position, recordLevel);
             rootRecord.Read(r, filePath, Format);
+
             // morrowind hack
             if (Format == FormType.TES3)
             {
@@ -647,6 +648,7 @@ namespace GameX.Bethesda.Formats
                 });
                 return Task.CompletedTask;
             }
+
             // read groups
             Groups = [];
             var endPosition = r.BaseStream.Length;

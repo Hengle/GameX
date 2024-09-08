@@ -12,6 +12,409 @@ using static System.IO.Polyfill;
 
 namespace GameX.Bethesda.Formats.Records
 {
+    #region Enums
+
+    public enum FormType : uint
+    {
+        APPA = 0x41505041,
+        ARMA = 0x414D5241,
+        AACT = 0x54434141,
+        ASPC = 0x43505341,
+        ACTI = 0x49544341,
+        ARMO = 0x4F4D5241,
+        AMMO = 0x4F4D4D41,
+        ASTP = 0x50545341,
+        ARTO = 0x4F545241,
+        AMDL = 0x4C444D41,
+        AECH = 0x48434541,
+        ACRE = 0x45524341,
+        AORU = 0x55524F41,
+        ALCH = 0x48434C41,
+        ACHR = 0x52484341,
+        ANIO = 0x4F494E41,
+        AVIF = 0x46495641,
+        ADDN = 0x4E444441,
+        BOOK = 0x4B4F4F42,
+        BSGN = 0x4E475342,
+        BODY = 0x59444F42,
+        BNDS = 0x53444E42,
+        BPTD = 0x44545042,
+        CMPO = 0x4F504D43,
+        CLAS = 0x53414C43,
+        CSTY = 0x59545343,
+        CONT = 0x544E4F43,
+        CLMT = 0x544D4C43,
+        CELL = 0x4C4C4543,
+        CAMS = 0x534D4143,
+        CPTH = 0x48545043,
+        CREA = 0x41455243,
+        CLFM = 0x4D464C43,
+        COLL = 0x4C4C4F43,
+        CLOT = 0x544F4C43,
+        COBJ = 0x4A424F43,
+        DMGT = 0x54474D44,
+        DOOR = 0x524F4F44,
+        DOBJ = 0x4A424F44,
+        DFOB = 0x424F4644,
+        DUAL = 0x4C415544,
+        DLBR = 0x52424C44,
+        DEBR = 0x52424544,
+        DLVW = 0x57564C44,
+        DIAL = 0x4C414944,
+        EQUP = 0x50555145,
+        EYES = 0x53455945,
+        EFSH = 0x48534645,
+        ECZN = 0x4E5A4345,
+        EXPL = 0x4C505845,
+        ENCH = 0x48434E45,
+        FACT = 0x54434146,
+        FURN = 0x4E525546,
+        FLOR = 0x524F4C46,
+        FSTP = 0x50545346,
+        FSTS = 0x53545346,
+        FLST = 0x54534C46,
+        GRUP = 0x50555247,
+        GMST = 0x54534D47,
+        GLOB = 0x424F4C47,
+        GRAS = 0x53415247,
+        GDRY = 0x59524447,
+        HAZD = 0x445A4148,
+        HDPT = 0x54504448,
+        HAIR = 0x52494148,
+        INGR = 0x52474E49,
+        IDLM = 0x4D4C4449,
+        INFO = 0x4F464E49,
+        IDLE = 0x454C4449,
+        IPCT = 0x54435049,
+        IPDS = 0x53445049,
+        IMGS = 0x53474D49,
+        IMAD = 0x44414D49,
+        INNR = 0x524E4E49,
+        KYWD = 0x4457594B,
+        KEYM = 0x4D59454B,
+        KSSM = 0x4D53534B,
+        LIGH = 0x4847494C,
+        LCTN = 0x4E54434C,
+        LCRT = 0x5452434C,
+        LTEX = 0x5845544C,
+        LVLN = 0x4E4C564C,
+        LVLI = 0x494C564C,
+        LAND = 0x444E414C,
+        LSCR = 0x5243534C,
+        LVSP = 0x5053564C,
+        LGTM = 0x4D54474C,
+        LVLC = 0x434C564C,
+        LEVC = 0x4356454C,
+        LOCK = 0x4B434F4C,
+        LENS = 0x534E454C,
+        LSPR = 0x5250534C,
+        LEVI = 0x4956454C,
+        LAYR = 0x5259414C,
+        MATT = 0x5454414D,
+        MSTT = 0x5454534D,
+        MGEF = 0x4645474D,
+        MICN = 0x4E43494D,
+        MISC = 0x4353494D,
+        MESG = 0x4753454D,
+        MUSC = 0x4353554D,
+        MUST = 0x5453554D,
+        MOVT = 0x54564F4D,
+        MATO = 0x4F54414D,
+        MSWP = 0x5057534D,
+        NONE = 0x454E4F4E,
+        NPC_ = 0x5F43504E,
+        NOTE = 0x45544F4E,
+        NAVI = 0x4956414E,
+        NAVM = 0x4D56414E,
+        NOCM = 0x4D434F4E,
+        OTFT = 0x5446544F,
+        OMOD = 0x444F4D4F,
+        OVIS = 0x5349564F,
+        PROJ = 0x4A4F5250,
+        PMIS = 0x53494D50,
+        PARW = 0x57524150,
+        PGRE = 0x45524750,
+        PBEA = 0x41454250,
+        PFLA = 0x414C4650,
+        PCON = 0x4E4F4350,
+        PBAR = 0x52414250,
+        PHZD = 0x445A4850,
+        PACK = 0x4B434150,
+        PERK = 0x4B524550,
+        PKIN = 0x4E494B50,
+        PROB = 0x424F5250,
+        PGRD = 0x44524750,
+        QUST = 0x54535551,
+        RFCT = 0x54434652,
+        REGN = 0x4E474552,
+        RACE = 0x45434152,
+        REFR = 0x52464552,
+        RGDL = 0x4C444752,
+        REVB = 0x42564552,
+        ROAD = 0x44414F52,
+        REPA = 0x41504552,
+        RFGP = 0x50474652,
+        RELA = 0x414C4552,
+        SPGD = 0x44475053,
+        SLGM = 0x4D474C53,
+        STAT = 0x54415453,
+        SCOL = 0x4C4F4353,
+        SOUN = 0x4E554F53,
+        SKIL = 0x4C494B53,
+        SCPT = 0x54504353,
+        SPEL = 0x4C455053,
+        SCRL = 0x4C524353,
+        SMBN = 0x4E424D53,
+        SMQN = 0x4E514D53,
+        SMEN = 0x4E454D53,
+        SHOU = 0x554F4853,
+        SBSP = 0x50534253,
+        SNDR = 0x52444E53,
+        SNCT = 0x54434E53,
+        SOPM = 0x4D504F53,
+        SCCO = 0x4F434353,
+        SCSN = 0x4E534353,
+        STAG = 0x47415453,
+        SGST = 0x54534753,
+        SSCR = 0x52435353,
+        SCEN = 0x4E454353,
+        SNDG = 0x47444E53,
+        TOFT = 0x54464F54,
+        TERM = 0x4D524554,
+        TREE = 0x45455254,
+        TLOD = 0x444F4C54,
+        TES3 = 0x33534554,
+        TES4 = 0x34534554,
+        TES5 = 0x35534554,
+        TES6 = 0x36534554,
+        TRNS = 0x534E5254,
+        TXST = 0x54535854,
+        TACT = 0x54434154,
+        VTYP = 0x50595456,
+        WRLD = 0x444C5257,
+        WEAP = 0x50414557,
+        WTHR = 0x52485457,
+        WATR = 0x52544157,
+        WOOP = 0x504F4F57,
+        ZOOM = 0x4D4F4F5A,
+    }
+
+    // $"0x{BitConverter.ToUInt32(Encoding.ASCII.GetBytes("FULL")):X}"
+    public enum FieldType : uint
+    {
+        ANAM = 0x4D414E41,
+        AVFX = 0x58465641,
+        ASND = 0x444E5341,
+        AADT = 0x54444141,
+        AODT = 0x54444F41,
+        ALDT = 0x54444C41,
+        AMBI = 0x49424D41,
+        ATXT = 0x54585441,
+        ATTR = 0x52545441,
+        AIDT = 0x54444941,
+        AI_W = 0x575F4941,
+        AI_T = 0x545F4941,
+        AI_F = 0x465F4941,
+        AI_E = 0x455F4941,
+        AI_A = 0x415F4941,
+        BTXT = 0x54585442,
+        BVFX = 0x58465642,
+        BSND = 0x444E5342,
+        BMDT = 0x54444D42,
+        BKDT = 0x54444B42,
+        BNAM = 0x4D414E42,
+        BYDT = 0x54445942,
+        CSTD = 0x44545343,
+        CSAD = 0x44415343,
+        CNAM = 0x4D414E43,
+        CTDA = 0x41445443,
+        CTDT = 0x54445443,
+        CVFX = 0x58465643,
+        CSND = 0x444E5343,
+        CNDT = 0x54444E43,
+        CLDT = 0x54444C43,
+        CNTO = 0x4F544E43,
+        DATA = 0x41544144,
+        DNAM = 0x4D414E44,
+        DESC = 0x43534544,
+        DELE = 0x454C4544,
+        DODT = 0x54444F44,
+        ENDT = 0x54444E45,
+        ESCE = 0x45435345,
+        ENIT = 0x54494E45,
+        EFID = 0x44494645,
+        EFIT = 0x54494645,
+        EDID = 0x44494445,
+        ENAM = 0x4D414E45,
+        FADT = 0x54444146,
+        FGGS = 0x53474746,
+        FGGA = 0x41474746,
+        FGTS = 0x53544746,
+        FRMR = 0x524D5246,
+        FLAG = 0x47414C46,
+        FLTV = 0x56544C46,
+        FULL = 0x4C4C5546,
+        FNAM = 0x4D414E46,
+        GNAM = 0x4D414E47,
+        HEDR = 0x52444548,
+        HSND = 0x444E5348,
+        HVFX = 0x58465648,
+        HNAM = 0x4D414E48,
+        ICON = 0x4E4F4349,
+        ICO2 = 0x324F4349,
+        INDX = 0x58444E49,
+        INTV = 0x56544E49,
+        INCC = 0x43434E49,
+        INAM = 0x4D414E49,
+        ITEX = 0x58455449,
+        IRDT = 0x54445249,
+        JNAM = 0x4D414E4A,
+        KNAM = 0x4D414E4B,
+        LVLD = 0x444C564C,
+        LVLF = 0x464C564C,
+        LVLO = 0x4F4C564C,
+        LNAM = 0x4D414E4C,
+        LKDT = 0x54444B4C,
+        LHDT = 0x5444484C,
+        MODL = 0x4C444F4D,
+        MODB = 0x42444F4D,
+        MODT = 0x54444F4D,
+        MNAM = 0x4D414E4D,
+        MAST = 0x5453414D,
+        MEDT = 0x5444454D,
+        MOD2 = 0x32444F4D,
+        MO2B = 0x42324F4D,
+        MO2T = 0x54324F4D,
+        MOD3 = 0x33444F4D,
+        MO3B = 0x42334F4D,
+        MO3T = 0x54334F4D,
+        MOD4 = 0x34444F4D,
+        MO4B = 0x42344F4D,
+        MO4T = 0x54344F4D,
+        MCDT = 0x5444434D,
+        NPCS = 0x5343504E,
+        NAM1 = 0x314D414E,
+        NAME = 0x454D414E,
+        NAM2 = 0x324D414E,
+        NAM0 = 0x304D414E,
+        NAM9 = 0x394D414E,
+        NNAM = 0x4D414E4E,
+        NAM5 = 0x354D414E,
+        NPCO = 0x4F43504E,
+        NPDT = 0x5444504E,
+        OFST = 0x5453464F,
+        ONAM = 0x4D414E4F,
+        PGRP = 0x50524750,
+        PGRR = 0x52524750,
+        PFIG = 0x47494650,
+        PFPC = 0x43504650,
+        PKDT = 0x54444B50,
+        PLDT = 0x54444C50,
+        PSDT = 0x54445350,
+        PTDT = 0x54445450,
+        PBDT = 0x54444250,
+        PTEX = 0x58455450,
+        PGRC = 0x43524750,
+        PGAG = 0x47414750,
+        PGRL = 0x4C524750,
+        PGRI = 0x49524750,
+        PNAM = 0x4D414E50,
+        QSDT = 0x54445351,
+        QSTA = 0x41545351,
+        QSTI = 0x49545351,
+        QSTR = 0x52545351,
+        QSTN = 0x4E545351,
+        QSTF = 0x46545351,
+        QNAM = 0x4D414E51,
+        RIDT = 0x54444952,
+        RNAM = 0x4D414E52,
+        RCLR = 0x524C4352,
+        RPLI = 0x494C5052,
+        RPLD = 0x444C5052,
+        RDAT = 0x54414452,
+        RDOT = 0x544F4452,
+        RDMP = 0x504D4452,
+        RDGS = 0x53474452,
+        RDMD = 0x444D4452,
+        RDSD = 0x44534452,
+        RDWT = 0x54574452,
+        RADT = 0x54444152,
+        RGNN = 0x4E4E4752,
+        SCIT = 0x54494353,
+        SCRI = 0x49524353,
+        SCHR = 0x52484353,
+        SCDA = 0x41444353,
+        SCTX = 0x58544353,
+        SCRO = 0x4F524353,
+        SOUL = 0x4C554F53,
+        SLCP = 0x50434C53,
+        SNAM = 0x4D414E53,
+        SPLO = 0x4F4C5053,
+        SCHD = 0x44484353,
+        SCVR = 0x52564353,
+        SCDT = 0x54444353,
+        SLSD = 0x44534C53,
+        SCRV = 0x56524353,
+        SCPT = 0x54504353,
+        STRV = 0x56525453,
+        SKDT = 0x54444B53,
+        SNDX = 0x58444E53,
+        SNDD = 0x44444E53,
+        SPIT = 0x54495053,
+        SPDT = 0x54445053,
+        TNAM = 0x4D414E54,
+        TPIC = 0x43495054,
+        TRDT = 0x54445254,
+        TCLT = 0x544C4354,
+        TCLF = 0x464C4354,
+        TEXT = 0x54584554,
+        UNAM = 0x4D414E55,
+        VNAM = 0x4D414E56,
+        VTXT = 0x54585456,
+        VNML = 0x4C4D4E56,
+        VHGT = 0x54474856,
+        VCLR = 0x524C4356,
+        VTEX = 0x58455456,
+        WLST = 0x54534C57,
+        WNAM = 0x4D414E57,
+        WHGT = 0x54474857,
+        WPDT = 0x54445057,
+        WEAT = 0x54414557,
+        XTEL = 0x4C455458,
+        XLOC = 0x434F4C58,
+        XTRG = 0x47525458,
+        XSED = 0x44455358,
+        XCHG = 0x47484358,
+        XHLT = 0x544C4858,
+        XLCM = 0x4D434C58,
+        XRTM = 0x4D545258,
+        XACT = 0x54434158,
+        XCNT = 0x544E4358,
+        XMRK = 0x4B524D58,
+        XXXX = 0x58585858,
+        XOWN = 0x4E574F58,
+        XRNK = 0x4B4E5258,
+        XGLB = 0x424C4758,
+        XESP = 0x50534558,
+        XSCL = 0x4C435358,
+        XRGD = 0x44475258,
+        XPCI = 0x49435058,
+        XLOD = 0x444F4C58,
+        XMRC = 0x43524D58,
+        XHRS = 0x53524858,
+        XSOL = 0x4C4F5358,
+        XCLC = 0x434C4358,
+        XCLL = 0x4C4C4358,
+        XCLW = 0x574C4358,
+        XCLR = 0x524C4358,
+        XCMT = 0x544D4358,
+        XCCM = 0x4D434358,
+        XCWT = 0x54574358,
+        XNAM = 0x4D414E58,
+    }
+
+    #endregion
+
     #region Base
 
     public interface IHaveMODL
@@ -66,7 +469,7 @@ namespace GameX.Bethesda.Formats.Records
 
         public override string ToString() => $"{Type}:{GroupType}";
         public Header Parent;
-        public FormType Type; // 4 bytes
+        public FormType Type;
         public uint DataSize;
         public HeaderFlags Flags;
         public bool Compressed => (Flags & HeaderFlags.Compressed) != 0;
@@ -93,10 +496,12 @@ namespace GameX.Bethesda.Formats.Records
             }
             DataSize = r.ReadUInt32();
             if (format == TES3) r.ReadUInt32(); // Unknown
-            Flags = (HeaderFlags)r.ReadUInt32(); if (format == TES3) { Position = r.Tell(); return; }
+            Flags = (HeaderFlags)r.ReadUInt32();
+            if (format == TES3) { Position = r.Tell(); return; }
             // tes4
             FormId = r.ReadUInt32();
-            r.ReadUInt32(); if (format == TES4) { Position = r.Tell(); return; }
+            r.ReadUInt32();
+            if (format == TES4) { Position = r.Tell(); return; }
             // tes5
             r.ReadUInt32();
             Position = r.Tell();
@@ -215,6 +620,49 @@ namespace GameX.Bethesda.Formats.Records
 
     #endregion
 
+    #region Base : Standard Fields
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct ColorRef3 { public override readonly string ToString() => $"{Red}:{Green}:{Blue}"; public static (string, int) Struct = ("<3c", 3); public byte Red; public byte Green; public byte Blue; }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct ColorRef4 { public override readonly string ToString() => $"{Red}:{Green}:{Blue}"; public static (string, int) Struct = ("<4c", 4); public byte Red; public byte Green; public byte Blue; public byte Null; public GXColor32 AsColor32 => new(Red, Green, Blue, 255); }
+    public struct STRVField { public override readonly string ToString() => Value; public string Value; }
+    public struct FILEField { public override readonly string ToString() => Value; public string Value; }
+    public struct DATVField { public override readonly string ToString() => "DATV"; public bool B; public int I; public float F; public string S; }
+    public struct FLTVField { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<f", 4); public float Value; }
+    public struct BYTEField { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<c", 1); public byte Value; }
+    public struct IN16Field { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<h", 2); public short Value; }
+    public struct UI16Field { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<H", 2); public ushort Value; }
+    public struct IN32Field { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<i", 4); public int Value; }
+    public struct UI32Field { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<I", 4); public uint Value; }
+    public struct INTVField { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<q", 8); public long Value; public UI16Field AsUI16Field => new() { Value = (ushort)Value }; }
+    public struct CREFField { public override readonly string ToString() => $"{Color}"; public static (string, int) Struct = ("<4c", 4); public ColorRef4 Color; }
+    public struct CNTOField
+    {
+        public override readonly string ToString() => $"{Item}";
+        public uint ItemCount; // Number of the item
+        public FormId<Record> Item; // The ID of the item
+        public CNTOField(BinaryReader r, int dataSize, FormType format)
+        {
+            if (format == TES3) { ItemCount = r.ReadUInt32(); Item = new FormId<Record>(r.ReadZString(32)); return; }
+            Item = new FormId<Record>(r.ReadUInt32()); ItemCount = r.ReadUInt32();
+        }
+    }
+    public struct BYTVField { public override readonly string ToString() => $"BYTS"; public byte[] Value; }
+    public struct UNKNField { public override readonly string ToString() => $"UNKN"; public byte[] Value; }
+
+    public class MODLGroup(BinaryReader r, int dataSize)
+    {
+        public override string ToString() => $"{Value}";
+        public string Value = r.ReadYEncoding(dataSize);
+        public float Bound;
+        public byte[] Textures; // Texture Files Hashes
+        public object MODBField(BinaryReader r, int dataSize) => Bound = r.ReadSingle();
+        public object MODTField(BinaryReader r, int dataSize) => Textures = r.ReadBytes(dataSize);
+    }
+
+    #endregion
+
     #region Base : Record
 
     public class Record : IRecord
@@ -233,8 +681,8 @@ namespace GameX.Bethesda.Formats.Records
 
         public void Read(BinaryReader r, string filePath, FormType format)
         {
-            long startPosition = r.Tell(), endPosition = startPosition + Header.DataSize;
-            while (r.BaseStream.Position < endPosition)
+            long startTell = r.Tell(), endTell = startTell + Header.DataSize;
+            while (r.BaseStream.Position < endTell)
             {
                 var fieldHeader = new FieldHeader(r, format);
                 if (fieldHeader.Type == FieldType.XXXX)
@@ -243,14 +691,14 @@ namespace GameX.Bethesda.Formats.Records
                     fieldHeader.DataSize = (int)r.ReadUInt32();
                     continue;
                 }
-                else if (fieldHeader.Type == FieldType.OFST && Header.Type == WRLD) { r.Seek(endPosition); continue; }
-                var position = r.BaseStream.Position;
+                else if (fieldHeader.Type == FieldType.OFST && Header.Type == WRLD) { r.Seek(endTell); continue; }
+                var tell = r.BaseStream.Position;
                 if (CreateField(r, format, fieldHeader.Type, fieldHeader.DataSize) == Empty) { Log($"Unsupported ESM record type: {Header.Type}:{fieldHeader.Type}"); r.Skip(fieldHeader.DataSize); continue; }
                 // check full read
-                if (r.BaseStream.Position != position + fieldHeader.DataSize) throw new FormatException($"Failed reading {Header.Type}:{fieldHeader.Type} field data at offset {position} in {filePath} of {r.BaseStream.Position - position - fieldHeader.DataSize}");
+                if (r.BaseStream.Position != tell + fieldHeader.DataSize) throw new FormatException($"Failed reading {Header.Type}:{fieldHeader.Type} field data at offset {tell} in {filePath} of {r.BaseStream.Position - tell - fieldHeader.DataSize}");
             }
             // check full read
-            if (r.Tell() != endPosition) throw new FormatException($"Failed reading {Header.Type} record data at offset {startPosition} in {filePath}");
+            if (r.Tell() != endTell) throw new FormatException($"Failed reading {Header.Type} record data at offset {startTell} in {filePath}");
         }
     }
 
@@ -496,56 +944,7 @@ namespace GameX.Bethesda.Formats.Records
 
     #endregion
 
-    #region Base : Standard Fields
 
-    public class MODLGroup(BinaryReader r, int dataSize)
-    {
-        public override string ToString() => $"{Value}";
-        public string Value = r.ReadYEncoding(dataSize);
-        public float Bound;
-        public byte[] Textures; // Texture Files Hashes
-        public object MODBField(BinaryReader r, int dataSize) => Bound = r.ReadSingle();
-        public object MODTField(BinaryReader r, int dataSize) => Textures = r.ReadBytes(dataSize);
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct ColorRef3 { public override readonly string ToString() => $"{Red}:{Green}:{Blue}"; public static (string, int) Struct = ("<3c", 3); public byte Red; public byte Green; public byte Blue; }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct ColorRef4 { public override readonly string ToString() => $"{Red}:{Green}:{Blue}"; public static (string, int) Struct = ("<4c", 4); public byte Red; public byte Green; public byte Blue; public byte Null; public GXColor32 AsColor32 => new(Red, Green, Blue, 255); }
-
-    public struct STRVField { public override readonly string ToString() => Value; public string Value; }
-    public struct FILEField { public override readonly string ToString() => Value; public string Value; }
-    public struct INTVField { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<q", 8); public long Value; public UI16Field AsUI16Field => new() { Value = (ushort)Value }; }
-    public struct DATVField { public override readonly string ToString() => "DATV"; public bool B; public int I; public float F; public string S; }
-    public struct FLTVField { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<f", 4); public float Value; }
-    public struct BYTEField { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<c", 1); public byte Value; }
-    public struct IN16Field { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<h", 2); public short Value; }
-    public struct UI16Field { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<H", 2); public ushort Value; }
-    public struct IN32Field { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<i", 4); public int Value; }
-    public struct UI32Field { public override readonly string ToString() => $"{Value}"; public static (string, int) Struct = ("<I", 4); public uint Value; }
-    public struct CREFField { public override readonly string ToString() => $"{Color}"; public static (string, int) Struct = ("<4c", 4); public ColorRef4 Color; }
-    public struct CNTOField
-    {
-        public override readonly string ToString() => $"{Item}";
-        public uint ItemCount; // Number of the item
-        public FormId<Record> Item; // The ID of the item
-        public CNTOField(BinaryReader r, int dataSize, FormType format)
-        {
-            if (format == TES3)
-            {
-                ItemCount = r.ReadUInt32();
-                Item = new FormId<Record>(r.ReadZString(32));
-                return;
-            }
-            Item = new FormId<Record>(r.ReadUInt32());
-            ItemCount = r.ReadUInt32();
-        }
-    }
-    public struct BYTVField { public override readonly string ToString() => $"BYTS"; public byte[] Value; }
-    public struct UNKNField { public override readonly string ToString() => $"UNKN"; public byte[] Value; }
-
-    #endregion
 
     #region 0050 : AACT.Action
 
@@ -3166,7 +3565,11 @@ namespace GameX.Bethesda.Formats.Records
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct XCLCField
         {
-            public static (string, int) Struct = ("<2iI", 12);
+            public static Dictionary<int, string> Struct = new()
+            {
+                { 8, "<2i" },
+                {  12, "<2iI" },
+            };
             public int GridX;
             public int GridY;
             public uint Flags;
@@ -5309,409 +5712,6 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.ANAM => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
             _ => Empty,
         };
-    }
-
-    #endregion
-
-    #region Enums
-
-    public enum FormType : uint
-    {
-        APPA = 0x41505041,
-        ARMA = 0x414D5241,
-        AACT = 0x54434141,
-        ASPC = 0x43505341,
-        ACTI = 0x49544341,
-        ARMO = 0x4F4D5241,
-        AMMO = 0x4F4D4D41,
-        ASTP = 0x50545341,
-        ARTO = 0x4F545241,
-        AMDL = 0x4C444D41,
-        AECH = 0x48434541,
-        ACRE = 0x45524341,
-        AORU = 0x55524F41,
-        ALCH = 0x48434C41,
-        ACHR = 0x52484341,
-        ANIO = 0x4F494E41,
-        AVIF = 0x46495641,
-        ADDN = 0x4E444441,
-        BOOK = 0x4B4F4F42,
-        BSGN = 0x4E475342,
-        BODY = 0x59444F42,
-        BNDS = 0x53444E42,
-        BPTD = 0x44545042,
-        CMPO = 0x4F504D43,
-        CLAS = 0x53414C43,
-        CSTY = 0x59545343,
-        CONT = 0x544E4F43,
-        CLMT = 0x544D4C43,
-        CELL = 0x4C4C4543,
-        CAMS = 0x534D4143,
-        CPTH = 0x48545043,
-        CREA = 0x41455243,
-        CLFM = 0x4D464C43,
-        COLL = 0x4C4C4F43,
-        CLOT = 0x544F4C43,
-        COBJ = 0x4A424F43,
-        DMGT = 0x54474D44,
-        DOOR = 0x524F4F44,
-        DOBJ = 0x4A424F44,
-        DFOB = 0x424F4644,
-        DUAL = 0x4C415544,
-        DLBR = 0x52424C44,
-        DEBR = 0x52424544,
-        DLVW = 0x57564C44,
-        DIAL = 0x4C414944,
-        EQUP = 0x50555145,
-        EYES = 0x53455945,
-        EFSH = 0x48534645,
-        ECZN = 0x4E5A4345,
-        EXPL = 0x4C505845,
-        ENCH = 0x48434E45,
-        FACT = 0x54434146,
-        FURN = 0x4E525546,
-        FLOR = 0x524F4C46,
-        FSTP = 0x50545346,
-        FSTS = 0x53545346,
-        FLST = 0x54534C46,
-        GRUP = 0x50555247,
-        GMST = 0x54534D47,
-        GLOB = 0x424F4C47,
-        GRAS = 0x53415247,
-        GDRY = 0x59524447,
-        HAZD = 0x445A4148,
-        HDPT = 0x54504448,
-        HAIR = 0x52494148,
-        INGR = 0x52474E49,
-        IDLM = 0x4D4C4449,
-        INFO = 0x4F464E49,
-        IDLE = 0x454C4449,
-        IPCT = 0x54435049,
-        IPDS = 0x53445049,
-        IMGS = 0x53474D49,
-        IMAD = 0x44414D49,
-        INNR = 0x524E4E49,
-        KYWD = 0x4457594B,
-        KEYM = 0x4D59454B,
-        KSSM = 0x4D53534B,
-        LIGH = 0x4847494C,
-        LCTN = 0x4E54434C,
-        LCRT = 0x5452434C,
-        LTEX = 0x5845544C,
-        LVLN = 0x4E4C564C,
-        LVLI = 0x494C564C,
-        LAND = 0x444E414C,
-        LSCR = 0x5243534C,
-        LVSP = 0x5053564C,
-        LGTM = 0x4D54474C,
-        LVLC = 0x434C564C,
-        LEVC = 0x4356454C,
-        LOCK = 0x4B434F4C,
-        LENS = 0x534E454C,
-        LSPR = 0x5250534C,
-        LEVI = 0x4956454C,
-        LAYR = 0x5259414C,
-        MATT = 0x5454414D,
-        MSTT = 0x5454534D,
-        MGEF = 0x4645474D,
-        MICN = 0x4E43494D,
-        MISC = 0x4353494D,
-        MESG = 0x4753454D,
-        MUSC = 0x4353554D,
-        MUST = 0x5453554D,
-        MOVT = 0x54564F4D,
-        MATO = 0x4F54414D,
-        MSWP = 0x5057534D,
-        NONE = 0x454E4F4E,
-        NPC_ = 0x5F43504E,
-        NOTE = 0x45544F4E,
-        NAVI = 0x4956414E,
-        NAVM = 0x4D56414E,
-        NOCM = 0x4D434F4E,
-        OTFT = 0x5446544F,
-        OMOD = 0x444F4D4F,
-        OVIS = 0x5349564F,
-        PROJ = 0x4A4F5250,
-        PMIS = 0x53494D50,
-        PARW = 0x57524150,
-        PGRE = 0x45524750,
-        PBEA = 0x41454250,
-        PFLA = 0x414C4650,
-        PCON = 0x4E4F4350,
-        PBAR = 0x52414250,
-        PHZD = 0x445A4850,
-        PACK = 0x4B434150,
-        PERK = 0x4B524550,
-        PKIN = 0x4E494B50,
-        PROB = 0x424F5250,
-        PGRD = 0x44524750,
-        QUST = 0x54535551,
-        RFCT = 0x54434652,
-        REGN = 0x4E474552,
-        RACE = 0x45434152,
-        REFR = 0x52464552,
-        RGDL = 0x4C444752,
-        REVB = 0x42564552,
-        ROAD = 0x44414F52,
-        REPA = 0x41504552,
-        RFGP = 0x50474652,
-        RELA = 0x414C4552,
-        SPGD = 0x44475053,
-        SLGM = 0x4D474C53,
-        STAT = 0x54415453,
-        SCOL = 0x4C4F4353,
-        SOUN = 0x4E554F53,
-        SKIL = 0x4C494B53,
-        SCPT = 0x54504353,
-        SPEL = 0x4C455053,
-        SCRL = 0x4C524353,
-        SMBN = 0x4E424D53,
-        SMQN = 0x4E514D53,
-        SMEN = 0x4E454D53,
-        SHOU = 0x554F4853,
-        SBSP = 0x50534253,
-        SNDR = 0x52444E53,
-        SNCT = 0x54434E53,
-        SOPM = 0x4D504F53,
-        SCCO = 0x4F434353,
-        SCSN = 0x4E534353,
-        STAG = 0x47415453,
-        SGST = 0x54534753,
-        SSCR = 0x52435353,
-        SCEN = 0x4E454353,
-        SNDG = 0x47444E53,
-        TOFT = 0x54464F54,
-        TERM = 0x4D524554,
-        TREE = 0x45455254,
-        TLOD = 0x444F4C54,
-        TES3 = 0x33534554,
-        TES4 = 0x34534554,
-        TES5 = 0x35534554,
-        TES6 = 0x36534554,
-        TRNS = 0x534E5254,
-        TXST = 0x54535854,
-        TACT = 0x54434154,
-        VTYP = 0x50595456,
-        WRLD = 0x444C5257,
-        WEAP = 0x50414557,
-        WTHR = 0x52485457,
-        WATR = 0x52544157,
-        WOOP = 0x504F4F57,
-        ZOOM = 0x4D4F4F5A,
-    }
-
-    // $"0x{BitConverter.ToUInt32(Encoding.ASCII.GetBytes("FULL")):X}"
-    public enum FieldType : uint
-    {
-        ANAM = 0x4D414E41,
-        AVFX = 0x58465641,
-        ASND = 0x444E5341,
-        AADT = 0x54444141,
-        AODT = 0x54444F41,
-        ALDT = 0x54444C41,
-        AMBI = 0x49424D41,
-        ATXT = 0x54585441,
-        ATTR = 0x52545441,
-        AIDT = 0x54444941,
-        AI_W = 0x575F4941,
-        AI_T = 0x545F4941,
-        AI_F = 0x465F4941,
-        AI_E = 0x455F4941,
-        AI_A = 0x415F4941,
-        BTXT = 0x54585442,
-        BVFX = 0x58465642,
-        BSND = 0x444E5342,
-        BMDT = 0x54444D42,
-        BKDT = 0x54444B42,
-        BNAM = 0x4D414E42,
-        BYDT = 0x54445942,
-        CSTD = 0x44545343,
-        CSAD = 0x44415343,
-        CNAM = 0x4D414E43,
-        CTDA = 0x41445443,
-        CTDT = 0x54445443,
-        CVFX = 0x58465643,
-        CSND = 0x444E5343,
-        CNDT = 0x54444E43,
-        CLDT = 0x54444C43,
-        CNTO = 0x4F544E43,
-        DATA = 0x41544144,
-        DNAM = 0x4D414E44,
-        DESC = 0x43534544,
-        DELE = 0x454C4544,
-        DODT = 0x54444F44,
-        ENDT = 0x54444E45,
-        ESCE = 0x45435345,
-        ENIT = 0x54494E45,
-        EFID = 0x44494645,
-        EFIT = 0x54494645,
-        EDID = 0x44494445,
-        ENAM = 0x4D414E45,
-        FADT = 0x54444146,
-        FGGS = 0x53474746,
-        FGGA = 0x41474746,
-        FGTS = 0x53544746,
-        FRMR = 0x524D5246,
-        FLAG = 0x47414C46,
-        FLTV = 0x56544C46,
-        FULL = 0x4C4C5546,
-        FNAM = 0x4D414E46,
-        GNAM = 0x4D414E47,
-        HEDR = 0x52444548,
-        HSND = 0x444E5348,
-        HVFX = 0x58465648,
-        HNAM = 0x4D414E48,
-        ICON = 0x4E4F4349,
-        ICO2 = 0x324F4349,
-        INDX = 0x58444E49,
-        INTV = 0x56544E49,
-        INCC = 0x43434E49,
-        INAM = 0x4D414E49,
-        ITEX = 0x58455449,
-        IRDT = 0x54445249,
-        JNAM = 0x4D414E4A,
-        KNAM = 0x4D414E4B,
-        LVLD = 0x444C564C,
-        LVLF = 0x464C564C,
-        LVLO = 0x4F4C564C,
-        LNAM = 0x4D414E4C,
-        LKDT = 0x54444B4C,
-        LHDT = 0x5444484C,
-        MODL = 0x4C444F4D,
-        MODB = 0x42444F4D,
-        MODT = 0x54444F4D,
-        MNAM = 0x4D414E4D,
-        MAST = 0x5453414D,
-        MEDT = 0x5444454D,
-        MOD2 = 0x32444F4D,
-        MO2B = 0x42324F4D,
-        MO2T = 0x54324F4D,
-        MOD3 = 0x33444F4D,
-        MO3B = 0x42334F4D,
-        MO3T = 0x54334F4D,
-        MOD4 = 0x34444F4D,
-        MO4B = 0x42344F4D,
-        MO4T = 0x54344F4D,
-        MCDT = 0x5444434D,
-        NPCS = 0x5343504E,
-        NAM1 = 0x314D414E,
-        NAME = 0x454D414E,
-        NAM2 = 0x324D414E,
-        NAM0 = 0x304D414E,
-        NAM9 = 0x394D414E,
-        NNAM = 0x4D414E4E,
-        NAM5 = 0x354D414E,
-        NPCO = 0x4F43504E,
-        NPDT = 0x5444504E,
-        OFST = 0x5453464F,
-        ONAM = 0x4D414E4F,
-        PGRP = 0x50524750,
-        PGRR = 0x52524750,
-        PFIG = 0x47494650,
-        PFPC = 0x43504650,
-        PKDT = 0x54444B50,
-        PLDT = 0x54444C50,
-        PSDT = 0x54445350,
-        PTDT = 0x54445450,
-        PBDT = 0x54444250,
-        PTEX = 0x58455450,
-        PGRC = 0x43524750,
-        PGAG = 0x47414750,
-        PGRL = 0x4C524750,
-        PGRI = 0x49524750,
-        PNAM = 0x4D414E50,
-        QSDT = 0x54445351,
-        QSTA = 0x41545351,
-        QSTI = 0x49545351,
-        QSTR = 0x52545351,
-        QSTN = 0x4E545351,
-        QSTF = 0x46545351,
-        QNAM = 0x4D414E51,
-        RIDT = 0x54444952,
-        RNAM = 0x4D414E52,
-        RCLR = 0x524C4352,
-        RPLI = 0x494C5052,
-        RPLD = 0x444C5052,
-        RDAT = 0x54414452,
-        RDOT = 0x544F4452,
-        RDMP = 0x504D4452,
-        RDGS = 0x53474452,
-        RDMD = 0x444D4452,
-        RDSD = 0x44534452,
-        RDWT = 0x54574452,
-        RADT = 0x54444152,
-        RGNN = 0x4E4E4752,
-        SCIT = 0x54494353,
-        SCRI = 0x49524353,
-        SCHR = 0x52484353,
-        SCDA = 0x41444353,
-        SCTX = 0x58544353,
-        SCRO = 0x4F524353,
-        SOUL = 0x4C554F53,
-        SLCP = 0x50434C53,
-        SNAM = 0x4D414E53,
-        SPLO = 0x4F4C5053,
-        SCHD = 0x44484353,
-        SCVR = 0x52564353,
-        SCDT = 0x54444353,
-        SLSD = 0x44534C53,
-        SCRV = 0x56524353,
-        SCPT = 0x54504353,
-        STRV = 0x56525453,
-        SKDT = 0x54444B53,
-        SNDX = 0x58444E53,
-        SNDD = 0x44444E53,
-        SPIT = 0x54495053,
-        SPDT = 0x54445053,
-        TNAM = 0x4D414E54,
-        TPIC = 0x43495054,
-        TRDT = 0x54445254,
-        TCLT = 0x544C4354,
-        TCLF = 0x464C4354,
-        TEXT = 0x54584554,
-        UNAM = 0x4D414E55,
-        VNAM = 0x4D414E56,
-        VTXT = 0x54585456,
-        VNML = 0x4C4D4E56,
-        VHGT = 0x54474856,
-        VCLR = 0x524C4356,
-        VTEX = 0x58455456,
-        WLST = 0x54534C57,
-        WNAM = 0x4D414E57,
-        WHGT = 0x54474857,
-        WPDT = 0x54445057,
-        WEAT = 0x54414557,
-        XTEL = 0x4C455458,
-        XLOC = 0x434F4C58,
-        XTRG = 0x47525458,
-        XSED = 0x44455358,
-        XCHG = 0x47484358,
-        XHLT = 0x544C4858,
-        XLCM = 0x4D434C58,
-        XRTM = 0x4D545258,
-        XACT = 0x54434158,
-        XCNT = 0x544E4358,
-        XMRK = 0x4B524D58,
-        XXXX = 0x58585858,
-        XOWN = 0x4E574F58,
-        XRNK = 0x4B4E5258,
-        XGLB = 0x424C4758,
-        XESP = 0x50534558,
-        XSCL = 0x4C435358,
-        XRGD = 0x44475258,
-        XPCI = 0x49435058,
-        XLOD = 0x444F4C58,
-        XMRC = 0x43524D58,
-        XHRS = 0x53524858,
-        XSOL = 0x4C4F5358,
-        XCLC = 0x434C4358,
-        XCLL = 0x4C4C4358,
-        XCLW = 0x574C4358,
-        XCLR = 0x524C4358,
-        XCMT = 0x544D4358,
-        XCCM = 0x4D434358,
-        XCWT = 0x54574358,
-        XNAM = 0x4D414E58,
     }
 
     #endregion
