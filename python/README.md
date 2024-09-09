@@ -21,4 +21,4 @@ https://stackoverflow.com/questions/13689628/is-there-a-python-equivalent-to-mem
 
 
 pip install --editable ../OpenStack/python
-pip install --editable .pip 
+pip install --editable .
