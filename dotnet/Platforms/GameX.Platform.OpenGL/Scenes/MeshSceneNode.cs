@@ -1,5 +1,7 @@
-using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Gl.Renders;
+using OpenStack.Gfx.Renders;
+using OpenStack.Gfx.Scenes;
 using System.Collections.Generic;
 using System.Numerics;
 

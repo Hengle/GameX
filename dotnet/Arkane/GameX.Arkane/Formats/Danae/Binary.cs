@@ -225,7 +225,7 @@ namespace GameX.Arkane.Formats.Danae
                 // Alloc'n'Copy vertices
                 if (_3Dh.NumVertex > 0)
                 {
-                    var vertexList = r.ReadTArray<FTL_VERTEX>(sizeof(FTL_VERTEX), _3Dh.NumVertex);
+                    var vertexList = r.ReadSArray<FTL_VERTEX>(_3Dh.NumVertex);
                     Obj.VertexList = new E_VERTEX[_3Dh.NumVertex];
                     for (var i = 0; i < Obj.VertexList.Length; i++)
                     {
@@ -238,7 +238,7 @@ namespace GameX.Arkane.Formats.Danae
                 // Alloc'n'Copy faces
                 if (_3Dh.NumFaces > 0)
                 {
-                    var faceList = r.ReadTArray<FTL_FACE>(sizeof(FTL_FACE), _3Dh.NumFaces);
+                    var faceList = r.ReadSArray<FTL_FACE>(_3Dh.NumFaces);
                     Obj.FaceList = new E_FACE[_3Dh.NumFaces];
                     for (var i = 0; i < Obj.FaceList.Length; i++)
                         Obj.FaceList[i] = faceList[i];
@@ -261,7 +261,7 @@ namespace GameX.Arkane.Formats.Danae
                     for (var i = 0; i < Obj.GroupList.Length; i++)
                     {
                         Obj.GroupList[i] = groupList[i];
-                        if (Obj.GroupList[i].NumIndex > 0) Obj.GroupList[i].Indexes = r.ReadTArray<int>(sizeof(int), Obj.GroupList[i].NumIndex);
+                        if (Obj.GroupList[i].NumIndex > 0) Obj.GroupList[i].Indexes = r.ReadPArray<int>("i", Obj.GroupList[i].NumIndex);
                     }
                 }
 
@@ -282,7 +282,7 @@ namespace GameX.Arkane.Formats.Danae
                     for (var i = 0; i < Obj.Selections.Length; i++)
                     {
                         Obj.Selections[i] = selections[i];
-                        Obj.Selections[i].Selected = r.ReadTArray<int>(sizeof(int), Obj.Selections[i].NumSelected);
+                        Obj.Selections[i].Selected = r.ReadPArray<int>("i", Obj.Selections[i].NumSelected);
                     }
                 }
             }
@@ -295,7 +295,7 @@ namespace GameX.Arkane.Formats.Danae
                 Obj.Sdata = new COLLISION_SPHERES_DATA
                 {
                     NumSpheres = csh.NumSpheres,
-                    Spheres = r.ReadTArray<COLLISION_SPHERE>(sizeof(COLLISION_SPHERE), csh.NumSpheres),
+                    Spheres = r.ReadSArray<COLLISION_SPHERE>(csh.NumSpheres),
                 };
             }
 
@@ -316,8 +316,8 @@ namespace GameX.Arkane.Formats.Danae
                 {
                     NumCvert = (short)ch.NumCvert,
                     NumSprings = (short)ch.NumSprings,
-                    Cvert = r.ReadTArray<CLOTHESVERTEX>(sizeof(CLOTHESVERTEX), ch.NumCvert),
-                    Springs = r.ReadTArray<E_SPRINGS>(sizeof(E_SPRINGS), ch.NumSprings),
+                    Cvert = r.ReadSArray<CLOTHESVERTEX>(ch.NumCvert),
+                    Springs = r.ReadSArray<E_SPRINGS>(ch.NumSprings),
                 };
             }
         }
@@ -700,17 +700,13 @@ namespace GameX.Arkane.Formats.Danae
                         if ((ep.Type & POLY.QUAD) != 0) DeclareEGInfo(Bkg, ep2.V[3].S.X, ep2.V[3].S.Y, ep2.V[3].S.Z);
                     }
 
-                    bi.IAnchors = fsi.NumIAnchors <= 0
-                        ? null
-                        : r2.ReadTArray<int>(sizeof(int), fsi.NumIAnchors);
+                    bi.IAnchors = fsi.NumIAnchors <= 0 ? null : r2.ReadPArray<int>("i", fsi.NumIAnchors);
                 }
             //Log($"Background: {r2.Position():x}");
 
             // anchors
             Bkg.NumAnchors = fsh.NumAnchors;
-            var anchors = Bkg.Anchors = fsh.NumAnchors > 0
-                ? new ANCHOR_DATA[fsh.NumAnchors]
-                : null;
+            var anchors = Bkg.Anchors = fsh.NumAnchors > 0 ? new ANCHOR_DATA[fsh.NumAnchors] : null;
             for (i = 0; i < fsh.NumAnchors; i++)
             {
                 ref ANCHOR_DATA a = ref anchors[i];
@@ -720,9 +716,7 @@ namespace GameX.Arkane.Formats.Danae
                 a.NumLinked = fad.NumLinked;
                 a.Height = fad.Height;
                 a.Radius = fad.Radius;
-                a.Linked = fad.NumLinked > 0
-                    ? r2.ReadTArray<int>(sizeof(int), fad.NumLinked)
-                    : null;
+                a.Linked = fad.NumLinked > 0 ? r2.ReadPArray<int>("i", fad.NumLinked) : null;
             }
             //Log($"Anchors: {r2.Position():x}");
 
@@ -764,12 +758,8 @@ namespace GameX.Arkane.Formats.Danae
                     var erd = r2.ReadS<E_SAVE_ROOM_DATA>();
                     rd.NumPortals = erd.NumPortals;
                     rd.NumPolys = erd.NumPolys;
-                    rd.Portals = rd.NumPortals > 0
-                        ? r2.ReadTArray<int>(sizeof(int), rd.NumPortals)
-                        : null;
-                    rd.EpData = rd.NumPolys > 0
-                        ? r2.ReadTArray<EP_DATA>(sizeof(EP_DATA), rd.NumPolys)
-                        : null;
+                    rd.Portals = rd.NumPortals > 0 ? r2.ReadPArray<int>("i", rd.NumPortals) : null;
+                    rd.EpData = rd.NumPolys > 0 ? r2.ReadSArray<EP_DATA>(rd.NumPolys) : null;
                 }
             }
             //Log($"Portals: {r2.Position():x}");

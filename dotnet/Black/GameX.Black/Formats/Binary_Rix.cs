@@ -1,6 +1,7 @@
 using GameX.Meta;
 using GameX.Platforms;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +35,7 @@ namespace GameX.Black.Formats
 
         public Binary_Rix(BinaryReader r, FileSource f)
         {
-            var header = r.ReadT<Header>(sizeof(Header));
+            var header = r.ReadS<Header>();
             var rgb = r.ReadBytes(256 * 3);
             var rgba32 = stackalloc uint[256];
             fixed (byte* s = rgb)

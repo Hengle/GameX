@@ -1,5 +1,5 @@
 ﻿//#define Arkane
-#define Bethesda
+//#define Bethesda
 //#define Bioware
 //#define Black
 //#define Blizzard
@@ -24,7 +24,7 @@
 //#define Unknown
 //#define Valve
 //#define Volition
-//#define WB
+#define WB
 
 namespace GameX
 {
@@ -590,7 +590,7 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            ForcePath = "sample:*",
+            ForcePath = "sample:0",
             Family = "WB",
             Game = "AC", // Asheron's Call [open, read, texture:GL]
         };

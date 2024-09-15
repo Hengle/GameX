@@ -1,6 +1,7 @@
 using GameX.Meta;
 using GameX.Platforms;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -213,7 +214,7 @@ namespace GameX.IW.Formats
                     _ => throw new FormatException($"Invalid IWI Version: {version}."),
                 });
 
-                var mips = r.ReadTArray<int>(sizeof(int), version < VERSION.CODBO1 ? 4 : 8);
+                var mips = r.ReadPArray<int>("i", version < VERSION.CODBO1 ? 4 : 8);
                 var mipsLength = mips[0] == mips[1] || mips[0] == mips[^1] ? 1 : mips.Length - 1;
                 var mipsBase = mipsLength == 1 ? (int)r.Tell() : mips[^1];
                 var size = (int)(r.BaseStream.Length - mipsBase);

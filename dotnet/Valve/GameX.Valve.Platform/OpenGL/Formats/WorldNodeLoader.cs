@@ -4,6 +4,7 @@ using GameX.Valve.Formats.Blocks;
 using GameX.Valve.OpenGL.Scenes;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Scenes;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -11,16 +12,10 @@ using System.Numerics;
 namespace GameX.Valve.OpenGL.Formats
 {
     //was:Renderer/WorldLoader
-    public class WorldNodeLoader
+    public class WorldNodeLoader(IOpenGLGfx gfx, DATAWorldNode node)
     {
-        readonly DATAWorldNode Node;
-        readonly IOpenGLGfx Gfx;
-
-        public WorldNodeLoader(IOpenGLGfx gfx, DATAWorldNode node)
-        {
-            Node = node;
-            Gfx = gfx;
-        }
+        readonly DATAWorldNode Node = node;
+        readonly IOpenGLGfx Gfx = gfx;
 
         public void Load(Scene scene)
         {

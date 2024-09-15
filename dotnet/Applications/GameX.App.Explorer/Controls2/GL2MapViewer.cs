@@ -1,5 +1,6 @@
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Renders;
 using System;
 using System.ComponentModel;
 using System.Numerics;
@@ -41,7 +42,6 @@ namespace GameX.App.Explorer.Controls2
             Camera.SetViewport(0, 0, (int)ActualWidth, (int)ActualHeight);
             Camera.SetLocation(new Vector3(200));
             Camera.LookAt(new Vector3(0));
-
         }
 
         protected override void Render(Camera camera, float frameTime) { }

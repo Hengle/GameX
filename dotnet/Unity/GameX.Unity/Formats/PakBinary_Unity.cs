@@ -345,8 +345,8 @@ namespace GameX.Unity.Formats
                     // read secondary
                     if (version >= 0x15)
                     {
-                        //var depListLen = (int)r.ReadUInt32E(endian); Deps = depListLen >= 0 ? r.ReadTArray(_ => r.ReadUInt32E(endian)), depListLen) : new uint[0];
-                        if (!secondaryTypeTree) Deps = r.ReadL32TArray<uint>(4, endian: endian);
+                        //var depListLen = (int)r.ReadUInt32E(endian); Deps = depListLen >= 0 ? r.ReadPArray("I" => r.ReadUInt32E(endian)), depListLen) : new uint[0];
+                        if (!secondaryTypeTree) Deps = r.ReadL32PArray<uint>("I", endian: endian);
                         else Headers = r.ReadZAStringList().ToArray();
                     }
                 }

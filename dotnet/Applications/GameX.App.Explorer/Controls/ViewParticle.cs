@@ -1,5 +1,7 @@
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Gl.Renders;
+using OpenStack.Gfx.Renders;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,7 +36,7 @@ namespace GameX.App.Explorer.Controls
             set => SetValue(SourceProperty, value);
         }
 
-        HashSet<ParticleRenderer> Renderers { get; } = new HashSet<ParticleRenderer>();
+        HashSet<ParticleRenderer> Renderers { get; } = [];
 
         void OnProperty()
         {

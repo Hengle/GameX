@@ -173,7 +173,7 @@ namespace GameX.Valve.Formats
                 source.Tag = new Verification
                 {
                     // archive md5
-                    ArchiveMd5Entries = headerV2.ArchiveMd5SectionSize != 0 ? r.ReadTArray<ArchiveMd5Entry>(sizeof(ArchiveMd5Entry), (int)headerV2.ArchiveMd5Entries) : null,
+                    ArchiveMd5Entries = headerV2.ArchiveMd5SectionSize != 0 ? r.ReadSArray<ArchiveMd5Entry>((int)headerV2.ArchiveMd5Entries) : null,
                     // other md5
                     TreeChecksum = r.ReadBytes(16),
                     ArchiveMd5EntriesChecksum = r.ReadBytes(16),

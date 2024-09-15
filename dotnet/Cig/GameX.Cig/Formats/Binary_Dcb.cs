@@ -195,35 +195,35 @@ namespace GameX.Cig.Formats
 
             if (!IsLegacy) r.Skip(2 << 2);
 
-            var h = r.ReadT<Header>((IsLegacy ? 25 : 26) << 2);
-            StructTypes = r.ReadTArray<StructType_>(sizeof(StructType_), h.StructTypes);
-            PropertyTypes = r.ReadTArray<PropertyType_>(sizeof(PropertyType_), h.PropertyTypes);
-            EnumTypes = r.ReadTArray<EnumType_>(sizeof(EnumType_), h.EnumTypes);
-            if (FileVersion >= 5) DataMapV1s = r.ReadTArray<DataMapV1_>(sizeof(DataMapV1_), h.DataMappings);
-            else DataMapV0s = r.ReadTArray<DataMapV0_>(sizeof(DataMapV0_), h.DataMappings);
-            if (!IsLegacy) RecordTypeV1s = r.ReadTArray<RecordTypeV1_>(sizeof(RecordTypeV1_), h.RecordTypes);
-            else RecordTypeV0s = r.ReadTArray<RecordTypeV0_>(sizeof(RecordTypeV0_), h.RecordTypes);
+            var h = r.ReadS<Header>((IsLegacy ? 25 : 26) << 2);
+            StructTypes = r.ReadSArray<StructType_>(sizeof(StructType_), h.StructTypes);
+            PropertyTypes = r.ReadSArray<PropertyType_>(sizeof(PropertyType_), h.PropertyTypes);
+            EnumTypes = r.ReadSArray<EnumType_>(sizeof(EnumType_), h.EnumTypes);
+            if (FileVersion >= 5) DataMapV1s = r.ReadSArray<DataMapV1_>(h.DataMappings);
+            else DataMapV0s = r.ReadSArray<DataMapV0_>(h.DataMappings);
+            if (!IsLegacy) RecordTypeV1s = r.ReadSArray<RecordTypeV1_>(h.RecordTypes);
+            else RecordTypeV0s = r.ReadSArray<RecordTypeV0_>(h.RecordTypes);
 
             // read values
-            Value_Int8s = r.ReadTArray<sbyte>(sizeof(sbyte), h.Int8s);
-            Value_Int16s = r.ReadTArray<short>(sizeof(short), h.Int16s);
-            Value_Int32s = r.ReadTArray<int>(sizeof(int), h.Int32s);
-            Value_Int64s = r.ReadTArray<long>(sizeof(long), h.Int64s);
-            Value_UInt8s = r.ReadTArray<byte>(sizeof(byte), h.UInt8s);
-            Value_UInt16s = r.ReadTArray<ushort>(sizeof(ushort), h.UInt16s);
-            Value_UInt32s = r.ReadTArray<uint>(sizeof(uint), h.UInt32s);
-            Value_UInt64s = r.ReadTArray<ulong>(sizeof(ulong), h.UInt64s);
-            Value_Booleans = r.ReadTArray<bool>(sizeof(byte), h.Booleans);
-            Value_Singles = r.ReadTArray<float>(sizeof(float), h.Singles);
-            Value_Doubles = r.ReadTArray<double>(sizeof(double), h.Doubles);
-            Value_Guids = r.ReadTArray<Guid>(sizeof(Guid), h.Guids);
-            Value_Strings = r.ReadTArray<Lookup_>(sizeof(Lookup_), h.Strings);
-            Value_Locales = r.ReadTArray<Lookup_>(sizeof(Lookup_), h.Locales);
-            Value_Enums = r.ReadTArray<Lookup_>(sizeof(Lookup_), h.Enums);
-            Value_Strongs = r.ReadTArray<Pointer_>(sizeof(Pointer_), h.Strongs);
-            Value_Weaks = r.ReadTArray<Pointer_>(sizeof(Pointer_), h.Weaks);
-            Value_References = r.ReadTArray<Reference_>(sizeof(Reference_), h.References);
-            Value_EnumOptions = r.ReadTArray<Lookup_>(sizeof(Lookup_), h.EnumOptions);
+            Value_Int8s = r.ReadPArray<sbyte>("b", h.Int8s);
+            Value_Int16s = r.ReadPArray<short>("h", h.Int16s);
+            Value_Int32s = r.ReadPArray<int>("i", h.Int32s);
+            Value_Int64s = r.ReadPArray<long>("q", h.Int64s);
+            Value_UInt8s = r.ReadPArray<byte>("B", h.UInt8s);
+            Value_UInt16s = r.ReadPArray<ushort>("H", h.UInt16s);
+            Value_UInt32s = r.ReadPArray<uint>("I", h.UInt32s);
+            Value_UInt64s = r.ReadPArray<ulong>("Q", h.UInt64s);
+            Value_Booleans = r.ReadPArray<bool>("B", h.Booleans);
+            Value_Singles = r.ReadPArray<float>("f", h.Singles);
+            Value_Doubles = r.ReadPArray<double>("d", h.Doubles);
+            Value_Guids = r.ReadPArray<Guid>("16s", h.Guids);
+            Value_Strings = r.ReadSArray<Lookup_>(h.Strings);
+            Value_Locales = r.ReadSArray<Lookup_>(h.Locales);
+            Value_Enums = r.ReadSArray<Lookup_>(h.Enums);
+            Value_Strongs = r.ReadSArray<Pointer_>(h.Strongs);
+            Value_Weaks = r.ReadSArray<Pointer_>(h.Weaks);
+            Value_References = r.ReadSArray<Reference_>(h.References);
+            Value_EnumOptions = r.ReadSArray<Lookup_>(h.EnumOptions);
 
             // read strings
             var b = new List<string>();

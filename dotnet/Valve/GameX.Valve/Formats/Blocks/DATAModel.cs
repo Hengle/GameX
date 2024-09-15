@@ -1,5 +1,6 @@
 using GameX.Valve.Formats.Animations;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Renders;
 using System.Collections.Generic;
 using System.Linq;
 

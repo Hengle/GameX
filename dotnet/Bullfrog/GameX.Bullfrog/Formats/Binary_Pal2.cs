@@ -16,13 +16,7 @@ namespace GameX.Bullfrog.Formats
         #region Palette
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        struct RGB
-        {
-            public static (string, int) Struct = ("<3x", sizeof(RGB));
-            public byte R;
-            public byte G;
-            public byte B;
-        }
+        struct RGB { public byte R; public byte G; public byte B; }
 
         public byte Bpp;
         public byte[][] Records;
@@ -45,16 +39,16 @@ namespace GameX.Bullfrog.Formats
         {
             using var r2 = new BinaryReader(new MemoryStream(Rnc.Read(r)));
             var numRecords = (int)(r2.BaseStream.Length / 3);
-            Records = r2.ReadTArray<RGB>(sizeof(RGB), numRecords).Select(s => new[] { s.R, s.G, s.B, (byte)255 }).ToArray();
+            Records = r2.ReadPArray<RGB>("3B", numRecords).Select(s => new[] { s.R, s.G, s.B, (byte)255 }).ToArray();
         }
 
         // IHaveMetaInfo
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-            => new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "Pallet" }),
-                new MetaInfo("Pallet", items: new List<MetaInfo> {
-                    new MetaInfo($"Records: {Records.Length}"),
-                })
-            };
+            => [
+                new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "Pallet" }),
+                new("Pallet", items: [
+                    new($"Records: {Records.Length}"),
+                ])
+            ];
     }
 }

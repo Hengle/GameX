@@ -1,6 +1,6 @@
 ﻿using GameX.Bethesda.Formats.Records;
 using GameX.Formats;
-using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -46,9 +46,9 @@ namespace GameX.Bethesda.Formats
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F4_File
         {
-            public static (string, int) Struct = ("<I4c2IQ3I", sizeof(F4_File));
+            public static (string, int) Struct = ("<4IQ3I", sizeof(F4_File));
             public uint NameHash;           // 00
-            public fixed byte Ext[4];       // 04 - extension
+            public uint Ext;                // 04 - extension
             public uint DirHash;            // 08
             public uint Flags;              // 0C - flags? 00100100
             public ulong Offset;            // 10 - relative to start of file
@@ -60,9 +60,9 @@ namespace GameX.Bethesda.Formats
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F4_Texture
         {
-            public static (string, int) Struct = ("<I4sIBBHHHBBBB", sizeof(F4_Texture));
+            public static (string, int) Struct = ("<3I2B3H4B", sizeof(F4_Texture));
             public uint NameHash;           // 00
-            public fixed byte Ext[4];       // 04 - extension
+            public uint Ext;                // 04 - extension
             public uint DirHash;            // 08
             public byte Unk0C;              // 0C
             public byte NumChunks;          // 0D
@@ -78,9 +78,9 @@ namespace GameX.Bethesda.Formats
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F4_GNMF
         {
-            public static (string, int) Struct = ("<I4sIBBH32sQIIII", sizeof(F4_GNMF));
+            public static (string, int) Struct = ("<3I2BH32sQ4I", sizeof(F4_GNMF));
             public uint NameHash;           // 00
-            public fixed byte Ext[4];       // 04 - extension
+            public uint Ext;                // 04 - extension
             public uint DirHash;            // 08
             public byte Unk0C;              // 0C
             public byte NumChunks;          // 0D
@@ -96,7 +96,7 @@ namespace GameX.Bethesda.Formats
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct F4_TextureChunk
         {
-            public static (string, int) Struct = ("<QIIHHI", sizeof(F4_TextureChunk));
+            public static (string, int) Struct = ("<Q2I2HI", sizeof(F4_TextureChunk));
             public ulong Offset;            // 00
             public uint PackedSize;         // 08
             public uint FileSize;           // 0C
@@ -126,7 +126,7 @@ namespace GameX.Bethesda.Formats
                 {
                     // General BA2 Format
                     case F4_HeaderType.GNRL:
-                        var headerFiles = r.ReadTArray<F4_File>(sizeof(F4_File), (int)header.NumFiles);
+                        var headerFiles = r.ReadSArray<F4_File>((int)header.NumFiles);
                         for (var i = 0; i < headerFiles.Length; i++)
                         {
                             ref F4_File headerFile = ref headerFiles[i];
@@ -144,7 +144,7 @@ namespace GameX.Bethesda.Formats
                         for (var i = 0; i < header.NumFiles; i++)
                         {
                             var headerTexture = r.ReadS<F4_Texture>();
-                            var headerTextureChunks = r.ReadTArray<F4_TextureChunk>(sizeof(F4_TextureChunk), headerTexture.NumChunks);
+                            var headerTextureChunks = r.ReadSArray<F4_TextureChunk>(headerTexture.NumChunks);
                             ref F4_TextureChunk firstChunk = ref headerTextureChunks[0];
                             files[i] = new FileSource
                             {
@@ -160,7 +160,7 @@ namespace GameX.Bethesda.Formats
                         for (var i = 0; i < header.NumFiles; i++)
                         {
                             var headerGNMF = r.ReadS<F4_GNMF>();
-                            var headerTextureChunks = r.ReadTArray<F4_TextureChunk>(sizeof(F4_TextureChunk), headerGNMF.NumChunks);
+                            var headerTextureChunks = r.ReadSArray<F4_TextureChunk>(headerGNMF.NumChunks);
                             files[i] = new FileSource
                             {
                                 PackedSize = headerGNMF.PackedSize,

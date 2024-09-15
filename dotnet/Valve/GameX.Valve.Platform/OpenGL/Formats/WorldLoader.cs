@@ -4,6 +4,7 @@ using GameX.Valve.Formats.Extras;
 using GameX.Valve.OpenGL.Scenes;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Scenes;
 using System;
 using System.Collections.Generic;
 using System.IO;

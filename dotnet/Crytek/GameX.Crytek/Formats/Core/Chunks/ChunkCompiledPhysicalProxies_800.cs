@@ -21,8 +21,8 @@ namespace GameX.Crytek.Formats.Core.Chunks
                 proxy.NumVertices = (int)r.ReadUInt32();
                 proxy.NumIndices = (int)r.ReadUInt32();
                 proxy.Material = r.ReadUInt32(); // Probably a fill of some sort?
-                proxy.Vertices = r.ReadTArray<Vector3>(MathX.SizeOfVector3, proxy.NumVertices);
-                proxy.Indices = r.ReadTArray<ushort>(sizeof(ushort), proxy.NumIndices);
+                proxy.Vertices = r.ReadPArray<Vector3>("3f", proxy.NumVertices);
+                proxy.Indices = r.ReadPArray<ushort>("H", proxy.NumIndices);
                 // read the crap at the end so we can move on.
                 SkipBytes(r, proxy.Material);
             }

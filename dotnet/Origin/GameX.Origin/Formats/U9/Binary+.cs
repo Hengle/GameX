@@ -3,6 +3,7 @@ using GameX.Meta;
 using GameX.Origin.Games.U9;
 using GameX.Platforms;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -147,14 +148,14 @@ namespace GameX.Origin.Formats.U9
         {
             var header = r.ReadS<AnimHeader>();
             Filename = r.ReadL32AString();
-            Elements = r.ReadL32TArray<uint>(sizeof(uint));
+            Elements = r.ReadL32PArray<uint>("I");
             Parts = r.ReadFArray(s => new AnimPart
             {
                 Id = r.ReadUInt32(),
                 Name = r.ReadL32AString(),
                 Frames = r.ReadL32SArray<AnimFrame>(),
             }, r.ReadInt32());
-            Suffixs = r.ReadL32TArray<(uint, uint, uint)>(sizeof((uint, uint, uint)));
+            Suffixs = r.ReadL32PArray<(uint, uint, uint)>("3I");
         }
 
         // IHaveMetaInfo
@@ -270,7 +271,7 @@ namespace GameX.Origin.Formats.U9
                 r.Seek(s.Offset);
                 var frame = r.ReadS<BmpFrame>();
                 int width = (int)frame.Width, height = (int)frame.Height;
-                var offsets = r.ReadTArray<uint>(sizeof(uint), height); // Offset to the data for each row relative to the start of the resource.
+                var offsets = r.ReadPArray<uint>("I", height); // Offset to the data for each row relative to the start of the resource.
                 if (offsets[0] == 0xcdcdcdcd) // unknownFrame
                     return new Record(width, height, null);
                 r.Seek(s.Offset + offsets[0]);

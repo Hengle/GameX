@@ -2,6 +2,8 @@ using GameX.Meta;
 using GameX.Valve.Formats.Blocks;
 using GameX.Valve.Formats.Extras;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Renders;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;

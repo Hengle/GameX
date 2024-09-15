@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shader = StereoKit.Shader;
 using OpenStack;
+using OpenStack.Gfx.Textures;
 
 namespace GameX.Platforms
 {

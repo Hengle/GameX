@@ -1,6 +1,6 @@
 using GameX.Meta;
 using GameX.Platforms;
-using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using static OpenStack.Debug;
 
@@ -698,21 +697,15 @@ namespace GameX.Formats
         #region Palette
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        struct RGB
-        {
-            public static (string, int) Struct = ("<3x", sizeof(RGB));
-            public byte R;
-            public byte G;
-            public byte B;
-        }
+        struct RGB { public byte R; public byte G; public byte B; }
 
         #endregion
 
         public readonly byte Bpp = bpp;
         public readonly byte[][] Records = bpp switch
         {
-            3 => r.ReadTArray<RGB>(sizeof(RGB), 256).Select(s => new[] { s.R, s.G, s.B, (byte)255 }).ToArray(),
-            4 => r.ReadTArray<uint>(sizeof(uint), 256).Select(BitConverter.GetBytes).ToArray(),
+            3 => r.ReadPArray<RGB>("3B", 256).Select(s => new[] { s.R, s.G, s.B, (byte)255 }).ToArray(),
+            4 => r.ReadPArray<uint>("I", 256).Select(BitConverter.GetBytes).ToArray(),
             _ => throw new ArgumentOutOfRangeException(nameof(bpp), $"{bpp}"),
         };
 

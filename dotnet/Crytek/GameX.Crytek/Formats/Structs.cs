@@ -298,7 +298,7 @@ namespace GameX.Crytek.Formats
     [StructLayout(LayoutKind.Sequential)]
     public struct MeshMorphTargetVertex
     {
-        public const int SizeOf = sizeof(uint) + MathX.SizeOfVector3;
+        //public const int SizeOf = sizeof(uint) + MathX.SizeOfVector3;
         public uint VertexID;
         public Vector3 Vertex;
     }
@@ -314,7 +314,7 @@ namespace GameX.Crytek.Formats
     [StructLayout(LayoutKind.Sequential)]
     public struct TFace
     {
-        public const int SizeOf = sizeof(ushort) * 3;
+        //public const int SizeOf = sizeof(ushort) * 3;
         public ushort I0;
         public ushort I1;
         public ushort I2;

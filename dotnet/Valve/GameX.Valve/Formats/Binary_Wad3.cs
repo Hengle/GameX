@@ -1,6 +1,7 @@
 using GameX.Meta;
 using GameX.Platforms;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -65,7 +66,7 @@ namespace GameX.Formats
                 width = 0x100;
                 var rowCount = r.ReadUInt32();
                 var rowHeight = r.ReadUInt32();
-                var charInfos = r.ReadTArray<CharInfo>(sizeof(CharInfo), 0x100);
+                var charInfos = r.ReadSArray<CharInfo>(0x100);
             }
 
             // read pixels

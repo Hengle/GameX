@@ -107,7 +107,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
                                     b: r.ReadByte(),
                                     a: 255);
                             break;
-                        case 4: Colors = r.ReadTArray<IRGBA>(IRGBA.SizeOf, NumElements); break;
+                        case 4: Colors = r.ReadSArray<IRGBA>(IRGBA.SizeOf, NumElements); break;
                         default: Log("Unknown Color Depth"); SkipBytes(r, NumElements * BytesPerElement); break;
                     }
                     break;

@@ -1,6 +1,7 @@
 using GameX.Formats;
 using GameX.Platforms;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -182,14 +183,14 @@ namespace GameX.Valve.Formats.Blocks
                             if (int1 != 1 && int1 != 0) throw new FormatException($"int1 got: {int1}");
                             IsActuallyCompressedMips = int1 == 1; // TODO: Verify whether this int is the one that actually controls compression
                             r.Skip(mipsOffset - 8);
-                            CompressedMips = z.ReadTArray<int>(sizeof(int), (int)mips);
+                            CompressedMips = z.ReadPArray<int>("I", (int)mips);
                         }
                         else if (type == VTexExtraData.CUBEMAP_RADIANCE_SH)
                         {
                             var coeffsOffset = r.ReadUInt32();
                             var coeffs = r.ReadUInt32();
                             r.Skip(coeffsOffset - 8);
-                            RadianceCoefficients = z.ReadTArray<float>(sizeof(float), (int)coeffs); // Spherical Harmonics
+                            RadianceCoefficients = z.ReadPArray<float>("f", (int)coeffs); // Spherical Harmonics
                         }
                     });
                 }

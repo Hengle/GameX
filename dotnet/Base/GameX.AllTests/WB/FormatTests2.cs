@@ -1,10 +1,7 @@
-using GameX.WB.Formats;
-using GameX.WB.Formats.FileTypes;
+using GameX.WB.Formats.AC.FileTypes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.IO;
-using System.Threading.Tasks;
-using Environment = GameX.WB.Formats.FileTypes.Environment;
+using Environment = GameX.WB.Formats.AC.FileTypes.Environment;
 
 namespace GameX.WB
 {

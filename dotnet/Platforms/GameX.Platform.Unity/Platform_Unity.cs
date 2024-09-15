@@ -1,4 +1,5 @@
 ﻿using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using OpenStack.Sfx;
 using System;
 using System.Collections.Generic;

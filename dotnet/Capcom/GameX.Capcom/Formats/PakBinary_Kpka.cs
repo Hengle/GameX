@@ -56,7 +56,7 @@ namespace GameX.Capcom.Formats
             var hashLookup = source.Game.Resource != null ? RE.GetHashLookup($"{source.Game.Resource}.list") : null;
 
             // get header
-            var header = r.ReadT<K_Header>(sizeof(K_Header));
+            var header = r.ReadS<K_Header>();
             if (header.MajorVersion != 2 && header.MajorVersion != 4 || header.MinorVersion != 0) throw new FormatException("BAD VERSION");
 
             // decrypt table
@@ -72,7 +72,7 @@ namespace GameX.Capcom.Formats
             // get files
             if (header.MajorVersion == 2)
             {
-                source.Files = tr.ReadTArray<K_FileV2>(sizeof(K_FileV2), header.NumFiles)
+                source.Files = tr.ReadSArray<K_FileV2>(header.NumFiles)
                     .Select(x => new FileSource
                     {
                         Path = hashLookup != null && hashLookup.TryGetValue(x.HashName, out var z)
@@ -85,7 +85,7 @@ namespace GameX.Capcom.Formats
             else if (header.MajorVersion == 4)
             {
                 int compressed;
-                source.Files = tr.ReadTArray<K_FileV4>(sizeof(K_FileV4), header.NumFiles)
+                source.Files = tr.ReadSArray<K_FileV4>(header.NumFiles)
                     .Select(x => new FileSource
                     {
                         Compressed = compressed = GetCompressed(x.Flag),

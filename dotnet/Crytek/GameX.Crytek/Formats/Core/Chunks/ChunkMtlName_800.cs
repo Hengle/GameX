@@ -16,7 +16,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
             PhysicsType = new[] { (MtlNamePhysicsType)r.ReadUInt32() };
             NumChildren = (int)r.ReadUInt32();
             // Now we need to read the Children references. 2 parts; the number of children, and then 66 - numchildren padding
-            ChildIDs = r.ReadTArray<uint>(sizeof(uint), NumChildren);
+            ChildIDs = r.ReadPArray<uint>("I", NumChildren);
             SkipBytes(r, 32);
         }
     }

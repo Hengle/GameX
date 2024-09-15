@@ -1,6 +1,9 @@
 ﻿using OpenStack;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Gl.Renders;
+using OpenStack.Gfx.Renders;
+using OpenStack.Gfx.Textures;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;

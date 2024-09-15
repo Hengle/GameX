@@ -24,7 +24,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
                 case DataStreamType.VERTICES:
                     switch (BytesPerElement)
                     {
-                        case 12: Vertices = r.ReadTArray<Vector3>(MathX.SizeOfVector3, NumElements); break;
+                        case 12: Vertices = r.ReadPArray<Vector3>("3f", NumElements); break;
                         // Prey files, and old Star Citizen files. 2 byte floats.
                         case 8: Vertices = new Vector3[NumElements]; for (var i = 0; i < NumElements; i++) { Vertices[i] = r.ReadHalfVector3(); r.ReadUInt16(); } break;
                         case 16: Vertices = new Vector3[NumElements]; for (var i = 0; i < NumElements; i++) { Vertices[i] = r.ReadVector3(); SkipBytes(r, 4); } break;
@@ -32,10 +32,10 @@ namespace GameX.Crytek.Formats.Core.Chunks
                     break;
                 case DataStreamType.INDICES:
                     if (BytesPerElement == 2) { Indices = new uint[NumElements]; for (var i = 0; i < NumElements; i++) Indices[i] = r.ReadUInt16(); }
-                    else if (BytesPerElement == 4) Indices = r.ReadTArray<uint>(sizeof(uint), NumElements);
+                    else if (BytesPerElement == 4) Indices = r.ReadPArray<uint>("I", NumElements);
                     break;
-                case DataStreamType.NORMALS: Normals = r.ReadTArray<Vector3>(MathX.SizeOfVector3, NumElements); break;
-                case DataStreamType.UVS: UVs = r.ReadTArray<Vector2>(MathX.SizeOfVector2, NumElements); break;
+                case DataStreamType.NORMALS: Normals = r.ReadPArray<Vector3>("3f", NumElements); break;
+                case DataStreamType.UVS: UVs = r.ReadPArray<Vector2>("2f", NumElements); break;
                 case DataStreamType.TANGENTS:
                     Tangents = new Tangent[NumElements, 2];
                     Normals = new Vector3[NumElements];
@@ -90,7 +90,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
                                     b: r.ReadByte(),
                                     a: 255);
                             break;
-                        case 4: Colors = r.ReadTArray<IRGBA>(IRGBA.SizeOf, NumElements); break;
+                        case 4: Colors = r.ReadSArray<IRGBA>(IRGBA.SizeOf, NumElements); break;
                         default: Log("Unknown Color Depth"); SkipBytes(r, NumElements * BytesPerElement); break;
                     }
                     break;

@@ -10,7 +10,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
             base.Read(r);
 
             NumberOfMorphTargets = (int)r.ReadUInt32();
-            MorphTargetVertices = r.ReadTArray<MeshMorphTargetVertex>(MeshMorphTargetVertex.SizeOf, NumberOfMorphTargets);
+            MorphTargetVertices = r.ReadSArray<MeshMorphTargetVertex>(NumberOfMorphTargets);
 
             // Add to SkinningInfo
             var skin = GetSkinningInfo();

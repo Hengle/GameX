@@ -216,20 +216,20 @@ namespace GameX.Bioware.Formats
             var magic = source.Magic = r.ReadUInt32();
             if (magic == KEY_MAGIC) // Signature("KEY ")
             {
-                var header = r.ReadT<KEY_Header>(sizeof(KEY_Header));
+                var header = r.ReadS<KEY_Header>();
                 if (header.Version != KEY_VERSION) throw new FormatException("BAD MAGIC");
                 source.Version = header.Version;
                 source.Files = files = new FileSource[header.NumFiles];
 
                 // parts
                 r.Seek(header.FilesOffset);
-                var headerFiles = r.ReadTArray<KEY_HeaderFile>(sizeof(KEY_HeaderFile), (int)header.NumFiles).Select(x =>
+                var headerFiles = r.ReadSArray<KEY_HeaderFile>((int)header.NumFiles).Select(x =>
                 {
                     r.Seek(x.FileNameOffset);
                     return (file: x, path: r.ReadFString(x.FileNameSize - 1));
                 }).ToArray();
                 r.Seek(header.KeysOffset);
-                var headerKeys = r.ReadTArray<KEY_HeaderKey>(sizeof(KEY_HeaderKey), (int)header.NumKeys).ToDictionary(x => x.Id, x => UnsafeX.FixedAString(x.Name, 0x10));
+                var headerKeys = r.ReadSArray<KEY_HeaderKey>((int)header.NumKeys).ToDictionary(x => x.Id, x => UnsafeX.FixedAString(x.Name, 0x10));
 
                 // combine
                 var subPathFormat = Path.Combine(Path.GetDirectoryName(source.PakPath), "{0}");
@@ -251,14 +251,14 @@ namespace GameX.Bioware.Formats
             {
                 if (source.Tag == null) throw new FormatException("BIFF files can only be processed through KEY files");
                 var (keys, bifId) = ((Dictionary<uint, string> keys, uint bifId))source.Tag;
-                var header = r.ReadT<BIFF_Header>(sizeof(BIFF_Header));
+                var header = r.ReadS<BIFF_Header>();
                 if (header.Version != BIFF_VERSION) throw new FormatException("BAD MAGIC");
                 source.Version = header.Version;
                 source.Files = files2 = new List<FileSource>();
 
                 // files
                 r.Seek(header.FilesOffset);
-                var headerFiles = r.ReadTArray<BIFF_HeaderFile>(sizeof(BIFF_HeaderFile), (int)header.NumFiles);
+                var headerFiles = r.ReadSArray<BIFF_HeaderFile>((int)header.NumFiles);
                 for (var i = 0; i < headerFiles.Length; i++)
                 {
                     var headerFile = headerFiles[i];

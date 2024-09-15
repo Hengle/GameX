@@ -7,6 +7,7 @@ using UnrealEngine.Framework;
 using Framework_Debug = UnrealEngine.Framework.Debug;
 using Framework_LogLevel = UnrealEngine.Framework.LogLevel;
 using Debug = OpenStack.Debug;
+using OpenStack.Gfx.Textures;
 
 namespace GameX.Platforms
 {

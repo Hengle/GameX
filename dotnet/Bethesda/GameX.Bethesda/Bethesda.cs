@@ -3,6 +3,7 @@ using GameX.Bethesda.Transforms;
 using GameX.Formats;
 using GameX.Formats.Unknown;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.IO;
 using System.Text.Json;

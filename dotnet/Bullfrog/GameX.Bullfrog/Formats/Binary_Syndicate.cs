@@ -563,7 +563,7 @@ namespace GameX.Bullfrog.Formats
                         var width = (maxX + maxY) * (TILE_WIDTH / 2);
                         var height = (maxX + maxY + maxZ) * TILE_HEIGHT / 3;
                         var data = r2.ReadToEnd(); r2.Seek(12);
-                        var lookups = r2.ReadTArray<uint>(sizeof(uint), maxX * maxY);
+                        var lookups = r2.ReadPArray<uint>("I", maxX * maxY);
                         // get tiles
                         // note: increased map height by 1 to enable range check on higher tiles
                         var tiles = new byte[maxX * maxY * (maxZ + 1)];
@@ -751,7 +751,7 @@ namespace GameX.Bullfrog.Formats
                 case Kind.SpriteAnim:
                     {
                         var count = (int)(streamSize / sizeof(ushort));
-                        Obj = r2.ReadTArray<ushort>(sizeof(ushort), count);
+                        Obj = r2.ReadPArray<ushort>("H", count);
                         break;
                     }
                 case Kind.Mission:

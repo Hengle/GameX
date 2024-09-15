@@ -1,7 +1,7 @@
+using OpenStack.Gfx.Animates;
 using System;
-using SystemX;
 using System.Numerics;
-using OpenStack.Gfx;
+using SystemX;
 
 namespace GameX.Valve.Formats.Animations.SegmentDecoders
 {

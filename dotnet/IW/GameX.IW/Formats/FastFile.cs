@@ -90,14 +90,14 @@ namespace GameX.IW.Formats
                 //{
                 //    if (argCount > 0)
                 //    {
-                //        var argsValues = r.ReadTArray<long>(sizeof(long), argCount);
-                //        var argsNames = r.ReadTArray(r => r.ReadCString(), argCount);
+                //        var argsValues = r.ReadPArray<long>("q", argCount);
+                //        var argsNames = r.ReadFArray(r => r.ReadCString(), argCount);
                 //        if (argsNames[argCount - 1] == "\u0005") { argCount--; r.Skip(-3); }
                 //        for (var i = 0; i < argCount; i++) args[argsNames[i] ?? $"${i}"] = argsValues[i];
                 //    }
                 //    if (assetCount > 0)
                 //    {
-                //        var assetType = r.ReadTArray<long>(sizeof(long), assetCount * 2);
+                //        var assetType = r.ReadPArray<long>("q", assetCount * 2);
                 //        //assetInfos = assetType.Select(x => (CodAssetType)(x << 32)).ToArray();
                 //    }
                 //}
@@ -105,14 +105,14 @@ namespace GameX.IW.Formats
                 {
                     if (argCount > 0)
                     {
-                        var argsValues = r.ReadTArray<int>(sizeof(int), argCount);
+                        var argsValues = r.ReadPArray<int>("i", argCount);
                         var argsNames = r.ReadFArray(r => r.ReadZAString(), argCount);
                         if (argsNames[argCount - 1] == "\u0005") { argCount--; r.Skip(-2); }
                         for (var i = 0; i < argCount; i++) args[argsNames[i] ?? $"${i}"] = argsValues[i];
                     }
                     if (assetCount > 0)
                     {
-                        var assetType = r.ReadTArray<long>(sizeof(long), assetCount);
+                        var assetType = r.ReadPArray<long>("q", assetCount);
                         switch (version)
                         {
                             case FF_VERSION.CO4_WWII: assetInfos = assetType.Select(x => ((IW3XAssetType)x).ToString()).ToArray(); break; // Call of Duty 4: Modern Warfare
@@ -363,17 +363,17 @@ namespace GameX.IW.Formats
 
             public COD_Shader(BinaryReader r)
             {
-                Pointers = r.ReadTArray<int>(sizeof(int), 36);  // 36 pointers (0x90 bytes) (bytes 0x19 up to 0x22 say if we get any content at all?)
+                Pointers = r.ReadPArray<int>("I", 36);  // 36 pointers (0x90 bytes) (bytes 0x19 up to 0x22 say if we get any content at all?)
                 Name = r.ReadZAString();                          // Then techset file name (0x00 termination) if pointer is 0xFFFFFFFF?
 
                 // start of shader pack
                 while (r.ReadInt32() != -1) // pointer (-1)
                 {
                     var packOption = r.ReadInt32();             // 1 dword of some character-length options / flags ?
-                    var packPointer2 = r.ReadTArray<int>(sizeof(int), 3); // 3 pointers
+                    var packPointer2 = r.ReadPArray<int>("I", 3); // 3 pointers
                     var packSizes = r.ReadInt32();              // 1 dword of some character-length options / flags ?
                     var packSeparator = r.ReadInt32();          // Separator
-                    var packPointer3 = r.ReadTArray<short>(sizeof(short), 0x32); // 0x64 bytes of some short length options / flags? If the second pointer above is 0xFFFFFFFF
+                    var packPointer3 = r.ReadPArray<short>("H", 0x32); // 0x64 bytes of some short length options / flags? If the second pointer above is 0xFFFFFFFF
 
                     // start of shader
                     while (true)
@@ -423,7 +423,7 @@ namespace GameX.IW.Formats
                         {
                             var mat = new COD_Shader(r);
                             //path = r.ReadZASCII(128);
-                            //var ps = r.ReadT<PixelShader>(PixelShader.COD4_SizeOf);
+                            //var ps = r.ReadS<PixelShader>(PixelShader.COD4_SizeOf);
                             //if (r.ReadInt32() != -1) throw new FormatException($"Bad End of Index");
                             break;
                         }
@@ -507,13 +507,13 @@ namespace GameX.IW.Formats
 //    r.Seek(index);
 //    if (header.Version == 0x251)
 //    {
-//        var asset = r.ReadT<FF_Asset64>(sizeof(FF_Asset64));
+//        var asset = r.ReadS<FF_Asset64>();
 //        if (asset.namePtr != 0xFFFFFFFFFFFFFFFF || asset.dataPtr != 0xFFFFFFFFFFFFFFFF || asset.size > uint.MaxValue) continue;
 //        var name = r.ReadZASCII(128);
 //    }
 //    else
 //    {
-//        var asset = r.ReadT<FF_Asset32>(sizeof(FF_Asset32));
+//        var asset = r.ReadS<FF_Asset32>();
 //        if (asset.namePtr != 0xFFFFFFFF || asset.dataPtr != 0xFFFFFFFF || asset.size > int.MaxValue) continue;
 //        var name = r.ReadZASCII(128);
 //    }

@@ -46,7 +46,7 @@ namespace GameX.Crytek.Formats
                 r = new BinaryReader(new CryptoStream(stream, aes.CreateDecryptor(), CryptoStreamMode.Read));
                 stream.Seek(stream.Length - 0x200, SeekOrigin.Begin);
 
-                var header = r.ReadT<AA_Header>(sizeof(AA_Header));
+                var header = r.ReadS<AA_Header>();
                 if (header.Magic != AA_MAGIC) throw new FormatException("BAD MAGIC");
                 source.Magic = header.Magic;
 

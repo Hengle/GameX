@@ -1,5 +1,4 @@
-using GameX.WB.Formats.FileTypes;
-using GameX.Formats;
+using GameX.WB.Formats.AC.FileTypes;
 using System.Collections.Concurrent;
 using static OpenStack.Debug;
 

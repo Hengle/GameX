@@ -106,7 +106,7 @@ namespace GameX.Volition.Formats.Descent
             if (header.Magic == MAGIC) throw new FormatException("BAD MAGIC");
             r.Seek(header.GeoOffset);
             var geo = r.ReadS<X_Geo>();
-            Vectors = r.ReadTArray<Vector3>(sizeof(Vector3), geo.NumVerts);
+            Vectors = r.ReadSArray<Vector3>(geo.NumVerts);
             Segments = r.ReadFArray<Segment>(r => new Segment(r), geo.NumSegments);
         }
 

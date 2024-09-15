@@ -1,5 +1,7 @@
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Renders;
+using OpenStack.Gfx.Textures;
 using OpenTK.Input;
 using System.Windows;
 using Key = OpenTK.Input.Key;

@@ -1,4 +1,5 @@
 ﻿using OpenStack.Gfx;
+using OpenStack.Gfx.Bitmaps;
 using System;
 using System.Drawing;
 using System.Linq;

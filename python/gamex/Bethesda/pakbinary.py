@@ -38,7 +38,7 @@ class PakBinary_Ba2(PakBinaryT):
             self.type = PakBinary_Ba2.F4_HeaderType(self.type)
 
     class F4_File:
-        struct = ('<I4s2IQ3I', 36)
+        struct = ('<4IQ3I', 36)
         def __init__(self, tuple):
             self.nameHash, \
             self.ext, \
@@ -50,7 +50,7 @@ class PakBinary_Ba2(PakBinaryT):
             self.align = tuple
 
     class F4_Texture:
-        struct = ('<I4sI2B3H4B', 24)
+        struct = ('<3I2B3H4B', 24)
         def __init__(self, tuple):
             self.nameHash, \
             self.ext, \
@@ -66,7 +66,7 @@ class PakBinary_Ba2(PakBinaryT):
             self.tileMode = tuple
 
     class F4_GNMF:
-        struct = ('<I4sI2BH32sQ4I', 72)
+        struct = ('<3I2BH32sQ4I', 72)
         def __init__(self, tuple):
             self.nameHash, \
             self.ext, \

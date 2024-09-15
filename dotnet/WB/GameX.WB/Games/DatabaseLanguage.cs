@@ -1,4 +1,4 @@
-using GameX.WB.Formats.FileTypes;
+using GameX.WB.Formats.AC.FileTypes;
 
 namespace GameX.WB
 {

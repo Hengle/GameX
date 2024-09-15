@@ -2,6 +2,7 @@ using GameX.Scenes;
 using GameX.Valve.Formats;
 using GameX.Valve.OpenGL.Scenes;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Renders;
 using System;
 using System.Collections.Generic;
 using System.Linq;

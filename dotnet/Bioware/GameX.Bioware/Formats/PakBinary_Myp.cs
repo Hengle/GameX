@@ -54,7 +54,7 @@ namespace GameX.Bioware.Formats
             var files = source.Files = new List<FileSource>();
             var hashLookup = TOR.HashLookup;
 
-            var header = r.ReadT<MYP_Header>(sizeof(MYP_Header));
+            var header = r.ReadS<MYP_Header>();
             header.Verify();
             source.Version = header.Version;
 
@@ -67,7 +67,7 @@ namespace GameX.Bioware.Formats
                 if (numFiles == 0) break;
                 tableOffset = r.ReadInt64();
 
-                var headerFiles = r.ReadTArray<MYP_HeaderFile>(sizeof(MYP_HeaderFile), numFiles);
+                var headerFiles = r.ReadSArray<MYP_HeaderFile>(numFiles);
                 for (var i = 0; i < headerFiles.Length; i++)
                 {
                     var headerFile = headerFiles[i];

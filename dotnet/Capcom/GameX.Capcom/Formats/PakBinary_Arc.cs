@@ -42,10 +42,10 @@ namespace GameX.Capcom.Formats
             if (magic != K_MAGIC) throw new FormatException("BAD MAGIC");
 
             // get header
-            var header = r.ReadT<K_Header>(sizeof(K_Header));
+            var header = r.ReadS<K_Header>();
 
             // get files
-            source.Files = r.ReadTArray<K_File>(sizeof(K_File), header.NumFiles)
+            source.Files = r.ReadSArray<K_File>(header.NumFiles)
                 .Select(x => new FileSource
                 {
                     Path = $"{Encoding.UTF8.GetString(new Span<byte>(x.Path, 0x40)).TrimEnd('\0')}{GetExtension(r, x.Offset)}".Replace('\\', '/'),

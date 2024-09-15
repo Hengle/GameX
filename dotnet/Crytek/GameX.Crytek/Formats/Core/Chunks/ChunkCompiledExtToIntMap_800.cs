@@ -10,7 +10,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
             base.Read(r);
 
             NumExtVertices = (int)(DataSize / sizeof(ushort));
-            Source = r.ReadTArray<ushort>(sizeof(ushort), NumExtVertices);
+            Source = r.ReadPArray<ushort>("H", NumExtVertices);
 
             // Add to SkinningInfo
             var skin = GetSkinningInfo();

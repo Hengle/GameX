@@ -33,7 +33,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
                             if (peek == 0) SkipBytes(r, 4);
                         }
                     }
-                    else if (BytesPerElement == 4) Indices = r.ReadTArray<uint>(sizeof(uint), NumElements);
+                    else if (BytesPerElement == 4) Indices = r.ReadPArray<uint>("I", NumElements);
                     break;
                 case DataStreamType.IVOVERTSUVS:
                     Vertices = new Vector3[NumElements];

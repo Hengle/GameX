@@ -40,7 +40,7 @@ namespace GameX.Cryptic.Formats
 
         public Binary_Bin(BinaryReader r)
         {
-            var header = r.ReadT<Header_M>(sizeof(Header_M));
+            var header = r.ReadS<Header_M>();
             if (header.Magic != MAGIC) throw new FormatException("BAD MAGIC");
             var type = r.ReadL16String(maxLength: 4096); r.Align();
             if (type != PARSE_M) throw new FormatException("BAD TYPE");

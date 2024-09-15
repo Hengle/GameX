@@ -10,7 +10,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
             base.Read(r);
 
             NumIntFaces = (int)(DataSize / 6); // This is an array of TFaces, which are 3 uint16.
-            Faces = r.ReadTArray<TFace>(TFace.SizeOf, NumIntFaces);
+            Faces = r.ReadSArray<TFace>(NumIntFaces);
 
             // Add to SkinningInfo
             var skin = GetSkinningInfo();

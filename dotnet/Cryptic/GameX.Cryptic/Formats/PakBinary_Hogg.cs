@@ -64,7 +64,7 @@ namespace GameX.Cryptic.Formats
         public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
         {
             // read header
-            var header = r.ReadT<Header>(sizeof(Header));
+            var header = r.ReadS<Header>();
             if (header.Magic != MAGIC) throw new FormatException("BAD MAGIC");
             if (header.Version < 10 || header.Version > 11) throw new FormatException("BAD Version");
             if (header.OperationJournalSection > 1024) throw new FormatException("BAD Journal");
@@ -77,8 +77,8 @@ namespace GameX.Cryptic.Formats
             r.Skip(header.FileJournalSection);
 
             // read files
-            var fileEntries = r.ReadTArray<FileEntry>(sizeof(FileEntry), numFiles);
-            var attributeEntries = r.ReadTArray<AttributeEntry>(sizeof(AttributeEntry), numFiles);
+            var fileEntries = r.ReadSArray<FileEntry>(numFiles);
+            var attributeEntries = r.ReadSArray<AttributeEntry>(numFiles);
             var files = new FileSource[numFiles];
             for (var i = 0; i < files.Length; i++)
             {
@@ -107,7 +107,7 @@ namespace GameX.Cryptic.Formats
 
             // read file journal
             r.Seek(fileJournalPosition);
-            var fileJournalHeader = r.ReadT<FileJournalHeader>(sizeof(FileJournalHeader));
+            var fileJournalHeader = r.ReadS<FileJournalHeader>();
             var endPosition = r.BaseStream.Position + fileJournalHeader.Size;
             while (r.BaseStream.Position < endPosition)
             {

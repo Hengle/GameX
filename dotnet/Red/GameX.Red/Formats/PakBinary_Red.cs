@@ -1,5 +1,5 @@
 ﻿using GameX.Formats;
-using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -461,9 +461,9 @@ namespace GameX.Red.Formats
 
                         // parts
                         r.Seek(header.FilesOffset);
-                        var headerFiles = r.ReadTArray<KEY_HeaderFile>(sizeof(KEY_HeaderFile), (int)header.NumFiles).Select(x => { r.Seek(x.FileNameOffset); return (file: x, path: r.ReadFString((int)x.FileNameSize)); }).ToArray();
+                        var headerFiles = r.ReadSArray<KEY_HeaderFile>((int)header.NumFiles).Select(x => { r.Seek(x.FileNameOffset); return (file: x, path: r.ReadFString((int)x.FileNameSize)); }).ToArray();
                         r.Seek(header.KeysOffset);
-                        var headerKeys = r.ReadTArray<KEY_HeaderKey>(sizeof(KEY_HeaderKey), (int)header.NumKeys).ToDictionary(x => (x.Id, x.ResourceId), x => UnsafeX.FixedAString(x.Name, 0x10));
+                        var headerKeys = r.ReadSArray<KEY_HeaderKey>((int)header.NumKeys).ToDictionary(x => (x.Id, x.ResourceId), x => UnsafeX.FixedAString(x.Name, 0x10));
 
                         // combine
                         var sourceName = source.Name;
@@ -496,7 +496,7 @@ namespace GameX.Red.Formats
                         // files
                         var fileTypes = BIFF_FileTypes;
                         r.Seek(header.FilesOffset);
-                        var headerFiles = r.ReadTArray<BIFF_HeaderFile>(sizeof(BIFF_HeaderFile), (int)header.NumFiles);
+                        var headerFiles = r.ReadSArray<BIFF_HeaderFile>((int)header.NumFiles);
                         for (var i = 0; i < header.NumFiles; i++)
                         {
                             var headerFile = headerFiles[i];
@@ -597,7 +597,7 @@ namespace GameX.Red.Formats
                         var headerTable = r.ReadS<RDAR_HeaderTable>();
                         var headerFiles = r.ReadSArray<RDAR_HeaderFile>((int)headerTable.Table1Count);
                         var headerOffsets = r.ReadSArray<RDAR_HeaderOffset>((int)headerTable.Table2Count);
-                        //var headerHashs = r.ReadTArray<ulong>(sizeof(ulong), (int)headerTable.Table3Count);
+                        //var headerHashs = r.ReadPArray<ulong>("Q", (int)headerTable.Table3Count);
                         source.Files = files2 = new List<FileSource>();
                         var nameHashs = new HashSet<ulong>();
                         for (var i = 0; i < headerFiles.Length; i++)
@@ -630,7 +630,7 @@ namespace GameX.Red.Formats
                             r.Seek(r.BaseStream.Length - offset);
 
                             // check block
-                            var headerChunks = r.ReadTArray<uint>(sizeof(uint), (int)header.ChunksSize);
+                            var headerChunks = r.ReadPArray<uint>("I", (int)header.ChunksSize);
                             source.Tag = headerChunks;
 
                             // name block

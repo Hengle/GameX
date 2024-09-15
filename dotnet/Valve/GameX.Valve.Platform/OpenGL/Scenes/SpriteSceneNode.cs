@@ -1,6 +1,9 @@
 using GameX.Valve.Formats;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Gl.Renders;
+using OpenStack.Gfx.Renders;
+using OpenStack.Gfx.Scenes;
 using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 using System.Linq;

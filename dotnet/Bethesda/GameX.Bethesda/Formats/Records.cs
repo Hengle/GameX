@@ -955,7 +955,7 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(size: dataSize),
+            FieldType.CNAM => CNAM = r.ReadS<CREFField>(dataSize),
             _ => Empty,
         };
     }
@@ -971,7 +971,7 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
+            FieldType.CNAM => CNAM = r.ReadS<CREFField>(dataSize),
             _ => Empty,
         };
     }
@@ -1000,7 +1000,7 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
+            FieldType.CNAM => CNAM = r.ReadS<CREFField>(dataSize),
             _ => Empty,
         };
     }
@@ -1016,7 +1016,7 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
+            FieldType.CNAM => CNAM = r.ReadS<CREFField>(dataSize),
             _ => Empty,
         };
     }
@@ -1032,7 +1032,7 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
+            FieldType.CNAM => CNAM = r.ReadS<CREFField>(dataSize),
             _ => Empty,
         };
     }
@@ -1048,7 +1048,7 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
+            FieldType.CNAM => CNAM = r.ReadS<CREFField>(dataSize),
             _ => Empty,
         };
     }
@@ -1064,7 +1064,7 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
+            FieldType.CNAM => CNAM = r.ReadS<CREFField>(dataSize),
             _ => Empty,
         };
     }
@@ -1080,7 +1080,7 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
+            FieldType.CNAM => CNAM = r.ReadS<CREFField>(dataSize),
             _ => Empty,
         };
     }
@@ -1096,7 +1096,7 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.CNAM => CNAM = r.ReadSAndVerify<CREFField>(dataSize),
+            FieldType.CNAM => CNAM = r.ReadS<CREFField>(dataSize),
             _ => Empty,
         };
     }
@@ -1120,10 +1120,10 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.NAME => NAME = new FMIDField<Record>(r, dataSize),
             FieldType.DATA => DATA = new REFRRecord.DATAField(r, dataSize),
             FieldType.XOWN => (XOWNs ??= []).AddX(new CELLRecord.XOWNGroup { XOWN = new FMIDField<Record>(r, dataSize) }),
-            FieldType.XRNK => XOWNs.Last().XRNK = r.ReadSAndVerify<IN32Field>(dataSize),
+            FieldType.XRNK => XOWNs.Last().XRNK = r.ReadS<IN32Field>(dataSize),
             FieldType.XGLB => XOWNs.Last().XGLB = new FMIDField<Record>(r, dataSize),
             FieldType.XESP => XESP = new REFRRecord.XESPField(r, dataSize),
-            FieldType.XSCL => XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
+            FieldType.XSCL => XSCL = r.ReadS<FLTVField>(dataSize),
             FieldType.XRGD => XRGD = r.ReadBYTV(dataSize),
             _ => Empty,
         };
@@ -1147,7 +1147,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
             FieldType.MODB => MODL.MODBField(r, dataSize),
             FieldType.ICON => ICON = r.ReadFILE(dataSize),
-            FieldType.DATA => DATA = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.DATA => DATA = r.ReadS<BYTEField>(dataSize),
             _ => Empty,
         };
     }
@@ -1199,8 +1199,8 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.LVLD => LVLD = r.ReadSAndVerify<BYTEField>(dataSize),
-            FieldType.LVLF => LVLF = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.LVLD => LVLD = r.ReadS<BYTEField>(dataSize),
+            FieldType.LVLF => LVLF = r.ReadS<BYTEField>(dataSize),
             FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             FieldType.TNAM => TNAM = new FMIDField<CREARecord>(r, dataSize),
             FieldType.LVLO => LVLOs.AddX(new LVLIRecord.LVLOField(r, dataSize)),
@@ -1242,9 +1242,9 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.LVLD => LVLD = r.ReadSAndVerify<BYTEField>(dataSize),
-            FieldType.LVLF => LVLF = r.ReadSAndVerify<BYTEField>(dataSize),
-            FieldType.DATA => DATA = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.LVLD => LVLD = r.ReadS<BYTEField>(dataSize),
+            FieldType.LVLF => LVLF = r.ReadS<BYTEField>(dataSize),
+            FieldType.DATA => DATA = r.ReadS<BYTEField>(dataSize),
             FieldType.LVLO => LVLOs.AddX(new LVLOField(r, dataSize)),
             _ => Empty,
         };
@@ -1263,8 +1263,8 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.LVLD => LVLD = r.ReadSAndVerify<BYTEField>(dataSize),
-            FieldType.LVLF => LVLF = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.LVLD => LVLD = r.ReadS<BYTEField>(dataSize),
+            FieldType.LVLF => LVLF = r.ReadS<BYTEField>(dataSize),
             FieldType.LVLO => LVLOs.AddX(new LVLIRecord.LVLOField(r, dataSize)),
             _ => Empty,
         };
@@ -1375,7 +1375,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.XESP => XESP = new REFRRecord.XESPField(r, dataSize),
             FieldType.XMRC => XMRC = new FMIDField<REFRRecord>(r, dataSize),
             FieldType.XHRS => XHRS = new FMIDField<ACRERecord>(r, dataSize),
-            FieldType.XSCL => XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
+            FieldType.XSCL => XSCL = r.ReadS<FLTVField>(dataSize),
             FieldType.XRGD => XRGD = r.ReadBYTV(dataSize),
             _ => Empty,
         };
@@ -1412,7 +1412,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
             FieldType.ICON => ICON = r.ReadFILE(dataSize),
             FieldType.ENAM => ENAM = new FMIDField<ENCHRecord>(r, dataSize),
-            FieldType.ANAM => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
+            FieldType.ANAM => ANAM = r.ReadS<IN16Field>(dataSize),
             FieldType.DATA => DATA = new DATAField(r, dataSize),
             _ => Empty,
         };
@@ -1684,7 +1684,7 @@ namespace GameX.Bethesda.Formats.Records
                 MembraneShader_SourceBlendMode = r.ReadUInt32();
                 MembraneShader_BlendOperation = r.ReadUInt32();
                 MembraneShader_ZTestFunction = r.ReadUInt32();
-                FillTextureEffect_Color = r.ReadSAndVerify<ColorRef4>(dataSize);
+                FillTextureEffect_Color = r.ReadS<ColorRef4>(dataSize);
                 FillTextureEffect_AlphaFadeInTime = r.ReadSingle();
                 FillTextureEffect_FullAlphaTime = r.ReadSingle();
                 FillTextureEffect_AlphaFadeOutTime = r.ReadSingle();
@@ -1694,7 +1694,7 @@ namespace GameX.Bethesda.Formats.Records
                 FillTextureEffect_TextureAnimationSpeed_U = r.ReadSingle();
                 FillTextureEffect_TextureAnimationSpeed_V = r.ReadSingle();
                 EdgeEffect_FallOff = r.ReadSingle();
-                EdgeEffect_Color = r.ReadSAndVerify<ColorRef4>(dataSize);
+                EdgeEffect_Color = r.ReadS<ColorRef4>(dataSize);
                 EdgeEffect_AlphaFadeInTime = r.ReadSingle();
                 EdgeEffect_FullAlphaTime = r.ReadSingle();
                 EdgeEffect_AlphaFadeOutTime = r.ReadSingle();
@@ -1728,9 +1728,9 @@ namespace GameX.Bethesda.Formats.Records
                 ParticleShader_ScaleKey2 = r.ReadSingle();
                 ParticleShader_ScaleKey1Time = r.ReadSingle();
                 ParticleShader_ScaleKey2Time = r.ReadSingle();
-                ColorKey1_Color = r.ReadSAndVerify<ColorRef4>(dataSize);
-                ColorKey2_Color = r.ReadSAndVerify<ColorRef4>(dataSize);
-                ColorKey3_Color = r.ReadSAndVerify<ColorRef4>(dataSize);
+                ColorKey1_Color = r.ReadS<ColorRef4>(dataSize);
+                ColorKey2_Color = r.ReadS<ColorRef4>(dataSize);
+                ColorKey3_Color = r.ReadS<ColorRef4>(dataSize);
                 ColorKey1_ColorAlpha = r.ReadSingle();
                 ColorKey2_ColorAlpha = r.ReadSingle();
                 ColorKey3_ColorAlpha = r.ReadSingle();
@@ -1769,7 +1769,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
             FieldType.ICON => ICON = r.ReadFILE(dataSize),
-            FieldType.DATA => DATA = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.DATA => DATA = r.ReadS<BYTEField>(dataSize),
             _ => Empty,
         };
     }
@@ -1819,7 +1819,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.MODT => MODL.MODTField(r, dataSize),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
             FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
-            FieldType.MNAM => MNAM = r.ReadSAndVerify<IN32Field>(dataSize),
+            FieldType.MNAM => MNAM = r.ReadS<IN32Field>(dataSize),
             _ => Empty,
         };
     }
@@ -1900,7 +1900,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
             FieldType.MODB => MODL.MODBField(r, dataSize),
             FieldType.CTDA or FieldType.CTDT => CTDAs.AddX(new SCPTRecord.CTDAField(r, dataSize, format)),
-            FieldType.ANAM => ANAM = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.ANAM => ANAM = r.ReadS<BYTEField>(dataSize),
             FieldType.DATA => DATAs = [.. Enumerable.Range(0, dataSize >> 2).Select(x => new FMIDField<IDLERecord>(r, 4))],
             _ => Empty,
         };
@@ -2137,27 +2137,27 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.DATA => DATA = new DATAField(r, dataSize),
             FieldType.XLOC => XLOC = new XLOCField(r, dataSize),
             FieldType.XOWN => (XOWNs ??= []).AddX(new CELLRecord.XOWNGroup { XOWN = new FMIDField<Record>(r, dataSize) }),
-            FieldType.XRNK => XOWNs.Last().XRNK = r.ReadSAndVerify<IN32Field>(dataSize),
+            FieldType.XRNK => XOWNs.Last().XRNK = r.ReadS<IN32Field>(dataSize),
             FieldType.XGLB => XOWNs.Last().XGLB = new FMIDField<Record>(r, dataSize),
             FieldType.XESP => XESP = new XESPField(r, dataSize),
             FieldType.XTRG => XTRG = new FMIDField<Record>(r, dataSize),
             FieldType.XSED => XSED = new XSEDField(r, dataSize),
             FieldType.XLOD => XLOD = r.ReadBYTV(dataSize),
-            FieldType.XCHG => XCHG = r.ReadSAndVerify<FLTVField>(dataSize),
-            FieldType.XHLT => XCHG = r.ReadSAndVerify<FLTVField>(dataSize),
+            FieldType.XCHG => XCHG = r.ReadS<FLTVField>(dataSize),
+            FieldType.XHLT => XCHG = r.ReadS<FLTVField>(dataSize),
             FieldType.XPCI => (_nextFull = 1, XPCI = new FMIDField<CELLRecord>(r, dataSize)),
             FieldType.FULL => _nextFull == 1 ? XPCI.Value.AddName(r.ReadFString(dataSize)) : _nextFull == 2 ? XMRKs.Last().FULL = r.ReadSTRV(dataSize) : _nextFull = 0,
-            FieldType.XLCM => XLCM = r.ReadSAndVerify<IN32Field>(dataSize),
+            FieldType.XLCM => XLCM = r.ReadS<IN32Field>(dataSize),
             FieldType.XRTM => XRTM = new FMIDField<REFRRecord>(r, dataSize),
-            FieldType.XACT => XACT = r.ReadSAndVerify<UI32Field>(dataSize),
-            FieldType.XCNT => XCNT = r.ReadSAndVerify<IN32Field>(dataSize),
+            FieldType.XACT => XACT = r.ReadS<UI32Field>(dataSize),
+            FieldType.XCNT => XCNT = r.ReadS<IN32Field>(dataSize),
             FieldType.XMRK => (_nextFull = 2, (XMRKs ??= []).AddX(new XMRKGroup())),
-            FieldType.FNAM => XMRKs.Last().FNAM = r.ReadSAndVerify<BYTEField>(dataSize),
-            FieldType.TNAM => XMRKs.Last().TNAM = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.FNAM => XMRKs.Last().FNAM = r.ReadS<BYTEField>(dataSize),
+            FieldType.TNAM => XMRKs.Last().TNAM = r.ReadS<BYTEField>(dataSize),
             FieldType.ONAM => true,
             FieldType.XRGD => XRGD = r.ReadBYTV(dataSize),
-            FieldType.XSCL => XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
-            FieldType.XSOL => XSOL = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.XSCL => XSCL = r.ReadS<FLTVField>(dataSize),
+            FieldType.XSOL => XSOL = r.ReadS<BYTEField>(dataSize),
             _ => Empty,
         };
     }
@@ -2192,8 +2192,8 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             FieldType.DATA => DATA = new DATAField(r, dataSize),
             FieldType.ICON => ICON = r.ReadFILE(dataSize),
-            FieldType.SOUL => SOUL = r.ReadSAndVerify<BYTEField>(dataSize),
-            FieldType.SLCP => SLCP = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.SOUL => SOUL = r.ReadS<BYTEField>(dataSize),
+            FieldType.SLCP => SLCP = r.ReadS<BYTEField>(dataSize),
             _ => Empty,
         };
     }
@@ -2225,7 +2225,7 @@ namespace GameX.Bethesda.Formats.Records
 
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
-            FieldType.HEDR => HEDR = r.ReadSAndVerify<HEDRField>(dataSize),
+            FieldType.HEDR => HEDR = r.ReadS<HEDRField>(dataSize),
             FieldType.OFST => r.Skip(dataSize),
             FieldType.DELE => r.Skip(dataSize),
             FieldType.CNAM => CNAM = r.ReadSTRV(dataSize),
@@ -2233,8 +2233,8 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.MAST => (MASTs ??= []).AddX(r.ReadSTRV(dataSize)),
             FieldType.DATA => (DATAs ??= []).AddX(r.ReadINTV(dataSize)),
             FieldType.ONAM => ONAM = r.ReadUNKN(dataSize),
-            FieldType.INTV => INTV = r.ReadSAndVerify<IN32Field>(dataSize),
-            FieldType.INCC => INCC = r.ReadSAndVerify<IN32Field>(dataSize),
+            FieldType.INTV => INTV = r.ReadS<IN32Field>(dataSize),
+            FieldType.INCC => INCC = r.ReadS<IN32Field>(dataSize),
             // TES5
             FieldType.TNAM => TNAM = r.ReadUNKN(dataSize),
             _ => Empty,
@@ -2348,9 +2348,9 @@ namespace GameX.Bethesda.Formats.Records
                 FogDistance_NearPlane = r.ReadSingle();
                 if (dataSize == 42) { Damage = r.ReadUInt16(); return; }
                 FogDistance_FarPlane = r.ReadSingle();
-                ShallowColor = r.ReadSAndVerify<ColorRef4>(dataSize);
-                DeepColor = r.ReadSAndVerify<ColorRef4>(dataSize);
-                ReflectionColor = r.ReadSAndVerify<ColorRef4>(dataSize);
+                ShallowColor = r.ReadS<ColorRef4>(dataSize);
+                DeepColor = r.ReadS<ColorRef4>(dataSize);
+                ReflectionColor = r.ReadS<ColorRef4>(dataSize);
                 TextureBlend = r.ReadByte();
                 r.Skip(3); // Unused
                 if (dataSize == 62) { Damage = r.ReadUInt16(); return; }
@@ -2393,8 +2393,8 @@ namespace GameX.Bethesda.Formats.Records
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
             FieldType.TNAM => TNAM = r.ReadSTRV(dataSize),
-            FieldType.ANAM => ANAM = r.ReadSAndVerify<BYTEField>(dataSize),
-            FieldType.FNAM => FNAM = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.ANAM => ANAM = r.ReadS<BYTEField>(dataSize),
+            FieldType.FNAM => FNAM = r.ReadS<BYTEField>(dataSize),
             FieldType.MNAM => MNAM = r.ReadSTRV(dataSize),
             FieldType.SNAM => SNAM = new FMIDField<SOUNRecord>(r, dataSize),
             FieldType.DATA => DATA = new DATAField(r, dataSize),
@@ -2448,7 +2448,7 @@ namespace GameX.Bethesda.Formats.Records
                 var referenceCount = r.ReadUInt32();
                 var referenceSize = dataSize - 8;
                 Assert(referenceSize >> 3 == referenceCount);
-                GridReferences = r.ReadTArray<Reference>(referenceSize, referenceSize >> 3);
+                GridReferences = r.ReadSArray<Reference>(referenceSize >> 3);
             }
         }
 
@@ -2472,11 +2472,11 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.CNAM => CNAM = new FMIDField<CLMTRecord>(r, dataSize),
             FieldType.NAM2 => NAM2 = new FMIDField<WATRRecord>(r, dataSize),
             FieldType.ICON => ICON = r.ReadFILE(dataSize),
-            FieldType.MNAM => MNAM = r.ReadSAndVerify<MNAMField>(dataSize),
-            FieldType.DATA => DATA = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.MNAM => MNAM = r.ReadS<MNAMField>(dataSize),
+            FieldType.DATA => DATA = r.ReadS<BYTEField>(dataSize),
             FieldType.NAM0 => NAM0 = new NAM0Field(r, dataSize),
             FieldType.NAM9 => NAM0.NAM9Field(r, dataSize),
-            FieldType.SNAM => SNAM = r.ReadSAndVerify<UI32Field>(dataSize),
+            FieldType.SNAM => SNAM = r.ReadS<UI32Field>(dataSize),
             FieldType.OFST => r.Skip(dataSize),
             // TES5
             FieldType.RNAM => RNAMs.AddX(new RNAMField(r, dataSize)),
@@ -2628,11 +2628,11 @@ namespace GameX.Bethesda.Formats.Records
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
-                FieldType.DATA => DATA = r.ReadSAndVerify<IN32Field>(dataSize),
-                FieldType.NNAM => NNAM = r.ReadSAndVerify<BYTEField>(dataSize),
-                FieldType.INDX => INDX = r.ReadSAndVerify<IN32Field>(dataSize),
+                FieldType.DATA => DATA = r.ReadS<IN32Field>(dataSize),
+                FieldType.NNAM => NNAM = r.ReadS<BYTEField>(dataSize),
+                FieldType.INDX => INDX = r.ReadS<IN32Field>(dataSize),
                 FieldType.CNAM => CNAMs.AddX(r.ReadSTRV(dataSize)),
-                FieldType.INTV => INTVs.AddX(r.ReadSAndVerify<IN16Field>(dataSize)),
+                FieldType.INTV => INTVs.AddX(r.ReadS<IN16Field>(dataSize)),
                 _ => Empty,
             }
             : null;
@@ -2655,11 +2655,11 @@ namespace GameX.Bethesda.Formats.Records
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
-                FieldType.DATA => DATA = r.ReadSAndVerify<IN32Field>(dataSize),
-                FieldType.NNAM => NNAM = r.ReadSAndVerify<BYTEField>(dataSize),
-                FieldType.INDX => INDX = r.ReadSAndVerify<IN32Field>(dataSize),
+                FieldType.DATA => DATA = r.ReadS<IN32Field>(dataSize),
+                FieldType.NNAM => NNAM = r.ReadS<BYTEField>(dataSize),
+                FieldType.INDX => INDX = r.ReadS<IN32Field>(dataSize),
                 FieldType.INAM => INAMs.AddX(r.ReadSTRV(dataSize)),
-                FieldType.INTV => INTVs.AddX(r.ReadSAndVerify<IN16Field>(dataSize)),
+                FieldType.INTV => INTVs.AddX(r.ReadS<IN16Field>(dataSize)),
                 _ => Empty,
             }
             : null;
@@ -2759,7 +2759,7 @@ namespace GameX.Bethesda.Formats.Records
             ? type switch
             {
                 FieldType.NAME => EDID = r.ReadSTRV(dataSize),
-                FieldType.DATA => DATA = r.ReadSAndVerify<IN32Field>(dataSize),
+                FieldType.DATA => DATA = r.ReadS<IN32Field>(dataSize),
                 FieldType.SNAM => SNAM = r.ReadSTRV(dataSize),
                 FieldType.CNAM => CNAM = r.ReadSTRV(dataSize),
                 _ => Empty,
@@ -3465,7 +3465,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.CNAM => INDXs.Last().CNAM = r.ReadSTRV(dataSize),
             FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             FieldType.ENAM => ENAM = new FMIDField<ENCHRecord>(r, dataSize),
-            FieldType.BMDT => BMDT = r.ReadSAndVerify<UI32Field>(dataSize),
+            FieldType.BMDT => BMDT = r.ReadS<UI32Field>(dataSize),
             FieldType.MOD2 => MOD2 = new MODLGroup(r, dataSize),
             FieldType.MO2B => MOD2.MODBField(r, dataSize),
             FieldType.MO2T => MOD2.MODTField(r, dataSize),
@@ -3476,7 +3476,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.MO4B => MOD4.MODBField(r, dataSize),
             FieldType.MO4T => MOD4.MODTField(r, dataSize),
             FieldType.ICO2 => ICO2 = r.ReadFILE(dataSize),
-            FieldType.ANAM => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
+            FieldType.ANAM => ANAM = r.ReadS<IN16Field>(dataSize),
             _ => Empty,
         };
     }
@@ -3537,7 +3537,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             FieldType.DESC or FieldType.TEXT => DESC = r.ReadSTRV(dataSize),
             FieldType.ENAM => ENAM = new FMIDField<ENCHRecord>(r, dataSize),
-            FieldType.ANAM => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
+            FieldType.ANAM => ANAM = r.ReadS<IN16Field>(dataSize),
             _ => Empty,
         };
     }
@@ -3568,7 +3568,7 @@ namespace GameX.Bethesda.Formats.Records
             public static Dictionary<int, string> Struct = new()
             {
                 { 8, "<2i" },
-                {  12, "<2iI" },
+                { 12, "<2iI" },
             };
             public int GridX;
             public int GridY;
@@ -3671,21 +3671,21 @@ namespace GameX.Bethesda.Formats.Records
                 {
                     FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
                     FieldType.FULL or FieldType.RGNN => FULL = r.ReadSTRV(dataSize),
-                    FieldType.DATA => (DATA = r.ReadINTV(format == TES3 ? 4 : dataSize).AsUI16Field, format == TES3 ? XCLC = r.ReadSAndVerify<XCLCField>(format == TES3 ? 8 : dataSize) : null),
-                    FieldType.XCLC => XCLC = r.ReadSAndVerify<XCLCField>(format == TES3 ? 8 : dataSize),
-                    FieldType.XCLL or FieldType.AMBI => XCLL = r.ReadSAndVerify<XCLLField>(dataSize),
-                    FieldType.XCLW or FieldType.WHGT => XCLW = r.ReadSAndVerify<FLTVField>(dataSize),
+                    FieldType.DATA => (DATA = r.ReadINTV(format == TES3 ? 4 : dataSize).AsUI16Field, format == TES3 ? XCLC = r.ReadS<XCLCField>(format == TES3 ? 8 : dataSize) : null),
+                    FieldType.XCLC => XCLC = r.ReadS<XCLCField>(format == TES3 ? 8 : dataSize),
+                    FieldType.XCLL or FieldType.AMBI => XCLL = r.ReadS<XCLLField>(dataSize),
+                    FieldType.XCLW or FieldType.WHGT => XCLW = r.ReadS<FLTVField>(dataSize),
                     // TES3
-                    FieldType.NAM0 => NAM0 = r.ReadSAndVerify<UI32Field>(dataSize),
+                    FieldType.NAM0 => NAM0 = r.ReadS<UI32Field>(dataSize),
                     FieldType.INTV => INTV = r.ReadINTV(dataSize),
-                    FieldType.NAM5 => NAM5 = r.ReadSAndVerify<CREFField>(dataSize),
+                    FieldType.NAM5 => NAM5 = r.ReadS<CREFField>(dataSize),
                     // TES4
                     FieldType.XCLR => XCLRs = [.. Enumerable.Range(0, dataSize >> 2).Select(x => new FMIDField<REGNRecord>(r, 4))],
-                    FieldType.XCMT => XCMT = r.ReadSAndVerify<BYTEField>(dataSize),
+                    FieldType.XCMT => XCMT = r.ReadS<BYTEField>(dataSize),
                     FieldType.XCCM => XCCM = new FMIDField<CLMTRecord>(r, dataSize),
                     FieldType.XCWT => XCWT = new FMIDField<WATRRecord>(r, dataSize),
                     FieldType.XOWN => XOWNs.AddX(new XOWNGroup { XOWN = new FMIDField<Record>(r, dataSize) }),
-                    FieldType.XRNK => XOWNs.Last().XRNK = r.ReadSAndVerify<IN32Field>(dataSize),
+                    FieldType.XRNK => XOWNs.Last().XRNK = r.ReadS<IN32Field>(dataSize),
                     FieldType.XGLB => XOWNs.Last().XGLB = new FMIDField<Record>(r, dataSize),
                     _ => Empty,
                 };
@@ -3693,26 +3693,26 @@ namespace GameX.Bethesda.Formats.Records
             else return type switch
             {
                 // RefObjDataGroup sub-records
-                FieldType.FRMR => RefObjs.AddX(_lastRef = new RefObj()).FRMR = r.ReadSAndVerify<UI32Field>(dataSize),
+                FieldType.FRMR => RefObjs.AddX(_lastRef = new RefObj()).FRMR = r.ReadS<UI32Field>(dataSize),
                 FieldType.NAME => _lastRef.EDID = r.ReadSTRV(dataSize),
-                FieldType.XSCL => _lastRef.XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
-                FieldType.DODT => _lastRef.DODT = r.ReadSAndVerify<RefObj.XYZAField>(dataSize),
+                FieldType.XSCL => _lastRef.XSCL = r.ReadS<FLTVField>(dataSize),
+                FieldType.DODT => _lastRef.DODT = r.ReadS<RefObj.XYZAField>(dataSize),
                 FieldType.DNAM => _lastRef.DNAM = r.ReadSTRV(dataSize),
-                FieldType.FLTV => _lastRef.FLTV = r.ReadSAndVerify<FLTVField>(dataSize),
+                FieldType.FLTV => _lastRef.FLTV = r.ReadS<FLTVField>(dataSize),
                 FieldType.KNAM => _lastRef.KNAM = r.ReadSTRV(dataSize),
                 FieldType.TNAM => _lastRef.TNAM = r.ReadSTRV(dataSize),
-                FieldType.UNAM => _lastRef.UNAM = r.ReadSAndVerify<BYTEField>(dataSize),
+                FieldType.UNAM => _lastRef.UNAM = r.ReadS<BYTEField>(dataSize),
                 FieldType.ANAM => _lastRef.ANAM = r.ReadSTRV(dataSize),
                 FieldType.BNAM => _lastRef.BNAM = r.ReadSTRV(dataSize),
-                FieldType.INTV => _lastRef.INTV = r.ReadSAndVerify<IN32Field>(dataSize),
-                FieldType.NAM9 => _lastRef.NAM9 = r.ReadSAndVerify<UI32Field>(dataSize),
+                FieldType.INTV => _lastRef.INTV = r.ReadS<IN32Field>(dataSize),
+                FieldType.NAM9 => _lastRef.NAM9 = r.ReadS<UI32Field>(dataSize),
                 FieldType.XSOL => _lastRef.XSOL = r.ReadSTRV(dataSize),
-                FieldType.DATA => _lastRef.DATA = r.ReadSAndVerify<RefObj.XYZAField>(dataSize),
+                FieldType.DATA => _lastRef.DATA = r.ReadS<RefObj.XYZAField>(dataSize),
                 //
                 FieldType.CNAM => _lastRef.CNAM = r.ReadSTRV(dataSize),
-                FieldType.NAM0 => _lastRef.NAM0 = r.ReadSAndVerify<UI32Field>(dataSize),
-                FieldType.XCHG => _lastRef.XCHG = r.ReadSAndVerify<IN32Field>(dataSize),
-                FieldType.INDX => _lastRef.INDX = r.ReadSAndVerify<IN32Field>(dataSize),
+                FieldType.NAM0 => _lastRef.NAM0 = r.ReadS<UI32Field>(dataSize),
+                FieldType.XCHG => _lastRef.XCHG = r.ReadS<IN32Field>(dataSize),
+                FieldType.INDX => _lastRef.INDX = r.ReadS<IN32Field>(dataSize),
                 _ => Empty,
             };
         }
@@ -3834,7 +3834,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.CNAM => INDXs.Last().CNAM = r.ReadSTRV(dataSize),
             FieldType.ENAM => ENAM = r.ReadSTRV(dataSize),
             FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
-            FieldType.BMDT => BMDT = r.ReadSAndVerify<UI32Field>(dataSize),
+            FieldType.BMDT => BMDT = r.ReadS<UI32Field>(dataSize),
             FieldType.MOD2 => MOD2 = new MODLGroup(r, dataSize),
             FieldType.MO2B => MOD2.MODBField(r, dataSize),
             FieldType.MO2T => MOD2.MODTField(r, dataSize),
@@ -3845,7 +3845,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.MO4B => MOD4.MODBField(r, dataSize),
             FieldType.MO4T => MOD4.MODTField(r, dataSize),
             FieldType.ICO2 => ICO2 = r.ReadFILE(dataSize),
-            FieldType.ANAM => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
+            FieldType.ANAM => ANAM = r.ReadS<IN16Field>(dataSize),
             _ => Empty,
         };
     }
@@ -4042,7 +4042,7 @@ namespace GameX.Bethesda.Formats.Records
                 FieldType.MODL => MODL = new MODLGroup(r, dataSize),
                 FieldType.FNAM => FNAM = r.ReadSTRV(dataSize),
                 FieldType.NPDT => NPDT = new NPDTField(r, dataSize),
-                FieldType.FLAG => FLAG = r.ReadSAndVerify<IN32Field>(dataSize),
+                FieldType.FLAG => FLAG = r.ReadS<IN32Field>(dataSize),
                 FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
                 FieldType.NPCO => NPCO = new CNTOField(r, dataSize, format),
                 FieldType.AIDT => AIDT = new AIDTField(r, dataSize),
@@ -4051,7 +4051,7 @@ namespace GameX.Bethesda.Formats.Records
                 FieldType.AI_F => AI_F = new AI_FField(r, dataSize),
                 FieldType.AI_E => AI_E = new AI_FField(r, dataSize),
                 FieldType.AI_A => AI_A = new AI_AField(r, dataSize),
-                FieldType.XSCL => XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
+                FieldType.XSCL => XSCL = r.ReadS<FLTVField>(dataSize),
                 FieldType.CNAM => CNAM = r.ReadSTRV(dataSize),
                 FieldType.NPCS => NPCSs.AddX(r.ReadSTRV_ZPad(dataSize)),
                 _ => Empty,
@@ -4078,7 +4078,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             FieldType.EDID or FieldType.NAME => (LastRecord = this, EDID = r.ReadSTRV(dataSize)),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
-            FieldType.DATA => DATA = r.ReadSAndVerify<BYTEField>(dataSize),
+            FieldType.DATA => DATA = r.ReadS<BYTEField>(dataSize),
             FieldType.QSTI or FieldType.QSTR => (QSTIs ??= []).AddX(new FMIDField<QUSTRecord>(r, dataSize)),
             _ => Empty,
         };
@@ -4104,7 +4104,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
-            FieldType.FNAM => format != FormType.TES3 ? FNAM = r.ReadT<BYTEField>(dataSize) : FULL = r.ReadSTRV(dataSize),
+            FieldType.FNAM => format != FormType.TES3 ? FNAM = r.ReadS<BYTEField>(dataSize) : FULL = r.ReadSTRV(dataSize),
             FieldType.MODL => MODL = new MODLGroup(r, dataSize),
             FieldType.MODB => MODL.MODBField(r, dataSize),
             FieldType.MODT => MODL.MODTField(r, dataSize),
@@ -4284,8 +4284,8 @@ namespace GameX.Bethesda.Formats.Records
                 FieldType.FULL => FNAM = r.ReadSTRV(dataSize),
                 FieldType.XNAM => XNAM = new XNAMField(r, dataSize, format),
                 FieldType.DATA => DATA = r.ReadINTV(dataSize),
-                FieldType.CNAM => CNAM = r.ReadT<UI32Field>(dataSize),
-                FieldType.RNAM => RNAMs.AddX(new RNAMGroup { RNAM = r.ReadT<IN32Field>(dataSize) }),
+                FieldType.CNAM => CNAM = r.ReadS<UI32Field>(dataSize),
+                FieldType.RNAM => RNAMs.AddX(new RNAMGroup { RNAM = r.ReadS<IN32Field>(dataSize) }),
                 FieldType.MNAM => RNAMs.Last().MNAM = r.ReadSTRV(dataSize),
                 FieldType.FNAM => RNAMs.Last().FNAM = r.ReadSTRV(dataSize),
                 FieldType.INAM => RNAMs.Last().INAM = r.ReadSTRV(dataSize),
@@ -4305,8 +4305,8 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
-            FieldType.FNAM => FNAM = r.ReadT<BYTEField>(dataSize),
-            FieldType.FLTV => FLTV = r.ReadT<FLTVField>(dataSize),
+            FieldType.FNAM => FNAM = r.ReadS<BYTEField>(dataSize),
+            FieldType.FLTV => FLTV = r.ReadS<FLTVField>(dataSize),
             _ => Empty,
         };
     }
@@ -4437,9 +4437,9 @@ namespace GameX.Bethesda.Formats.Records
                 FieldType.DNAM => TES3.DNAM = r.ReadSTRV(dataSize),
                 FieldType.NAME => TES3.NAME = r.ReadSTRV(dataSize),
                 FieldType.SNAM => TES3.SNAM = r.ReadFILE(dataSize),
-                FieldType.QSTN => TES3.QSTN = r.ReadT<BYTEField>(dataSize),
-                FieldType.QSTF => TES3.QSTF = r.ReadT<BYTEField>(dataSize),
-                FieldType.QSTR => TES3.QSTR = r.ReadT<BYTEField>(dataSize),
+                FieldType.QSTN => TES3.QSTN = r.ReadS<BYTEField>(dataSize),
+                FieldType.QSTF => TES3.QSTF = r.ReadS<BYTEField>(dataSize),
+                FieldType.QSTR => TES3.QSTR = r.ReadS<BYTEField>(dataSize),
                 FieldType.SCVR => TES3.SCVR = new SCPTRecord.CTDAField(r, dataSize, format),
                 FieldType.INTV => TES3.INTV = r.ReadUNKN(dataSize),
                 FieldType.FLTV => TES3.FLTV = r.ReadUNKN(dataSize),
@@ -4549,7 +4549,7 @@ namespace GameX.Bethesda.Formats.Records
         // TESX
         public struct VNMLField(BinaryReader r, int dataSize)
         {
-            public Byte3[] Vertexs = r.ReadTArray<Byte3>(dataSize, dataSize / 3); // XYZ 8 bit floats
+            public Byte3[] Vertexs = r.ReadPArray<Byte3>("3B", dataSize / 3); // XYZ 8 bit floats
         }
 
         public struct VHGTField
@@ -4561,14 +4561,14 @@ namespace GameX.Bethesda.Formats.Records
             {
                 ReferenceHeight = r.ReadSingle();
                 var count = dataSize - 4 - 3;
-                HeightData = r.ReadTArray<sbyte>(count, count);
+                HeightData = r.ReadPArray<sbyte>("B", count);
                 r.Skip(3); // Unused
             }
         }
 
         public struct VCLRField(BinaryReader r, int dataSize)
         {
-            public ColorRef3[] Colors = r.ReadTArray<ColorRef3>(dataSize, dataSize / 24); // 24-bit RGB
+            public ColorRef3[] Colors = r.ReadSArray<ColorRef3>(dataSize / 24); // 24-bit RGB
         }
 
         public struct VTEXField
@@ -4580,12 +4580,12 @@ namespace GameX.Bethesda.Formats.Records
             {
                 if (format == FormType.TES3)
                 {
-                    TextureIndicesT3 = r.ReadTArray<ushort>(dataSize, dataSize >> 1);
+                    TextureIndicesT3 = r.ReadPArray<ushort>("H", dataSize >> 1);
                     TextureIndicesT4 = null;
                     return;
                 }
                 TextureIndicesT3 = null;
-                TextureIndicesT4 = r.ReadTArray<uint>(dataSize, dataSize >> 2);
+                TextureIndicesT4 = r.ReadPArray<uint>("I", dataSize >> 2);
             }
         }
 
@@ -4657,18 +4657,18 @@ namespace GameX.Bethesda.Formats.Records
 
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
-            FieldType.DATA => DATA = r.ReadSAndVerify<IN32Field>(dataSize),
+            FieldType.DATA => DATA = r.ReadS<IN32Field>(dataSize),
             FieldType.VNML => VNML = new VNMLField(r, dataSize),
             FieldType.VHGT => VHGT = new VHGTField(r, dataSize),
             FieldType.VCLR => VCLR = new VNMLField(r, dataSize),
             FieldType.VTEX => VTEX = new VTEXField(r, dataSize, format),
             // TES3
-            FieldType.INTV => INTV = r.ReadSAndVerify<CORDField>(dataSize),
+            FieldType.INTV => INTV = r.ReadS<CORDField>(dataSize),
             FieldType.WNAM => WNAM = new WNAMField(r, dataSize),
             // TES4
-            FieldType.BTXT => this.Then(r.ReadSAndVerify<BTXTField>(dataSize), btxt => BTXTs[btxt.Quadrant] = btxt),
-            FieldType.ATXT => (ATXTs ??= new ATXTGroup[4], this.Then(r.ReadSAndVerify<BTXTField>(dataSize), atxt => _lastATXT = ATXTs[atxt.Quadrant] = new ATXTGroup { ATXT = atxt })),
-            FieldType.VTXT => _lastATXT.VTXTs = r.ReadTArray<VTXTField>(dataSize, dataSize >> 3),
+            FieldType.BTXT => this.Then(r.ReadS<BTXTField>(dataSize), btxt => BTXTs[btxt.Quadrant] = btxt),
+            FieldType.ATXT => (ATXTs ??= new ATXTGroup[4], this.Then(r.ReadS<BTXTField>(dataSize), atxt => _lastATXT = ATXTs[atxt.Quadrant] = new ATXTGroup { ATXT = atxt })),
+            FieldType.VTXT => _lastATXT.VTXTs = r.ReadSArray<VTXTField>(dataSize >> 3),
             _ => Empty,
         };
     }
@@ -4713,7 +4713,7 @@ namespace GameX.Bethesda.Formats.Records
                     Value = r.ReadInt32();
                     Time = r.ReadInt32();
                     Radius = r.ReadInt32();
-                    LightColor = r.ReadSAndVerify<ColorRef4>(4);
+                    LightColor = r.ReadS<ColorRef4>(4);
                     Flags = r.ReadInt32();
                     FalloffExponent = 1;
                     FOV = 90;
@@ -4721,7 +4721,7 @@ namespace GameX.Bethesda.Formats.Records
                 }
                 Time = r.ReadInt32();
                 Radius = r.ReadInt32();
-                LightColor = r.ReadSAndVerify<ColorRef4>(4);
+                LightColor = r.ReadS<ColorRef4>(4);
                 Flags = r.ReadInt32();
                 if (dataSize == 32) { FalloffExponent = r.ReadSingle(); FOV = r.ReadSingle(); }
                 else { FalloffExponent = 1; FOV = 90; }
@@ -4743,7 +4743,7 @@ namespace GameX.Bethesda.Formats.Records
         {
             FieldType.EDID or FieldType.NAME => EDID = r.ReadSTRV(dataSize),
             FieldType.FULL => FULL = r.ReadSTRV(dataSize),
-            FieldType.FNAM => format != FormType.TES3 ? FNAM = r.ReadSAndVerify<FLTVField>(dataSize) : FULL = r.ReadSTRV(dataSize),
+            FieldType.FNAM => format != FormType.TES3 ? FNAM = r.ReadS<FLTVField>(dataSize) : FULL = r.ReadSTRV(dataSize),
             FieldType.DATA or FieldType.LHDT => DATA = new DATAField(r, dataSize, format),
             FieldType.SCPT => SCPT = r.ReadSTRV(dataSize),
             FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
@@ -4818,7 +4818,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.ICON or FieldType.DATA => ICON = r.ReadFILE(dataSize),
             // TES4
             FieldType.HNAM => HNAM = new HNAMField(r, dataSize),
-            FieldType.SNAM => SNAM = r.ReadT<BYTEField>(dataSize),
+            FieldType.SNAM => SNAM = r.ReadS<BYTEField>(dataSize),
             FieldType.GNAM => GNAMs.AddX(new FMIDField<GRASRecord>(r, dataSize)),
             _ => Empty,
         };
@@ -5020,7 +5020,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.AI_A => AI_A = new CREARecord.AI_AField(r, dataSize),
             FieldType.DODT => DODT = new DODTField(r, dataSize),
             FieldType.DNAM => DNAM = r.ReadSTRV(dataSize),
-            FieldType.XSCL => XSCL = r.ReadSAndVerify<FLTVField>(dataSize),
+            FieldType.XSCL => XSCL = r.ReadS<FLTVField>(dataSize),
             FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
             _ => Empty,
         };
@@ -5227,9 +5227,9 @@ namespace GameX.Bethesda.Formats.Records
                     FieldType.SPLO => SPLOs.AddX(r.ReadSTRV(dataSize)),
                     FieldType.VNAM => VNAM = new FMID2Field<RACERecord>(r, dataSize),
                     FieldType.DNAM => DNAM = new FMID2Field<HAIRRecord>(r, dataSize),
-                    FieldType.CNAM => CNAM = r.ReadSAndVerify<BYTEField>(dataSize),
-                    FieldType.PNAM => PNAM = r.ReadSAndVerify<FLTVField>(dataSize),
-                    FieldType.UNAM => UNAM = r.ReadSAndVerify<FLTVField>(dataSize),
+                    FieldType.CNAM => CNAM = r.ReadS<BYTEField>(dataSize),
+                    FieldType.PNAM => PNAM = r.ReadS<FLTVField>(dataSize),
+                    FieldType.UNAM => UNAM = r.ReadS<FLTVField>(dataSize),
                     FieldType.XNAM => XNAM = r.ReadUNKN(dataSize),
                     FieldType.ATTR => DATA.ATTRField(r, dataSize),
                     FieldType.NAM0 => _nameState++,
@@ -5238,7 +5238,7 @@ namespace GameX.Bethesda.Formats.Records
                 // face data
                 1 => type switch
                 {
-                    FieldType.INDX => FaceParts.AddX(new FacePartGroup { INDX = r.ReadSAndVerify<UI32Field>(dataSize) }),
+                    FieldType.INDX => FaceParts.AddX(new FacePartGroup { INDX = r.ReadS<UI32Field>(dataSize) }),
                     FieldType.MODL => FaceParts.Last().MODL = new MODLGroup(r, dataSize),
                     FieldType.ICON => FaceParts.Last().ICON = r.ReadFILE(dataSize),
                     FieldType.MODB => FaceParts.Last().MODL.MODBField(r, dataSize),
@@ -5251,8 +5251,8 @@ namespace GameX.Bethesda.Formats.Records
                     FieldType.MNAM => _genderState = 0,
                     FieldType.FNAM => _genderState = 1,
                     FieldType.MODL => Bodys[_genderState].MODL = r.ReadFILE(dataSize),
-                    FieldType.MODB => Bodys[_genderState].MODB = r.ReadSAndVerify<FLTVField>(dataSize),
-                    FieldType.INDX => Bodys[_genderState].BodyParts.AddX(new BodyPartGroup { INDX = r.ReadSAndVerify<UI32Field>(dataSize) }),
+                    FieldType.MODB => Bodys[_genderState].MODB = r.ReadS<FLTVField>(dataSize),
+                    FieldType.INDX => Bodys[_genderState].BodyParts.AddX(new BodyPartGroup { INDX = r.ReadS<UI32Field>(dataSize) }),
                     FieldType.ICON => Bodys[_genderState].BodyParts.Last().ICON = r.ReadFILE(dataSize),
                     FieldType.HNAM => (_nameState++, HNAMs.AddRangeX(Enumerable.Range(0, dataSize >> 2).Select(x => new FMIDField<HAIRRecord>(r, 4)))),
                     _ => Empty,
@@ -5344,7 +5344,7 @@ namespace GameX.Bethesda.Formats.Records
                 SizeVariance = r.ReadSingle();
                 AngleVariance = new Int3(r.ReadUInt16(), r.ReadUInt16(), r.ReadUInt16());
                 r.Skip(2); // Unused
-                VertexShading = r.ReadSAndVerify<ColorRef4>(dataSize);
+                VertexShading = r.ReadS<ColorRef4>(dataSize);
             }
         }
 
@@ -5448,7 +5448,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.WNAM or FieldType.FNAM => WNAM = new FMIDField<WRLDRecord>(r, dataSize),
             FieldType.WEAT => WEAT = new WEATField(r, dataSize),//: TES3
             FieldType.ICON or FieldType.BNAM => ICON = r.ReadSTRV(dataSize),
-            FieldType.RCLR or FieldType.CNAM => RCLR = r.ReadSAndVerify<CREFField>(dataSize),
+            FieldType.RCLR or FieldType.CNAM => RCLR = r.ReadS<CREFField>(dataSize),
             FieldType.SNAM => RDATs.AddX(new RDATField { RDSDs = [new RDSDField(r, dataSize, format)] }),
             FieldType.RPLI => RPLIs.AddX(new RPLIField(r, dataSize)),
             FieldType.RPLD => RPLIs.Last().RPLDField(r, dataSize),
@@ -5456,7 +5456,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.RDOT => RDATs.Last().RDOTs = [.. Enumerable.Range(0, dataSize / 52).Select(x => new RDOTField(r, dataSize))],
             FieldType.RDMP => RDATs.Last().RDMP = r.ReadSTRV(dataSize),
             FieldType.RDGS => RDATs.Last().RDGSs = [.. Enumerable.Range(0, dataSize / 8).Select(x => new RDGSField(r, dataSize))],
-            FieldType.RDMD => RDATs.Last().RDMD = r.ReadSAndVerify<UI32Field>(dataSize),
+            FieldType.RDMD => RDATs.Last().RDMD = r.ReadS<UI32Field>(dataSize),
             FieldType.RDSD => RDATs.Last().RDSDs = [.. Enumerable.Range(0, dataSize / 12).Select(x => new RDSDField(r, dataSize, format))],
             FieldType.RDWT => RDATs.Last().RDWTs = [.. Enumerable.Range(0, dataSize / RDWTField.SizeOf(format)).Select(x => new RDWTField(r, dataSize, format))],
             _ => Empty,
@@ -5501,7 +5501,7 @@ namespace GameX.Bethesda.Formats.Records
         public override object CreateField(BinaryReader r, FormType format, FieldType type, int dataSize) => type switch
         {
             FieldType.EDID => EDID = r.ReadSTRV(dataSize),
-            FieldType.INDX => INDX = r.ReadT<IN32Field>(dataSize),
+            FieldType.INDX => INDX = r.ReadS<IN32Field>(dataSize),
             FieldType.DATA or FieldType.SKDT => DATA = new DATAField(r, dataSize, format),
             FieldType.DESC => DESC = r.ReadSTRV(dataSize),
             FieldType.ICON => ICON = r.ReadFILE(dataSize),
@@ -5709,7 +5709,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.ICON or FieldType.ITEX => ICON = r.ReadFILE(dataSize),
             FieldType.ENAM => ENAM = new FMIDField<ENCHRecord>(r, dataSize),
             FieldType.SCRI => SCRI = new FMIDField<SCPTRecord>(r, dataSize),
-            FieldType.ANAM => ANAM = r.ReadSAndVerify<IN16Field>(dataSize),
+            FieldType.ANAM => ANAM = r.ReadS<IN16Field>(dataSize),
             _ => Empty,
         };
     }

@@ -1,5 +1,4 @@
-﻿using GameX.Formats;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 
@@ -14,17 +13,15 @@ namespace GameX.WB.Formats
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class PakTypeAttribute : Attribute
+    public class PakTypeAttribute(PakType type) : Attribute
     {
-        public PakTypeAttribute(PakType type) => Type = type;
-        public PakType Type { get; set; }
+        public PakType Type { get; set; } = type;
     }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class PakFileTypeAttribute : Attribute
+    public class PakFileTypeAttribute(PakFileType fileType) : Attribute
     {
-        public PakFileTypeAttribute(PakFileType fileType) => FileType = fileType;
-        public PakFileType FileType { get; set; }
+        public PakFileType FileType { get; set; } = fileType;
     }
 
     [AttributeUsage(AttributeTargets.Field)]
@@ -34,18 +31,16 @@ namespace GameX.WB.Formats
         public PakFileExtensionAttribute(Type classType, string methodName)
         {
             ExtensionMethod = classType.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            Value = (Func<FileSource, BinaryReader, string>)((s, r) => (string)ExtensionMethod.Invoke(null, new object[] { s, r }));
+            Value = (Func<FileSource, BinaryReader, string>)((s, r) => (string)ExtensionMethod.Invoke(null, [s, r]));
         }
         public object Value { get; set; }
         MethodInfo ExtensionMethod { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class PakFileIdRangeAttribute : Attribute
+    public class PakFileIdRangeAttribute(uint begin, uint end) : Attribute
     {
-        public PakFileIdRangeAttribute(uint begin, uint end) { Begin = begin; End = end; }
-        public uint Begin { get; set; }
-        public uint End { get; set; }
+        public uint Begin { get; set; } = begin; public uint End { get; set; } = end;
     }
 
     /// <summary>

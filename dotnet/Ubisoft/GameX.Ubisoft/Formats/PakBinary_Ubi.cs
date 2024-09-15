@@ -135,7 +135,7 @@ namespace GameX.Ubisoft.Formats
         public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
         {
             // read file
-            var header = r.ReadT<Header>(sizeof(Header));
+            var header = r.ReadS<Header>();
             if (header.Magic != MAGIC) throw new FormatException("BAD MAGIC");
             if (header.Version != 3) throw new FormatException("BAD VERSION");
             source.Version = header.Version;
@@ -145,7 +145,7 @@ namespace GameX.Ubisoft.Formats
             fixed (byte* stringsB = strings)
             {
                 // files
-                var headerFiles = r.ReadTArray<HeaderFile>(sizeof(HeaderFile), header.FileCount);
+                var headerFiles = r.ReadSArray<HeaderFile>(header.FileCount);
                 for (var i = 0; i < headerFiles.Length; i++)
                 {
                     var headerFile = headerFiles[i];
@@ -158,7 +158,7 @@ namespace GameX.Ubisoft.Formats
                 }
 
                 // directories
-                var headerDirectories = r.ReadTArray<HeaderDirectory>(sizeof(HeaderDirectory), header.DirectoryCount);
+                var headerDirectories = r.ReadSArray<HeaderDirectory>(header.DirectoryCount);
                 for (var i = 0; i < headerDirectories.Length; i++)
                 {
                     var headerDirectory = headerDirectories[i];

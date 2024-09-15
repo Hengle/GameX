@@ -185,7 +185,7 @@ namespace GameX.Lucas.Formats
                             ObjectStateTable[i] = (byte)(tmp >> 4);
                             ObjectOwnerTable[i] = (byte)(tmp & 0x0F);
                         }
-                        ClassData = r.ReadTArray<uint>(sizeof(uint), count);
+                        ClassData = r.ReadPArray<uint>("I", count);
                         break;
                     case ObjectFlags.Loop4:
                         ObjectStateTable = r.ReadBytes(count);
@@ -193,7 +193,7 @@ namespace GameX.Lucas.Formats
                         ObjectOwnerTable = new byte[count];
                         for (var i = 0; i < count; i++)
                             ObjectOwnerTable[i] = 0xFF;
-                        ClassData = r.ReadTArray<uint>(sizeof(uint), count);
+                        ClassData = r.ReadPArray<uint>("I", count);
                         break;
                     case ObjectFlags.Loop5:
                         ObjectIDMap = new Dictionary<string, int>();

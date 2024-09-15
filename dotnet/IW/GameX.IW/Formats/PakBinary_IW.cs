@@ -338,7 +338,7 @@ namespace GameX.IW.Formats
 
                         // Read hash entries
                         r.Seek((long)body.HashOffset);
-                        var entries = r.ReadTArray<XPAK_HashEntry>(sizeof(XPAK_HashEntry), (int)body.HashCount);
+                        var entries = r.ReadSArray<XPAK_HashEntry>((int)body.HashCount);
                         for (var i = 0; i < (int)body.HashCount; i++)
                         {
                             // Read it

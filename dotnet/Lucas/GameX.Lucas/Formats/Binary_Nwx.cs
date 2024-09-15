@@ -2,6 +2,7 @@ using GameX.Formats;
 using GameX.Meta;
 using GameX.Platforms;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -114,7 +115,7 @@ namespace GameX.Lucas.Formats
                 if (flip) { var temp = cell.Width; cell.Width = cell.Height; cell.Height = temp; }
 
                 var cellOffsetTablePosition = r.Tell();
-                var cellOffsets = r.ReadTArray<uint>(sizeof(uint), (int)cell.Width);
+                var cellOffsets = r.ReadPArray<uint>("I", (int)cell.Width);
                 var data = new List<byte>();
                 foreach (var offset in cellOffsets)
                 {

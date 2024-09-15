@@ -1,11 +1,12 @@
-using OpenStack.Gfx;
 using OpenStack.Gfx.Algorithms;
+using OpenStack.Gfx.Renders;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using static OpenStack.Gfx.OnDiskBufferData;
+using static OpenStack.Gfx.Renders.OnDiskBufferData;
 
 namespace GameX.Valve.Formats.Blocks
 {
@@ -20,8 +21,8 @@ namespace GameX.Valve.Formats.Blocks
 
         public VBIB()
         {
-            VertexBuffers = new List<OnDiskBufferData>();
-            IndexBuffers = new List<OnDiskBufferData>();
+            VertexBuffers = [];
+            IndexBuffers = [];
         }
 
         public VBIB(IDictionary<string, object> data) : this()

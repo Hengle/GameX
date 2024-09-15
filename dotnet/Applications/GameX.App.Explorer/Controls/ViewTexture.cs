@@ -1,5 +1,6 @@
-using OpenStack.Gfx;
-using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Gl.Renders;
+using OpenStack.Gfx.Renders;
+using OpenStack.Gfx.Textures;
 
 namespace GameX.App.Explorer.Controls
 {

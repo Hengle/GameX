@@ -18,8 +18,8 @@ namespace GameX.Crytek.Formats.Core.Chunks
                 IntSkinVertices[i].Obsolete0 = r.ReadVector3();
                 IntSkinVertices[i].Position = r.ReadVector3();
                 IntSkinVertices[i].Obsolete2 = r.ReadVector3();
-                IntSkinVertices[i].BoneIDs = r.ReadTArray<ushort>(sizeof(ushort), 4); // Read 4 bone IDs
-                IntSkinVertices[i].Weights = r.ReadTArray<float>(sizeof(float), 4); // Read the weights for those bone IDs
+                IntSkinVertices[i].BoneIDs = r.ReadPArray<ushort>("H", 4); // Read 4 bone IDs
+                IntSkinVertices[i].Weights = r.ReadPArray<float>("f", 4); // Read the weights for those bone IDs
                 IntSkinVertices[i].Color.value = r.ReadInt32(); // Read the color
             }
 

@@ -2,7 +2,11 @@ using GameX.Valve.Formats;
 using GameX.Valve.Formats.Animations;
 using GameX.Valve.Formats.Blocks;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Animates;
 using OpenStack.Gfx.Gl;
+using OpenStack.Gfx.Gl.Renders;
+using OpenStack.Gfx.Renders;
+using OpenStack.Gfx.Scenes;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -26,13 +30,13 @@ namespace GameX.Valve.OpenGL.Scenes
         public IEnumerable<RenderableMesh> RenderableMeshes => ActiveMeshRenderers;
         public string ActiveSkin;
 
-        readonly List<RenderableMesh> MeshRenderers = new List<RenderableMesh>();
-        readonly List<Animation> Animations = new List<Animation>();
+        readonly List<RenderableMesh> MeshRenderers = [];
+        readonly List<Animation> Animations = [];
         Dictionary<string, string> SkinMaterials;
 
         int AnimationTexture = -1;
-        ICollection<string> ActiveMeshGroups = new HashSet<string>();
-        ICollection<RenderableMesh> ActiveMeshRenderers = new HashSet<RenderableMesh>();
+        ICollection<string> ActiveMeshGroups = [];
+        ICollection<RenderableMesh> ActiveMeshRenderers = [];
 
         bool LoadedAnimations;
 
@@ -99,7 +103,7 @@ namespace GameX.Valve.OpenGL.Scenes
                 if (materialGroup.Get<string>("m_name") == skin)
                 {
                     var materials = materialGroup.Get<string[]>("m_materials");
-                    SkinMaterials = new Dictionary<string, string>();
+                    SkinMaterials = [];
                     for (var i = 0; i < defaultMaterials.Length; i++) SkinMaterials[defaultMaterials[i]] = materials[i];
                     break;
                 }

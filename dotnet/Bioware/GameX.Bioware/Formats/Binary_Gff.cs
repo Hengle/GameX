@@ -88,10 +88,10 @@ namespace GameX.Bioware.Formats
         public Binary_Gff(BinaryReader r)
         {
             Type = (DataType)r.ReadUInt32();
-            var header = r.ReadT<GFF_Header>(sizeof(GFF_Header));
+            var header = r.ReadS<GFF_Header>();
             if (header.Version != GFF_VERSION3_2 && header.Version != GFF_VERSION3_3) throw new FormatException("BAD MAGIC");
             r.Seek(header.StructOffset);
-            var headerStructs = r.ReadTArray<GFF_Struct>(sizeof(GFF_Struct), (int)header.StructCount);
+            var headerStructs = r.ReadSArray<GFF_Struct>((int)header.StructCount);
             var index = new Dictionary<uint, object>();
             var structs = new IDictionary<string, object>[header.StructCount];
             for (var i = 0; i < structs.Length; i++)
@@ -103,7 +103,7 @@ namespace GameX.Bioware.Formats
                 index.Add(id, s);
             }
             r.Seek(header.FieldOffset);
-            var headerFields = r.ReadTArray<GFF_Field>(sizeof(GFF_Field), (int)header.FieldCount).Select<GFF_Field, (uint label, object value)>(x =>
+            var headerFields = r.ReadSArray<GFF_Field>((int)header.FieldCount).Select<GFF_Field, (uint label, object value)>(x =>
             {
                 switch (x.Type)
                 {
@@ -145,7 +145,7 @@ namespace GameX.Bioware.Formats
                 throw new ArgumentOutOfRangeException(nameof(x.Type), x.Type.ToString());
             }).ToArray();
             r.Seek(header.LabelOffset);
-            var headerLabels = r.ReadTArray<GFF_Label>(sizeof(GFF_Label), (int)header.LabelCount).Select(x => UnsafeX.FixedAString(x.Name, 0x10)).ToArray();
+            var headerLabels = r.ReadSArray<GFF_Label>((int)header.LabelCount).Select(x => UnsafeX.FixedAString(x.Name, 0x10)).ToArray();
             // combine
             for (var i = 0; i < structs.Length; i++)
             {
@@ -159,7 +159,7 @@ namespace GameX.Bioware.Formats
                 }
                 var fields = structs[i];
                 r.Seek(header.FieldIndicesOffset + dataOrDataOffset);
-                foreach (var idx in r.ReadTArray<uint>(sizeof(uint), (int)fieldCount))
+                foreach (var idx in r.ReadPArray<uint>("I", (int)fieldCount))
                 {
                     var (label, value) = headerFields[idx];
                     fields.Add(headerLabels[label], value);
