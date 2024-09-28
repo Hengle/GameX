@@ -212,7 +212,7 @@ class HostFileSystem(IFileSystem):
 
 # StandardFileSystem
 class StandardFileSystem(IFileSystem):
-    def __init__(self, root: str): self.root = root; self.skip = len(root) + 1
+    def __init__(self, root: str): self.root = root; self.skip = len(root) + (1 if root.endswith('/') else 0)
     def glob(self, path: str, searchPattern: str) -> list[str]:
         g = pathlib.Path(os.path.join(self.root, path)).glob(searchPattern if searchPattern else '**/*')
         return [str(x)[self.skip:] for x in g if x.is_file()]

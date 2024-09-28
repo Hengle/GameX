@@ -99,7 +99,7 @@ class OpenGLTextureBuilder(TextureBuilderBase):
                 internalFormat = glFormat
                 if not internalFormat or not compressedTexImage2D(source, level, internalFormat.value): return self.defaultTexture
             case glPixelFormat if isinstance(fmt, tuple):
-                internalFormat, format, type = glPixelFormat, glPixelFormat, glPixelFormat
+                internalFormat, format, type = glPixelFormat
                 if not internalFormat or not texImage2D(source, level, internalFormat.value, format.value, type.value): return self.defaultTexture
             case _: raise Exception(f'Unknown format: {fmt}')
 

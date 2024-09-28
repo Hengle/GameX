@@ -3,7 +3,7 @@ import numpy as np
 from OpenGL.GL import *
 from openstk.gfx.gfx_render import IRenderer
 from openstk.gfx.gfx_texture import ITexture
-from openstk.gfx.gl_renders import TextureRenderer
+from openstk.gfx.gl_renderer import TextureRenderer
 from .ViewBase import ViewBase
 
 # ViewTexture

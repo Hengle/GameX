@@ -7,8 +7,8 @@ from PyQt6.QtVulkenWidgets import QVulkanWindow
 from PyQt6.QtVulken import QOpenGLBuffer, QOpenGLShader, QOpenGLShaderProgram, QOpenGLTexture
 from openstk.gfx_render import RenderPass
 from openstk.gfx_texture import ITexture, ITextureSelect
-from openstk.vulken_view import VulkenView
-from openstk.vulken_renders import TextureRenderer
+from openstk.vk_view import VulkenView
+from openstk.vk_renderer import TextureRenderer
 from openstk.gfx_ui import MouseState, KeyboardState
 
 FACTOR: int = 1

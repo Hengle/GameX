@@ -8,7 +8,7 @@ from PyQt6.QtOpenGL import QOpenGLBuffer, QOpenGLShader, QOpenGLShaderProgram, Q
 from openstk.gfx.gfx_render import RenderPass
 from openstk.gfx.gfx_texture import ITexture, ITextureSelect
 from openstk.gfx.gl_view import OpenGLView
-from openstk.gfx.gl_renders import TextureRenderer
+from openstk.gfx.gl_renderer import TextureRenderer
 from openstk.gfx.gfx_ui import MouseState, KeyboardState
 
 # from OpenGL.GL import *
