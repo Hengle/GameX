@@ -1,5 +1,5 @@
 ﻿//#define Arkane
-//#define Bethesda
+#define Bethesda
 //#define Bioware
 //#define Black
 //#define Blizzard
@@ -24,7 +24,7 @@
 //#define Unknown
 //#define Valve
 //#define Volition
-#define WB
+//#define WB
 
 namespace GameX
 {
@@ -51,8 +51,8 @@ namespace GameX
             ForceOpen = true,
             ForcePath = "sample:2",
             Family = "Arkane",
-            Game = "AF", // Arx Fatalis [open, read, texture:GL]
-            //Game = "DOM", // Dark Messiah of Might and Magic [open, read]
+            //Game = "AF", // Arx Fatalis [open, read, texture:GL]
+            Game = "DOM", // Dark Messiah of Might and Magic [open, read]
             //Game = "D", // Dishonored [unreal]
             //Game = "D2", // Dishonored 2 [open, read]
             //Game = "P", // Prey [open, read]

@@ -7,6 +7,7 @@ using OpenStack.Gfx.Textures;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Numerics;
 using System.Threading.Tasks;
 
@@ -75,12 +76,12 @@ namespace GameX.Platforms
         {
             var id = reuse != 0 ? reuse : GL.GenTexture();
             var numMipMaps = Math.Max(1, source.MipMaps);
-            (int start, int stop) level = (level2?.Start.Value ?? 0, numMipMaps - 1);
+            (int start, int stop) level = (level2?.Start.Value ?? 0, numMipMaps);
 
             // bind
             GL.BindTexture(TextureTarget.Texture2D, id);
             if (level.start > 0) GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, level.start);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, level.stop - level.start);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, level.stop - level.start - 1);
             var (bytes, fmt, spans) = source.Begin((int)Platform.Type.OpenGL);
             if (bytes == null) return DefaultTexture;
 
@@ -88,25 +89,29 @@ namespace GameX.Platforms
             bool CompressedTexImage2D(ITexture source, (int start, int stop) level, InternalFormat internalFormat)
             {
                 int width = source.Width, height = source.Height;
-                for (var l = level.start; l <= level.stop; l++)
-                {
-                    var span = spans[l];
-                    if (span.Start.Value < 0) return false;
-                    var pixels = bytes.AsSpan(span);
-                    fixed (byte* data = pixels) GL.CompressedTexImage2D(TextureTarget.Texture2D, l, internalFormat, width >> l, height >> l, 0, pixels.Length, (IntPtr)data);
-                }
+                if (spans != null)
+                    for (var l = level.start; l < level.stop; l++)
+                    {
+                        var span = spans[l];
+                        if (span.Start.Value < 0) return false;
+                        var pixels = bytes.AsSpan(span);
+                        fixed (byte* data = pixels) GL.CompressedTexImage2D(TextureTarget.Texture2D, l, internalFormat, width >> l, height >> l, 0, pixels.Length, (IntPtr)data);
+                    }
+                else fixed (byte* data = bytes) GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, bytes.Length, (IntPtr)data);
                 return true;
             }
             bool TexImage2D(ITexture source, (int start, int stop) level, PixelInternalFormat internalFormat, PixelFormat format, PixelType type)
             {
                 int width = source.Width, height = source.Height;
-                for (var l = level.start; l < level.stop; l++)
-                {
-                    var span = spans[l];
-                    if (span.Start.Value < 0) return false;
-                    var pixels = bytes.AsSpan(span);
-                    fixed (byte* data = pixels) GL.TexImage2D(TextureTarget.Texture2D, l, internalFormat, width >> l, height >> l, 0, format, type, (IntPtr)data);
-                }
+                if (spans != null)
+                    for (var l = level.start; l < level.stop; l++)
+                    {
+                        var span = spans[l];
+                        if (span.Start.Value < 0) return false;
+                        var pixels = bytes.AsSpan(span);
+                        fixed (byte* data = pixels) GL.TexImage2D(TextureTarget.Texture2D, l, internalFormat, width >> l, height >> l, 0, format, type, (IntPtr)data);
+                    }
+                else fixed (byte* data = bytes) GL.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, format, type, (IntPtr)data);
                 return true;
             }
             if (fmt is TextureGLFormat glFormat)

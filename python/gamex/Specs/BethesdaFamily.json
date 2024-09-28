@@ -24,8 +24,8 @@
         ".bsa",
         ".esm"
       ],
-      "pak": "game:/Morrowind.esm",
-      "paky": "game:/Morrowind.bsa",
+      "paky": "game:/Morrowind.esm",
+      "pak": "game:/Morrowind.bsa",
       "pakx": [
         "game:/Morrowind.bsa",
         "game:/Morrowind.esm"

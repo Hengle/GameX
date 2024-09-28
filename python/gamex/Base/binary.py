@@ -150,6 +150,7 @@ class Binary_Img(IHaveMetaInfo, ITexture):
                 (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
                 TextureUnityFormat.RGBA32,
                 TextureUnrealFormat.Unknown)
+        # print(f'format: {self.format}')
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
         match platform:
