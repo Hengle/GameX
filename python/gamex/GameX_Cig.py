@@ -1,5 +1,4 @@
 import os
-from typing import Callable
 from gamex.pak import BinaryPakFile
 from .Cig.pakbinary_p4k import PakBinary_P4k
 from .util import _pathExtension
@@ -18,7 +17,7 @@ class CigPakFile(BinaryPakFile):
 
     #region Factories
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, Callable):
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
             case _: return (0, None)
     #endregion

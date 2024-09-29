@@ -1290,7 +1290,7 @@ namespace GameX
                     : new ManyPakFile(
                         CreatePakFileType(pakState), pakState,
                         s.Item1.Length > 0 ? s.Item1 : "Many", s.Item2,
-                        pathSkip: 0), //s.Item1.Length > 0 ? s.Item1.Length + 1 : 0),
+                        pathSkip: s.Item1.Length > 0 ? s.Item1.Length + 1 : 0),
                 IList<PakFile> s => s.Count == 1 ? s[0] : new MultiPakFile(pakState, "Multi", s),
                 null => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(value), $"{value}"),

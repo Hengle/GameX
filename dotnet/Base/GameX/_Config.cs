@@ -1,5 +1,5 @@
 ﻿//#define Arkane
-#define Bethesda
+//#define Bethesda
 //#define Bioware
 //#define Black
 //#define Blizzard
@@ -22,7 +22,7 @@
 //#define Ubisoft
 //#define Unity
 //#define Unknown
-//#define Valve
+#define Valve
 //#define Volition
 //#define WB
 
@@ -52,7 +52,7 @@ namespace GameX
             ForcePath = "sample:2",
             Family = "Arkane",
             //Game = "AF", // Arx Fatalis [open, read, texture:GL]
-            Game = "DOM", // Dark Messiah of Might and Magic [open, read]
+            //Game = "DOM", // Dark Messiah of Might and Magic [open, read]
             //Game = "D", // Dishonored [unreal]
             //Game = "D2", // Dishonored 2 [open, read]
             //Game = "P", // Prey [open, read]
@@ -526,7 +526,7 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            ForcePath = "sample:*",
+            ForcePath = "sample:0",
             Family = "Valve",
             Game = "HL", // Half-Life [open, read, texture:GL]
             //Game = "TF", // Team Fortress Classic [open, read, texture:GL]

@@ -3,16 +3,18 @@ from io import BytesIO
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinaryT
 from gamex.compression import decompressBlast
-from gamex.util import _pathExtension
+from gamex.util import _throw, _pathExtension
+from openstk.poly import unsafe
 
 # typedefs
 class Reader: pass
 class BinaryPakFile: pass
 
-#region PakBinary_Danae
+#region PakBinary_Vpk
 
-# PakBinary_Danae
-class PakBinary_Danae(PakBinaryT):
+# PakBinary_Vpk
+class PakBinary_Vpk(PakBinaryT):
+
     # read
     def read(self, source: BinaryPakFile, r: Reader, tag: object = None) -> None:
         source.files = files = []
@@ -81,91 +83,74 @@ class PakBinary_Danae(PakBinaryT):
 
 #endregion
 
-#region PakBinary_Void
+#region PakBinary_Wad
 
-# PakBinary_Void
-class PakBinary_Void(PakBinaryT):
+# PakBinary_Wad
+class PakBinary_Wad(PakBinaryT):
 
     #region Headers
 
-    class V_File:
-        struct = ('>Q4IH', 26)
+    W_MAGIC = 0x33444157 #: WAD3
+
+    class W_Header:
+        struct = ('<3I', 12)
+        def __init__(self, tuple):
+            self.magic, \
+            self.lumpCount, \
+            self.lumpOffset = tuple
+
+    class W_Lump:
+        struct = ('<3I2bH16s', 32)
         def __init__(self, tuple):
             self.offset, \
-            self.fileSize, \
-            self.packedSize, \
-            self.unknown1, \
-            self.flags, \
-            self.flags2 = tuple
+            self.diskSize, \
+            self.size, \
+            self.type, \
+            self.compression, \
+            self.padding, \
+            self.name = tuple
+
+    class W_LumpInfo:
+        struct = ('<3I', 12)
+        def __init__(self, tuple):
+            self.width, \
+            self.height, \
+            self.paletteSize = tuple
 
     #endregion
 
     # read
     def read(self, source: BinaryPakFile, r: Reader, tag: object = None) -> None:
-        # must be .index file
-        if _pathExtension(source.filePath) != '.index': raise Exception('must be a .index file')
+        source.files = files = []
 
-        files = source.files = []
-
-        # master.index file
-        if source.filePath == 'master.index':
-            MAGIC = 0x04534552
-            SubMarker = 0x18000000
-            EndMarker = 0x01000000
-            
-            magic = r.readUInt32E()
-            if magic != MAGIC: raise Exception('BAD MAGIC')
-            r.skip(4)
-            first = True
-            while True:
-                pathSize = r.readUInt32()
-                if pathSize == SubMarker: first = False; pathSize = r.readUInt32()
-                elif pathSize == EndMarker: break
-                path = r.readFString(pathSize).replace('\\', '/')
-                packId = 0 if first else r.readUInt16()
-                if not path.endswith('.index'): continue
-                files.append(FileSource(
-                    path = path,
-                    pak = self.SubPakFile(self, None, source, source.game, source.fileSystem, path)
-                    ))
-            return
-
-        # find files
-        fileSystem = source.fileSystem
-        resourcePath = f'{source.filePath[:-6]}.resources'
-        if not fileSystem.fileExists(resourcePath): raise Exception('Unable to find resources extension')
-        sharedResourcePath = next((x for x in ['shared_2_3.sharedrsc',
-            'shared_2_3_4.sharedrsc',
-            'shared_1_2_3.sharedrsc',
-            'shared_1_2_3_4.sharedrsc'] if fileSystem.fileExists(x)), None)
-
-        # read
-        r.seek(4)
-        mainFileSize = r.readUInt32E()
-        r.skip(24)
-        numFiles = r.readUInt32E()
-        files = source.files = []
-        for _ in range(numFiles):
-            id = r.readUInt32E()
-            tag1 = r.readL32Encoding()
-            tag2 = r.readL32Encoding()
-            path = (r.readL32Encoding() or '').replace('\\', '/')
-            file = r.readS(self.V_File)
-            useSharedResources = (file.flags & 0x20) != 0 and file.flags2 == 0x8000
-            if useSharedResources and not sharedResourcePath: raise Exception('sharedResourcePath not available')
-            newPath = sharedResourcePath if useSharedResources else resourcePath
+        # read file
+        header = r.readS(self.W_Header)
+        if header.magic != self.W_MAGIC: raise Exception('BAD MAGIC')
+        r.seek(header.lumpOffset)
+        lumps = r.readSArray(self.W_Lump, header.lumpCount)
+        for lump in lumps:
+            name = unsafe.fixedAString(lump.name, 16)
+            path = None
+            match lump.type:
+                case 0x40: path = f'{name}.tex2'
+                case 0x42: path = f'{name}.pic'
+                case 0x43: path = f'{name}.tex'
+                case 0x46: path = f'{name}.fnt'
+                case _: path = f'{name}.{lump.type:x}'
             files.append(FileSource(
-                id = id,
                 path = path,
-                compressed = 1 if file.fileSize != file.packedSize else 0,
-                fileSize = file.fileSize,
-                packedSize = file.packedSize,
-                offset = file.offset,
-                tag = (newPath, tag1, tag2)
+                offset = lump.offset,
+                compressed = lump.compression,
+                fileSize = lump.diskSize,
+                packedSize = lump.size,
                 ))
 
     # readData
     def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
-        pass
+        r.seek(file.offset)
+        return BytesIO(
+            r.read(file.fileSize) if file.compressed == 0 else \
+            _throw('NotSupportedException')
+            )
 
 #endregion

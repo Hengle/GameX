@@ -1,5 +1,4 @@
 import os
-from typing import Callable
 from gamex.pak import BinaryPakFile
 from .Cryptic.pakbinary_hogg import PakBinary_Hogg
 from .util import _pathExtension
@@ -22,7 +21,7 @@ class CrypticPakFile(BinaryPakFile):
         return PakBinary_Hogg()
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, Callable):
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
             case _: return (0, None)
     #endregion

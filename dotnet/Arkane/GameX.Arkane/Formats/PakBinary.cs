@@ -18,6 +18,12 @@ namespace GameX.Arkane.Formats
             var files = source.Files = [];
             var key = Encoding.ASCII.GetBytes((string)source.Game.Key); int keyLength = key.Length, keyIndex = 0;
 
+            // move to fat table
+            r.Seek(r.ReadUInt32());
+            var fatSize = (int)r.ReadUInt32();
+            var fatBytes = r.ReadBytes(fatSize);
+
+            // read int32
             int readInt32(ref byte* b)
             {
                 var p = b;
@@ -29,6 +35,7 @@ namespace GameX.Arkane.Formats
                 return *(int*)p;
             }
 
+            // read string
             string readString(ref byte* b)
             {
                 var p = b;
@@ -44,11 +51,7 @@ namespace GameX.Arkane.Formats
                 return r;
             }
 
-            // move to fat table
-            r.Seek(r.ReadUInt32());
-            var fatSize = (int)r.ReadUInt32();
-            var fatBytes = r.ReadBytes(fatSize);
-
+            // while there are bytes
             fixed (byte* _ = fatBytes)
             {
                 byte* c = _, end = _ + fatSize;
@@ -58,6 +61,7 @@ namespace GameX.Arkane.Formats
                     var numFiles = readInt32(ref c);
                     for (var i = 0; i < numFiles; i++)
                     {
+                        // get file
                         var file = new FileSource
                         {
                             Path = dirPath + readString(ref c).Replace('\\', '/'),
@@ -66,8 +70,10 @@ namespace GameX.Arkane.Formats
                             FileSize = readInt32(ref c),
                             PackedSize = readInt32(ref c),
                         };
+                        // special case
                         if (file.Path.EndsWith(".FTL")) file.Compressed = 1;
                         else if (file.Compressed == 0) file.FileSize = file.PackedSize;
+                        // add file
                         files.Add(file);
                     }
                 }
@@ -111,6 +117,8 @@ namespace GameX.Arkane.Formats
             // must be .index file
             if (!source.PakPath.EndsWith(".index")) throw new FormatException("must be a .index file");
 
+            var files = source.Files = [];
+
             // master.index file
             if (source.PakPath == "master.index")
             {
@@ -118,7 +126,6 @@ namespace GameX.Arkane.Formats
                 const uint SubMarker = 0x18000000;
                 const uint EndMarker = 0x01000000;
 
-                var files2 = source.Files = [];
                 var magic = r.ReadUInt32E();
                 if (magic != MAGIC) throw new FormatException("BAD MAGIC");
                 r.Skip(4);
@@ -131,7 +138,7 @@ namespace GameX.Arkane.Formats
                     var path = r.ReadFString((int)pathSize).Replace('\\', '/');
                     var packId = first ? 0 : r.ReadUInt16();
                     if (!path.EndsWith(".index")) continue;
-                    files2.Add(new FileSource
+                    files.Add(new FileSource
                     {
                         Path = path,
                         Pak = new SubPakFile(source, null, path),
@@ -151,11 +158,12 @@ namespace GameX.Arkane.Formats
                 "shared_1_2_3_4.sharedrsc" }
                 .FirstOrDefault(fileSystem.FileExists);
 
+            // read
             r.Seek(4);
             var mainFileSize = r.ReadUInt32E();
             r.Skip(24);
             var numFiles = r.ReadUInt32E();
-            var files = source.Files = new FileSource[numFiles];
+            files = source.Files = new FileSource[numFiles];
             for (var i = 0; i < numFiles; i++)
             {
                 var id = r.ReadUInt32E();

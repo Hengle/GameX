@@ -82,7 +82,7 @@ class MainPage(QMainWindow):
         mainTab = self.mainTab = QTabWidget(self)
         # mainTab.setMinimumWidth(300) # remove
         mainTab.setMaximumWidth(500)
-        mainTab.setMaximumWidth(200) # remove
+        mainTab.setMaximumWidth(300) # remove
         self.updateTabs()
 
         # contentBlock

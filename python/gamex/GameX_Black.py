@@ -1,5 +1,4 @@
 import os
-from typing import Callable
 from gamex.pak import BinaryPakFile
 from .Black.pakbinary_dat import PakBinary_Dat
 from .util import _pathExtension
@@ -22,7 +21,7 @@ class BlackPakFile(BinaryPakFile):
         return PakBinary_Dat()
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, Callable):
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
             case _: return (0, None)
     #endregion

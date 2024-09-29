@@ -12,6 +12,8 @@ using static OpenStack.Debug;
 
 namespace GameX.Valve
 {
+    #region ValvePakFile
+
     /// <summary>
     /// ValvePakFile
     /// </summary>
@@ -22,7 +24,7 @@ namespace GameX.Valve
         /// Initializes a new instance of the <see cref="ValvePakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public ValvePakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
+        public ValvePakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
             ObjectFactoryFunc = ObjectFactoryFactory;
             PathFinders.Add(typeof(object), FindBinary);
@@ -30,24 +32,21 @@ namespace GameX.Valve
 
         #region Factories
 
-        static readonly ConcurrentDictionary<string, PakBinary> PakBinarys = new ConcurrentDictionary<string, PakBinary>();
+        static readonly ConcurrentDictionary<string, PakBinary> PakBinarys = new();
 
-        static PakBinary GetPakBinary(FamilyGame game, string filePath)
-            => PakBinarys.GetOrAdd(game.Id, _ => PakBinaryFactory(game, filePath != null ? Path.GetExtension(filePath).ToLowerInvariant() : null));
-
-        static PakBinary PakBinaryFactory(FamilyGame game, string extension)
-            => game.Engine switch
+        static PakBinary GetPakBinary(FamilyGame game, string extension)
+            => PakBinarys.GetOrAdd(game.Id, _ => game.Engine switch
             {
                 "Unity" => Unity.Formats.PakBinary_Unity.Current,
                 "Source" => PakBinary_Vpk.Current,
                 "HL" => PakBinary_Wad.Current,
-                _ => null,
+                _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine),
                 //_ => extension switch
                 //{
                 //    ".wad" => PakBinaryWad.Instance,
                 //    _ => null,
                 //}
-            };
+            });
 
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
         {
@@ -115,4 +114,6 @@ namespace GameX.Valve
 
         #endregion
     }
+
+    #endregion
 }

@@ -1,5 +1,4 @@
 import os
-from typing import Callable
 from gamex import FamilyGame
 from gamex.pak import BinaryPakFile
 from .util import _pathExtension
@@ -27,7 +26,7 @@ class WbBPakFile(BinaryPakFile):
         pass
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, Callable):
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
             case _: return (0, None)
     #endregion

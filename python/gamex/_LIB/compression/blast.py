@@ -1,6 +1,5 @@
 import os
 from io import BytesIO
-from typing import Callable
 
 MAXBITS = 13
 MAXWIN = 4096
@@ -67,7 +66,7 @@ extra = [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8] # extra bits for length
 # Blast
 class Blast:
     # input state
-    infun: Callable                     # input function provided by user
+    infun: callable                     # input function provided by user
     inhow: object                       # opaque information passed to infun()
     inxs: bytes
     inx: int                            # next input location
@@ -76,7 +75,7 @@ class Blast:
     bitcnt: int                         # number of bits in bit buffer
 
     # output state
-    outfun: Callable                    # output function provided by user
+    outfun: callable                    # output function provided by user
     outhow: object                      # opaque information passed to outfun()
     nextx: int                          # index of next write location in out[]
     first: int                          # true to check distances (for first 4K)
@@ -208,7 +207,7 @@ class Blast:
                     self.first = 0
         return 0
 
-    def blast(self, infun: Callable, inhow: object, outfun: Callable, outhow: object) -> int:
+    def blast(self, infun: callable, inhow: object, outfun: callable, outhow: object) -> int:
         # initialize input state
         self.infun = infun
         self.inhow = inhow
@@ -237,7 +236,7 @@ class Blast:
         hold = bytearray(CHUNK); holdPtr = 0
         inputLen = len(inputx); inputPtr = 0
         outputLen = len(output); outputPtr = 0
-        def inf(how: object, buf: Callable) -> int:
+        def inf(how: object, buf: callable) -> int:
             nonlocal inputLen, inputPtr
             if inputLen <= 0: return 0
             buf(hold)

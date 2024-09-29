@@ -1,5 +1,5 @@
 import os, json, glob, re, random
-from typing import Any, Callable
+from typing import Any
 from urllib.parse import urlparse
 from importlib import resources
 from openstk.poly import findType
@@ -42,13 +42,13 @@ def createDetector(game: FamilyGame, id: str, elem: dict[str, object]) -> Detect
 
 # create FamilySample
 @staticmethod
-def createFamilySample(path: str, loader: Callable) -> FamilySample:
+def createFamilySample(path: str, loader: callable) -> FamilySample:
     elem = loader(path)
     return FamilySample(elem)
 
 # create Family
 @staticmethod
-def createFamily(any: str, loader: Callable = None, loadSamples: bool = False) -> Family:
+def createFamily(any: str, loader: callable = None, loadSamples: bool = False) -> Family:
     elem = loader(any) if loader else any
     familyType = _value(elem, 'familyType')
     family = findType(familyType)(elem) if familyType else \
@@ -371,7 +371,7 @@ class FamilyGame:
 #   - locales: {self.locales if self.locales else None}'''
 
     # detect
-    def detect(self, id: str, key: str, value: object, func: Callable) -> Any:
+    def detect(self, id: str, key: str, value: object, func: callable) -> Any:
         return self.detectors[id].get(key, value, func) if id in self.detectors else None
 
     # converts the Paks to Application Paks

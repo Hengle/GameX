@@ -1,5 +1,4 @@
 import os, io, re, pathlib, platform, psutil, winreg
-from typing import Callable
 from zipfile import ZipFile
 from openstk.poly import Reader, findType
 from . import store
@@ -71,7 +70,7 @@ class FileManager:
         self.filters.update(source.filters)
 
     @staticmethod
-    def createMatcher(searchPattern: str) -> Callable:
+    def createMatcher(searchPattern: str) -> callable:
         if not searchPattern: return lambda x: True
         wildcardCount = searchPattern.count('*')
         if wildcardCount <= 0: return lambda x: x.casefold() == searchPattern.casefold()

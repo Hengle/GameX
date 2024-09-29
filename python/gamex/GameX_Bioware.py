@@ -1,5 +1,4 @@
 import os
-from typing import Callable
 from gamex.pak import BinaryPakFile
 from .Base.pakbinary_zip import PakBinary_Zip
 from .Bioware.pakbinary_aurora import PakBinary_Aurora
@@ -28,7 +27,7 @@ class BiowarePakFile(BinaryPakFile):
             case _: raise Exception(f'Unknown: {game.engine}')
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, Callable):
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
             case _: return (0, None)
     #endregion

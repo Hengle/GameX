@@ -1,5 +1,4 @@
 import os
-from typing import Callable
 from enum import Enum
 from gamex.pak import PakFile
 from openstk.gfx.gfx import IObjectManager, IMaterialManager, IShaderManager, ITextureManager, PlatformStats
@@ -236,11 +235,11 @@ class Platform:
     platformType: Type = None
     platformTag: str = None
     platformOS: OS = OS.Windows
-    gfxFactory: Callable = None
-    sfxFactory: Callable = None
+    gfxFactory: callable = None
+    sfxFactory: callable = None
     startups: list[object] = []
     inTestHost: bool = False
-    logFunc: Callable = None
+    logFunc: callable = None
 
     class Stats:
         maxTextureMaxAnisotropy: int

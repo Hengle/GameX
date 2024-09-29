@@ -1,7 +1,6 @@
 import os, numpy as np
 from ctypes import c_ulong, c_ulonglong
 from io import BytesIO
-from typing import Callable
 from pathlib import Path
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinaryT
@@ -20,7 +19,7 @@ class PakBinary_UO(PakBinaryT):
     #region Factories
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, Callable):
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match source.path.lower():
             case 'animdata.mul': return (0, Binary_Animdata.factory)
             case 'fonts.mul': return (0, Binary_AsciiFont.factory)

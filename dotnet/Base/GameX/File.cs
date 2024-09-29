@@ -318,7 +318,7 @@ namespace GameX
         {
             var matcher = new Matcher();
             matcher.AddIncludePatterns(new[] { searchPattern });
-            return matcher.GetResultsInFullPath(searchPattern);
+            return matcher.GetResultsInFullPath(searchPattern).ToList();
         }
         public bool FileExists(string path) => File.Exists(path);
         public (string path, long length) FileInfo(string path) => File.Exists(path) ? (path, 0) : (null, 0);
@@ -341,8 +341,7 @@ namespace GameX
         {
             var matcher = new Matcher();
             matcher.AddIncludePatterns(new[] { string.IsNullOrEmpty(searchPattern) ? "**/*" : searchPattern });
-            //var skip = Skip + path.Length + 1;
-            return matcher.GetResultsInFullPath(Path.Combine(Root, path)).Select(x => x[Skip..]);
+            return matcher.GetResultsInFullPath(Path.Combine(Root, path)).Select(x => x[Skip..]).ToList();
         }
         public bool FileExists(string path) => File.Exists(Path.Combine(Root, path));
         public (string path, long length) FileInfo(string path) => File.Exists(path = Path.Combine(Root, path)) ? (path[Skip..], new FileInfo(Path.Combine(Root, path)).Length) : (null, 0);
@@ -394,7 +393,7 @@ namespace GameX
             {
                 var fn = x.FullName;
                 return fn.Length > skip && fn.StartsWith(root) && matcher(fn[skip..]);
-            }).Select(x => x.FullName[skip..]);
+            }).Select(x => x.FullName[skip..]).ToList();
         }
         public bool FileExists(string path) => Pak.GetEntry(Path.Combine(Root, path)) != null;
         public (string path, long length) FileInfo(string path) { var e = Pak.GetEntry(Path.Combine(Root, path)); return e != null ? (e.Name, e.Length) : (null, 0); }

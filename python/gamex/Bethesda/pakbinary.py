@@ -15,7 +15,7 @@ class BinaryPakFile: pass
 # PakBinary_Ba2
 class PakBinary_Ba2(PakBinaryT):
 
-    #region TES5
+    #region Header : TES5
 
     # Default header data
     F4_BSAHEADER_FILEID = 0x58445442    # Magic for Fallout 4 BA2, the literal string "BTDX".

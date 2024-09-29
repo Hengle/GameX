@@ -1,5 +1,5 @@
 import os
-from typing import Any, Callable
+from typing import Any
 
 def _throw(message: str) -> None:
     raise Exception(message)
@@ -14,15 +14,15 @@ def _valueV(elem: Any) -> Any:
 
 def _list(elem: dict[str, Any], key: str, default: Any = None) -> Any:
     return (elem[key] if isinstance(elem[key], list) else [elem[key]]) if key in elem else default
-def _listV(elem: Any, method: Callable) -> Any:
+def _listV(elem: Any, method: callable) -> Any:
      return method(elem)
 def _listV(elem: Any) -> Any:
      return elem
 
-def _method(elem: dict[str, Any], key: str, method: Callable, default: Any = None) -> Any:
+def _method(elem: dict[str, Any], key: str, method: callable, default: Any = None) -> Any:
     return method(elem[key]) if key in elem else default
 
-def _related(elem: dict[str, Any], key: str, method: Callable, default: Any = None) -> Any:
+def _related(elem: dict[str, Any], key: str, method: callable, default: Any = None) -> Any:
     return { k:method(k, v) for k,v in elem[key].items() } if key in elem else {}
 
 def _dictTrim(source: dict[str, Any]) -> Any:

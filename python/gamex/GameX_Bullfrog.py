@@ -1,5 +1,4 @@
 import os
-from typing import Callable
 from gamex import Family, FamilyGame
 from gamex.pak import BinaryPakFile
 from .util import _pathExtension
@@ -37,7 +36,7 @@ class BullfrogPakFile(BinaryPakFile):
             case _: return PakBinary_Bullfrog()
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, Callable):
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match game.id:
             case _: return PakBinary_Bullfrog.objectFactoryFactory(source, game)
     #endregion

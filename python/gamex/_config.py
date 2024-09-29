@@ -1,8 +1,9 @@
 __title__ = "gamex"
 __version__ = "0.0.1"
 # __current__ = "Unknown"
-__current__ = "Arkane"
+# __current__ = "Arkane"
 # __current__ = "Bethesda"
+__current__ = "Valve"
 
 class GlobalOption:
     def __init__(self, Family:str=None, Game:str=None, Edition:str=None, ForcePath:str=None, ForceOpen:bool=False):
@@ -470,7 +471,7 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:*",
+            ForcePath = "sample:0",
             Family = "Valve",
             Game = "HL", # Half-Life [open, read, texture:GL]
             # Game = "TF", # Team Fortress Classic [open, read, texture:GL]

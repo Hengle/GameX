@@ -1,15 +1,18 @@
 ﻿using GameX.Algorithms;
-using GameX.Formats;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace GameX.Valve.Formats
 {
+    #region PakBinary_Vpk
+
     // https://developer.valvesoftware.com/wiki/VPK_File_Format
     public unsafe class PakBinary_Vpk : PakBinary<PakBinary_Vpk>
     {
@@ -33,7 +36,7 @@ namespace GameX.Valve.Formats
             public uint ArchiveMd5SectionSize;
             public uint OtherMd5SectionSize;
             public uint SignatureSectionSize;
-            public int ArchiveMd5Entries => (int)ArchiveMd5SectionSize / 28; // 28 is sizeof(VPK_MD5SectionEntry), which is int + int + int + 16 chars
+            public int ArchiveMd5Entries => (int)ArchiveMd5SectionSize / sizeof(ArchiveMd5Entry); // 28 is sizeof(VPK_MD5SectionEntry), which is int + int + int + 16 chars
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -44,10 +47,6 @@ namespace GameX.Valve.Formats
             public uint Length; // Gets or sets the length in bytes.
             public fixed byte Checksum[16];// Gets or sets the expected Checksum checksum.
         }
-
-        #endregion
-
-        #region Verification
 
         /// <summary>
         /// Verification
@@ -106,7 +105,7 @@ namespace GameX.Valve.Formats
 
         public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
         {
-            var files = source.Files = new List<FileSource>();
+            var files = source.Files = [];
 
             // header
             if (r.ReadUInt32() != MAGIC) throw new FormatException("BAD MAGIC");
@@ -208,4 +207,90 @@ namespace GameX.Valve.Formats
             return Task.FromResult((Stream)new MemoryStream(data));
         }
     }
+
+    #endregion
+
+    #region PakBinary_Wad
+
+    // https://github.com/Rupan/HLLib/blob/master/HLLib/WADFile.h
+    public unsafe class PakBinary_Wad : PakBinary<PakBinary_Wad>
+    {
+        #region Headers
+
+        const uint W_MAGIC = 0x33444157; //: WAD3
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1), DebuggerDisplay("Header:{LumpCount}")]
+        struct W_Header
+        {
+            public static (string, int) Struct = ("<3I", sizeof(W_Header));
+            public uint Magic;
+            public uint LumpCount;
+            public uint LumpOffset;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1), DebuggerDisplay("Lump:{Name}")]
+        struct W_Lump
+        {
+            public static (string, int) Struct = ("<3I2bH16s", 32);
+            public uint Offset;
+            public uint DiskSize;
+            public uint Size;
+            public byte Type;
+            public byte Compression;
+            public ushort Padding;
+            public fixed byte Name[16];
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1), DebuggerDisplay("LumpInfo:{Width}x{Height}")]
+        struct W_LumpInfo
+        {
+            public static (string, int) Struct = ("<3I", 32);
+            public uint Width;
+            public uint Height;
+            public uint PaletteSize;
+        }
+
+        #endregion
+
+        public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
+        {
+            var files = source.Files = [];
+
+            // read file
+            var header = r.ReadS<W_Header>();
+            if (header.Magic != W_MAGIC) throw new FormatException("BAD MAGIC");
+            r.Seek(header.LumpOffset);
+            var lumps = r.ReadSArray<W_Lump>((int)header.LumpCount);
+            foreach (var lump in lumps)
+            {
+                var name = UnsafeX.FixedAString(lump.Name, 16);
+                files.Add(new FileSource
+                {
+                    Path = lump.Type switch
+                    {
+                        0x40 => $"{name}.tex2",
+                        0x42 => $"{name}.pic",
+                        0x43 => $"{name}.tex",
+                        0x46 => $"{name}.fnt",
+                        _ => $"{name}.{lump.Type:x}"
+                    },
+                    Offset = lump.Offset,
+                    Compressed = lump.Compression,
+                    FileSize = lump.DiskSize,
+                    PackedSize = lump.Size,
+                });
+            }
+            return Task.CompletedTask;
+        }
+
+        public override Task<Stream> ReadData(BinaryPakFile source, BinaryReader r, FileSource file, FileOption option = default)
+        {
+            r.Seek(file.Offset);
+            return Task.FromResult<Stream>(new MemoryStream(file.Compressed == 0
+                ? r.ReadBytes((int)file.FileSize)
+                : throw new NotSupportedException()));
+        }
+    }
+
+    #endregion
 }

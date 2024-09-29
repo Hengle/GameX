@@ -3,10 +3,6 @@
     "name": "Half-Life",
     "files": [
       {
-        "path": "valve/maps/boot_camp.bsp",
-        "type": "Map"
-      },
-      {
         "path": "valve/cached.wad:LOADING.pic",
         "type": "Texture"
       },
@@ -21,6 +17,10 @@
       {
         "path": "valve/fonts.wad:FONT2.fnt",
         "type": "Texture:Font"
+      },
+      {
+        "path": "valve/maps/boot_camp.bsp",
+        "type": "Map"
       },
       {
         "path": "valve/sprites:640_logo.spr",

@@ -1,5 +1,4 @@
 import sys, os, re, time, itertools
-from typing import Callable
 from enum import Enum, Flag
 from io import BytesIO
 from openstk.poly import Reader
@@ -196,7 +195,7 @@ class BinaryPakFile(PakFile):
         return data if type == BytesIO or type == object else \
             _throw(f'Stream not returned for {f.path} with {type}')
 
-    def _ensureCachedObjectFactory(self, file: FileSource) -> Callable:
+    def _ensureCachedObjectFactory(self, file: FileSource) -> callable:
         if not self.objectFactoryFunc: return FileSource.emptyObjectFactory
         if file.cachedObjectFactory: return file.cachedObjectFactory
         option, factory = self.objectFactoryFunc(file, self.game)
@@ -257,9 +256,9 @@ class ManyPakFile(BinaryPakFile):
 # MultiPakFile
 class MultiPakFile(PakFile):
     def __init__(self, state: PakState, name: str, pakFiles: list[PakFile]):
-        super().__init__(state, name)
+        super().__init__(state)
         self.name = name
-        self.pakFiles = pakFiles
+        self.pakFiles = pakFiles or _throw('Empty pakFiles')
 
     def closing(self):
         for pakFile in self.pakFiles: pakFile.close()

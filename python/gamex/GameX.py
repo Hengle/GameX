@@ -1,5 +1,4 @@
 import os
-from typing import Callable
 from gamex.filesrc import FileSource
 from gamex import Family
 from gamex.pak import PakFile
@@ -26,7 +25,7 @@ class UnknownPakFile(PakFile):
     #region Factories
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, Callable):
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match source.path:
             case 'testtri.gfx': return (0, UnknownPakFile.Binary_TestTri.factory)
             case _: return (0, None)

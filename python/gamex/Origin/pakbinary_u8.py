@@ -1,6 +1,5 @@
 import os
 from io import BytesIO
-from typing import Callable
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinaryT
 from gamex.util import _pathExtension
@@ -18,7 +17,7 @@ class PakBinary_U8(PakBinaryT):
     #region Factories
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, Callable):
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match source.path.lower():
             case _: pass
 

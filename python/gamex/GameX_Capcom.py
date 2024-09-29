@@ -1,5 +1,4 @@
 import os
-from typing import Callable
 from gamex.pak import BinaryPakFile
 from .Base.pakbinary_zip import PakBinary_Zip
 from .Capcom.pakbinary_arc import PakBinary_Arc

@@ -1,6 +1,5 @@
 import os
 from io import BytesIO
-from typing import Callable
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinaryT
 from gamex.util import _pathExtension
@@ -18,7 +17,7 @@ S_FLIFILES = ['INTRO.DAT', 'MBRIEF.DAT', 'MBRIEOUT.DAT', 'MCONFOUT.DAT', 'MCONFU
 # PakBinary_Void
 class PakBinary_Bullfrog(PakBinaryT):
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, Callable):
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match game.id:
             case 'S':
                 match os.path.basename(source.path).upper():
