@@ -1,7 +1,5 @@
 using GameX.Valve.Formats;
-using GameX.Valve.Formats.Animations;
-using GameX.Valve.Formats.Blocks;
-using OpenStack.Gfx;
+using GameX.Valve.Formats.Vpk;
 using OpenStack.Gfx.Animates;
 using OpenStack.Gfx.Gl;
 using OpenStack.Gfx.Gl.Renders;
@@ -134,7 +132,7 @@ namespace GameX.Valve.OpenGL.Scenes
 
                 if (!newResource.ContainsBlockType<VBIB>()) { Console.WriteLine("Old style model, no VBIB!"); continue; }
 
-                MeshRenderers.Add(new GLRenderableMesh(Scene.Gfx as IOpenGLGfx, (DATAMesh)newResource.DATA, refMesh.MeshIndex, SkinMaterials, Model));
+                MeshRenderers.Add(new GLRenderableMesh(Scene.Gfx as IOpenGLGfx, (D_Mesh)newResource.DATA, refMesh.MeshIndex, SkinMaterials, Model));
             }
 
             // Set active meshes to default

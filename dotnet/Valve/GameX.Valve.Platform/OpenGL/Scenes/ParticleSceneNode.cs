@@ -1,4 +1,4 @@
-using GameX.Valve.Formats.Blocks;
+using GameX.Valve.Formats.Vpk;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
 using OpenStack.Gfx.Gl.Renders;
@@ -12,8 +12,8 @@ namespace GameX.Valve.OpenGL.Scenes
     {
         class ParticleSystemWrapper : IParticleSystem
         {
-            readonly DATAParticleSystem _source;
-            public ParticleSystemWrapper(DATAParticleSystem source) => _source = source;
+            readonly D_ParticleSystem _source;
+            public ParticleSystemWrapper(D_ParticleSystem source) => _source = source;
             IDictionary<string, object> IParticleSystem.Data => _source.Data;
             IEnumerable<IDictionary<string, object>> IParticleSystem.Renderers => _source.Renderers;
             IEnumerable<IDictionary<string, object>> IParticleSystem.Operators => _source.Operators;
@@ -24,7 +24,7 @@ namespace GameX.Valve.OpenGL.Scenes
 
         ParticleRenderer ParticleRenderer;
 
-        public ParticleSceneNode(Scene scene, DATAParticleSystem particleSystem) : base(scene)
+        public ParticleSceneNode(Scene scene, D_ParticleSystem particleSystem) : base(scene)
         {
             ParticleRenderer = new ParticleRenderer(Scene.Gfx as IOpenGLGfx, new ParticleSystemWrapper(particleSystem));
             LocalBoundingBox = ParticleRenderer.BoundingBox;

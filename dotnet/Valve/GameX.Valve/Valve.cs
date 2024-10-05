@@ -1,8 +1,7 @@
 ﻿using GameX.Formats;
 using GameX.Formats.Unknown;
 using GameX.Valve.Formats;
-using GameX.Valve.Formats.Blocks;
-using GameX.Valve.Formats.Extras;
+using GameX.Valve.Formats.Vpk;
 using GameX.Valve.Transforms;
 using System;
 using System.Collections.Concurrent;
@@ -60,7 +59,7 @@ namespace GameX.Valve
                 else if (magic == CompiledShader.MAGIC) return Task.FromResult((object)new CompiledShader(r, f.Path));
                 else if (magic == ClosedCaptions.MAGIC) return Task.FromResult((object)new ClosedCaptions(r));
                 else if (magic == ToolsAssetInfo.MAGIC) return Task.FromResult((object)new ToolsAssetInfo(r));
-                else if (magic == DATABinaryKV3.MAGIC || magic == DATABinaryKV3.MAGIC2) { var kv3 = new DATABinaryKV3 { Size = (uint)r.BaseStream.Length }; kv3.Read(null, r); return Task.FromResult((object)kv3); }
+                else if (magic == XKV3.MAGIC || magic == XKV3.MAGIC2) { var kv3 = new XKV3 { Size = (uint)r.BaseStream.Length }; kv3.Read(null, r); return Task.FromResult((object)kv3); }
                 else if (magicResourceVersion == Binary_Pak.KnownHeaderVersion) return Task.FromResult((object)new Binary_Pak(r));
                 //else if (magicResourceVersion == BinaryPak.KnownHeaderVersion)
                 //{

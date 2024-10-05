@@ -1,16 +1,1960 @@
 using GameX.Algorithms;
+using GameX.Formats;
+using GameX.Meta;
+using GameX.Platforms;
+using K4os.Compression.LZ4;
+using K4os.Compression.LZ4.Encoders;
+using OpenStack.Gfx;
+using OpenStack.Gfx.Algorithms;
+using OpenStack.Gfx.Renders;
+using OpenStack.Gfx.Textures;
+using System;
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Security;
+using System.Text;
+using System.Threading.Tasks;
+using static GameX.Valve.Formats.Vpk.D_Texture.VTexFormat;
 
-namespace GameX.Valve.Formats.Blocks
+namespace GameX.Valve.Formats.Vpk
 {
-    public partial class DATAEntityLump
+    #region ResourceType
+    //was:Resource/Enums/ResourceType
+
+    public enum ResourceType
     {
+        Unknown = 0,
+        [ExtensionX("vanim")] Animation,
+        [ExtensionX("vagrp")] AnimationGroup,
+        [ExtensionX("vanmgrph")] AnimationGraph,
+        [ExtensionX("valst")] ActionList,
+        [ExtensionX("vseq")] Sequence,
+        [ExtensionX("vpcf")] ParticleSystem,
+        [ExtensionX("vmat")] Material,
+        [ExtensionX("vmks")] Sheet,
+        [ExtensionX("vmesh")] Mesh,
+        [ExtensionX("vtex")] Texture,
+        [ExtensionX("vmdl")] Model,
+        [ExtensionX("vphys")] PhysicsCollisionMesh,
+        [ExtensionX("vsnd")] Sound,
+        [ExtensionX("vmorf")] Morph,
+        [ExtensionX("vrman")] ResourceManifest,
+        [ExtensionX("vwrld")] World,
+        [ExtensionX("vwnod")] WorldNode,
+        [ExtensionX("vvis")] WorldVisibility,
+        [ExtensionX("vents")] EntityLump,
+        [ExtensionX("vsurf")] SurfaceProperties,
+        [ExtensionX("vsndevts")] SoundEventScript,
+        [ExtensionX("vmix")] VMix,
+        [ExtensionX("vsndstck")] SoundStackScript,
+        [ExtensionX("vfont")] BitmapFont,
+        [ExtensionX("vrmap")] ResourceRemapTable,
+        [ExtensionX("vcdlist")] ChoreoSceneFileData,
+        // All Panorama* are compiled just as CompilePanorama
+        [ExtensionX("vtxt")] Panorama, // vtxt is not a real extension
+        [ExtensionX("vcss")] PanoramaStyle,
+        [ExtensionX("vxml")] PanoramaLayout,
+        [ExtensionX("vpdi")] PanoramaDynamicImages,
+        [ExtensionX("vjs")] PanoramaScript,
+        [ExtensionX("vts")] PanoramaTypescript,
+        [ExtensionX("vsvg")] PanoramaVectorGraphic,
+        [ExtensionX("vpsf")] ParticleSnapshot,
+        [ExtensionX("vmap")] Map,
+        [ExtensionX("vpost")] PostProcessing,
+        [ExtensionX("vdata")] VData,
+        [ExtensionX("item")] ArtifactItem,
+        [ExtensionX("sbox")] SboxManagedResource, // TODO: Managed resources can have any extension
+    }
+
+    #endregion
+
+    #region KV3File
+    //was:Serialization/KV3File
+
+    public class KV3File(IDictionary<string, object> root,
+        string encoding = "text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d}",
+        string format = "generic:version{7412167c-06e9-4698-aff2-e63eb59037e7}")
+    {
+        // <!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+        public IDictionary<string, object> Root = root;
+        public string Encoding = encoding;
+        public string Format = format;
+
+        public override string ToString()
+        {
+            using var w = new IndentedTextWriter();
+            w.WriteLine(string.Format("<!-- kv3 encoding:{0} format:{1} -->", Encoding, Format));
+            //Root.Serialize(w);
+            return w.ToString();
+        }
+    }
+
+    #endregion
+
+    #region Block
+    //was:Resource/Block
+
+    /// <summary>
+    /// Represents a block within the resource file.
+    /// </summary>
+    public abstract class Block
+    {
+        /// <summary>
+        /// Gets or sets the offset to the data.
+        /// </summary>
+        public uint Offset { get; set; }
+
+        /// <summary>
+        /// Gets or sets the data size.
+        /// </summary>
+        public uint Size { get; set; }
+
+        public abstract void Read(Binary_Pak parent, BinaryReader r);
+
+        /// <summary>
+        /// Returns a string that represents the current object.
+        /// </summary>
+        /// <returns>A string that represents the current object.</returns>
+        public override string ToString()
+        {
+            using var w = new IndentedTextWriter();
+            WriteText(w);
+            return w.ToString();
+        }
+
+        /// <summary>
+        /// Writers the correct object to IndentedTextWriter.
+        /// </summary>
+        /// <param name="w">IndentedTextWriter.</param>
+        public virtual void WriteText(IndentedTextWriter w) => w.WriteLine("{0:X8}", Offset);
+
+        //was:Resource.ConstructFromType()
+        public static Block Factory(Binary_Pak source, string value)
+            => value switch
+            {
+                "DATA" => Factory(source),
+                "REDI" => new REDI(),
+                "RED2" => new RED2(),
+                "RERL" => new RERL(),
+                "NTRO" => new NTRO(),
+                "VBIB" => new VBIB(),
+                "VXVS" => new VXVS(),
+                "SNAP" => new SNAP(),
+                "MBUF" => new MBUF(),
+                "CTRL" => new CTRL(),
+                "MDAT" => new MDAT(),
+                "INSG" => new INSG(),
+                "SrMa" => new SRMA(),
+                "LaCo" => new LACO(),
+                "MRPH" => new MRPH(),
+                "ANIM" => new ANIM(),
+                "ASEQ" => new ASEQ(),
+                "AGRP" => new AGRP(),
+                "PHYS" => new PHYS(),
+                _ => throw new ArgumentOutOfRangeException(nameof(value), $"Unrecognized block type '{value}'"),
+            };
+
+        //was:Resource.ConstructResourceType()
+        internal static DATA Factory(Binary_Pak source) => source.DataType switch
+        {
+            var x when x == ResourceType.Panorama || x == ResourceType.PanoramaScript || x == ResourceType.PanoramaTypescript || x == ResourceType.PanoramaDynamicImages || x == ResourceType.PanoramaVectorGraphic => new D_Panorama(),
+            ResourceType.PanoramaStyle => new D_PanoramaStyle(),
+            ResourceType.PanoramaLayout => new D_PanoramaLayout(),
+            ResourceType.Sound => new D_Sound(),
+            ResourceType.Texture => new D_Texture(),
+            ResourceType.Model => new D_Model(),
+            ResourceType.World => new D_World(),
+            ResourceType.WorldNode => new D_WorldNode(),
+            ResourceType.EntityLump => new D_EntityLump(),
+            ResourceType.Material => new D_Material(),
+            ResourceType.SoundEventScript => new D_SoundEventScript(),
+            ResourceType.SoundStackScript => new D_SoundStackScript(),
+            ResourceType.ParticleSystem => new D_ParticleSystem(),
+            ResourceType.PostProcessing => new D_PostProcessing(),
+            ResourceType.ResourceManifest => new D_ResourceManifest(),
+            var x when x == ResourceType.SboxManagedResource || x == ResourceType.ArtifactItem => new D_Plaintext(),
+            ResourceType.PhysicsCollisionMesh => new D_PhysAggregateData(),
+            ResourceType.Mesh => new D_Mesh(source),
+            //ResourceType.Mesh => source.Version != 0 ? new DATABinaryKV3() : source.ContainsBlockType<NTRO>() ? new DATABinaryNTRO() : new DATA(),
+            _ => source.ContainsBlockType<NTRO>() ? new D_NTRO() : new DATA(),
+        };
+
+        internal static ResourceType DetermineResourceTypeByFileExtension(string fileName, string extension = null)
+        {
+            extension ??= Path.GetExtension(fileName);
+            if (string.IsNullOrEmpty(extension)) return ResourceType.Unknown;
+            extension = extension.EndsWith("_c", StringComparison.Ordinal) ? extension[1..^2] : extension[1..];
+            foreach (ResourceType typeValue in Enum.GetValues(typeof(ResourceType)))
+            {
+                if (typeValue == ResourceType.Unknown) continue;
+                var type = typeof(ResourceType).GetMember(typeValue.ToString())[0];
+                var typeExt = (ExtensionXAttribute)type.GetCustomAttributes(typeof(ExtensionXAttribute), false)[0];
+                if (typeExt.Extension == extension) return typeValue;
+            }
+            return ResourceType.Unknown;
+        }
+
+        internal static ResourceType DetermineTypeByCompilerIdentifier(R_SpecialDependencies.SpecialDependency value)
+        {
+            var identifier = value.CompilerIdentifier;
+            if (identifier.StartsWith("Compile", StringComparison.Ordinal)) identifier = identifier.Remove(0, "Compile".Length);
+            return identifier switch
+            {
+                "Psf" => ResourceType.ParticleSnapshot,
+                "AnimGroup" => ResourceType.AnimationGroup,
+                "Animgraph" => ResourceType.AnimationGraph,
+                "VPhysXData" => ResourceType.PhysicsCollisionMesh,
+                "Font" => ResourceType.BitmapFont,
+                "RenderMesh" => ResourceType.Mesh,
+                "ChoreoSceneFileData" => ResourceType.ChoreoSceneFileData,
+                "Panorama" => value.String switch
+                {
+                    "Panorama Style Compiler Version" => ResourceType.PanoramaStyle,
+                    "Panorama Script Compiler Version" => ResourceType.PanoramaScript,
+                    "Panorama Layout Compiler Version" => ResourceType.PanoramaLayout,
+                    "Panorama Dynamic Images Compiler Version" => ResourceType.PanoramaDynamicImages,
+                    _ => ResourceType.Panorama,
+                },
+                "VectorGraphic" => ResourceType.PanoramaVectorGraphic,
+                "VData" => ResourceType.VData,
+                "DotaItem" => ResourceType.ArtifactItem,
+                var x when x == "SBData" || x == "ManagedResourceCompiler" => ResourceType.SboxManagedResource, // This is without the "Compile" prefix
+                _ => Enum.TryParse(identifier, false, out ResourceType resourceType) ? resourceType : ResourceType.Unknown,
+            };
+        }
+
+        internal static bool IsHandledType(ResourceType type) =>
+            type == ResourceType.Model ||
+            type == ResourceType.World ||
+            type == ResourceType.WorldNode ||
+            type == ResourceType.ParticleSystem ||
+            type == ResourceType.Material ||
+            type == ResourceType.EntityLump ||
+            type == ResourceType.PhysicsCollisionMesh ||
+            type == ResourceType.Morph ||
+            type == ResourceType.PostProcessing;
+
+        public static ReadOnlySpan<byte> FastDecompress(BinaryReader r)
+        {
+            var decompressedSize = r.ReadUInt32();
+
+            // Valve sets fourth byte in the compressed buffer to 0x80 to indicate that the data is uncompressed,
+            // 0x80000000 is 2147483648 which automatically makes any number higher than max signed 32-bit integer.
+            if (decompressedSize > int.MaxValue) return r.ReadBytes((int)decompressedSize & 0x7FFFFFFF);
+
+            var result = new Span<byte>(new byte[decompressedSize]);
+            var position = 0;
+            ushort blockMask = 0;
+            var i = 0;
+
+            while (position < decompressedSize)
+            {
+                if (i == 0) { blockMask = r.ReadUInt16(); i = 16; }
+                if ((blockMask & 1) > 0)
+                {
+                    var offsetSize = r.ReadUInt16();
+                    var offset = (offsetSize >> 4) + 1;
+                    var size = (offsetSize & 0xF) + 3;
+                    var positionSource = position - offset;
+
+                    // This path is seemingly useless, because it produces equal results.
+                    // Is this draw of the luck because `result` is initialized to zeroes?
+                    if (offset == 1) while (size-- > 0) result[position++] = result[positionSource];
+                    else while (size-- > 0) result[position++] = result[positionSource++];
+                }
+                else result[position++] = r.ReadByte();
+                blockMask >>= 1;
+                i--;
+            }
+            return result;
+        }
+    }
+
+    #endregion
+
+    #region Data : XKV1
+    //was:Resource/ResourceTypes/BinaryKV1
+
+    public class XKV1 : DATA
+    {
+        public const int MAGIC = 0x564B4256; // VBKV
+
+        public IDictionary<string, object> KeyValues { get; private set; }
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.BaseStream.Position = Offset;
+            //KeyValues = KVSerializer.Create(KVSerializationFormat.KeyValues1Binary).Deserialize(r.BaseStream);
+        }
+
+        public override string ToString()
+        {
+            using var ms = new MemoryStream();
+            using var r = new StreamReader(ms);
+            //KVSerializer.Create(KVSerializationFormat.KeyValues1Text).Serialize(ms, KeyValues);
+            ms.Seek(0, SeekOrigin.Begin);
+            return r.ReadToEnd();
+        }
+    }
+
+    #endregion
+
+    #region Data : XKV3
+    //was:Resource/ResourceTypes/BinaryKV3
+
+    public class XKV3 : DATA, IHaveMetaInfo
+    {
+        public enum KVFlag //was:Serialization/KeyValues/KVFlaggedValue
+        {
+            None,
+            Resource,
+            DeferredResource
+        }
+
+        public enum KVType : byte //was:Serialization/KeyValues/KVValue
+        {
+            STRING_MULTI = 0, // STRING_MULTI doesn't have an ID
+            NULL = 1,
+            BOOLEAN = 2,
+            INT64 = 3,
+            UINT64 = 4,
+            DOUBLE = 5,
+            STRING = 6,
+            BINARY_BLOB = 7,
+            ARRAY = 8,
+            OBJECT = 9,
+            ARRAY_TYPED = 10,
+            INT32 = 11,
+            UINT32 = 12,
+            BOOLEAN_TRUE = 13,
+            BOOLEAN_FALSE = 14,
+            INT64_ZERO = 15,
+            INT64_ONE = 16,
+            DOUBLE_ZERO = 17,
+            DOUBLE_ONE = 18,
+        }
+
+        static readonly Guid KV3_ENCODING_BINARY_BLOCK_COMPRESSED = new Guid(new byte[] { 0x46, 0x1A, 0x79, 0x95, 0xBC, 0x95, 0x6C, 0x4F, 0xA7, 0x0B, 0x05, 0xBC, 0xA1, 0xB7, 0xDF, 0xD2 });
+        static readonly Guid KV3_ENCODING_BINARY_UNCOMPRESSED = new Guid(new byte[] { 0x00, 0x05, 0x86, 0x1B, 0xD8, 0xF7, 0xC1, 0x40, 0xAD, 0x82, 0x75, 0xA4, 0x82, 0x67, 0xE7, 0x14 });
+        static readonly Guid KV3_ENCODING_BINARY_BLOCK_LZ4 = new Guid(new byte[] { 0x8A, 0x34, 0x47, 0x68, 0xA1, 0x63, 0x5C, 0x4F, 0xA1, 0x97, 0x53, 0x80, 0x6F, 0xD9, 0xB1, 0x19 });
+        static readonly Guid KV3_FORMAT_GENERIC = new Guid(new byte[] { 0x7C, 0x16, 0x12, 0x74, 0xE9, 0x06, 0x98, 0x46, 0xAF, 0xF2, 0xE6, 0x3E, 0xB5, 0x90, 0x37, 0xE7 });
+        public const int MAGIC = 0x03564B56; // VKV3 (3 isn't ascii, its 0x03)
+        public const int MAGIC2 = 0x4B563301; // KV3\x01
+        public const int MAGIC3 = 0x4B563302; // KV3\x02
+
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Text", Name = "BinaryKV3", Value = ToString() }),
+            new("BinaryKV3", items: [
+                new($"Data: {Data.Count}"),
+                new($"Encoding: {Encoding}"),
+                new($"Format: {Format}"),
+            ]),
+        ];
+
+        public IDictionary<string, object> Data { get; private set; }
+        public Guid Encoding { get; private set; }
+        public Guid Format { get; private set; }
+
+        string[] strings;
+        byte[] types;
+        BinaryReader uncompressedBlockDataReader;
+        int[] uncompressedBlockLengthArray;
+        long currentCompressedBlockIndex;
+        long currentTypeIndex;
+        long currentEightBytesOffset = -1;
+        long currentBinaryBytesOffset = -1;
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            var magic = r.ReadUInt32();
+            switch (magic)
+            {
+                case MAGIC: ReadVersion1(r); break;
+                case MAGIC2: ReadVersion2(r); break;
+                case MAGIC3: ReadVersion3(r); break;
+                default: throw new ArgumentOutOfRangeException(nameof(magic), $"Invalid XKV3 signature {magic}");
+            }
+        }
+
+        void DecompressLZ4(BinaryReader r, MemoryStream s)
+        {
+            var uncompressedSize = r.ReadUInt32();
+            var compressedSize = (int)(Size - (r.BaseStream.Position - Offset));
+
+            var output = new Span<byte>(new byte[uncompressedSize]);
+            var buf = ArrayPool<byte>.Shared.Rent(compressedSize);
+            try
+            {
+                var input = buf.AsSpan(0, compressedSize);
+                r.Read(input);
+
+                var written = LZ4Codec.Decode(input, output);
+                if (written != output.Length) throw new InvalidDataException($"Failed to decompress LZ4 (expected {output.Length} bytes, got {written}).");
+            }
+            finally { ArrayPool<byte>.Shared.Return(buf); }
+
+            s.Write(output);
+        }
+
+        void ReadVersion1(BinaryReader r)
+        {
+            Encoding = r.ReadGuid();
+            Format = r.ReadGuid();
+
+            using var s = new MemoryStream();
+            using var r2 = new BinaryReader(s, System.Text.Encoding.UTF8, true);
+
+            if (Encoding.CompareTo(KV3_ENCODING_BINARY_BLOCK_COMPRESSED) == 0) s.Write(FastDecompress(r));
+            else if (Encoding.CompareTo(KV3_ENCODING_BINARY_BLOCK_LZ4) == 0) DecompressLZ4(r, s);
+            else if (Encoding.CompareTo(KV3_ENCODING_BINARY_UNCOMPRESSED) == 0) r.CopyTo(s);
+            else throw new ArgumentOutOfRangeException(nameof(Encoding), $"Unrecognised XKV3 Encoding: {Encoding}");
+            s.Seek(0, SeekOrigin.Begin);
+
+            strings = new string[r2.ReadUInt32()];
+            for (var i = 0; i < strings.Length; i++) strings[i] = r2.ReadZUTF8();
+
+            Data = (IDictionary<string, object>)ParseBinaryKV3(r2, null, true);
+
+            var trailer = r2.ReadUInt32();
+            if (trailer != 0xFFFFFFFF) throw new ArgumentOutOfRangeException(nameof(trailer), $"Invalid trailer {trailer}");
+        }
+
+        void ReadVersion2(BinaryReader r)
+        {
+            Format = r.ReadGuid();
+            var compressionMethod = r.ReadInt32();
+            var countOfBinaryBytes = r.ReadInt32(); // how many bytes (binary blobs)
+            var countOfIntegers = r.ReadInt32(); // how many 4 byte values (ints)
+            var countOfEightByteValues = r.ReadInt32(); // how many 8 byte values (doubles)
+
+            using var s = new MemoryStream();
+
+            if (compressionMethod == 0)
+            {
+                var length = r.ReadInt32();
+                var output = new Span<byte>(new byte[length]);
+                r.Read(output);
+                s.Write(output);
+                s.Seek(0, SeekOrigin.Begin);
+            }
+            else if (compressionMethod == 1) DecompressLZ4(r, s);
+            else throw new ArgumentOutOfRangeException(nameof(compressionMethod), $"Unknown XKV3 compression method: {compressionMethod}");
+
+            using var r2 = new BinaryReader(s, System.Text.Encoding.UTF8, true);
+
+            currentBinaryBytesOffset = 0;
+            r2.SeekAndAlign(countOfBinaryBytes, 4);
+
+            var countOfStrings = r2.ReadInt32();
+            var kvDataOffset = r2.BaseStream.Position;
+
+            // Subtract one integer since we already read it (countOfStrings)
+            r2.SkipAndAlign((countOfIntegers - 1) * 4, 8);
+
+            currentEightBytesOffset = r2.BaseStream.Position;
+            r2.BaseStream.Position += countOfEightByteValues * 8;
+
+            strings = new string[countOfStrings];
+            for (var i = 0; i < countOfStrings; i++) strings[i] = r2.ReadZUTF8();
+
+            // bytes after the string table is kv types, minus 4 static bytes at the end
+            var typesLength = r2.BaseStream.Length - 4 - r2.BaseStream.Position;
+            types = new byte[typesLength];
+            for (var i = 0; i < typesLength; i++) types[i] = r2.ReadByte();
+
+            // Move back to the start of the KV data for reading.
+            r2.Seek(kvDataOffset);
+            Data = (IDictionary<string, object>)ParseBinaryKV3(r2, null, true);
+        }
+
+        void ReadVersion3(BinaryReader r)
+        {
+            Format = r.ReadGuid();
+
+            var compressionMethod = r.ReadUInt32();
+            var compressionDictionaryId = r.ReadUInt16();
+            var compressionFrameSize = r.ReadUInt16();
+            var countOfBinaryBytes = r.ReadUInt32(); // how many bytes (binary blobs)
+            var countOfIntegers = r.ReadUInt32(); // how many 4 byte values (ints)
+            var countOfEightByteValues = r.ReadUInt32(); // how many 8 byte values (doubles)
+
+            // 8 bytes that help valve preallocate, useless for us
+            var stringAndTypesBufferSize = r.ReadUInt32();
+            var b = r.ReadUInt16();
+            var c = r.ReadUInt16();
+
+            var uncompressedSize = r.ReadUInt32();
+            var compressedSize = r.ReadUInt32();
+            var blockCount = r.ReadUInt32();
+            var blockTotalSize = r.ReadUInt32();
+
+            if (compressedSize > int.MaxValue) throw new NotImplementedException("XKV3 compressedSize is higher than 32-bit integer, which we currently don't handle.");
+            else if (blockTotalSize > int.MaxValue) throw new NotImplementedException("XKV3 compressedSize is higher than 32-bit integer, which we currently don't handle.");
+
+            using var s = new MemoryStream();
+
+            if (compressionMethod == 0)
+            {
+                if (compressionDictionaryId != 0) throw new ArgumentOutOfRangeException(nameof(compressionDictionaryId), $"Unhandled: {compressionDictionaryId}");
+                else if (compressionFrameSize != 0) throw new ArgumentOutOfRangeException(nameof(compressionFrameSize), $"Unhandled: {compressionFrameSize}");
+
+                var output = new Span<byte>(new byte[compressedSize]);
+                r.Read(output);
+                s.Write(output);
+            }
+            else if (compressionMethod == 1)
+            {
+                if (compressionDictionaryId != 0) throw new ArgumentOutOfRangeException(nameof(compressionDictionaryId), $"Unhandled: {compressionDictionaryId}");
+                else if (compressionFrameSize != 16384) throw new ArgumentOutOfRangeException(nameof(compressionFrameSize), $"Unhandled: {compressionFrameSize}");
+
+                var output = new Span<byte>(new byte[uncompressedSize]);
+                var buf = ArrayPool<byte>.Shared.Rent((int)compressedSize);
+                try
+                {
+                    var input = buf.AsSpan(0, (int)compressedSize);
+                    r.Read(input);
+                    var written = LZ4Codec.Decode(input, output);
+                    if (written != output.Length) throw new InvalidDataException($"Failed to decompress LZ4 (expected {output.Length} bytes, got {written}).");
+                }
+                finally { ArrayPool<byte>.Shared.Return(buf); }
+                s.Write(output);
+            }
+            else if (compressionMethod == 2)
+            {
+                if (compressionDictionaryId != 0) throw new ArgumentOutOfRangeException(nameof(compressionDictionaryId), $"Unhandled {compressionDictionaryId}");
+                else if (compressionFrameSize != 0) throw new ArgumentOutOfRangeException(nameof(compressionFrameSize), $"Unhandled {compressionFrameSize}");
+
+                using var zstd = new ZstdSharp.Decompressor();
+                var totalSize = uncompressedSize + blockTotalSize;
+                var output = new Span<byte>(new byte[totalSize]);
+                var buf = ArrayPool<byte>.Shared.Rent((int)compressedSize);
+                try
+                {
+                    var input = buf.AsSpan(0, (int)compressedSize);
+                    r.Read(input);
+                    if (!zstd.TryUnwrap(input, output, out var written) || totalSize != written) throw new InvalidDataException($"Failed to decompress zstd correctly (written {written} bytes, expected {totalSize} bytes)");
+                }
+                finally { ArrayPool<byte>.Shared.Return(buf); }
+                s.Write(output);
+            }
+            else throw new ArgumentOutOfRangeException(nameof(compressionMethod), $"Unknown compression method {compressionMethod}");
+
+            s.Seek(0, SeekOrigin.Begin);
+            using var r2 = new BinaryReader(s, System.Text.Encoding.UTF8, true);
+
+            currentBinaryBytesOffset = 0;
+            r2.BaseStream.Position = countOfBinaryBytes;
+            r2.SeekAndAlign(countOfBinaryBytes, 4); // Align to % 4 after binary blobs
+
+            var countOfStrings = r2.ReadUInt32();
+            var kvDataOffset = r2.BaseStream.Position;
+
+            // Subtract one integer since we already read it (countOfStrings)
+            r2.SkipAndAlign((countOfIntegers - 1) * 4, 8); // Align to % 8 for the start of doubles
+
+            currentEightBytesOffset = r2.BaseStream.Position;
+
+            r2.BaseStream.Position += countOfEightByteValues * 8;
+            var stringArrayStartPosition = r2.BaseStream.Position;
+
+            strings = new string[countOfStrings];
+            for (var i = 0; i < countOfStrings; i++) strings[i] = r2.ReadZUTF8();
+
+            var typesLength = stringAndTypesBufferSize - (r2.BaseStream.Position - stringArrayStartPosition);
+            types = new byte[typesLength];
+            for (var i = 0; i < typesLength; i++) types[i] = r2.ReadByte();
+
+            if (blockCount == 0)
+            {
+                var noBlocksTrailer = r2.ReadUInt32();
+                if (noBlocksTrailer != 0xFFEEDD00) throw new ArgumentOutOfRangeException(nameof(noBlocksTrailer), $"Invalid trailer {noBlocksTrailer}");
+
+                // Move back to the start of the KV data for reading.
+                r2.BaseStream.Position = kvDataOffset;
+
+                Data = (IDictionary<string, object>)ParseBinaryKV3(r2, null, true);
+                return;
+            }
+
+            uncompressedBlockLengthArray = new int[blockCount];
+            for (var i = 0; i < blockCount; i++) uncompressedBlockLengthArray[i] = r2.ReadInt32();
+
+            var trailer = r2.ReadUInt32();
+            if (trailer != 0xFFEEDD00) throw new ArgumentOutOfRangeException(nameof(trailer), $"Invalid trailer {trailer}");
+
+            try
+            {
+                using var uncompressedBlocks = new MemoryStream((int)blockTotalSize);
+                uncompressedBlockDataReader = new BinaryReader(uncompressedBlocks);
+
+                if (compressionMethod == 0)
+                {
+                    for (var i = 0; i < blockCount; i++) r.BaseStream.CopyTo(uncompressedBlocks, uncompressedBlockLengthArray[i]);
+                }
+                else if (compressionMethod == 1)
+                {
+                    using var lz4decoder = new LZ4ChainDecoder(compressionFrameSize, 0);
+                    while (r2.BaseStream.Position < r2.BaseStream.Length)
+                    {
+                        var compressedBlockLength = r2.ReadUInt16();
+                        var output = new Span<byte>(new byte[compressionFrameSize]);
+                        var buf = ArrayPool<byte>.Shared.Rent(compressedBlockLength);
+                        try
+                        {
+                            var input = buf.AsSpan(0, compressedBlockLength);
+                            r.Read(input);
+                            if (lz4decoder.DecodeAndDrain(input, output, out var decoded) && decoded > 0) uncompressedBlocks.Write(decoded < output.Length ? output[..decoded] : output);
+                            else throw new InvalidOperationException("LZ4 decode drain failed, this is likely a bug.");
+                        }
+                        finally { ArrayPool<byte>.Shared.Return(buf); }
+                    }
+                }
+                else if (compressionMethod == 2)
+                {
+                    // This is supposed to be a streaming decompress using ZSTD_decompressStream,
+                    // but as it turns out, zstd unwrap above already decompressed all of the blocks for us,
+                    // so all we need to do is just copy the buffer.
+                    // It's possible that Valve's code needs extra decompress because they set ZSTD_d_stableOutBuffer parameter.
+                    r2.BaseStream.CopyTo(uncompressedBlocks);
+                }
+                else throw new ArgumentOutOfRangeException(nameof(compressionMethod), $"Unimplemented compression method in block decoder {compressionMethod}");
+
+                uncompressedBlocks.Position = 0;
+
+                // Move back to the start of the KV data for reading.
+                r2.BaseStream.Position = kvDataOffset;
+
+                Data = (IDictionary<string, object>)ParseBinaryKV3(r2, null, true);
+            }
+            finally { uncompressedBlockDataReader.Dispose(); }
+        }
+
+        (KVType Type, KVFlag Flag) ReadType(BinaryReader r)
+        {
+            var databyte = types != null ? types[currentTypeIndex++] : r.ReadByte();
+            var flag = KVFlag.None;
+            if ((databyte & 0x80) > 0)
+            {
+                databyte &= 0x7F; // Remove the flag bit
+                flag = types != null ? (KVFlag)types[currentTypeIndex++] : (KVFlag)r.ReadByte();
+            }
+            return ((KVType)databyte, flag);
+        }
+
+        object ParseBinaryKV3(BinaryReader r, IDictionary<string, object> parent, bool inArray = false)
+        {
+            string name;
+            if (!inArray)
+            {
+                var stringId = r.ReadInt32();
+                name = stringId == -1 ? string.Empty : strings[stringId];
+            }
+            else name = null;
+            var (type, flag) = ReadType(r);
+            var value = ReadBinaryValue(name, type, flag, r);
+            if (name != null) parent?.Add(name, value);
+            return value;
+        }
+
+        object ReadBinaryValue(string name, KVType type, KVFlag flag, BinaryReader r)
+        {
+            var currentOffset = r.BaseStream.Position;
+            object value;
+            switch (type)
+            {
+                case KVType.NULL: value = MakeValue(type, null, flag); break;
+                case KVType.BOOLEAN:
+                    {
+                        if (currentBinaryBytesOffset > -1) r.BaseStream.Position = currentBinaryBytesOffset;
+                        value = MakeValue(type, r.ReadBoolean(), flag);
+                        if (currentBinaryBytesOffset > -1) { currentBinaryBytesOffset++; r.BaseStream.Position = currentOffset; }
+                        break;
+                    }
+                case KVType.BOOLEAN_TRUE: value = MakeValue(type, true, flag); break;
+                case KVType.BOOLEAN_FALSE: value = MakeValue(type, false, flag); break;
+                case KVType.INT64_ZERO: value = MakeValue(type, 0L, flag); break;
+                case KVType.INT64_ONE: value = MakeValue(type, 1L, flag); break;
+                case KVType.INT64:
+                    {
+                        if (currentEightBytesOffset > 0) r.BaseStream.Position = currentEightBytesOffset;
+                        value = MakeValue(type, r.ReadInt64(), flag);
+                        if (currentEightBytesOffset > 0) { currentEightBytesOffset = r.BaseStream.Position; r.BaseStream.Position = currentOffset; }
+                        break;
+                    }
+                case KVType.UINT64:
+                    {
+                        if (currentEightBytesOffset > 0) r.BaseStream.Position = currentEightBytesOffset;
+                        value = MakeValue(type, r.ReadUInt64(), flag);
+                        if (currentEightBytesOffset > 0) { currentEightBytesOffset = r.BaseStream.Position; r.BaseStream.Position = currentOffset; }
+                        break;
+                    }
+                case KVType.INT32: value = MakeValue(type, r.ReadInt32(), flag); break;
+                case KVType.UINT32: value = MakeValue(type, r.ReadUInt32(), flag); break;
+                case KVType.DOUBLE:
+                    {
+                        if (currentEightBytesOffset > 0) r.BaseStream.Position = currentEightBytesOffset;
+                        value = MakeValue(type, r.ReadDouble(), flag);
+                        if (currentEightBytesOffset > 0) { currentEightBytesOffset = r.BaseStream.Position; r.BaseStream.Position = currentOffset; }
+                        break;
+                    }
+                case KVType.DOUBLE_ZERO: value = MakeValue(type, 0.0D, flag); break;
+                case KVType.DOUBLE_ONE: value = MakeValue(type, 1.0D, flag); break;
+                case KVType.STRING:
+                    {
+                        var id = r.ReadInt32();
+                        value = MakeValue(type, id == -1 ? string.Empty : strings[id], flag);
+                        break;
+                    }
+                case KVType.BINARY_BLOB:
+                    {
+                        if (uncompressedBlockDataReader != null)
+                        {
+                            var output = uncompressedBlockDataReader.ReadBytes(uncompressedBlockLengthArray[currentCompressedBlockIndex++]);
+                            value = MakeValue(type, output, flag);
+                            break;
+                        }
+                        var length = r.ReadInt32();
+                        if (currentBinaryBytesOffset > -1) r.BaseStream.Position = currentBinaryBytesOffset;
+                        value = MakeValue(type, r.ReadBytes(length), flag);
+                        if (currentBinaryBytesOffset > -1) { currentBinaryBytesOffset = r.BaseStream.Position; r.BaseStream.Position = currentOffset + 4; }
+                        break;
+                    }
+                case KVType.ARRAY:
+                    {
+                        var arrayLength = r.ReadInt32();
+                        var array = new object[arrayLength];
+                        for (var i = 0; i < arrayLength; i++) array[i] = ParseBinaryKV3(r, null, true);
+                        value = MakeValue(type, array, flag);
+                        break;
+                    }
+                case KVType.ARRAY_TYPED:
+                    {
+                        var typeArrayLength = r.ReadInt32();
+                        var (subType, subFlag) = ReadType(r);
+                        var typedArray = new object[typeArrayLength];
+                        for (var i = 0; i < typeArrayLength; i++) typedArray[i] = ReadBinaryValue(null, subType, subFlag, r);
+                        value = MakeValue(type, typedArray, flag);
+                        break;
+                    }
+                case KVType.OBJECT:
+                    {
+                        var objectLength = r.ReadInt32();
+                        var newObject = new Dictionary<string, object>();
+                        if (name != null) newObject.Add("_key", name);
+                        for (var i = 0; i < objectLength; i++) ParseBinaryKV3(r, newObject, false);
+                        value = MakeValue(type, newObject, flag);
+                        break;
+                    }
+                default: throw new InvalidDataException($"Unknown KVType {type} on byte {r.BaseStream.Position - 1}");
+            }
+            return value;
+        }
+
+        static object MakeValue(KVType type, object data, KVFlag flag) => data;
+
+        public KV3File GetKV3File()
+        {
+            // TODO: Other format guids are not "generic" but strings like "vpc19"
+            var formatType = Format != KV3_FORMAT_GENERIC ? "vrfunknown" : "generic";
+            return new KV3File(Data, format: $"{formatType}:version{{{Format}}}");
+        }
+
+        public override void WriteText(IndentedTextWriter w) => w.Write(KVExtensions.Print(Data));
+    }
+
+    #endregion
+
+    #region Data : XKV3_NTRO
+    //was:Resource/ResourceTypes/KeyValuesOrNTRO
+
+    public class XKV3_NTRO : DATA
+    {
+        readonly string IntrospectionStructName;
+        protected Binary_Pak Parent { get; private set; }
+        public IDictionary<string, object> Data { get; private set; }
+        DATA BackingData;
+
+        public XKV3_NTRO() { }
+        public XKV3_NTRO(string introspectionStructName) => IntrospectionStructName = introspectionStructName;
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            Parent = parent;
+            if (!parent.ContainsBlockType<NTRO>())
+            {
+                var kv3 = new XKV3 { Offset = Offset, Size = Size };
+                kv3.Read(parent, r);
+                Data = kv3.Data;
+                BackingData = kv3;
+            }
+            else
+            {
+                var ntro = new D_NTRO { StructName = IntrospectionStructName, Offset = Offset, Size = Size };
+                ntro.Read(parent, r);
+                Data = ntro.Data;
+                BackingData = ntro;
+            }
+        }
+
+        public override string ToString() => BackingData is XKV3 kv3 ? kv3.ToString() : BackingData.ToString();
+    }
+
+    #endregion
+
+    #region Block : NTRO
+
+    /// <summary>
+    /// "NTRO" block. CResourceIntrospectionManifest.
+    /// </summary>
+    public class NTRO : Block
+    {
+        public enum SchemaFieldType //was:Resource/Enum.SchemaFieldType
+        {
+            Unknown = 0,
+            Struct = 1,
+            Enum = 2,
+            ExternalReference = 3,
+            Char = 4,
+            UChar = 5,
+            Int = 6,
+            UInt = 7,
+            Float_8 = 8,
+            Double = 9,
+            SByte = 10, // Int8
+            Byte = 11, // UInt8
+            Int16 = 12,
+            UInt16 = 13,
+            Int32 = 14,
+            UInt32 = 15,
+            Int64 = 16,
+            UInt64 = 17,
+            Float = 18, // Float32
+            Float64 = 19,
+            Time = 20,
+            Vector2D = 21,
+            Vector3D = 22,
+            Vector4D = 23,
+            QAngle = 24,
+            Quaternion = 25,
+            VMatrix = 26,
+            Fltx4 = 27,
+            Color = 28,
+            UniqueId = 29,
+            Boolean = 30,
+            ResourceString = 31,
+            Void = 32,
+            Matrix3x4 = 33,
+            UtlSymbol = 34,
+            UtlString = 35,
+            Matrix3x4a = 36,
+            UtlBinaryBlock = 37,
+            Uuid = 38,
+            OpaqueType = 39,
+            Transform = 40,
+            Unused = 41,
+            RadianEuler = 42,
+            DegreeEuler = 43,
+            FourVectors = 44,
+        }
+
+        public enum SchemaIndirectionType //was:Resource/Enum.SchemaIndirectionType
+        {
+            Unknown = 0,
+            Pointer = 1,
+            Reference = 2,
+            ResourcePointer = 3,
+            ResourceArray = 4,
+            UtlVector = 5,
+            UtlReference = 6,
+            Ignorable = 7,
+            Opaque = 8,
+        }
+
+        public class ResourceDiskStruct
+        {
+            public class Field
+            {
+                public string FieldName { get; set; }
+                public short Count { get; set; }
+                public short OnDiskOffset { get; set; }
+                public List<byte> Indirections { get; private set; } = new List<byte>();
+                public uint TypeData { get; set; }
+                public SchemaFieldType Type { get; set; }
+                public ushort Unknown { get; set; }
+
+                public void WriteText(IndentedTextWriter w)
+                {
+                    w.WriteLine("CResourceDiskStructField {"); w.Indent++;
+                    w.WriteLine($"CResourceString m_pFieldName = \"{FieldName}\"");
+                    w.WriteLine($"int16 m_nCount = {Count}");
+                    w.WriteLine($"int16 m_nOnDiskOffset = {OnDiskOffset}");
+                    w.WriteLine($"uint8[{Indirections.Count}] m_Indirection = ["); w.Indent++;
+                    foreach (var dep in Indirections) w.WriteLine("{0:D2}", dep);
+                    w.Indent--; w.WriteLine("]");
+                    w.WriteLine($"uint32 m_nTypeData = 0x{TypeData:X8}");
+                    w.WriteLine($"int16 m_nType = {(int)Type}");
+                    w.Indent--; w.WriteLine("}");
+                }
+            }
+
+            public uint IntrospectionVersion { get; set; }
+            public uint Id { get; set; }
+            public string Name { get; set; }
+            public uint DiskCrc { get; set; }
+            public int UserVersion { get; set; }
+            public ushort DiskSize { get; set; }
+            public ushort Alignment { get; set; }
+            public uint BaseStructId { get; set; }
+            public byte StructFlags { get; set; }
+            public ushort Unknown { get; set; }
+            public byte Unknown2 { get; set; }
+            public List<Field> FieldIntrospection { get; private set; } = new List<Field>();
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("CResourceDiskStruct {"); w.Indent++;
+                w.WriteLine($"uint32 m_nIntrospectionVersion = 0x{IntrospectionVersion:X8}");
+                w.WriteLine($"uint32 m_nId = 0x{Id:X8}");
+                w.WriteLine($"CResourceString m_pName = \"{Name}\"");
+                w.WriteLine($"uint32 m_nDiskCrc = 0x{DiskCrc:X8}");
+                w.WriteLine($"int32 m_nUserVersion = {UserVersion}");
+                w.WriteLine($"uint16 m_nDiskSize = 0x{DiskSize:X4}");
+                w.WriteLine($"uint16 m_nAlignment = 0x{Alignment:X4}");
+                w.WriteLine($"uint32 m_nBaseStructId = 0x{BaseStructId:X8}");
+                w.WriteLine($"Struct m_FieldIntrospection[{FieldIntrospection.Count}] = ["); w.Indent++;
+                foreach (var field in FieldIntrospection) field.WriteText(w);
+                w.Indent--; w.WriteLine("]");
+                w.WriteLine($"uint8 m_nStructFlags = 0x{StructFlags:X2}");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public class ResourceDiskEnum
+        {
+            public class Value
+            {
+                public string EnumValueName { get; set; }
+                public int EnumValue { get; set; }
+
+                public void WriteText(IndentedTextWriter w)
+                {
+                    w.WriteLine("CResourceDiskEnumValue {"); w.Indent++;
+                    w.WriteLine("CResourceString m_pEnumValueName = \"{EnumValueName}\"");
+                    w.WriteLine("int32 m_nEnumValue = {EnumValue}");
+                    w.Indent--; w.WriteLine("}");
+                }
+            }
+
+            public uint IntrospectionVersion { get; set; }
+            public uint Id { get; set; }
+            public string Name { get; set; }
+            public uint DiskCrc { get; set; }
+            public int UserVersion { get; set; }
+            public List<Value> EnumValueIntrospection { get; private set; } = new List<Value>();
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("CResourceDiskEnum {"); w.Indent++;
+                w.WriteLine($"uint32 m_nIntrospectionVersion = 0x{IntrospectionVersion:X8}");
+                w.WriteLine($"uint32 m_nId = 0x{Id:X8}");
+                w.WriteLine($"CResourceString m_pName = \"{Name}\"");
+                w.WriteLine($"uint32 m_nDiskCrc = 0x{DiskCrc:X8}");
+                w.WriteLine($"int32 m_nUserVersion = {UserVersion}");
+                w.WriteLine($"Struct m_EnumValueIntrospection[{EnumValueIntrospection.Count}] = ["); w.Indent++;
+                foreach (var value in EnumValueIntrospection) value.WriteText(w);
+                w.Indent--; w.WriteLine("]");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public uint IntrospectionVersion { get; private set; }
+
+        public List<ResourceDiskStruct> ReferencedStructs { get; } = new List<ResourceDiskStruct>();
+        public List<ResourceDiskEnum> ReferencedEnums { get; } = new List<ResourceDiskEnum>();
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            IntrospectionVersion = r.ReadUInt32();
+            ReadStructs(r);
+            r.BaseStream.Position = Offset + 12; // skip 3 ints
+            ReadEnums(r);
+        }
+
+        void ReadStructs(BinaryReader r)
+        {
+            var entriesOffset = r.ReadUInt32();
+            var entriesCount = r.ReadUInt32();
+            if (entriesCount == 0) return;
+
+            r.BaseStream.Position += entriesOffset - 8; // offset minus 2 ints we just read
+            for (var i = 0; i < entriesCount; i++)
+            {
+                var diskStruct = new ResourceDiskStruct
+                {
+                    IntrospectionVersion = r.ReadUInt32(),
+                    Id = r.ReadUInt32(),
+                    Name = r.ReadO32UTF8(),
+                    DiskCrc = r.ReadUInt32(),
+                    UserVersion = r.ReadInt32(),
+                    DiskSize = r.ReadUInt16(),
+                    Alignment = r.ReadUInt16(),
+                    BaseStructId = r.ReadUInt32()
+                };
+
+                var fieldsOffset = r.ReadUInt32();
+                var fieldsSize = r.ReadUInt32();
+                if (fieldsSize > 0)
+                {
+                    var prev = r.BaseStream.Position;
+                    r.BaseStream.Position += fieldsOffset - 8; // offset minus 2 ints we just read
+
+                    for (var y = 0; y < fieldsSize; y++)
+                    {
+                        var field = new ResourceDiskStruct.Field
+                        {
+                            FieldName = r.ReadO32UTF8(),
+                            Count = r.ReadInt16(),
+                            OnDiskOffset = r.ReadInt16()
+                        };
+
+                        var indirectionOffset = r.ReadUInt32();
+                        var indirectionSize = r.ReadUInt32();
+                        if (indirectionSize > 0)
+                        {
+                            // jump to indirections
+                            var prev2 = r.BaseStream.Position;
+                            r.BaseStream.Position += indirectionOffset - 8; // offset minus 2 ints we just read
+                            for (var x = 0; x < indirectionSize; x++)
+                                field.Indirections.Add(r.ReadByte());
+                            r.BaseStream.Position = prev2;
+                        }
+                        field.TypeData = r.ReadUInt32();
+                        field.Type = (SchemaFieldType)r.ReadInt16();
+                        field.Unknown = r.ReadUInt16();
+                        diskStruct.FieldIntrospection.Add(field);
+                    }
+                    r.BaseStream.Position = prev;
+                }
+
+                diskStruct.StructFlags = r.ReadByte();
+                diskStruct.Unknown = r.ReadUInt16();
+                diskStruct.Unknown2 = r.ReadByte();
+                ReferencedStructs.Add(diskStruct);
+            }
+        }
+
+        void ReadEnums(BinaryReader r)
+        {
+            var entriesOffset = r.ReadUInt32();
+            var entriesCount = r.ReadUInt32();
+            if (entriesCount == 0) return;
+
+            r.BaseStream.Position += entriesOffset - 8; // offset minus 2 ints we just read
+            for (var i = 0; i < entriesCount; i++)
+            {
+                var diskEnum = new ResourceDiskEnum
+                {
+                    IntrospectionVersion = r.ReadUInt32(),
+                    Id = r.ReadUInt32(),
+                    Name = r.ReadO32UTF8(),
+                    DiskCrc = r.ReadUInt32(),
+                    UserVersion = r.ReadInt32()
+                };
+
+                var fieldsOffset = r.ReadUInt32();
+                var fieldsSize = r.ReadUInt32();
+                if (fieldsSize > 0)
+                {
+                    var prev = r.BaseStream.Position;
+                    r.BaseStream.Position += fieldsOffset - 8; // offset minus 2 ints we just read
+                    for (var y = 0; y < fieldsSize; y++) diskEnum.EnumValueIntrospection.Add(new ResourceDiskEnum.Value { EnumValueName = r.ReadO32UTF8(), EnumValue = r.ReadInt32() });
+                    r.BaseStream.Position = prev;
+                }
+                ReferencedEnums.Add(diskEnum);
+            }
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine("CResourceIntrospectionManifest {"); w.Indent++;
+            w.WriteLine($"uint32 m_nIntrospectionVersion = 0x{IntrospectionVersion:x8}");
+            w.WriteLine($"Struct m_ReferencedStructs[{ReferencedStructs.Count}] = ["); w.Indent++;
+            foreach (var refStruct in ReferencedStructs) refStruct.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+            w.WriteLine($"Struct m_ReferencedEnums[{ReferencedEnums.Count}] = ["); w.Indent++;
+            foreach (var refEnum in ReferencedEnums) refEnum.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+            w.Indent--; w.WriteLine("}");
+        }
+    }
+
+    #endregion
+
+    #region Block : AGRP
+
+    /// <summary>
+    /// "AGRP" block.
+    /// </summary>
+    public class AGRP : XKV3_NTRO
+    {
+        public AGRP() : base("AnimationGroupResourceData_t") { }
+    }
+
+    #endregion
+
+    #region Block : ANIM
+
+    /// <summary>
+    /// "ANIM" block.
+    /// </summary>
+    public class ANIM : XKV3_NTRO
+    {
+        public ANIM() : base("AnimationResourceData_t") { }
+    }
+
+    #endregion
+
+    #region Block : ASEQ
+
+    /// <summary>
+    /// "ASEQ" block.
+    /// </summary>
+    public class ASEQ : XKV3_NTRO
+    {
+        public ASEQ() : base("SequenceGroupResourceData_t") { }
+    }
+
+    #endregion
+
+    #region Block : CTRL
+
+    /// <summary>
+    /// "CTRL" block.
+    /// </summary>
+    public class CTRL : XKV3 { }
+
+    #endregion
+
+    #region Block : DATA
+    //was:Resource/Blocks/ResourceData
+
+    /// <summary>
+    /// "DATA" block.
+    /// </summary>
+    public class DATA : Block
+    {
+        public IDictionary<string, object> AsKeyValue()
+        {
+            if (this is D_NTRO ntro) return ntro.Data;
+            else if (this is XKV3 kv3) return kv3.Data;
+            return default;
+        }
+
+        public override void Read(Binary_Pak parent, BinaryReader r) { }
+    }
+
+    #endregion
+
+    #region Block : INSG
+
+    /// <summary>
+    /// "INSG" block.
+    /// </summary>
+    public class INSG : XKV3 { }
+
+    #endregion
+
+    #region Block : LACO
+
+    /// <summary>
+    /// "LACO" block.
+    /// </summary>
+    public class LACO : XKV3 { }
+
+    #endregion
+
+    #region Block : MBUF
+
+    /// <summary>
+    /// "MBUF" block.
+    /// </summary>
+    public class MBUF : VBIB { }
+
+    #endregion
+
+    #region Block : MDAT
+
+    /// <summary>
+    /// "MDAT" block.
+    /// </summary>
+    public class MDAT : XKV3 { }
+
+    #endregion
+
+    #region Block : MRPH
+
+    /// <summary>
+    /// "MRPH" block.
+    /// </summary>
+    public class MRPH : XKV3_NTRO
+    {
+        public MRPH() : base("MorphSetData_t") { }
+    }
+
+    #endregion
+
+    #region Block : PHYS
+
+    /// <summary>
+    /// "PHYS" block.
+    /// </summary>
+    public class PHYS : XKV3_NTRO
+    {
+        public PHYS() : base("VPhysXAggregateData_t") { }
+    }
+
+    #endregion
+
+    #region Block : RED2
+
+    /// <summary>
+    /// "RED2" block. CResourceEditInfo.
+    /// </summary>
+    public class RED2 : REDI
+    {
+        /// <summary>
+        /// This is not a real Valve enum, it's just the order they appear in.
+        /// </summary>
+        public XKV3 BackingData;
+
+        public IDictionary<string, object> SearchableUserData { get; private set; }
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            var kv3 = new XKV3
+            {
+                Offset = Offset,
+                Size = Size,
+            };
+            kv3.Read(parent, r);
+            BackingData = kv3;
+
+            ConstructSpecialDependencies();
+            ConstuctInputDependencies();
+
+            SearchableUserData = kv3.Data.GetSub("m_SearchableUserData");
+            //foreach (var kv in kv3.Data) { } //var structType = ConstructStruct(kv.Key);
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+           => BackingData.WriteText(w);
+
+        void ConstructSpecialDependencies()
+        {
+            var specialDependenciesRedi = new R_SpecialDependencies();
+            foreach (var specialDependency in BackingData.Data.GetArray("m_SpecialDependencies"))
+                specialDependenciesRedi.List.Add(new R_SpecialDependencies.SpecialDependency
+                {
+                    String = specialDependency.Get<string>("m_String"),
+                    CompilerIdentifier = specialDependency.Get<string>("m_CompilerIdentifier"),
+                    Fingerprint = specialDependency.GetUInt32("m_nFingerprint"),
+                    UserData = specialDependency.GetUInt32("m_nUserData"),
+                });
+            Structs.Add(REDIStruct.SpecialDependencies, specialDependenciesRedi);
+        }
+
+        void ConstuctInputDependencies()
+        {
+            var dependenciesRedi = new R_InputDependencies();
+            foreach (var dependency in BackingData.Data.GetArray("m_InputDependencies"))
+                dependenciesRedi.List.Add(new R_InputDependencies.InputDependency
+                {
+                    ContentRelativeFilename = dependency.Get<string>("m_RelativeFilename"),
+                    ContentSearchPath = dependency.Get<string>("m_SearchPath"),
+                    FileCRC = dependency.GetUInt32("m_nFileCRC"),
+                });
+            Structs.Add(REDIStruct.InputDependencies, dependenciesRedi);
+        }
+    }
+
+    #endregion
+
+    #region Block : REDI
+
+    /// <summary>
+    /// "REDI" block. ResourceEditInfoBlock_t.
+    /// </summary>
+    public class REDI : Block
+    {
+        /// <summary>
+        /// This is not a real Valve enum, it's just the order they appear in.
+        /// </summary>
+        public enum REDIStruct
+        {
+            InputDependencies,
+            AdditionalInputDependencies,
+            ArgumentDependencies,
+            SpecialDependencies,
+            CustomDependencies,
+            AdditionalRelatedFiles,
+            ChildResourceList,
+            ExtraIntData,
+            ExtraFloatData,
+            ExtraStringData,
+            End,
+        }
+
+        public Dictionary<REDIStruct, REDI> Structs { get; private set; } = new Dictionary<REDIStruct, REDI>();
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            for (var i = REDIStruct.InputDependencies; i < REDIStruct.End; i++)
+            {
+                var block = REDIFactory(i);
+                block.Offset = (uint)r.BaseStream.Position + r.ReadUInt32();
+                block.Size = r.ReadUInt32();
+                Structs.Add(i, block);
+            }
+            foreach (var block in Structs) block.Value.Read(parent, r);
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine("ResourceEditInfoBlock_t {"); w.Indent++;
+            foreach (var dep in Structs) dep.Value.WriteText(w);
+            w.Indent--; w.WriteLine("}");
+        }
+
+        static REDI REDIFactory(REDIStruct id)
+            => id switch
+            {
+                REDIStruct.InputDependencies => new R_InputDependencies(),
+                REDIStruct.AdditionalInputDependencies => new R_AdditionalInputDependencies(),
+                REDIStruct.ArgumentDependencies => new R_ArgumentDependencies(),
+                REDIStruct.SpecialDependencies => new R_SpecialDependencies(),
+                REDIStruct.CustomDependencies => new R_CustomDependencies(),
+                REDIStruct.AdditionalRelatedFiles => new R_AdditionalRelatedFiles(),
+                REDIStruct.ChildResourceList => new R_ChildResourceList(),
+                REDIStruct.ExtraIntData => new R_ExtraIntData(),
+                REDIStruct.ExtraFloatData => new R_ExtraFloatData(),
+                REDIStruct.ExtraStringData => new R_ExtraStringData(),
+                _ => throw new InvalidDataException("Unknown struct in REDI block."),
+            };
+    }
+
+    #endregion
+
+    #region Block : RERL
+
+    /// <summary>
+    /// "RERL" block. ResourceExtRefList_t.
+    /// </summary>
+    public class RERL : Block
+    {
+        public class RERLInfo
+        {
+            /// <summary>
+            /// Gets or sets the resource id.
+            /// </summary>
+            public ulong Id { get; set; }
+
+            /// <summary>
+            /// Gets or sets the resource name.
+            /// </summary>
+            public string Name { get; set; }
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("ResourceReferenceInfo_t {"); w.Indent++;
+                w.WriteLine($"uint64 m_nId = 0x{Id:X16}");
+                w.WriteLine($"CResourceString m_pResourceName = \"{Name}\"");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public IList<RERLInfo> RERLInfos { get; private set; } = new List<RERLInfo>();
+
+        public string this[ulong id] => RERLInfos.FirstOrDefault(c => c.Id == id)?.Name;
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            var offset = r.ReadUInt32();
+            var size = r.ReadUInt32();
+            if (size == 0) return;
+
+            r.Skip(offset - 8); // 8 is 2 uint32s we just read
+            for (var i = 0; i < size; i++)
+            {
+                var id = r.ReadUInt64();
+                var previousPosition = r.BaseStream.Position;
+                // jump to string: offset is counted from current position, so we will need to add 8 to position later
+                r.BaseStream.Position += r.ReadInt64();
+                RERLInfos.Add(new RERLInfo { Id = id, Name = r.ReadZUTF8() });
+                r.BaseStream.Position = previousPosition + 8; // 8 is to account for string offset
+            }
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine("ResourceExtRefList_t {"); w.Indent++;
+            w.WriteLine($"Struct m_resourceRefInfoList[{RERLInfos.Count}] = ["); w.Indent++;
+            foreach (var refInfo in RERLInfos) refInfo.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+            w.Indent--; w.WriteLine("}");
+        }
+    }
+
+    #endregion
+
+    #region Block : SRMA
+
+    /// <summary>
+    /// "SRMA" block.
+    /// </summary>
+    public class SRMA : XKV3 { }
+
+    #endregion
+
+    #region Block : SNAP
+    //was:Resource/Blocks/SNAP
+
+    /// <summary>
+    /// "SNAP" block.
+    /// </summary>
+    public class SNAP : Block
+    {
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            throw new NotImplementedException();
+        }
+    }
+
+    #endregion
+
+    #region Block : VBIB
+    //was:Resource/Blocks/VBIB
+
+    /// <summary>
+    /// "VBIB" block.
+    /// </summary>
+    public class VBIB : Block, IVBIB
+    {
+        public List<OnDiskBufferData> VertexBuffers { get; }
+        public List<OnDiskBufferData> IndexBuffers { get; }
+
+        public VBIB()
+        {
+            VertexBuffers = [];
+            IndexBuffers = [];
+        }
+
+        public VBIB(IDictionary<string, object> data) : this()
+        {
+            var vertexBuffers = data.GetArray("m_vertexBuffers");
+            foreach (var vb in vertexBuffers)
+            {
+                var vertexBuffer = BufferDataFromDATA(vb);
+                var decompressedSize = vertexBuffer.ElementCount * vertexBuffer.ElementSizeInBytes;
+                if (vertexBuffer.Data.Length != decompressedSize) vertexBuffer.Data = MeshOptimizerVertexDecoder.DecodeVertexBuffer((int)vertexBuffer.ElementCount, (int)vertexBuffer.ElementSizeInBytes, vertexBuffer.Data);
+                VertexBuffers.Add(vertexBuffer);
+            }
+            var indexBuffers = data.GetArray("m_indexBuffers");
+            foreach (var ib in indexBuffers)
+            {
+                var indexBuffer = BufferDataFromDATA(ib);
+                var decompressedSize = indexBuffer.ElementCount * indexBuffer.ElementSizeInBytes;
+                if (indexBuffer.Data.Length != decompressedSize) indexBuffer.Data = MeshOptimizerIndexDecoder.DecodeIndexBuffer((int)indexBuffer.ElementCount, (int)indexBuffer.ElementSizeInBytes, indexBuffer.Data);
+                IndexBuffers.Add(indexBuffer);
+            }
+        }
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            var vertexBufferOffset = r.ReadUInt32();
+            var vertexBufferCount = r.ReadUInt32();
+            var indexBufferOffset = r.ReadUInt32();
+            var indexBufferCount = r.ReadUInt32();
+
+            r.Seek(Offset + vertexBufferOffset);
+            for (var i = 0; i < vertexBufferCount; i++)
+            {
+                var vertexBuffer = ReadOnDiskBufferData(r);
+                var decompressedSize = vertexBuffer.ElementCount * vertexBuffer.ElementSizeInBytes;
+                if (vertexBuffer.Data.Length != decompressedSize) vertexBuffer.Data = MeshOptimizerVertexDecoder.DecodeVertexBuffer((int)vertexBuffer.ElementCount, (int)vertexBuffer.ElementSizeInBytes, vertexBuffer.Data);
+                VertexBuffers.Add(vertexBuffer);
+            }
+
+            r.Seek(Offset + 8 + indexBufferOffset); // 8 to take into account vertexOffset / count
+            for (var i = 0; i < indexBufferCount; i++)
+            {
+                var indexBuffer = ReadOnDiskBufferData(r);
+                var decompressedSize = indexBuffer.ElementCount * indexBuffer.ElementSizeInBytes;
+                if (indexBuffer.Data.Length != decompressedSize) indexBuffer.Data = MeshOptimizerIndexDecoder.DecodeIndexBuffer((int)indexBuffer.ElementCount, (int)indexBuffer.ElementSizeInBytes, indexBuffer.Data);
+                IndexBuffers.Add(indexBuffer);
+            }
+        }
+
+        static OnDiskBufferData ReadOnDiskBufferData(BinaryReader r)
+        {
+            var buffer = default(OnDiskBufferData);
+
+            buffer.ElementCount = r.ReadUInt32();            //0
+            buffer.ElementSizeInBytes = r.ReadUInt32();      //4
+
+            var refA = r.BaseStream.Position;
+            var attributeOffset = r.ReadUInt32();  //8
+            var attributeCount = r.ReadUInt32();   //12
+
+            var refB = r.BaseStream.Position;
+            var dataOffset = r.ReadUInt32();       //16
+            var totalSize = r.ReadInt32();        //20
+
+            r.Seek(refA + attributeOffset);
+            buffer.Attributes = Enumerable.Range(0, (int)attributeCount)
+                .Select(j =>
+                {
+                    var attribute = default(OnDiskBufferData.Attribute);
+                    var previousPosition = r.BaseStream.Position;
+                    attribute.SemanticName = r.ReadZUTF8().ToUpperInvariant(); //32 bytes long null-terminated string
+                    r.BaseStream.Position = previousPosition + 32; // Offset is always 40 bytes from the start
+                    attribute.SemanticIndex = r.ReadInt32();
+                    attribute.Format = (DXGI_FORMAT)r.ReadUInt32();
+                    attribute.Offset = r.ReadUInt32();
+                    attribute.Slot = r.ReadInt32();
+                    attribute.SlotType = (OnDiskBufferData.RenderSlotType)r.ReadUInt32();
+                    attribute.InstanceStepRate = r.ReadInt32();
+                    return attribute;
+                }).ToArray();
+
+            r.Seek(refB + dataOffset);
+            buffer.Data = r.ReadBytes(totalSize); //can be compressed
+
+            r.Seek(refB + 8); //Go back to the index array to read the next iteration.
+            return buffer;
+        }
+
+        static OnDiskBufferData BufferDataFromDATA(IDictionary<string, object> data)
+        {
+            var buffer = new OnDiskBufferData
+            {
+                ElementCount = data.GetUInt32("m_nElementCount"),
+                ElementSizeInBytes = data.GetUInt32("m_nElementSizeInBytes"),
+            };
+
+            var inputLayoutFields = data.GetArray("m_inputLayoutFields");
+            buffer.Attributes = inputLayoutFields.Select(il => new OnDiskBufferData.Attribute
+            {
+                //null-terminated string
+                SemanticName = Encoding.UTF8.GetString(il.Get<byte[]>("m_pSemanticName")).TrimEnd((char)0),
+                SemanticIndex = il.GetInt32("m_nSemanticIndex"),
+                Format = (DXGI_FORMAT)il.GetUInt32("m_Format"),
+                Offset = il.GetUInt32("m_nOffset"),
+                Slot = il.GetInt32("m_nSlot"),
+                SlotType = (OnDiskBufferData.RenderSlotType)il.GetUInt32("m_nSlotType"),
+                InstanceStepRate = il.GetInt32("m_nInstanceStepRate")
+            }).ToArray();
+
+            buffer.Data = data.Get<byte[]>("m_pData");
+            return buffer;
+        }
+
+        public static float[] ReadVertexAttribute(int offset, OnDiskBufferData vertexBuffer, OnDiskBufferData.Attribute attribute)
+        {
+            offset = (int)(offset * vertexBuffer.ElementSizeInBytes) + (int)attribute.Offset;
+            // Useful reference: https://github.com/apitrace/dxsdk/blob/master/Include/d3dx_dxgiformatconvert.inl
+            float[] result;
+            switch (attribute.Format)
+            {
+                case DXGI_FORMAT.R32G32B32_FLOAT:
+                    {
+                        result = new float[3];
+                        Buffer.BlockCopy(vertexBuffer.Data, offset, result, 0, 12);
+                        return result;
+                    }
+                case DXGI_FORMAT.R32G32B32A32_FLOAT:
+                    {
+                        result = new float[4];
+                        Buffer.BlockCopy(vertexBuffer.Data, offset, result, 0, 16);
+                        return result;
+                    }
+                case DXGI_FORMAT.R16G16_UNORM:
+                    {
+                        var shorts = new ushort[2];
+                        Buffer.BlockCopy(vertexBuffer.Data, offset, shorts, 0, 4);
+                        result = [(float)shorts[0] / ushort.MaxValue, (float)shorts[1] / ushort.MaxValue];
+                        return result;
+                    }
+                case DXGI_FORMAT.R16G16_SNORM:
+                    {
+                        var shorts = new short[2];
+                        Buffer.BlockCopy(vertexBuffer.Data, offset, shorts, 0, 4);
+                        result = [(float)shorts[0] / short.MaxValue, (float)shorts[1] / short.MaxValue];
+                        return result;
+                    }
+                case DXGI_FORMAT.R16G16_FLOAT:
+                    {
+                        result = [(float)BitConverterX.ToHalf(vertexBuffer.Data, offset), (float)BitConverterX.ToHalf(vertexBuffer.Data, offset + 2)];
+                        return result;
+                    }
+                case DXGI_FORMAT.R32_FLOAT:
+                    {
+                        result = new float[1];
+                        Buffer.BlockCopy(vertexBuffer.Data, offset, result, 0, 4);
+                        return result;
+                    }
+                case DXGI_FORMAT.R32G32_FLOAT:
+                    {
+                        result = new float[2];
+                        Buffer.BlockCopy(vertexBuffer.Data, offset, result, 0, 8);
+                        return result;
+                    }
+                case DXGI_FORMAT.R16G16_SINT:
+                    {
+                        var shorts = new short[2];
+                        Buffer.BlockCopy(vertexBuffer.Data, offset, shorts, 0, 4);
+                        result = new float[2];
+                        for (var i = 0; i < 2; i++) result[i] = shorts[i];
+                        return result;
+                    }
+                case DXGI_FORMAT.R16G16B16A16_SINT:
+                    {
+                        var shorts = new short[4];
+                        Buffer.BlockCopy(vertexBuffer.Data, offset, shorts, 0, 8);
+                        result = new float[4];
+                        for (var i = 0; i < 4; i++) result[i] = shorts[i];
+                        return result;
+                    }
+                case DXGI_FORMAT.R8G8B8A8_UINT:
+                case DXGI_FORMAT.R8G8B8A8_UNORM:
+                    {
+                        var bytes = new byte[4];
+                        Buffer.BlockCopy(vertexBuffer.Data, offset, bytes, 0, 4);
+                        result = new float[4];
+                        for (var i = 0; i < 4; i++) result[i] = attribute.Format == DXGI_FORMAT.R8G8B8A8_UNORM ? (float)bytes[i] / byte.MaxValue : bytes[i];
+                        return result;
+                    }
+                default: throw new NotImplementedException($"Unsupported \"{attribute.SemanticName}\" DXGI_FORMAT.{attribute.Format}");
+            }
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine("Vertex buffers:");
+            foreach (var vertexBuffer in VertexBuffers)
+            {
+                w.WriteLine($"Count: {vertexBuffer.ElementCount}");
+                w.WriteLine($"Size: {vertexBuffer.ElementSizeInBytes}");
+                for (var i = 0; i < vertexBuffer.Attributes.Length; i++)
+                {
+                    var vertexAttribute = vertexBuffer.Attributes[i];
+                    w.WriteLine($"Attribute[{i}]"); w.Indent++;
+                    w.WriteLine($"SemanticName = {vertexAttribute.SemanticName}");
+                    w.WriteLine($"SemanticIndex = {vertexAttribute.SemanticIndex}");
+                    w.WriteLine($"Offset = {vertexAttribute.Offset}");
+                    w.WriteLine($"Format = {vertexAttribute.Format}");
+                    w.WriteLine($"Slot = {vertexAttribute.Slot}");
+                    w.WriteLine($"SlotType = {vertexAttribute.SlotType}");
+                    w.WriteLine($"InstanceStepRate = {vertexAttribute.InstanceStepRate}"); w.Indent--;
+                }
+                w.WriteLine();
+            }
+            w.WriteLine();
+            w.WriteLine("Index buffers:");
+            foreach (var indexBuffer in IndexBuffers)
+            {
+                w.WriteLine($"Count: {indexBuffer.ElementCount}");
+                w.WriteLine($"Size: {indexBuffer.ElementSizeInBytes}");
+                w.WriteLine();
+            }
+        }
+
+        static (int ElementSize, int ElementCount) GetFormatInfo(OnDiskBufferData.Attribute attribute)
+            => attribute.Format switch
+            {
+                DXGI_FORMAT.R32G32B32_FLOAT => (4, 3),
+                DXGI_FORMAT.R32G32B32A32_FLOAT => (4, 4),
+                DXGI_FORMAT.R16G16_UNORM => (2, 2),
+                DXGI_FORMAT.R16G16_SNORM => (2, 2),
+                DXGI_FORMAT.R16G16_FLOAT => (2, 2),
+                DXGI_FORMAT.R32_FLOAT => (4, 1),
+                DXGI_FORMAT.R32G32_FLOAT => (4, 2),
+                DXGI_FORMAT.R16G16_SINT => (2, 2),
+                DXGI_FORMAT.R16G16B16A16_SINT => (2, 4),
+                DXGI_FORMAT.R8G8B8A8_UINT => (1, 4),
+                DXGI_FORMAT.R8G8B8A8_UNORM => (1, 4),
+                _ => throw new NotImplementedException($"Unsupported \"{attribute.SemanticName}\" DXGI_FORMAT.{attribute.Format}"),
+            };
+
+        public static int[] CombineRemapTables(int[][] remapTables)
+        {
+            remapTables = remapTables.Where(remapTable => remapTable.Length != 0).ToArray();
+            var newRemapTable = remapTables[0].AsEnumerable();
+            for (var i = 1; i < remapTables.Length; i++)
+            {
+                var remapTable = remapTables[i];
+                newRemapTable = newRemapTable.Select(j => j != -1 ? remapTable[j] : -1);
+            }
+            return newRemapTable.ToArray();
+        }
+
+        public IVBIB RemapBoneIndices(int[] remapTable)
+        {
+            var res = new VBIB();
+            res.VertexBuffers.AddRange(VertexBuffers.Select(buf =>
+            {
+                var blendIndices = Array.FindIndex(buf.Attributes, field => field.SemanticName == "BLENDINDICES");
+                if (blendIndices != -1)
+                {
+                    var field = buf.Attributes[blendIndices];
+                    var (formatElementSize, formatElementCount) = GetFormatInfo(field);
+                    var formatSize = formatElementSize * formatElementCount;
+                    buf.Data = buf.Data.ToArray();
+                    var bufSpan = buf.Data.AsSpan();
+                    for (var i = (int)field.Offset; i < buf.Data.Length; i += (int)buf.ElementSizeInBytes)
+                        for (var j = 0; j < formatSize; j += formatElementSize)
+                        {
+                            switch (formatElementSize)
+                            {
+                                case 4:
+                                    BitConverter.TryWriteBytes(bufSpan.Slice(i + j), remapTable[BitConverter.ToUInt32(buf.Data, i + j)]);
+                                    break;
+                                case 2:
+                                    BitConverter.TryWriteBytes(bufSpan.Slice(i + j), (short)remapTable[BitConverter.ToUInt16(buf.Data, i + j)]);
+                                    break;
+                                case 1:
+                                    buf.Data[i + j] = (byte)remapTable[buf.Data[i + j]];
+                                    break;
+                                default: throw new NotImplementedException();
+                            }
+                        }
+                }
+                return buf;
+            }));
+            res.IndexBuffers.AddRange(IndexBuffers);
+            return res;
+        }
+    }
+
+    #endregion
+
+    #region Block : VXVS
+    //was:Resource/Blocks/VXVS
+
+    /// <summary>
+    /// "VXVS" block.
+    /// </summary>
+    public class VXVS : Block
+    {
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            throw new NotImplementedException();
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+            => w.WriteLine("{0:X8}", Offset);
+    }
+
+    #endregion
+
+    #region D_EntityLump
+    //was:Resource/ResourceTypes/EntityLump
+
+    public class D_EntityLump : XKV3_NTRO
+    {
+        public enum EntityFieldType : uint //was:Resource/Enums/EntityFieldType
+        {
+            Void = 0x0,
+            Float = 0x1,
+            String = 0x2,
+            Vector = 0x3,
+            Quaternion = 0x4,
+            Integer = 0x5,
+            Boolean = 0x6,
+            Short = 0x7,
+            Character = 0x8,
+            Color32 = 0x9,
+            Embedded = 0xa,
+            Custom = 0xb,
+            ClassPtr = 0xc,
+            EHandle = 0xd,
+            PositionVector = 0xe,
+            Time = 0xf,
+            Tick = 0x10,
+            SoundName = 0x11,
+            Input = 0x12,
+            Function = 0x13,
+            VMatrix = 0x14,
+            VMatrixWorldspace = 0x15,
+            Matrix3x4Worldspace = 0x16,
+            Interval = 0x17,
+            Unused = 0x18,
+            Vector2d = 0x19,
+            Integer64 = 0x1a,
+            Vector4D = 0x1b,
+            Resource = 0x1c,
+            TypeUnknown = 0x1d,
+            CString = 0x1e,
+            HScript = 0x1f,
+            Variant = 0x20,
+            UInt64 = 0x21,
+            Float64 = 0x22,
+            PositiveIntegerOrNull = 0x23,
+            HScriptNewInstance = 0x24,
+            UInt = 0x25,
+            UtlStringToken = 0x26,
+            QAngle = 0x27,
+            NetworkOriginCellQuantizedVector = 0x28,
+            HMaterial = 0x29,
+            HModel = 0x2a,
+            NetworkQuantizedVector = 0x2b,
+            NetworkQuantizedFloat = 0x2c,
+            DirectionVectorWorldspace = 0x2d,
+            QAngleWorldspace = 0x2e,
+            QuaternionWorldspace = 0x2f,
+            HScriptLightbinding = 0x30,
+            V8_value = 0x31,
+            V8_object = 0x32,
+            V8_array = 0x33,
+            V8_callback_info = 0x34,
+            UtlString = 0x35,
+            NetworkOriginCellQuantizedPositionVector = 0x36,
+            HRenderTexture = 0x37,
+        }
+
+        public class Entity
+        {
+            public Dictionary<uint, EntityProperty> Properties { get; } = [];
+            public List<IDictionary<string, object>> Connections { get; internal set; }
+            public T Get<T>(string name) => Get<T>(StringToken.Get(name));
+            public EntityProperty Get(string name) => Get(StringToken.Get(name));
+            public T Get<T>(uint hash) => Properties.TryGetValue(hash, out var property) ? (T)property.Data : default;
+            public EntityProperty Get(uint hash) => Properties.TryGetValue(hash, out var property) ? property : default;
+        }
+
+        public class EntityProperty
+        {
+            public EntityFieldType Type { get; set; }
+            public string Name { get; set; }
+            public object Data { get; set; }
+        }
+
+        public IEnumerable<string> GetChildEntityNames() => Data.Get<string[]>("m_childLumps");
+
+        public IEnumerable<Entity> GetEntities() => Data.GetArray("m_entityKeyValues").Select(entity => ParseEntityProperties(entity.Get<byte[]>("m_keyValuesData"), entity.GetArray("m_connections"))).ToList();
+
+        static Entity ParseEntityProperties(byte[] bytes, IDictionary<string, object>[] connections)
+        {
+            using var s = new MemoryStream(bytes);
+            using var r = new BinaryReader(s);
+            var a = r.ReadUInt32(); // always 1?
+            if (a != 1) throw new NotImplementedException($"First field in entity lump is not 1");
+            var hashedFieldsCount = r.ReadUInt32();
+            var stringFieldsCount = r.ReadUInt32();
+            var entity = new Entity();
+            void ReadTypedValue(uint keyHash, string keyName)
+            {
+                var type = (EntityFieldType)r.ReadUInt32();
+                var entityProperty = new EntityProperty
+                {
+                    Type = type,
+                    Name = keyName,
+                    Data = type switch
+                    {
+                        EntityFieldType.Boolean => r.ReadBoolean(),
+                        EntityFieldType.Float => r.ReadSingle(),
+                        EntityFieldType.Color32 => r.ReadBytes(4),
+                        EntityFieldType.Integer => r.ReadInt32(),
+                        EntityFieldType.UInt => r.ReadUInt32(),
+                        EntityFieldType.Integer64 => r.ReadUInt64(),
+                        var x when x == EntityFieldType.Vector || x == EntityFieldType.QAngle => new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle()),
+                        EntityFieldType.CString => r.ReadZUTF8(), // null term variable
+                        _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unknown type {type}"),
+                    }
+                };
+                entity.Properties.Add(keyHash, entityProperty);
+            }
+            for (var i = 0; i < hashedFieldsCount; i++) ReadTypedValue(r.ReadUInt32(), null); // murmur2 hashed field name (see EntityLumpKeyLookup)
+            for (var i = 0; i < stringFieldsCount; i++) ReadTypedValue(r.ReadUInt32(), r.ReadZUTF8());
+            if (connections.Length > 0) entity.Connections = connections.ToList();
+            return entity;
+        }
+
+        public override string ToString()
+        {
+            var knownKeys = StringToken.InvertedTable;
+            var b = new StringBuilder();
+            var unknownKeys = new Dictionary<uint, uint>();
+
+            var index = 0;
+            foreach (var entity in GetEntities())
+            {
+                b.AppendLine($"===={index++}====");
+                foreach (var property in entity.Properties)
+                {
+                    var value = property.Value.Data;
+                    if (value.GetType() == typeof(byte[]))
+                    {
+                        var tmp = value as byte[];
+                        value = $"Array [{string.Join(", ", tmp.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray())}]";
+                    }
+                    string key;
+                    if (knownKeys.TryGetValue(property.Key, out var knownKey)) key = knownKey;
+                    else if (property.Value.Name != null) key = property.Value.Name;
+                    else
+                    {
+                        key = $"key={property.Key}";
+                        if (!unknownKeys.ContainsKey(property.Key)) unknownKeys.Add(property.Key, 1);
+                        else unknownKeys[property.Key]++;
+                    }
+                    b.AppendLine($"{key,-30} {property.Value.Type.ToString(),-10} {value}");
+                }
+
+                if (entity.Connections != null)
+                    foreach (var connection in entity.Connections)
+                    {
+                        b.Append('@'); b.Append(connection.Get<string>("m_outputName")); b.Append(' ');
+                        var delay = connection.GetFloat("m_flDelay");
+                        if (delay > 0) b.Append($"Delay={delay} ");
+                        var timesToFire = connection.GetInt32("m_nTimesToFire");
+                        if (timesToFire == 1) b.Append("OnlyOnce ");
+                        else if (timesToFire != -1) throw new ArgumentOutOfRangeException(nameof(timesToFire), $"Unexpected times to fire {timesToFire}");
+                        b.Append(connection.Get<string>("m_inputName")); b.Append(' '); b.Append(connection.Get<string>("m_targetName"));
+                        var param = connection.Get<string>("m_overrideParam");
+                        if (!string.IsNullOrEmpty(param) && param != "(null)") { b.Append(' '); b.Append(param); }
+                        b.AppendLine();
+                    }
+
+                b.AppendLine();
+            }
+
+            if (unknownKeys.Count > 0)
+            {
+                b.AppendLine($"@@@@@ UNKNOWN KEY LOOKUPS:");
+                b.AppendLine($"If you know what these are, add them to EntityLumpKnownKeys.cs");
+                foreach (var unknownKey in unknownKeys) b.AppendLine($"key={unknownKey.Key} hits={unknownKey.Value}");
+            }
+            return b.ToString();
+        }
+
+        #region StringToken
+
         //was:Utils/StringToken
         public static class StringToken
         {
             public const uint MURMUR2SEED = 0x31415926; // PI
-            static readonly ConcurrentDictionary<string, uint> Lookup = new ConcurrentDictionary<string, uint>();
+            static readonly ConcurrentDictionary<string, uint> Lookup = new();
             public static Dictionary<uint, string> InvertedTable
             {
                 get
@@ -6260,5 +8204,2141 @@ namespace GameX.Valve.Formats.Blocks
                 "zoomfogscale"}) Get(field);
             }
         }
+
+        #endregion
     }
+
+    #endregion
+
+    #region D_Material
+
+    public class D_Material : XKV3_NTRO, IParamMaterial
+    {
+        public string Name { get; set; }
+        public string ShaderName { get; set; }
+
+        public Dictionary<string, long> IntParams { get; } = [];
+        public Dictionary<string, float> FloatParams { get; } = [];
+        public Dictionary<string, Vector4> VectorParams { get; } = [];
+        public Dictionary<string, string> TextureParams { get; } = [];
+        public Dictionary<string, long> IntAttributes { get; } = [];
+        public Dictionary<string, float> FloatAttributes { get; } = [];
+        public Dictionary<string, Vector4> VectorAttributes { get; } = [];
+        public Dictionary<string, string> StringAttributes { get; } = [];
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            base.Read(parent, r);
+            Name = Data.Get<string>("m_materialName");
+            ShaderName = Data.Get<string>("m_shaderName");
+
+            // TODO: Is this a string array?
+            //RenderAttributesUsed = Data.Get<string>("m_renderAttributesUsed");
+
+            foreach (var kv in Data.GetArray("m_intParams")) IntParams[kv.Get<string>("m_name")] = kv.GetInt64("m_nValue");
+            foreach (var kv in Data.GetArray("m_floatParams")) FloatParams[kv.Get<string>("m_name")] = kv.GetFloat("m_flValue");
+            foreach (var kv in Data.GetArray("m_vectorParams")) VectorParams[kv.Get<string>("m_name")] = kv.Get<Vector4>("m_value");
+            foreach (var kv in Data.GetArray("m_textureParams")) TextureParams[kv.Get<string>("m_name")] = kv.Get<string>("m_pValue");
+
+            // TODO: These 3 parameters
+            //var textureAttributes = Data.GetArray("m_textureAttributes");
+            //var dynamicParams = Data.GetArray("m_dynamicParams");
+            //var dynamicTextureParams = Data.GetArray("m_dynamicTextureParams");
+
+            foreach (var kv in Data.GetArray("m_intAttributes")) IntAttributes[kv.Get<string>("m_name")] = kv.GetInt64("m_nValue");
+            foreach (var kv in Data.GetArray("m_floatAttributes")) FloatAttributes[kv.Get<string>("m_name")] = kv.GetFloat("m_flValue");
+            foreach (var kv in Data.GetArray("m_vectorAttributes")) VectorAttributes[kv.Get<string>("m_name")] = kv.Get<Vector4>("m_value");
+            foreach (var kv in Data.GetArray("m_stringAttributes")) StringAttributes[kv.Get<string>("m_name")] = kv.Get<string>("m_pValue");
+        }
+
+        public IDictionary<string, bool> GetShaderArgs()
+        {
+            var args = new Dictionary<string, bool>();
+            if (Data == null) return args;
+            foreach (var kv in Data.GetArray("m_intParams")) args.Add(kv.Get<string>("m_name"), kv.GetInt64("m_nValue") != 0);
+
+            var specialDeps = (R_SpecialDependencies)Parent.REDI.Structs[REDI.REDIStruct.SpecialDependencies];
+            var hemiOctIsoRoughness_RG_B = specialDeps.List.Any(dependancy => dependancy.CompilerIdentifier == "CompileTexture" && dependancy.String == "Texture Compiler Version Mip HemiOctIsoRoughness_RG_B");
+            if (hemiOctIsoRoughness_RG_B) args.Add("HemiOctIsoRoughness_RG_B", true);
+
+            var invert = specialDeps.List.Any(dependancy => dependancy.CompilerIdentifier == "CompileTexture" && dependancy.String == "Texture Compiler Version LegacySource1InvertNormals");
+            if (invert) args.Add("LegacySource1InvertNormals", true);
+
+            return args;
+        }
+    }
+
+    #endregion
+
+    #region D_Mesh
+    //was:Resource/ResourceTypes/Mesh
+
+    public class D_Mesh : XKV3_NTRO, IMesh, IHaveMetaInfo
+    {
+        IVBIB _vbib;
+        public IVBIB VBIB
+        {
+            //new format has VBIB block, for old format we can get it from NTRO DATA block
+            get => _vbib ??= Parent.VBIB ?? new VBIB(Data);
+            set => _vbib = value;
+        }
+        public Vector3 MinBounds { get; private set; }
+        public Vector3 MaxBounds { get; private set; }
+        public D_Morph MorphData { get; set; }
+
+        public D_Mesh(Binary_Pak pak) : base("PermRenderMeshData_t") { }
+
+        public void GetBounds()
+        {
+            var sceneObjects = Data.GetArray("m_sceneObjects");
+            if (sceneObjects.Length == 0)
+            {
+                MinBounds = MaxBounds = new Vector3(0, 0, 0);
+                return;
+            }
+            var minBounds = sceneObjects[0].GetVector3("m_vMinBounds"); //: sceneObjects[0].GetSub("m_vMinBounds").ToVector3();
+            var maxBounds = sceneObjects[0].GetVector3("m_vMaxBounds"); //: sceneObjects[0].GetSub("m_vMaxBounds").ToVector3();
+            for (var i = 1; i < sceneObjects.Length; ++i)
+            {
+                var localMin = sceneObjects[i].GetVector3("m_vMinBounds"); //: sceneObjects[i].GetSub("m_vMinBounds").ToVector3();
+                var localMax = sceneObjects[i].GetVector3("m_vMaxBounds"); //: sceneObjects[i].GetSub("m_vMaxBounds").ToVector3();
+                minBounds.X = Math.Min(minBounds.X, localMin.X);
+                minBounds.Y = Math.Min(minBounds.Y, localMin.Y);
+                minBounds.Z = Math.Min(minBounds.Z, localMin.Z);
+                maxBounds.X = Math.Max(maxBounds.X, localMax.X);
+                maxBounds.Y = Math.Max(maxBounds.Y, localMax.Y);
+                maxBounds.Z = Math.Max(maxBounds.Z, localMax.Z);
+            }
+            MinBounds = minBounds;
+            MaxBounds = maxBounds;
+        }
+
+        public async void LoadExternalMorphData(PakFile fileLoader)
+        {
+            if (MorphData == null)
+            {
+                var morphSetPath = Data.Get<string>("m_morphSet");
+                if (!string.IsNullOrEmpty(morphSetPath))
+                {
+                    var morphSetResource = await fileLoader.LoadFileObject<Binary_Pak>(morphSetPath + "_c");
+                    if (morphSetResource != null)
+                    {
+                        //MorphData = morphSetResource.GetBlockByType<MRPH>() as DATAMorph;
+                        var abc = morphSetResource.GetBlockByType<MRPH>();
+                        MorphData = abc as object as D_Morph;
+                    }
+                }
+            }
+
+            await MorphData?.LoadFlexData(fileLoader);
+        }
+
+        public List<MetaInfo> GetInfoNodes(MetaManager resource, FileSource file, object tag) => (Parent as IHaveMetaInfo).GetInfoNodes(resource, file, tag);
+    }
+
+    #endregion
+
+    #region D_Model
+    //was:Resource/ResourceTypes/Model
+
+    public class D_Model : XKV3_NTRO, IValveModel
+    {
+        public Skeleton Skeleton => CachedSkeleton ??= Skeleton.FromModelData(Data);
+
+        List<Animation> CachedAnimations;
+        Skeleton CachedSkeleton;
+        readonly IDictionary<(IVBIB VBIB, int MeshIndex), IVBIB> remappedVBIBCache = new Dictionary<(IVBIB VBIB, int MeshIndex), IVBIB>();
+
+        public int[] GetRemapTable(int meshIndex)
+        {
+            var remapTableStarts = Data.Get<int[]>("m_remappingTableStarts");
+            if (remapTableStarts.Length <= meshIndex) return null;
+
+            // Get the remap table and invert it for our construction method
+            var remapTable = Data.Get<int[]>("m_remappingTable").Select(i => (int)i);
+            var start = (int)remapTableStarts[meshIndex];
+            return remapTable.Skip(start).Take(Skeleton.LocalRemapTable.Length).ToArray();
+        }
+
+        public IVBIB RemapBoneIndices(IVBIB vbib, int meshIndex)
+        {
+            if (Skeleton.Bones.Length == 0) return vbib;
+            if (remappedVBIBCache.TryGetValue((vbib, meshIndex), out var res)) return res;
+            res = vbib.RemapBoneIndices(VBIB.CombineRemapTables(new int[][] { GetRemapTable(meshIndex), Skeleton.LocalRemapTable }));
+            remappedVBIBCache.Add((vbib, meshIndex), res);
+            return res;
+        }
+
+        public IEnumerable<(int MeshIndex, string MeshName, long LoDMask)> GetReferenceMeshNamesAndLoD()
+        {
+            var refLODGroupMasks = Data.GetInt64Array("m_refLODGroupMasks");
+            var refMeshes = Data.Get<string[]>("m_refMeshes");
+            var result = new List<(int MeshIndex, string MeshName, long LoDMask)>();
+            for (var meshIndex = 0; meshIndex < refMeshes.Length; meshIndex++)
+            {
+                var refMesh = refMeshes[meshIndex];
+                if (!string.IsNullOrEmpty(refMesh)) result.Add((meshIndex, refMesh, refLODGroupMasks[meshIndex]));
+            }
+            return result;
+        }
+
+        public IEnumerable<(D_Mesh Mesh, int MeshIndex, string Name, long LoDMask)> GetEmbeddedMeshesAndLoD()
+            => GetEmbeddedMeshes().Zip(Data.GetInt64Array("m_refLODGroupMasks"), (l, r) => (l.Mesh, l.MeshIndex, l.Name, r));
+
+        public IEnumerable<(D_Mesh Mesh, int MeshIndex, string Name)> GetEmbeddedMeshes()
+        {
+            var meshes = new List<(D_Mesh Mesh, int MeshIndex, string Name)>();
+            if (Parent.ContainsBlockType<CTRL>())
+            {
+                var ctrl = Parent.GetBlockByType<CTRL>() as XKV3;
+                var embeddedMeshes = ctrl.Data.GetArray("embedded_meshes");
+                if (embeddedMeshes == null) return meshes;
+
+                foreach (var embeddedMesh in embeddedMeshes)
+                {
+                    var name = embeddedMesh.Get<string>("name");
+                    var meshIndex = (int)embeddedMesh.Get<int>("mesh_index");
+                    var dataBlockIndex = (int)embeddedMesh.Get<int>("data_block");
+                    var vbibBlockIndex = (int)embeddedMesh.Get<int>("vbib_block");
+
+                    var mesh = Parent.GetBlockByIndex<D_Mesh>(dataBlockIndex);
+                    mesh.VBIB = Parent.GetBlockByIndex<VBIB>(vbibBlockIndex);
+
+                    var morphBlockIndex = (int)embeddedMesh.Get<int>("morph_block");
+                    if (morphBlockIndex >= 0) mesh.MorphData = Parent.GetBlockByIndex<D_Morph>(morphBlockIndex);
+
+                    meshes.Add((mesh, meshIndex, name));
+                }
+            }
+            return meshes;
+        }
+
+        public D_PhysAggregateData GetEmbeddedPhys()
+        {
+            if (!Parent.ContainsBlockType<CTRL>()) return null;
+
+            var ctrl = Parent.GetBlockByType<CTRL>() as XKV3;
+            var embeddedPhys = ctrl.Data.GetSub("embedded_physics");
+            if (embeddedPhys == null) return null;
+
+            var physBlockIndex = (int)embeddedPhys.Get<int>("phys_data_block");
+            return Parent.GetBlockByIndex<D_PhysAggregateData>(physBlockIndex);
+        }
+
+        public IEnumerable<string> GetReferencedPhysNames()
+            => Data.Get<string[]>("m_refPhysicsData");
+
+        public IEnumerable<string> GetReferencedAnimationGroupNames()
+            => Data.Get<string[]>("m_refAnimGroups");
+
+        public IEnumerable<Animation> GetEmbeddedAnimations()
+        {
+            var embeddedAnimations = new List<Animation>();
+            if (!Parent.ContainsBlockType<CTRL>()) return embeddedAnimations;
+
+            var ctrl = Parent.GetBlockByType<CTRL>() as XKV3;
+            var embeddedAnimation = ctrl.Data.GetSub("embedded_animation");
+            if (embeddedAnimation == null) return embeddedAnimations;
+
+            var groupDataBlockIndex = (int)embeddedAnimation.Get<int>("group_data_block");
+            var animDataBlockIndex = (int)embeddedAnimation.Get<int>("anim_data_block");
+
+            var animationGroup = Parent.GetBlockByIndex<XKV3_NTRO>(groupDataBlockIndex);
+            var decodeKey = animationGroup.Data.GetSub("m_decodeKey");
+            var animationDataBlock = Parent.GetBlockByIndex<XKV3_NTRO>(animDataBlockIndex);
+            return Animation.FromData(animationDataBlock.Data, decodeKey, Skeleton);
+        }
+
+        public IEnumerable<Animation> GetAllAnimations(IOpenGfx gfx)
+        {
+            if (CachedAnimations != null) return CachedAnimations;
+
+            var animGroupPaths = GetReferencedAnimationGroupNames();
+            var animations = GetEmbeddedAnimations().ToList();
+
+            // Load animations from referenced animation groups
+            foreach (var animGroupPath in animGroupPaths)
+            {
+                var animGroup = gfx.LoadFileObject<Binary_Pak>($"{animGroupPath}_c").Result;
+                if (animGroup != default) animations.AddRange(AnimationGroupLoader.LoadAnimationGroup(animGroup, gfx, Skeleton));
+            }
+
+            CachedAnimations = animations.ToList();
+            return CachedAnimations;
+        }
+
+        public IEnumerable<string> GetMeshGroups()
+            => Data.Get<string[]>("m_meshGroups");
+
+        public IEnumerable<string> GetMaterialGroups()
+           => Data.Get<IDictionary<string, object>[]>("m_materialGroups").Select(group => group.Get<string>("m_name"));
+
+        public IEnumerable<string> GetDefaultMeshGroups()
+        {
+            var defaultGroupMask = Data.GetUInt64("m_nDefaultMeshGroupMask");
+            return GetMeshGroups().Where((group, index) => ((ulong)(1 << index) & defaultGroupMask) != 0);
+        }
+
+        public IEnumerable<bool> GetActiveMeshMaskForGroup(string groupName)
+        {
+            var groupIndex = GetMeshGroups().ToList().IndexOf(groupName);
+            var meshGroupMasks = Data.GetInt64Array("m_refMeshGroupMasks");
+            return groupIndex >= 0
+                ? meshGroupMasks.Select(mask => (mask & 1 << groupIndex) != 0)
+                : meshGroupMasks.Select(_ => false);
+        }
+    }
+
+    #endregion
+
+    #region D_Morph
+    //was:Resource/ResourceTypes/Morph
+
+    public class D_Morph : XKV3_NTRO
+    {
+        public enum MorphBundleType //was:Resource/Enum/MorphBundleType
+        {
+            None = 0,
+            PositionSpeed = 1,
+            NormalWrinkle = 2,
+        }
+
+        public Dictionary<string, Vector3[]> FlexData { get; private set; }
+
+        public D_Morph() : base("MorphSetData_t") { }
+
+        public async Task LoadFlexData(PakFile fileLoader)
+        {
+            var atlasPath = Data.Get<string>("m_pTextureAtlas");
+            if (string.IsNullOrEmpty(atlasPath)) return;
+
+            var textureResource = await fileLoader.LoadFileObject<D_Texture>(atlasPath + "_c");
+            if (textureResource == null) return;
+
+            LocalFunction();
+            // Note the use of a local non-async function so you can use `Span<T>`
+            void LocalFunction()
+            {
+                var width = Data.GetInt32("m_nWidth");
+                var height = Data.GetInt32("m_nHeight");
+
+                FlexData = new Dictionary<string, Vector3[]>();
+                var texture = textureResource; // as ITexture;
+                var texWidth = texture.Width;
+                var texHeight = texture.Height;
+                var texPixels = texture.ReadOne(0);
+                // Some vmorf_c may be another old struct(NTROValue, eg: models/heroes/faceless_void/faceless_void_body.vmdl_c). the latest struct is IKeyValueCollection.
+                var morphDatas = GetMorphKeyValueCollection(Data, "m_morphDatas");
+                if (morphDatas == null || !morphDatas.Any()) return;
+
+                var bundleTypes = GetMorphKeyValueCollection(Data, "m_bundleTypes").Select(kv => ParseBundleType(kv.Value)).ToArray();
+
+                foreach (var pair in morphDatas)
+                {
+                    if (!(pair.Value is IDictionary<string, object> morphData)) continue;
+
+                    var morphName = morphData.Get<string>("m_name");
+                    if (string.IsNullOrEmpty(morphName)) continue; // Exist some empty names may need skip.
+
+                    var rectData = new Vector3[height * width];
+                    rectData.Initialize();
+
+                    var morphRectDatas = morphData.GetSub("m_morphRectDatas");
+                    foreach (var morphRectData in morphRectDatas)
+                    {
+                        var rect = morphRectData.Value as IDictionary<string, object>;
+                        var xLeftDst = rect.GetInt32("m_nXLeftDst");
+                        var yTopDst = rect.GetInt32("m_nYTopDst");
+                        var rectWidth = (int)Math.Round(rect.GetFloat("m_flUWidthSrc") * texWidth, 0);
+                        var rectHeight = (int)Math.Round(rect.GetFloat("m_flVHeightSrc") * texHeight, 0);
+                        var bundleDatas = rect.GetSub("m_bundleDatas");
+
+                        foreach (var bundleData in bundleDatas)
+                        {
+                            var bundleKey = int.Parse(bundleData.Key, CultureInfo.InvariantCulture);
+
+                            // We currently only support Position. TODO: Add Normal support for gltf
+                            if (bundleTypes[bundleKey] != MorphBundleType.PositionSpeed) continue;
+
+                            var bundle = bundleData.Value as IDictionary<string, object>;
+                            var rectU = (int)Math.Round(bundle.GetFloat("m_flULeftSrc") * texWidth, 0);
+                            var rectV = (int)Math.Round(bundle.GetFloat("m_flVTopSrc") * texHeight, 0);
+                            var ranges = bundle.Get<float[]>("m_ranges");
+                            var offsets = bundle.Get<float[]>("m_offsets");
+
+                            throw new NotImplementedException();
+                            //for (var row = rectV; row < rectV + rectHeight; row++)
+                            //    for (var col = rectU; col < rectU + rectWidth; col++)
+                            //    {
+                            //        var colorIndex = row * texWidth + col;
+                            //        var color = texPixels[colorIndex];
+                            //        var dstI = row - rectV + yTopDst;
+                            //        var dstJ = col - rectU + xLeftDst;
+
+                            //        rectData[dstI * width + dstJ] = new Vector3(
+                            //            color.Red / 255f * ranges[0] + offsets[0],
+                            //            color.Green / 255f * ranges[1] + offsets[1],
+                            //            color.Blue / 255f * ranges[2] + offsets[2]
+                            //        );
+                            //    }
+                        }
+                    }
+                    FlexData.Add(morphName, rectData);
+                }
+            }
+        }
+
+        static MorphBundleType ParseBundleType(object bundleType)
+            => bundleType is uint bundleTypeEnum ? (MorphBundleType)bundleTypeEnum
+            : bundleType is string bundleTypeString ? bundleTypeString switch
+            {
+                "MORPH_BUNDLE_TYPE_POSITION_SPEED" => MorphBundleType.PositionSpeed,
+                "BUNDLE_TYPE_POSITION_SPEED" => MorphBundleType.PositionSpeed,
+                "MORPH_BUNDLE_TYPE_NORMAL_WRINKLE" => MorphBundleType.NormalWrinkle,
+                _ => throw new NotImplementedException($"Unhandled bundle type: {bundleTypeString}"),
+            }
+            : throw new NotImplementedException("Unhandled bundle type");
+
+        static IDictionary<string, object> GetMorphKeyValueCollection(IDictionary<string, object> data, string name)
+        {
+            throw new NotImplementedException();
+            //var kvObj = data.Get<object>(name);
+            //if (kvObj is NTROStruct ntroStruct) return ntroStruct.ToKVObject();
+            //if (kvObj is NTROValue[] ntroArray)
+            //{
+            //    var kv = new KVObject("root", true);
+            //    foreach (var ntro in ntroArray) kv.AddProperty("", ntro.ToKVValue());
+            //    return kv;
+            //}
+            //return kvObj as IDictionary<string, object>;
+        }
+    }
+
+    #endregion
+
+    #region D_NTRO
+
+    //was:Resource/ResourceTypes/NTRO
+    public class D_NTRO : DATA
+    {
+        protected Binary_Pak Parent;
+        public IDictionary<string, object> Data;
+        public string StructName;
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            Parent = parent;
+            Data = ReadStructure(r, StructName != null
+                ? parent.NTRO.ReferencedStructs.Find(s => s.Name == StructName)
+                : parent.NTRO.ReferencedStructs.First(), Offset);
+        }
+
+        IDictionary<string, object> ReadStructure(BinaryReader r, NTRO.ResourceDiskStruct refStruct, long startingOffset)
+        {
+            var structEntry = new Dictionary<string, object> {
+                { "_name", refStruct.Name }
+            };
+            foreach (var field in refStruct.FieldIntrospection)
+            {
+                r.Seek(startingOffset + field.OnDiskOffset);
+                ReadFieldIntrospection(r, field, ref structEntry);
+            }
+
+            // Some structs are padded, so all the field sizes do not add up to the size on disk
+            r.Seek(startingOffset + refStruct.DiskSize);
+            if (refStruct.BaseStructId != 0)
+                r.Peek(z =>
+                {
+                    var newStruct = Parent.NTRO.ReferencedStructs.First(x => x.Id == refStruct.BaseStructId);
+                    // Valve doesn't print this struct's type, so we can't just call ReadStructure *sigh*
+                    foreach (var field in newStruct.FieldIntrospection)
+                    {
+                        z.Seek(startingOffset + field.OnDiskOffset);
+                        ReadFieldIntrospection(z, field, ref structEntry);
+                    }
+                });
+            return structEntry;
+        }
+
+        void ReadFieldIntrospection(BinaryReader r, NTRO.ResourceDiskStruct.Field field, ref Dictionary<string, object> structEntry)
+        {
+            var count = (uint)field.Count;
+            if (count == 0) count = 1;
+            var pointer = false;
+            var prevOffset = 0L;
+
+            if (field.Indirections.Count > 0)
+            {
+                if (field.Indirections.Count > 1) throw new NotImplementedException("More than one indirection, not yet handled.");
+                if (field.Count > 0) throw new NotImplementedException("Indirection.Count > 0 && field.Count > 0");
+
+                var indirection = (NTRO.SchemaIndirectionType)field.Indirections[0];
+                var offset = r.ReadUInt32();
+                if (indirection == NTRO.SchemaIndirectionType.ResourcePointer)
+                {
+                    pointer = true;
+                    if (offset == 0)
+                    {
+                        structEntry.Add(field.FieldName, MakeValue<byte?>(field.Type, null, true)); // being byte shouldn't matter 
+                        return;
+                    }
+                    prevOffset = r.Tell();
+                    r.Skip(offset - 4);
+                }
+                else if (indirection == NTRO.SchemaIndirectionType.ResourceArray)
+                {
+                    count = r.ReadUInt32();
+                    prevOffset = r.Tell();
+                    if (count > 0) r.Skip(offset - 8);
+                }
+                else throw new ArgumentOutOfRangeException(nameof(indirection), $"Unsupported indirection {indirection}");
+            }
+            if (field.Count > 0 || field.Indirections.Count > 0)
+            {
+                //if (field.Type == NTRO.DataType.Byte) { }
+                var values = new object[(int)count];
+                for (var i = 0; i < count; i++) values[i] = ReadField(r, field, pointer);
+                structEntry.Add(field.FieldName, values);
+            }
+            else for (var i = 0; i < count; i++) structEntry.Add(field.FieldName, ReadField(r, field, pointer));
+            if (prevOffset > 0) r.Seek(prevOffset);
+        }
+
+        object ReadField(BinaryReader r, NTRO.ResourceDiskStruct.Field field, bool pointer)
+        {
+            switch (field.Type)
+            {
+                case NTRO.SchemaFieldType.Struct:
+                    {
+                        var newStruct = Parent.NTRO.ReferencedStructs.First(x => x.Id == field.TypeData);
+                        return MakeValue<IDictionary<string, object>>(field.Type, ReadStructure(r, newStruct, r.BaseStream.Position), pointer);
+                    }
+                case NTRO.SchemaFieldType.Enum: return MakeValue<uint>(field.Type, r.ReadUInt32(), pointer);
+                case NTRO.SchemaFieldType.SByte: return MakeValue<sbyte>(field.Type, r.ReadSByte(), pointer);
+                case NTRO.SchemaFieldType.Byte: return MakeValue<byte>(field.Type, r.ReadByte(), pointer);
+                case NTRO.SchemaFieldType.Boolean: return MakeValue<bool>(field.Type, r.ReadByte() == 1 ? true : false, pointer);
+                case NTRO.SchemaFieldType.Int16: return MakeValue<short>(field.Type, r.ReadInt16(), pointer);
+                case NTRO.SchemaFieldType.UInt16: return MakeValue<ushort>(field.Type, r.ReadUInt16(), pointer);
+                case NTRO.SchemaFieldType.Int32: return MakeValue<int>(field.Type, r.ReadInt32(), pointer);
+                case NTRO.SchemaFieldType.UInt32: return MakeValue<uint>(field.Type, r.ReadUInt32(), pointer);
+                case NTRO.SchemaFieldType.Float: return MakeValue<float>(field.Type, r.ReadSingle(), pointer);
+                case NTRO.SchemaFieldType.Int64: return MakeValue<long>(field.Type, r.ReadInt64(), pointer);
+                case NTRO.SchemaFieldType.ExternalReference:
+                    {
+                        var id = r.ReadUInt64();
+                        var value = id > 0 ? Parent.RERL?.RERLInfos.FirstOrDefault(c => c.Id == id)?.Name : null;
+                        return MakeValue<string>(field.Type, value, pointer);
+                    }
+                case NTRO.SchemaFieldType.UInt64: return MakeValue<ulong>(field.Type, r.ReadUInt64(), pointer);
+                case NTRO.SchemaFieldType.Vector3D: return MakeValue<Vector3>(field.Type, new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle()), pointer);
+                case NTRO.SchemaFieldType.Quaternion: return MakeValue<Quaternion>(field.Type, new Quaternion(r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), r.ReadSingle()), pointer);
+                case NTRO.SchemaFieldType.Color: return MakeValue<Vector4<byte>>(field.Type, new Vector4<byte>(r.ReadByte(), r.ReadByte(), r.ReadByte(), r.ReadByte()), pointer);
+                case NTRO.SchemaFieldType.Fltx4:
+                case NTRO.SchemaFieldType.Vector4D:
+                case NTRO.SchemaFieldType.FourVectors: return MakeValue<Vector4>(field.Type, new Vector4(r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), r.ReadSingle()), pointer);
+                case NTRO.SchemaFieldType.Char:
+                case NTRO.SchemaFieldType.ResourceString: return MakeValue<string>(field.Type, r.ReadO32UTF8(), pointer);
+                case NTRO.SchemaFieldType.Vector2D: return MakeValue<float[]>(field.Type, new[] { r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), r.ReadSingle() }, pointer);
+                case NTRO.SchemaFieldType.Matrix3x4:
+                case NTRO.SchemaFieldType.Matrix3x4a:
+                    return MakeValue<Matrix4x4>(field.Type, new Matrix4x4(
+                        r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), 0,
+                        r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), 0,
+                        r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), 0,
+                        r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), 0), pointer);
+                case NTRO.SchemaFieldType.Transform:
+                    return MakeValue<Matrix3x3>(field.Type, new Matrix4x4(
+                        r.ReadSingle(), r.ReadSingle(), 0, 0,
+                        r.ReadSingle(), r.ReadSingle(), 0, 0,
+                        r.ReadSingle(), r.ReadSingle(), 0, 0,
+                        r.ReadSingle(), r.ReadSingle(), 0, 0), pointer);
+                default: throw new ArgumentOutOfRangeException(nameof(field.Type), $"Unknown data type: {field.Type} (name: {field.FieldName})");
+            }
+        }
+
+        static object MakeValue<T>(NTRO.SchemaFieldType type, object data, bool pointer) => data;
+
+        public override string ToString() => Data?.ToString() ?? "None";
+    }
+
+    #endregion
+
+    #region D_Panorama
+    //was:Resource/ResourceTypes/Panorama
+
+    public class D_Panorama : DATA
+    {
+        public class NameEntry
+        {
+            public string Name { get; set; }
+            public uint Unknown1 { get; set; }
+            public uint Unknown2 { get; set; }
+        }
+
+        public List<NameEntry> Names { get; } = new List<NameEntry>();
+
+        public byte[] Data { get; private set; }
+        public uint Crc32 { get; private set; }
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            Crc32 = r.ReadUInt32();
+            var size = r.ReadUInt16();
+            for (var i = 0; i < size; i++)
+                Names.Add(new NameEntry
+                {
+                    Name = r.ReadZUTF8(),
+                    Unknown1 = r.ReadUInt32(),
+                    Unknown2 = r.ReadUInt32(),
+                });
+            var headerSize = r.BaseStream.Position - Offset;
+            Data = r.ReadBytes((int)Size - (int)headerSize);
+
+            // Valve seemingly screwed up when they started minifying vcss and the crc no longer matches
+            // See core/pak01 in Artifact Foundry for such files
+            if (!parent.ContainsBlockType<SRMA>() && Crc32Digest.Compute(Data) != Crc32) throw new InvalidDataException("CRC32 mismatch for read data.");
+        }
+
+        public override string ToString() => Encoding.UTF8.GetString(Data);
+    }
+
+    #endregion
+
+    #region D_PanoramaLayout
+    //was:Resource/ResourceTypes/PanoramaLayout
+
+    public class D_PanoramaLayout : D_Panorama
+    {
+        XKV3 _layoutContent;
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            base.Read(parent, r);
+            _layoutContent = parent.GetBlockByType<LACO>();
+        }
+
+        public override string ToString() => _layoutContent == default
+            ? base.ToString()
+            : PanoramaLayoutPrinter.Print(_layoutContent.Data);
+
+        static class PanoramaLayoutPrinter
+        {
+            public static string Print(IDictionary<string, object> layoutRoot)
+            {
+                using var w = new IndentedTextWriter();
+                w.WriteLine("<!-- xml reconstructed by ValveResourceFormat: https://vrf.steamdb.info/ -->");
+                var root = layoutRoot.GetSub("m_AST")?.GetSub("m_pRoot");
+                if (root == default) throw new InvalidDataException("Unknown LaCo format, unable to format to XML");
+                PrintNode(root, w);
+                return w.ToString();
+            }
+
+            static void PrintNode(IDictionary<string, object> node, IndentedTextWriter writer)
+            {
+                var type = node.Get<string>("eType");
+                switch (type)
+                {
+                    case "ROOT": PrintPanelBase("root", node, writer); break;
+                    case "STYLES": PrintPanelBase("styles", node, writer); break;
+                    case "INCLUDE": PrintInclude(node, writer); break;
+                    case "PANEL": PrintPanel(node, writer); break;
+                    case "SCRIPT_BODY": PrintScriptBody(node, writer); break;
+                    case "SCRIPTS": PrintPanelBase("scripts", node, writer); break;
+                    case "SNIPPET": PrintSnippet(node, writer); break;
+                    case "SNIPPETS": PrintPanelBase("snippets", node, writer); break;
+                    default: throw new ArgumentOutOfRangeException(nameof(type), $"Unknown node type {type}");
+                };
+            }
+
+            static void PrintPanel(IDictionary<string, object> node, IndentedTextWriter w)
+            {
+                var name = node.Get<string>("name");
+                PrintPanelBase(name, node, w);
+            }
+
+            static void PrintPanelBase(string name, IDictionary<string, object> node, IndentedTextWriter w)
+            {
+                var attributes = NodeAttributes(node);
+                var nodeChildren = NodeChildren(node);
+                if (!nodeChildren.Any()) { PrintOpenNode(name, attributes, " />", w); return; }
+                PrintOpenNode(name, attributes, ">", w); w.Indent++;
+                foreach (var child in nodeChildren) PrintNode(child, w);
+                w.Indent--; w.WriteLine($"</{name}>");
+            }
+
+            static void PrintInclude(IDictionary<string, object> node, IndentedTextWriter w)
+            {
+                var reference = node.GetSub("child");
+                w.Write($"<include src=");
+                PrintAttributeOrReferenceValue(reference, w);
+                w.WriteLine(" />");
+            }
+
+            static void PrintScriptBody(IDictionary<string, object> node, IndentedTextWriter w)
+            {
+                var content = node.Get<string>("name");
+                w.Write("<script><![CDATA[");
+                w.Write(content);
+                w.WriteLine("]]></script>");
+            }
+
+            static void PrintSnippet(IDictionary<string, object> node, IndentedTextWriter w)
+            {
+                var nodeChildren = NodeChildren(node);
+                var name = node.Get<string>("name");
+                w.WriteLine($"<snippet name=\"{name}\">"); w.Indent++;
+                foreach (var child in nodeChildren) PrintNode(child, w);
+                w.Indent--; w.WriteLine("</snippet>");
+            }
+
+            static void PrintOpenNode(string name, IEnumerable<IDictionary<string, object>> attributes, string nodeEnding, IndentedTextWriter w)
+            {
+                w.Write($"<{name}");
+                PrintAttributes(attributes, w);
+                w.WriteLine(nodeEnding);
+            }
+
+            static void PrintAttributes(IEnumerable<IDictionary<string, object>> attributes, IndentedTextWriter w)
+            {
+                foreach (var attribute in attributes)
+                {
+                    var name = attribute.Get<string>("name");
+                    var value = attribute.GetSub("child");
+                    w.Write($" {name}=");
+                    PrintAttributeOrReferenceValue(value, w);
+                }
+            }
+
+            static void PrintAttributeOrReferenceValue(IDictionary<string, object> attributeValue, IndentedTextWriter w)
+            {
+                var value = attributeValue.Get<string>("name");
+                var type = attributeValue.Get<string>("eType");
+                value = type switch
+                {
+                    "REFERENCE_COMPILED" => "s2r://" + value,
+                    "REFERENCE_PASSTHROUGH" => "file://" + value,
+                    "PANEL_ATTRIBUTE_VALUE" => SecurityElement.Escape(value),
+                    _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unknown node type {type}"),
+                };
+                w.Write($"\"{value}\"");
+            }
+
+            static bool IsAttribute(IDictionary<string, object> node) => node.Get<string>("eType") == "PANEL_ATTRIBUTE";
+            static IEnumerable<IDictionary<string, object>> NodeAttributes(IDictionary<string, object> node) => SubNodes(node).Where(n => IsAttribute(n));
+            static IEnumerable<IDictionary<string, object>> NodeChildren(IDictionary<string, object> node) => SubNodes(node).Where(n => !IsAttribute(n));
+            static IEnumerable<IDictionary<string, object>> SubNodes(IDictionary<string, object> node)
+                => node.ContainsKey("vecChildren") ? node.GetArray("vecChildren") : node.ContainsKey("child")
+                    ? ([node.GetSub("child")])
+                    : (IEnumerable<IDictionary<string, object>>)[];
+        }
+    }
+
+    #endregion
+
+    #region D_PanoramaStyle
+    //was:Resource/ResourceTypes/PanoramaStyle
+
+    public class D_PanoramaStyle : D_Panorama
+    {
+        XKV3 SourceMap;
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            base.Read(parent, r);
+            SourceMap = parent.GetBlockByType<SRMA>();
+        }
+
+        public override string ToString() => ToString(true);
+
+        public string ToString(bool applySourceMapIfPresent)
+            => (applySourceMapIfPresent && SourceMap != default && !(SourceMap.Data.Get<object>("DBITSLC") is null))
+                ? Encoding.UTF8.GetString(PanoramaSourceMapDecode(Data, SourceMap.Data))
+                : base.ToString();
+
+        static byte[] PanoramaSourceMapDecode(byte[] data, IDictionary<string, object> sourceMap)
+        {
+            var mapping = sourceMap.GetArray("DBITSLC", kvArray => (kvArray.GetInt32("0"), kvArray.GetInt32("1"), kvArray.GetInt32("2")));
+            var results = new List<IEnumerable<byte>>();
+            var currentCol = 0;
+            var currentLine = 1;
+            for (var i = 0; i < mapping.Length - 1; i++)
+            {
+                var (startIndex, sourceLine, sourceColumn) = mapping[i];
+                var (nextIndex, _, _) = mapping[i + 1];
+
+                // Prepend newlines if they are in front of this chunk according to sourceLineByteIndices
+                if (currentLine < sourceLine) { results.Add(Enumerable.Repeat(Encoding.UTF8.GetBytes("\n")[0], sourceLine - currentLine)); currentCol = 0; currentLine = sourceLine; }
+                // Referring back to an object higher in hierarchy, also add newline here
+                else if (sourceLine < currentLine) { results.Add(Enumerable.Repeat(Encoding.UTF8.GetBytes("\n")[0], 1)); currentCol = 0; currentLine++; }
+                // Prepend spaces until we catch up to the index we need to be at
+                if (currentCol < sourceColumn) { results.Add(Enumerable.Repeat(Encoding.UTF8.GetBytes(" ")[0], sourceColumn - currentCol)); currentCol = sourceColumn; }
+                // Copy destination
+                var length = nextIndex - startIndex;
+                results.Add(data.Skip(startIndex).Take(length));
+                currentCol += length;
+            }
+            results.Add(Enumerable.Repeat(Encoding.UTF8.GetBytes("\n")[0], 1));
+            results.Add(data.Skip(mapping[^1].Item1));
+            return results.SelectMany(_ => _).ToArray();
+        }
+    }
+
+    #endregion
+
+    #region D_ParticleSystem
+    //was:Resource/ResourceTypes/ParticleSystem
+
+    public class D_ParticleSystem : XKV3_NTRO, IParticleSystem
+    {
+        public IEnumerable<IDictionary<string, object>> Renderers => Data.GetArray("m_Renderers") ?? [];
+
+        public IEnumerable<IDictionary<string, object>> Operators => Data.GetArray("m_Operators") ?? [];
+
+        public IEnumerable<IDictionary<string, object>> Initializers => Data.GetArray("m_Initializers") ?? [];
+
+        public IEnumerable<IDictionary<string, object>> Emitters => Data.GetArray("m_Emitters") ?? [];
+
+        public IEnumerable<string> GetChildParticleNames(bool enabledOnly = false)
+        {
+            IEnumerable<IDictionary<string, object>> children = Data.GetArray("m_Children");
+            if (children == null) return [];
+            if (enabledOnly) children = children.Where(c => !c.ContainsKey("m_bDisableChild") || !c.Get<bool>("m_bDisableChild"));
+            return children.Select(c => c.Get<string>("m_ChildRef")).ToList();
+        }
+    }
+
+    #endregion
+
+    #region D_PhysAggregateData
+    //was:Resource/ResourceTypes/PhysAggregateData
+
+    public class D_PhysAggregateData : XKV3_NTRO
+    {
+        public D_PhysAggregateData() : base("VPhysXAggregateData_t") { }
+    }
+
+    #endregion
+
+    #region D_Plaintext
+    //was:Resource/ResourceTypes/Plaintext
+
+    public class D_Plaintext : D_NTRO
+    {
+        public new string Data;
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            Data = Encoding.UTF8.GetString(r.ReadBytes((int)Size));
+        }
+
+        public override string ToString() => Data;
+    }
+
+    #endregion
+
+    #region D_PostProcessing
+    //was:Resource/ResourceTypes/PostProcessing
+
+    public class D_PostProcessing : XKV3_NTRO
+    {
+        public D_PostProcessing() : base("PostProcessingResource_t") { }
+
+        public IDictionary<string, object> GetTonemapParams() => Data.Get<bool>("m_bHasTonemapParams") ? Data.Get<IDictionary<string, object>>("m_toneMapParams") : null;
+        public IDictionary<string, object> GetBloomParams() => Data.Get<bool>("m_bHasBloomParams") ? Data.Get<IDictionary<string, object>>("m_bloomParams") : null;
+        public IDictionary<string, object> GetVignetteParams() => Data.Get<bool>("m_bHasVignetteParams") ? Data.Get<IDictionary<string, object>>("m_vignetteParams") : null;
+        public IDictionary<string, object> GetLocalContrastParams() => Data.Get<bool>("m_bHasLocalContrastParams") ? Data.Get<IDictionary<string, object>>("m_localConstrastParams") : null;
+        public bool HasColorCorrection() => Data.TryGetValue("m_bHasColorCorrection", out var value) ? (bool)value : true; // Assumed true pre Aperture Desk Job
+        public int GetColorCorrectionLUTDimension() => Data.Get<int>("m_nColorCorrectionVolumeDim");
+        public byte[] GetColorCorrectionLUT() => Data.Get<byte[]>("m_colorCorrectionVolumeData");
+
+        public byte[] GetRawData()
+        {
+            var lut = GetColorCorrectionLUT().Clone() as byte[];
+            var j = 0;
+            for (var i = 0; i < lut.Length; i++)
+            {
+                if (((i + 1) % 4) == 0) continue; // Skip each 4th byte
+                lut[j++] = lut[i];
+            }
+            return lut[..j];
+        }
+
+        public string ToValvePostProcessing(bool preloadLookupTable = false, string lutFileName = "")
+        {
+            var outKV3 = new Dictionary<string, object>
+            {
+                { "_class", "CPostProcessData" }
+            };
+
+            var layers = new List<object>();
+
+            var tonemapParams = GetTonemapParams();
+            var bloomParams = GetBloomParams();
+            var vignetteParams = GetVignetteParams();
+            var localContrastParams = GetLocalContrastParams();
+
+            if (tonemapParams != null)
+            {
+                var tonemappingLayer = new Dictionary<string, object>
+                {
+                    { "_class", "CToneMappingLayer" },
+                    { "m_nOpacityPercent", 100L },
+                    { "m_bVisible", true },
+                    { "m_pLayerMask", null },
+                };
+                var tonemappingLayerParams = new Dictionary<string, object>();
+                foreach (var kv in tonemapParams) tonemappingLayerParams.Add(kv.Key, kv.Value);
+                tonemappingLayer.Add("m_params", tonemappingLayerParams);
+                layers.Add(tonemappingLayer);
+            }
+
+            if (bloomParams != null)
+            {
+                var bloomLayer = new Dictionary<string, object>
+                {
+                    { "_class", "CBloomLayer" },
+                    { "m_name",  "Bloom" },
+                    { "m_nOpacityPercent", 100L },
+                    { "m_bVisible", true },
+                    { "m_pLayerMask", null },
+                };
+                var bloomLayerParams = new Dictionary<string, object>();
+                foreach (var kv in tonemapParams) bloomLayerParams.Add(kv.Key, kv.Value);
+                bloomLayer.Add("m_params", bloomLayerParams);
+                layers.Add(bloomLayer);
+            }
+
+            if (vignetteParams != null) { } // TODO: How does the vignette layer look like?
+            if (localContrastParams != null) { } // TODO: How does the local contrast layer look like?
+
+            // All other layers are compiled into a 3D lookup table
+            if (HasColorCorrection())
+            {
+                var ccLayer = new Dictionary<string, object>
+                {
+                    { "_class", "CColorLookupColorCorrectionLayer" },
+                    { "m_name",  "VRF Extracted Lookup Table" },
+                    { "m_nOpacityPercent", 100L },
+                    { "m_bVisible", true },
+                    { "m_pLayerMask", null },
+                    { "m_fileName", lutFileName },
+                };
+                var lut = new List<object>();
+                if (preloadLookupTable) foreach (var b in GetRawData()) lut.Add(b / 255d);
+                ccLayer.Add("m_lut", lut.ToArray());
+                ccLayer.Add("m_nDim", GetColorCorrectionLUTDimension());
+                layers.Add(ccLayer);
+            }
+
+            outKV3.Add("m_layers", layers.ToArray());
+
+            return new KV3File(outKV3).ToString();
+        }
+    }
+
+    #endregion
+
+    #region D_ResourceManifest
+    //was:Resource/ResourceTypes/ResourceManifest
+
+    public class D_ResourceManifest : D_NTRO
+    {
+        public List<List<string>> Resources { get; private set; }
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            if (parent.ContainsBlockType<NTRO>())
+            {
+                var ntro = new D_NTRO { StructName = "ResourceManifest_t", Offset = Offset, Size = Size };
+                ntro.Read(parent, r);
+                Resources = new List<List<string>> { new List<string>(ntro.Data.Get<string[]>("m_ResourceFileNameList")) };
+                return;
+            }
+
+            var version = r.ReadInt32();
+            if (version != 8) throw new ArgumentOutOfRangeException(nameof(version), $"Unknown version {version}");
+
+            Resources = new List<List<string>>();
+            var blockCount = r.ReadInt32();
+            for (var block = 0; block < blockCount; block++)
+            {
+                var strings = new List<string>();
+                var originalOffset = r.BaseStream.Position;
+                var offset = r.ReadInt32();
+                var count = r.ReadInt32();
+                r.Seek(originalOffset + offset);
+                for (var i = 0; i < count; i++)
+                {
+                    var returnOffset = r.BaseStream.Position;
+                    var stringOffset = r.ReadInt32();
+                    r.Seek(returnOffset + stringOffset);
+                    strings.Add(r.ReadZUTF8());
+                    r.Seek(returnOffset + 4);
+                }
+                r.Seek(originalOffset + 8);
+                Resources.Add(strings);
+            }
+        }
+
+        public override string ToString()
+        {
+            using var w = new IndentedTextWriter();
+            foreach (var block in Resources)
+            {
+                foreach (var entry in block) w.WriteLine(entry);
+                w.WriteLine();
+            }
+            return w.ToString();
+        }
+    }
+
+    #endregion
+
+    #region D_Sound
+    //was:Resource/ResourceTypes/Sound
+
+    public struct EmphasisSample
+    {
+        public float Time;
+        public float Value;
+    }
+
+    public struct PhonemeTag(float startTime, float endTime, ushort phonemeCode)
+    {
+        public float StartTime = startTime;
+        public float EndTime = endTime;
+        public ushort PhonemeCode = phonemeCode;
+    }
+
+    public class Sentence(PhonemeTag[] runTimePhonemes)
+    {
+        public bool ShouldVoiceDuck;
+        public PhonemeTag[] RunTimePhonemes = runTimePhonemes;
+        public EmphasisSample[] EmphasisSamples;
+    }
+
+    public class D_Sound : DATA
+    {
+        public enum AudioFileType
+        {
+            AAC = 0,
+            WAV = 1,
+            MP3 = 2,
+        }
+
+        public enum AudioFormatV4
+        {
+            PCM16 = 0,
+            PCM8 = 1,
+            MP3 = 2,
+            ADPCM = 3,
+        }
+
+        // https://github.com/naudio/NAudio/blob/fb35ce8367f30b8bc5ea84e7d2529e172cf4c381/NAudio.Core/Wave/WaveFormats/WaveFormatEncoding.cs
+        public enum WaveAudioFormat : uint
+        {
+            Unknown = 0,
+            PCM = 1,
+            ADPCM = 2,
+        }
+
+        /// <summary>
+        /// Gets the audio file type.
+        /// </summary>
+        /// <value>The file type.</value>
+        public AudioFileType SoundType { get; private set; }
+
+        /// <summary>
+        /// Gets the samples per second.
+        /// </summary>
+        /// <value>The sample rate.</value>
+        public uint SampleRate { get; private set; }
+
+        /// <summary>
+        /// Gets the bit size.
+        /// </summary>
+        /// <value>The bit size.</value>
+        public uint Bits { get; private set; }
+
+        /// <summary>
+        /// Gets the number of channels. 1 for mono, 2 for stereo.
+        /// </summary>
+        /// <value>The number of channels.</value>
+        public uint Channels { get; private set; }
+
+        /// <summary>
+        /// Gets the bitstream encoding format.
+        /// </summary>
+        /// <value>The audio format.</value>
+        public WaveAudioFormat AudioFormat { get; private set; }
+
+        public uint SampleSize { get; private set; }
+
+        public uint SampleCount { get; private set; }
+
+        public int LoopStart { get; private set; }
+
+        public int LoopEnd { get; private set; }
+
+        public float Duration { get; private set; }
+
+        public Sentence Sentence { get; private set; }
+
+        public uint StreamingDataSize { get; private set; }
+
+        protected Binary_Pak Parent { get; private set; }
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            Parent = parent;
+            r.Seek(Offset);
+            if (parent.Version > 4) throw new InvalidDataException($"Invalid vsnd version '{parent.Version}'");
+            if (parent.Version >= 4)
+            {
+                SampleRate = r.ReadUInt16();
+                var soundFormat = (AudioFormatV4)r.ReadByte();
+                Channels = r.ReadByte();
+                switch (soundFormat)
+                {
+                    case AudioFormatV4.PCM8:
+                        SoundType = AudioFileType.WAV;
+                        Bits = 8;
+                        SampleSize = 1;
+                        AudioFormat = WaveAudioFormat.PCM;
+                        break;
+                    case AudioFormatV4.PCM16:
+                        SoundType = AudioFileType.WAV;
+                        Bits = 16;
+                        SampleSize = 2;
+                        AudioFormat = WaveAudioFormat.PCM;
+                        break;
+                    case AudioFormatV4.MP3:
+                        SoundType = AudioFileType.MP3;
+                        break;
+                    case AudioFormatV4.ADPCM:
+                        SoundType = AudioFileType.WAV;
+                        Bits = 4;
+                        SampleSize = 1;
+                        AudioFormat = WaveAudioFormat.ADPCM;
+                        throw new NotImplementedException("ADPCM is currently not implemented correctly.");
+                    default: throw new ArgumentOutOfRangeException(nameof(soundFormat), $"Unexpected audio type {soundFormat}");
+                }
+            }
+            else
+            {
+                var bitpackedSoundInfo = r.ReadUInt32();
+                var type = ExtractSub(bitpackedSoundInfo, 0, 2);
+                if (type > 2) throw new InvalidDataException($"Unknown sound type in old vsnd version: {type}");
+                SoundType = (AudioFileType)type;
+                Bits = ExtractSub(bitpackedSoundInfo, 2, 5);
+                Channels = ExtractSub(bitpackedSoundInfo, 7, 2);
+                SampleSize = ExtractSub(bitpackedSoundInfo, 9, 3);
+                AudioFormat = (WaveAudioFormat)ExtractSub(bitpackedSoundInfo, 12, 2);
+                SampleRate = ExtractSub(bitpackedSoundInfo, 14, 17);
+            }
+            LoopStart = r.ReadInt32();
+            SampleCount = r.ReadUInt32();
+            Duration = r.ReadSingle();
+
+            var sentenceOffset = (long)r.ReadUInt32();
+            r.Skip(4);
+            if (sentenceOffset != 0) sentenceOffset = r.BaseStream.Position + sentenceOffset;
+
+            r.Skip(4); // Skipping over m_pHeader
+            StreamingDataSize = r.ReadUInt32();
+
+            if (parent.Version >= 1)
+            {
+                var d = r.ReadUInt32();
+                if (d != 0) throw new ArgumentOutOfRangeException(nameof(d), $"Unexpected {d}");
+                var e = r.ReadUInt32();
+                if (e != 0) throw new ArgumentOutOfRangeException(nameof(e), $"Unexpected {e}");
+            }
+            // v2 and v3 are the same?
+            if (parent.Version >= 2)
+            {
+                var f = r.ReadUInt32();
+                if (f != 0) throw new ArgumentOutOfRangeException(nameof(f), $"Unexpected {f}");
+            }
+            if (parent.Version >= 4) LoopEnd = r.ReadInt32();
+
+            ReadPhonemeStream(r, sentenceOffset);
+        }
+
+        void ReadPhonemeStream(BinaryReader r, long sentenceOffset)
+        {
+            if (sentenceOffset == 0) return;
+            r.Seek(sentenceOffset);
+            var numPhonemeTags = r.ReadInt32();
+            var a = r.ReadInt32(); // numEmphasisSamples ?
+            var b = r.ReadInt32(); // Sentence.ShouldVoiceDuck ?
+            // Skip sounds that have these
+            if (a != 0 || b != 0) return;
+            Sentence = new Sentence(new PhonemeTag[numPhonemeTags]);
+            for (var i = 0; i < numPhonemeTags; i++)
+            {
+                Sentence.RunTimePhonemes[i] = new PhonemeTag(r.ReadSingle(), r.ReadSingle(), r.ReadUInt16());
+                r.Skip(2);
+            }
+        }
+
+        static uint ExtractSub(uint l, byte offset, byte nrBits)
+        {
+            var rightShifted = l >> offset;
+            var mask = (1 << nrBits) - 1;
+            return (uint)(rightShifted & mask);
+        }
+
+        /// <summary>
+        /// Returns a fully playable sound data.
+        /// In case of WAV files, header is automatically generated as Valve removes it when compiling.
+        /// </summary>
+        /// <returns>Byte array containing sound data.</returns>
+        public byte[] GetSound()
+        {
+            using var sound = GetSoundStream();
+            return sound.ToArray();
+        }
+
+        /// <summary>
+        /// Returns a fully playable sound data.
+        /// In case of WAV files, header is automatically generated as Valve removes it when compiling.
+        /// </summary>
+        /// <returns>Memory stream containing sound data.</returns>
+        public MemoryStream GetSoundStream()
+        {
+            var r = Parent.Reader;
+            r.Seek(Offset + Size);
+            var s = new MemoryStream();
+            if (SoundType == AudioFileType.WAV)
+            {
+                // http://soundfile.sapp.org/doc/WaveFormat/
+                // http://www.codeproject.com/Articles/129173/Writing-a-Proper-Wave-File
+                var headerRiff = new byte[] { 0x52, 0x49, 0x46, 0x46 };
+                var formatWave = new byte[] { 0x57, 0x41, 0x56, 0x45 };
+                var formatTag = new byte[] { 0x66, 0x6d, 0x74, 0x20 };
+                var subChunkId = new byte[] { 0x64, 0x61, 0x74, 0x61 };
+
+                var byteRate = SampleRate * Channels * (Bits / 8);
+                var blockAlign = Channels * (Bits / 8);
+                if (AudioFormat == WaveAudioFormat.ADPCM)
+                {
+                    byteRate = 1;
+                    blockAlign = 4;
+                }
+
+                s.Write(headerRiff, 0, headerRiff.Length);
+                s.Write(PackageInt(StreamingDataSize + 42, 4), 0, 4);
+
+                s.Write(formatWave, 0, formatWave.Length);
+                s.Write(formatTag, 0, formatTag.Length);
+                s.Write(PackageInt(16, 4), 0, 4); // Subchunk1Size
+
+                s.Write(PackageInt((uint)AudioFormat, 2), 0, 2);
+                s.Write(PackageInt(Channels, 2), 0, 2);
+                s.Write(PackageInt(SampleRate, 4), 0, 4);
+                s.Write(PackageInt(byteRate, 4), 0, 4);
+                s.Write(PackageInt(blockAlign, 2), 0, 2);
+                s.Write(PackageInt(Bits, 2), 0, 2);
+                //s.Write(PackageInt(0,2), 0, 2); // Extra param size
+                s.Write(subChunkId, 0, subChunkId.Length);
+                s.Write(PackageInt(StreamingDataSize, 4), 0, 4);
+            }
+            r.BaseStream.CopyTo(s, (int)StreamingDataSize);
+            // Flush and reset position so that consumers can read it
+            s.Flush();
+            s.Seek(0, SeekOrigin.Begin);
+            return s;
+        }
+
+        static byte[] PackageInt(uint source, int length)
+        {
+            var retVal = new byte[length];
+            retVal[0] = (byte)(source & 0xFF);
+            retVal[1] = (byte)((source >> 8) & 0xFF);
+            if (length == 4)
+            {
+                retVal[2] = (byte)((source >> 0x10) & 0xFF);
+                retVal[3] = (byte)((source >> 0x18) & 0xFF);
+            }
+            return retVal;
+        }
+
+        public override string ToString()
+        {
+            var b = new StringBuilder();
+            b.AppendLine($"SoundType: {SoundType}");
+            b.AppendLine($"Sample Rate: {SampleRate}");
+            b.AppendLine($"Bits: {Bits}");
+            b.AppendLine($"SampleSize: {SampleSize}");
+            b.AppendLine($"SampleCount: {SampleCount}");
+            b.AppendLine($"Format: {AudioFormat}");
+            b.AppendLine($"Channels: {Channels}");
+            b.AppendLine($"LoopStart: ({TimeSpan.FromSeconds(LoopStart)}) {LoopStart}");
+            b.AppendLine($"LoopEnd: ({TimeSpan.FromSeconds(LoopEnd)}) {LoopEnd}");
+            b.AppendLine($"Duration: {TimeSpan.FromSeconds(Duration)} ({Duration})");
+            b.AppendLine($"StreamingDataSize: {StreamingDataSize}");
+            if (Sentence != null)
+            {
+                b.AppendLine($"Sentence[{Sentence.RunTimePhonemes.Length}]:");
+                foreach (var phoneme in Sentence.RunTimePhonemes) b.AppendLine($"\tPhonemeTag(StartTime={phoneme.StartTime}, EndTime={phoneme.EndTime}, PhonemeCode={phoneme.PhonemeCode})");
+            }
+            return b.ToString();
+        }
+    }
+
+    #endregion
+
+    #region D_SoundEventScript
+    //was:Resource/ResourceTypes/SoundEventScript
+
+    public class D_SoundEventScript : D_NTRO
+    {
+        public Dictionary<string, string> SoundEventScriptValue = [];
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            base.Read(parent, r);
+
+            // Data is VSoundEventScript_t we need to iterate m_SoundEvents inside it.
+            var soundEvents = Data.Get<IDictionary<string, object>>("m_SoundEvents");
+            foreach (IDictionary<string, object> entry in soundEvents.Values)
+            {
+                // sound is VSoundEvent_t
+                var soundName = entry.Get<string>("m_SoundName");
+                var soundValue = entry.Get<string>("m_OperatorsKV").Replace("\n", Environment.NewLine); // make sure we have new lines
+                if (SoundEventScriptValue.ContainsKey(soundName)) SoundEventScriptValue.Remove(soundName); // Duplicates last one wins
+                SoundEventScriptValue.Add(soundName, soundValue);
+            }
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            foreach (var entry in SoundEventScriptValue)
+            {
+                w.WriteLine($"\"{entry.Key}\" {{"); w.Indent++;
+                // m_OperatorsKV wont be indented, so we manually indent it here, removing the last indent so we can close brackets later correctly.
+                w.Write(entry.Value.Replace(Environment.NewLine, $"{Environment.NewLine}\t").TrimEnd('\t'));
+                w.Indent--; w.WriteLine("}");
+                w.WriteLine(string.Empty); // There is an empty line after every entry (including the last)
+            }
+        }
+    }
+
+    #endregion
+
+    #region D_SoundStackScript
+    //was:Resource/ResourceTypes/SoundStackScript
+
+    public class D_SoundStackScript : DATA
+    {
+        public Dictionary<string, string> SoundStackScriptValue = [];
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            var version = r.ReadInt32();
+            if (version != 8) throw new FormatException($"Unknown version: {version}");
+            var count = r.ReadInt32();
+            var offset = r.BaseStream.Position;
+            for (var i = 0; i < count; i++)
+            {
+                var offsetToName = offset + r.ReadInt32(); offset += 4;
+                var offsetToValue = offset + r.ReadInt32(); offset += 4;
+                r.Seek(offsetToName);
+                var name = r.ReadZUTF8();
+                r.Seek(offsetToValue);
+                var value = r.ReadZUTF8();
+                r.Seek(offset);
+                if (SoundStackScriptValue.ContainsKey(name)) SoundStackScriptValue.Remove(name); // duplicates last wins
+                SoundStackScriptValue.Add(name, value);
+            }
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            foreach (var entry in SoundStackScriptValue)
+            {
+                w.WriteLine($"// {entry.Key}");
+                w.Write(entry.Value);
+                w.WriteLine(string.Empty);
+            }
+        }
+    }
+
+    #endregion
+
+    #region D_Texture
+    //was:Resource/ResourceTypes/Texture
+
+    public class D_Texture : DATA, ITexture
+    {
+        public enum VTexExtraData //was:Resource/Enums/VTexExtraData
+        {
+            UNKNOWN = 0,
+            FALLBACK_BITS = 1,
+            SHEET = 2,
+            FILL_TO_POWER_OF_TWO = 3,
+            COMPRESSED_MIP_SIZE = 4,
+            CUBEMAP_RADIANCE_SH = 5,
+        }
+
+        [Flags]
+        public enum VTexFlags //was:Resource/Enums/VTexFlags
+        {
+            SUGGEST_CLAMPS = 0x00000001,
+            SUGGEST_CLAMPT = 0x00000002,
+            SUGGEST_CLAMPU = 0x00000004,
+            NO_LOD = 0x00000008,
+            CUBE_TEXTURE = 0x00000010,
+            VOLUME_TEXTURE = 0x00000020,
+            TEXTURE_ARRAY = 0x00000040,
+        }
+
+        public enum VTexFormat : byte //was:Resource/Enums/VTexFlags
+        {
+            UNKNOWN = 0,
+            DXT1 = 1,
+            DXT5 = 2,
+            I8 = 3,
+            RGBA8888 = 4,
+            R16 = 5,
+            RG1616 = 6,
+            RGBA16161616 = 7,
+            R16F = 8,
+            RG1616F = 9,
+            RGBA16161616F = 10,
+            R32F = 11,
+            RG3232F = 12,
+            RGB323232F = 13,
+            RGBA32323232F = 14,
+            JPEG_RGBA8888 = 15,
+            PNG_RGBA8888 = 16,
+            JPEG_DXT5 = 17,
+            PNG_DXT5 = 18,
+            BC6H = 19,
+            BC7 = 20,
+            ATI2N = 21,
+            IA88 = 22,
+            ETC2 = 23,
+            ETC2_EAC = 24,
+            R11_EAC = 25,
+            RG11_EAC = 26,
+            ATI1N = 27,
+            BGRA8888 = 28,
+        }
+
+        public BinaryReader Reader { get; private set; }
+        long DataOffset;
+        public ushort Version { get; private set; }
+        public ushort Width { get; private set; }
+        public ushort Height { get; private set; }
+        public ushort Depth { get; private set; }
+        public float[] Reflectivity { get; private set; }
+        public VTexFlags Flags { get; private set; }
+        public VTexFormat Format { get; private set; }
+        public byte NumMipMaps { get; private set; }
+        public uint Picmip0Res { get; private set; }
+        public Dictionary<VTexExtraData, byte[]> ExtraData { get; private set; } = [];
+        public ushort NonPow2Width { get; private set; }
+        public ushort NonPow2Height { get; private set; }
+
+        int[] CompressedMips;
+        bool IsActuallyCompressedMips;
+        float[] RadianceCoefficients;
+
+        public ushort ActualWidth => NonPow2Width > 0 ? NonPow2Width : Width;
+        public ushort ActualHeight => NonPow2Height > 0 ? NonPow2Height : Height;
+
+        #region ITextureInfo
+
+        (VTexFormat type, object gl, object vulken, object unity, object unreal) TexFormat;
+        byte[] Bytes;
+        Range[] Mips;
+
+        int ITexture.Width => Width;
+        int ITexture.Height => Height;
+        int ITexture.Depth => Depth;
+        int ITexture.MipMaps => NumMipMaps;
+        TextureFlags ITexture.Flags => (TextureFlags)Flags;
+
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        {
+            Reader.BaseStream.Position = Offset + Size;
+
+            using (var b = new MemoryStream())
+            {
+                Mips = new Range[NumMipMaps];
+                var lastLength = 0;
+                for (var i = NumMipMaps - 1; i >= 0; i--)
+                {
+                    b.Write(ReadOne(i));
+                    Mips[i] = new Range(lastLength, (int)b.Length);
+                    lastLength = (int)b.Length;
+                }
+                Bytes = b.ToArray();
+            }
+
+            return (Bytes, (Platform.Type)platform switch
+            {
+                Platform.Type.OpenGL => TexFormat.gl,
+                Platform.Type.Unity => TexFormat.unity,
+                Platform.Type.Unreal => TexFormat.unreal,
+                Platform.Type.Vulken => TexFormat.vulken,
+                Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
+                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
+            }, Mips);
+        }
+        void ITexture.End() { }
+
+        #endregion
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            Reader = r;
+            Version = r.ReadUInt16();
+            if (Version != 1) throw new FormatException($"Unknown vtex version. ({Version} != expected 1)");
+            Flags = (VTexFlags)r.ReadUInt16();
+            Reflectivity = [r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), r.ReadSingle()];
+            Width = r.ReadUInt16();
+            Height = r.ReadUInt16();
+            Depth = r.ReadUInt16();
+            NonPow2Width = 0;
+            NonPow2Height = 0;
+            Format = (VTexFormat)r.ReadByte();
+            NumMipMaps = r.ReadByte();
+            Picmip0Res = r.ReadUInt32();
+            var extraDataOffset = r.ReadUInt32();
+            var extraDataCount = r.ReadUInt32();
+            if (extraDataCount > 0)
+            {
+                r.Skip(extraDataOffset - 8); // 8 is 2 uint32s we just read
+                for (var i = 0; i < extraDataCount; i++)
+                {
+                    var type = (VTexExtraData)r.ReadUInt32();
+                    var offset = r.ReadUInt32() - 8;
+                    var size = r.ReadUInt32();
+                    r.Peek(z =>
+                    {
+                        z.Skip(offset);
+                        ExtraData.Add(type, r.ReadBytes((int)size));
+                        z.Skip(-size);
+                        if (type == VTexExtraData.FILL_TO_POWER_OF_TWO)
+                        {
+                            z.ReadUInt16();
+                            var nw = z.ReadUInt16();
+                            var nh = z.ReadUInt16();
+                            if (nw > 0 && nh > 0 && Width >= nw && Height >= nh)
+                            {
+                                NonPow2Width = nw;
+                                NonPow2Height = nh;
+                            }
+                        }
+                        else if (type == VTexExtraData.COMPRESSED_MIP_SIZE)
+                        {
+                            var int1 = z.ReadUInt32(); // 1?
+                            var mipsOffset = z.ReadUInt32();
+                            var mips = z.ReadUInt32();
+                            if (int1 != 1 && int1 != 0) throw new FormatException($"int1 got: {int1}");
+                            IsActuallyCompressedMips = int1 == 1; // TODO: Verify whether this int is the one that actually controls compression
+                            r.Skip(mipsOffset - 8);
+                            CompressedMips = z.ReadPArray<int>("I", (int)mips);
+                        }
+                        else if (type == VTexExtraData.CUBEMAP_RADIANCE_SH)
+                        {
+                            var coeffsOffset = r.ReadUInt32();
+                            var coeffs = r.ReadUInt32();
+                            r.Skip(coeffsOffset - 8);
+                            RadianceCoefficients = z.ReadPArray<float>("f", (int)coeffs); // Spherical Harmonics
+                        }
+                    });
+                }
+            }
+            DataOffset = Offset + Size;
+
+            TexFormat = Format switch
+            {
+                DXT1 => (DXT1, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureUnityFormat.DXT1, TextureUnrealFormat.DXT1),
+                //DXT3 => (DXT3, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureUnityFormat.DXT3_POLYFILL, TextureUnrealFormat.DXT3),
+                DXT5 => (DXT5, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureUnityFormat.DXT5, TextureUnrealFormat.DXT5),
+                ETC2 => (ETC2, TextureGLFormat.CompressedRgb8Etc2, TextureGLFormat.CompressedRgb8Etc2, TextureUnityFormat.ETC2_RGBA8Crunched, TextureUnrealFormat.ETC2RGB),
+                ETC2_EAC => (ETC2_EAC, TextureGLFormat.CompressedRgba8Etc2Eac, TextureGLFormat.CompressedRgba8Etc2Eac, TextureUnityFormat.Unknown, TextureUnrealFormat.Unknown),
+                ATI1N => (ATI1N, TextureGLFormat.CompressedRedRgtc1, TextureGLFormat.CompressedRedRgtc1, TextureUnityFormat.BC4, TextureUnrealFormat.BC4),
+                ATI2N => (ATI2N, TextureGLFormat.CompressedRgRgtc2, TextureGLFormat.CompressedRgRgtc2, TextureUnityFormat.BC5, TextureUnrealFormat.BC5),
+                BC6H => (BC6H, TextureGLFormat.CompressedRgbBptcUnsignedFloat, TextureGLFormat.CompressedRgbBptcUnsignedFloat, TextureUnityFormat.BC6H, TextureUnrealFormat.BC6H),
+                BC7 => (BC7, TextureGLFormat.CompressedRgbaBptcUnorm, TextureGLFormat.CompressedRgbaBptcUnorm, TextureUnityFormat.BC7, TextureUnrealFormat.BC7),
+                RGBA8888 => (RGBA8888, (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnrealFormat.R8G8B8A8),
+                RGBA16161616F => (RGBA16161616F, (TextureGLFormat.Rgba16f, TextureGLPixelFormat.Rgba, TextureGLPixelType.Float), (TextureGLFormat.Rgba16f, TextureGLPixelFormat.Rgba, TextureGLPixelType.Float), TextureUnityFormat.RGBAFloat, TextureUnrealFormat.FloatRGBA),
+                I8 => (I8, TextureGLFormat.Intensity8, TextureGLFormat.Intensity8, TextureUnityFormat.Unknown, TextureUnityFormat.Unknown), //(TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte)
+                R16 => (R16, (TextureGLFormat.R16, TextureGLPixelFormat.Red, TextureGLPixelType.UnsignedShort), (TextureGLFormat.R16, TextureGLPixelFormat.Red, TextureGLPixelType.UnsignedShort), TextureUnityFormat.R16, TextureUnrealFormat.R16UInt),
+                R16F => (R16F, (TextureGLFormat.R16f, TextureGLPixelFormat.Red, TextureGLPixelType.Float), (TextureGLFormat.R16f, TextureGLPixelFormat.Red, TextureGLPixelType.Float), TextureUnityFormat.RFloat, TextureUnrealFormat.R16F),
+                RG1616 => (RG1616, (TextureGLFormat.Rg16, TextureGLPixelFormat.Rg, TextureGLPixelType.UnsignedShort), (TextureGLFormat.Rg16, TextureGLPixelFormat.Rg, TextureGLPixelType.UnsignedShort), TextureUnityFormat.RG16, TextureUnrealFormat.R16G16UInt),
+                RG1616F => (RG1616F, (TextureGLFormat.Rg16f, TextureGLPixelFormat.Rg, TextureGLPixelType.Float), (TextureGLFormat.Rg16f, TextureGLPixelFormat.Rg, TextureGLPixelType.Float), TextureUnityFormat.RGFloat, TextureUnrealFormat.R16G16UInt),
+                _ => (Format, null, null, null, null),
+            };
+        }
+
+        public byte[] ReadOne(int index)
+        {
+            var uncompressedSize = TextureHelper.GetMipmapTrueDataSize(TexFormat.gl, Width, Height, Depth, index);
+            if (!IsActuallyCompressedMips) return Reader.ReadBytes(uncompressedSize);
+            var compressedSize = CompressedMips[index];
+            if (compressedSize >= uncompressedSize) return Reader.ReadBytes(uncompressedSize);
+            return Reader.DecompressLz4(compressedSize, uncompressedSize);
+        }
+
+        public TextureSequences GetSpriteSheetData()
+        {
+            if (!ExtraData.TryGetValue(VTexExtraData.SHEET, out var bytes)) return null;
+            var sequences = new TextureSequences();
+            using var r = new BinaryReader(new MemoryStream(bytes));
+            var version = r.ReadUInt32();
+            if (version != 8) throw new ArgumentOutOfRangeException(nameof(version), $"Unknown version {version}");
+
+            var numSequences = r.ReadUInt32();
+            for (var i = 0; i < numSequences; i++)
+            {
+                var sequence = new TextureSequences.Sequence();
+                var id = r.ReadUInt32();
+                sequence.Clamp = r.ReadBoolean();
+                sequence.AlphaCrop = r.ReadBoolean();
+                sequence.NoColor = r.ReadBoolean();
+                sequence.NoAlpha = r.ReadBoolean();
+                var framesOffset = r.BaseStream.Position + r.ReadUInt32();
+                var numFrames = r.ReadUInt32();
+                sequence.FramesPerSecond = r.ReadSingle(); // Not too sure about this one
+                var nameOffset = r.BaseStream.Position + r.ReadUInt32();
+                var floatParamsOffset = r.BaseStream.Position + r.ReadUInt32();
+                var floatParamsCount = r.ReadUInt32();
+                r.Peek(z =>
+                {
+                    z.Seek(nameOffset);
+                    sequence.Name = z.ReadZUTF8();
+
+                    if (floatParamsCount > 0)
+                    {
+                        r.Seek(floatParamsOffset);
+                        for (var p = 0; p < floatParamsCount; p++)
+                        {
+                            var floatParamNameOffset = r.BaseStream.Position + r.ReadUInt32();
+                            var floatValue = r.ReadSingle();
+                            var offsetNextParam = r.BaseStream.Position;
+                            r.Seek(floatParamNameOffset);
+                            var floatName = r.ReadZUTF8();
+                            r.Seek(offsetNextParam);
+                            sequence.FloatParams.Add(floatName, floatValue);
+                        }
+                    }
+
+                    z.Seek(framesOffset);
+                    sequence.Frames = new TextureSequences.Frame[numFrames];
+                    for (var f = 0; f < numFrames; f++)
+                    {
+                        var displayTime = r.ReadSingle();
+                        var imageOffset = r.BaseStream.Position + r.ReadUInt32();
+                        var imageCount = r.ReadUInt32();
+                        var originalOffset = r.BaseStream.Position;
+                        var images = new TextureSequences.Image[imageCount];
+                        sequence.Frames[f] = new TextureSequences.Frame
+                        {
+                            DisplayTime = displayTime,
+                            Images = images,
+                        };
+
+                        r.Seek(imageOffset);
+                        for (var i = 0; i < images.Length; i++)
+                            images[i] = new TextureSequences.Image
+                            {
+                                CroppedMin = r.ReadVector2(),
+                                CroppedMax = r.ReadVector2(),
+                                UncroppedMin = r.ReadVector2(),
+                                UncroppedMax = r.ReadVector2(),
+                            };
+                        r.Skip(originalOffset);
+                    }
+                });
+                sequences.Add(sequence);
+            }
+            return sequences;
+        }
+
+        public override string ToString()
+        {
+            using var w = new IndentedTextWriter();
+            w.WriteLine($"{"VTEX Version",-12} = {Version}");
+            w.WriteLine($"{"Width",-12} = {Width}");
+            w.WriteLine($"{"Height",-12} = {Height}");
+            w.WriteLine($"{"Depth",-12} = {Depth}");
+            w.WriteLine($"{"NonPow2W",-12} = {NonPow2Width}");
+            w.WriteLine($"{"NonPow2H",-12} = {NonPow2Height}");
+            w.WriteLine($"{"Reflectivity",-12} = ( {Reflectivity[0]:F6}, {Reflectivity[1]:F6}, {Reflectivity[2]:F6}, {Reflectivity[3]:F6} )");
+            w.WriteLine($"{"NumMipMaps",-12} = {NumMipMaps}");
+            w.WriteLine($"{"Picmip0Res",-12} = {Picmip0Res}");
+            w.WriteLine($"{"Format",-12} = {(int)Format} (VTEX_FORMAT_{Format})");
+            w.WriteLine($"{"Flags",-12} = 0x{(int)Flags:X8}");
+            foreach (Enum value in Enum.GetValues(Flags.GetType())) if (Flags.HasFlag(value)) w.WriteLine($"{"",-12} | 0x{(Convert.ToInt32(value)):X8} = VTEX_FLAG_{value}");
+            w.WriteLine($"{"Extra Data",-12} = {ExtraData.Count} entries:");
+            var entry = 0;
+            foreach (var b in ExtraData)
+            {
+                w.WriteLine($"{"",-12}   [ Entry {entry++}: VTEX_EXTRA_DATA_{b.Key} - {b.Value.Length} bytes ]");
+                if (b.Key == VTexExtraData.COMPRESSED_MIP_SIZE && CompressedMips != null) w.WriteLine($"{"",-16}   [ {CompressedMips.Length} mips, sized: {string.Join(", ", CompressedMips)} ]");
+                else if (b.Key == VTexExtraData.CUBEMAP_RADIANCE_SH && RadianceCoefficients != null) w.WriteLine($"{"",-16}   [ {RadianceCoefficients.Length} coefficients, sized: {string.Join(", ", RadianceCoefficients)} ]");
+                else if (b.Key == VTexExtraData.SHEET && CompressedMips != null) w.WriteLine($"{"",-16}   [ {CompressedMips.Length} mips, sized: {string.Join(", ", CompressedMips)} ]");
+            }
+            //if (Format is not JPEG_DXT5 and not JPEG_RGBA8888 and not PNG_DXT5 and not PNG_RGBA8888)
+            if (!(Format is JPEG_DXT5 || Format is JPEG_RGBA8888 || Format is PNG_DXT5 || Format is PNG_RGBA8888))
+                for (var j = 0; j < NumMipMaps; j++) w.WriteLine($"Mip level {j} - buffer size: {TextureHelper.GetMipmapTrueDataSize(TexFormat.gl, Width, Height, Depth, j)}");
+            return w.ToString();
+        }
+
+        public int CalculateTextureDataSize()
+        {
+            if (Format == PNG_DXT5 || Format == PNG_RGBA8888) return TextureHelper.CalculatePngSize(Reader, DataOffset);
+            var bytes = 0;
+            if (CompressedMips != null) bytes = CompressedMips.Sum();
+            else for (var j = 0; j < NumMipMaps; j++) bytes += CalculateBufferSizeForMipLevel(j);
+            return bytes;
+        }
+
+        int CalculateBufferSizeForMipLevel(int mipLevel)
+        {
+            var (bytesPerPixel, _) = TextureHelper.GetBlockSize(TexFormat.gl);
+            var width = TextureHelper.MipLevelSize(Width, mipLevel);
+            var height = TextureHelper.MipLevelSize(Height, mipLevel);
+            var depth = TextureHelper.MipLevelSize(Depth, mipLevel);
+            if ((Flags & VTexFlags.CUBE_TEXTURE) != 0) bytesPerPixel *= 6;
+            if (Format == DXT1 || Format == DXT5 || Format == BC6H || Format == BC7 ||
+                Format == ETC2 || Format == ETC2_EAC || Format == ATI1N)
+            {
+                var misalign = width % 4;
+                if (misalign > 0) width += 4 - misalign;
+                misalign = height % 4;
+                if (misalign > 0) height += 4 - misalign;
+                if (width < 4 && width > 0) width = 4;
+                if (height < 4 && height > 0) height = 4;
+                if (depth < 4 && depth > 1) depth = 4;
+                var numBlocks = (width * height) >> 4;
+                numBlocks *= depth;
+                return numBlocks * bytesPerPixel;
+            }
+            return width * height * depth * bytesPerPixel;
+        }
+    }
+
+    #endregion
+
+    #region D_World
+    //was:Resource/ResourceTypes/World
+
+    public class D_World : XKV3_NTRO
+    {
+        public IEnumerable<string> GetEntityLumpNames() => Data.Get<string[]>("m_entityLumps");
+        public IEnumerable<string> GetWorldNodeNames() => Data.GetArray("m_worldNodes").Select(nodeData => nodeData.Get<string>("m_worldNodePrefix")).ToList();
+    }
+
+    #endregion
+
+    #region D_WorldNode
+
+    //was:Resource/ResourceTypes/WorldNode
+    public class D_WorldNode : XKV3_NTRO { }
+
+    #endregion
+
+    #region R_AdditionalInputDependencies
+
+    public class R_AdditionalInputDependencies : R_InputDependencies
+    {
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine($"Struct m_AdditionalInputDependencies[{List.Count}] = [");
+            WriteList(w);
+        }
+    }
+
+    #endregion
+
+    #region R_AdditionalRelatedFiles
+
+    public class R_AdditionalRelatedFiles : REDI
+    {
+        public class AdditionalRelatedFile
+        {
+            public string ContentRelativeFilename { get; set; }
+            public string ContentSearchPath { get; set; }
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("ResourceAdditionalRelatedFile_t {"); w.Indent++;
+                w.WriteLine($"CResourceString m_ContentRelativeFilename = \"{ContentRelativeFilename}\"");
+                w.WriteLine($"CResourceString m_ContentSearchPath = \"{ContentSearchPath}\"");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public List<AdditionalRelatedFile> List = [];
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            for (var i = 0; i < Size; i++)
+                List.Add(new AdditionalRelatedFile
+                {
+                    ContentRelativeFilename = r.ReadO32UTF8(),
+                    ContentSearchPath = r.ReadO32UTF8()
+                });
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine($"Struct m_AdditionalRelatedFiles[{List.Count}] = ["); w.Indent++;
+            foreach (var dep in List) dep.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+        }
+    }
+
+    #endregion
+
+    #region R_ArgumentDependencies
+
+    public class R_ArgumentDependencies : REDI
+    {
+        public class ArgumentDependency
+        {
+            public string ParameterName { get; set; }
+            public string ParameterType { get; set; }
+            public uint Fingerprint { get; set; }
+            public uint FingerprintDefault { get; set; }
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("ResourceArgumentDependency_t {"); w.Indent++;
+                w.WriteLine($"CResourceString m_ParameterName = \"{ParameterName}\"");
+                w.WriteLine($"CResourceString m_ParameterType = \"{ParameterType}\"");
+                w.WriteLine($"uint32 m_nFingerprint = 0x{Fingerprint:X8}");
+                w.WriteLine($"uint32 m_nFingerprintDefault = 0x{FingerprintDefault:X8}");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public List<ArgumentDependency> List { get; } = [];
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            for (var i = 0; i < Size; i++)
+                List.Add(new ArgumentDependency
+                {
+                    ParameterName = r.ReadO32UTF8(),
+                    ParameterType = r.ReadO32UTF8(),
+                    Fingerprint = r.ReadUInt32(),
+                    FingerprintDefault = r.ReadUInt32()
+                });
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine($"Struct m_ArgumentDependencies[{List.Count}] = ["); w.Indent++;
+            foreach (var dep in List) dep.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+        }
+    }
+
+    #endregion
+
+    #region R_ChildResourceList
+
+    public class R_ChildResourceList : REDI
+    {
+        public class ReferenceInfo
+        {
+            public ulong Id { get; set; }
+            public string ResourceName { get; set; }
+            public uint Unknown { get; set; }
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("ResourceReferenceInfo_t {"); w.Indent++;
+                w.WriteLine($"uint64 m_nId = 0x{Id:X16}");
+                w.WriteLine($"CResourceString m_pResourceName = \"{ResourceName}\"");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public List<ReferenceInfo> List = [];
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            for (var i = 0; i < Size; i++)
+                List.Add(new ReferenceInfo
+                {
+                    Id = r.ReadUInt64(),
+                    ResourceName = r.ReadO32UTF8(),
+                    Unknown = r.ReadUInt32()
+                });
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine($"Struct m_ChildResourceList[{List.Count}] = ["); w.Indent++;
+            foreach (var dep in List) dep.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+        }
+    }
+
+    #endregion
+
+    #region R_CustomDependencies
+
+    public class R_CustomDependencies : REDI
+    {
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            if (Size > 0) throw new NotImplementedException("CustomDependencies block is not handled.");
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine($"Struct m_CustomDependencies[{0}] = ["); w.Indent++;
+            w.Indent--; w.WriteLine("]");
+        }
+    }
+
+    #endregion
+
+    #region R_ExtraFloatData
+
+    public class R_ExtraFloatData : REDI
+    {
+        public class EditFloatData
+        {
+            public string Name { get; set; }
+            public float Value { get; set; }
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("ResourceEditFloatData_t {"); w.Indent++;
+                w.WriteLine($"CResourceString m_Name = \"{Name}\"");
+                w.WriteLine($"float32 m_flFloat = {Value:F6}");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public List<EditFloatData> List { get; } = new List<EditFloatData>();
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            for (var i = 0; i < Size; i++) List.Add(new EditFloatData
+            {
+                Name = r.ReadO32UTF8(),
+                Value = r.ReadSingle()
+            });
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine($"Struct m_ExtraFloatData[{List.Count}] = ["); w.Indent++;
+            foreach (var dep in List) dep.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+        }
+    }
+
+    #endregion
+
+    #region R_ExtraIntData
+
+    public class R_ExtraIntData : REDI
+    {
+        public class EditIntData
+        {
+            public string Name { get; set; }
+            public int Value { get; set; }
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("ResourceEditIntData_t {"); w.Indent++;
+                w.WriteLine($"CResourceString m_Name = \"{Name}\"");
+                w.WriteLine($"int32 m_nInt = {Value}");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public List<EditIntData> List { get; } = new List<EditIntData>();
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            for (var i = 0; i < Size; i++) List.Add(new EditIntData
+            {
+                Name = r.ReadO32UTF8(),
+                Value = r.ReadInt32()
+            });
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine($"Struct m_ExtraIntData[{List.Count}] = ["); w.Indent++;
+            foreach (var dep in List) dep.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+        }
+    }
+
+    #endregion
+
+    #region R_ExtraStringData
+
+    public class R_ExtraStringData : REDI
+    {
+        public class EditStringData
+        {
+            public string Name { get; set; }
+            public string Value { get; set; }
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("ResourceEditStringData_t {"); w.Indent++;
+                w.WriteLine($"CResourceString m_Name = \"{Name}\"");
+                var lines = Value.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+                if (lines.Length > 1)
+                {
+                    w.Indent++;
+                    w.Write("CResourceString m_String = \"");
+                    foreach (var line in lines) w.WriteLine(line);
+                    w.WriteLine("\"");
+                    w.Indent--;
+                }
+                else w.WriteLine($"CResourceString m_String = \"{Value}\"");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public List<EditStringData> List { get; } = new List<EditStringData>();
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            for (var i = 0; i < Size; i++) List.Add(new EditStringData
+            {
+                Name = r.ReadO32UTF8(),
+                Value = r.ReadO32UTF8()
+            });
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine($"Struct m_ExtraStringData[{List.Count}] = ["); w.Indent++;
+            foreach (var dep in List) dep.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+        }
+    }
+
+    #endregion
+
+    #region R_InputDependencies
+
+    public class R_InputDependencies : REDI
+    {
+        public class InputDependency
+        {
+            public string ContentRelativeFilename { get; set; }
+            public string ContentSearchPath { get; set; }
+            public uint FileCRC { get; set; }
+            public uint Flags { get; set; }
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("ResourceInputDependency_t {"); w.Indent++;
+                w.WriteLine($"CResourceString m_ContentRelativeFilename = \"{ContentRelativeFilename}\"");
+                w.WriteLine($"CResourceString m_ContentSearchPath = \"{ContentSearchPath}\"");
+                w.WriteLine($"uint32 m_nFileCRC = 0x{FileCRC:X8}");
+                w.WriteLine($"uint32 m_nFlags = 0x{Flags:X8}");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public List<InputDependency> List = [];
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            for (var i = 0; i < Size; i++)
+                List.Add(new InputDependency
+                {
+                    ContentRelativeFilename = r.ReadO32UTF8(),
+                    ContentSearchPath = r.ReadO32UTF8(),
+                    FileCRC = r.ReadUInt32(),
+                    Flags = r.ReadUInt32()
+                });
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine($"Struct m_InputDependencies[{List.Count}] = [");
+            WriteList(w);
+        }
+
+        protected void WriteList(IndentedTextWriter w)
+        {
+            w.Indent++;
+            foreach (var dep in List) dep.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+        }
+    }
+
+    #endregion
+
+    #region R_SpecialDependencies
+
+    public class R_SpecialDependencies : REDI
+    {
+        public class SpecialDependency
+        {
+            public string String { get; set; }
+            public string CompilerIdentifier { get; set; }
+            public uint Fingerprint { get; set; }
+            public uint UserData { get; set; }
+
+            public void WriteText(IndentedTextWriter w)
+            {
+                w.WriteLine("ResourceSpecialDependency_t {"); w.Indent++;
+                w.WriteLine($"CResourceString m_String = \"{String}\"");
+                w.WriteLine($"CResourceString m_CompilerIdentifier = \"{CompilerIdentifier}\"");
+                w.WriteLine($"uint32 m_nFingerprint = 0x{Fingerprint:X8}");
+                w.WriteLine($"uint32 m_nUserData = 0x{UserData:X8}");
+                w.Indent--; w.WriteLine("}");
+            }
+        }
+
+        public List<SpecialDependency> List = [];
+
+        public override void Read(Binary_Pak parent, BinaryReader r)
+        {
+            r.Seek(Offset);
+            for (var i = 0; i < Size; i++)
+                List.Add(new SpecialDependency
+                {
+                    String = r.ReadO32UTF8(),
+                    CompilerIdentifier = r.ReadO32UTF8(),
+                    Fingerprint = r.ReadUInt32(),
+                    UserData = r.ReadUInt32()
+                });
+        }
+
+        public override void WriteText(IndentedTextWriter w)
+        {
+            w.WriteLine($"Struct m_SpecialDependencies[{List.Count}] = ["); w.Indent++;
+            foreach (var dep in List) dep.WriteText(w);
+            w.Indent--; w.WriteLine("]");
+        }
+    }
+
+    #endregion
 }

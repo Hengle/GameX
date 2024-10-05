@@ -1,5 +1,6 @@
 using GameX.Scenes;
 using GameX.Valve.Formats;
+using GameX.Valve.Formats.Vpk;
 using GameX.Valve.OpenGL.Scenes;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Renders;

@@ -1,8 +1,6 @@
 using GameX.Valve.Formats;
-using GameX.Valve.Formats.Blocks;
-using GameX.Valve.Formats.Extras;
+using GameX.Valve.Formats.Vpk;
 using GameX.Valve.OpenGL.Scenes;
-using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
 using OpenStack.Gfx.Scenes;
 using System;
@@ -10,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using static GameX.Valve.Formats.Blocks.DATAEntityLump;
+using static GameX.Valve.Formats.Vpk.D_EntityLump;
 using static System.Numerics.Polyfill;
 
 namespace GameX.Valve.OpenGL.Formats
@@ -18,7 +16,7 @@ namespace GameX.Valve.OpenGL.Formats
     //was:Renderer/WorldLoader
     public class WorldLoader
     {
-        readonly DATAWorld World;
+        readonly D_World World;
         readonly IOpenGLGfx Gfx;
 
         // Contains metadata that can't be captured by manipulating the scene itself. Returned from Load().
@@ -27,12 +25,12 @@ namespace GameX.Valve.OpenGL.Formats
             public readonly HashSet<string> DefaultEnabledLayers = new HashSet<string>();
             public readonly IDictionary<string, Matrix4x4> CameraMatrices = new Dictionary<string, Matrix4x4>();
             public Vector3? GlobalLightPosition;
-            public DATAWorld Skybox;
+            public D_World Skybox;
             public float SkyboxScale = 1.0f;
             public Vector3 SkyboxOrigin = Vector3.Zero;
         }
 
-        public WorldLoader(IOpenGLGfx gfx, DATAWorld world)
+        public WorldLoader(IOpenGLGfx gfx, D_World world)
         {
             World = world;
             Gfx = gfx;
@@ -49,7 +47,7 @@ namespace GameX.Valve.OpenGL.Formats
                 {
                     var newResource = Gfx.LoadFileObject<Binary_Pak>($"{worldNode}.vwnod_c").Result;
                     if (newResource == null) continue;
-                    var subloader = new WorldNodeLoader(Gfx, (DATAWorldNode)newResource.DATA);
+                    var subloader = new WorldNodeLoader(Gfx, (D_WorldNode)newResource.DATA);
                     subloader.Load(scene);
                 }
 
@@ -60,20 +58,20 @@ namespace GameX.Valve.OpenGL.Formats
                 var newResource = Gfx.LoadFileObject<Binary_Pak>("{lumpName}_c").Result;
                 if (newResource == null) continue;
 
-                var entityLump = (DATAEntityLump)newResource.DATA;
+                var entityLump = (D_EntityLump)newResource.DATA;
                 LoadEntitiesFromLump(scene, result, entityLump, "world_layer_base");
             }
             return result;
         }
 
-        void LoadEntitiesFromLump(Scene scene, LoadResult result, DATAEntityLump entityLump, string layerName = null)
+        void LoadEntitiesFromLump(Scene scene, LoadResult result, D_EntityLump entityLump, string layerName = null)
         {
             foreach (var childEntityName in entityLump.GetChildEntityNames())
             {
                 var newResource = Gfx.LoadFileObject<Binary_Pak>(childEntityName).Result;
                 if (newResource == null) continue;
 
-                var childLump = (DATAEntityLump)newResource.DATA;
+                var childLump = (D_EntityLump)newResource.DATA;
                 var childName = childLump.Data.Get<string>("m_name");
 
                 LoadEntitiesFromLump(scene, result, childLump, childName);
@@ -100,7 +98,7 @@ namespace GameX.Valve.OpenGL.Formats
 
                     var skyboxWorldPath = $"maps/{Path.GetFileNameWithoutExtension(targetmapname)}/world.vwrld_c";
                     var skyboxPackage = Gfx.LoadFileObject<Binary_Pak>(skyboxWorldPath).Result;
-                    if (skyboxPackage != null) result.Skybox = (DATAWorld)skyboxPackage.DATA;
+                    if (skyboxPackage != null) result.Skybox = (D_World)skyboxPackage.DATA;
                 }
 
                 var scale = entity.Get<string>("scales");
@@ -130,7 +128,7 @@ namespace GameX.Valve.OpenGL.Formats
                     var particleResource = Gfx.LoadFileObject<Binary_Pak>(particle).Result;
                     if (particleResource != null)
                     {
-                        var particleSystem = (DATAParticleSystem)particleResource.DATA;
+                        var particleSystem = (D_ParticleSystem)particleResource.DATA;
                         try
                         {
                             var particleNode = new ParticleSceneNode(scene, particleSystem)
@@ -236,7 +234,7 @@ namespace GameX.Valve.OpenGL.Formats
                     if (refPhysicsPaths.Any())
                     {
                         var newResource = Gfx.LoadFileObject<Binary_Pak>($"{refPhysicsPaths.First()}_c").Result;
-                        if (newResource != null) phys = (DATAPhysAggregateData)newResource.DATA;
+                        if (newResource != null) phys = (D_PhysAggregateData)newResource.DATA;
                     }
                 }
 
@@ -264,7 +262,7 @@ namespace GameX.Valve.OpenGL.Formats
                 if (resource == null) return;
             }
 
-            if (resource.DATA is DATAModel model)
+            if (resource.DATA is D_Model model)
             {
                 var modelNode = new ModelSceneNode(scene, (IValveModel)model, null, false)
                 {
@@ -273,7 +271,7 @@ namespace GameX.Valve.OpenGL.Formats
                 };
                 scene.Add(modelNode, false);
             }
-            else if (resource.DATA is DATAMaterial)
+            else if (resource.DATA is D_Material)
             {
                 var spriteNode = new SpriteSceneNode(scene, resource, position)
                 {

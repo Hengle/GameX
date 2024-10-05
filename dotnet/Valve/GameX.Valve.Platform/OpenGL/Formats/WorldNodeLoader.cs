@@ -1,8 +1,7 @@
 using GameX.Scenes;
 using GameX.Valve.Formats;
-using GameX.Valve.Formats.Blocks;
+using GameX.Valve.Formats.Vpk;
 using GameX.Valve.OpenGL.Scenes;
-using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
 using OpenStack.Gfx.Scenes;
 using System;
@@ -12,9 +11,9 @@ using System.Numerics;
 namespace GameX.Valve.OpenGL.Formats
 {
     //was:Renderer/WorldLoader
-    public class WorldNodeLoader(IOpenGLGfx gfx, DATAWorldNode node)
+    public class WorldNodeLoader(IOpenGLGfx gfx, D_WorldNode node)
     {
-        readonly DATAWorldNode Node = node;
+        readonly D_WorldNode Node = node;
         readonly IOpenGLGfx Gfx = gfx;
 
         public void Load(Scene scene)
@@ -57,7 +56,7 @@ namespace GameX.Valve.OpenGL.Formats
                 {
                     var newResource = Gfx.LoadFileObject<Binary_Pak>($"{renderable}_c").Result;
                     if (newResource == null) continue;
-                    var meshNode = new MeshSceneNode(scene, new DATAMesh(newResource), 0)
+                    var meshNode = new MeshSceneNode(scene, new D_Mesh(newResource), 0)
                     {
                         Transform = matrix,
                         Tint = tintColor,

@@ -1,5 +1,4 @@
-using GameX.Valve.Formats.Blocks;
-using OpenStack;
+using GameX.Valve.Formats.Vpk;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
 using OpenStack.Gfx.Renders;
@@ -24,7 +23,7 @@ namespace GameX.Valve.OpenGL.Scenes
         readonly int iboHandle;
         readonly int vaoHandle;
 
-        public PhysSceneNode(Scene scene, DATAPhysAggregateData phys) : base(scene)
+        public PhysSceneNode(Scene scene, D_PhysAggregateData phys) : base(scene)
         {
             var verts = new List<float>();
             var inds = new List<int>();

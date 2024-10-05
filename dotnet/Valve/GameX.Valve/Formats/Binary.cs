@@ -1,7 +1,6 @@
 using GameX.Meta;
 using GameX.Platforms;
-using GameX.Valve.Formats.Blocks;
-using GameX.Valve.Formats.Extras;
+using GameX.Valve.Formats.Vpk;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
@@ -12,8 +11,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static GameX.Valve.Formats.Blocks.DATA;
-using static GameX.Valve.Formats.Blocks.DATATexture;
+using static GameX.Valve.Formats.Vpk.D_Texture;
 
 namespace GameX.Valve.Formats
 {
@@ -132,7 +130,7 @@ namespace GameX.Valve.Formats
 
         ITexture IRedirected<ITexture>.Value => DATA as ITexture;
         IMaterial IRedirected<IMaterial>.Value => DATA as IMaterial;
-        IMesh IRedirected<IMesh>.Value => DataType == ResourceType.Mesh ? new DATAMesh(this) as IMesh : null;
+        IMesh IRedirected<IMesh>.Value => DataType == ResourceType.Mesh ? new D_Mesh(this) as IMesh : null;
         IModel IRedirected<IModel>.Value => DATA as IModel;
         IParticleSystem IRedirected<IParticleSystem>.Value => DATA as IParticleSystem;
 
@@ -150,7 +148,7 @@ namespace GameX.Valve.Formats
             {
                 case ResourceType.Texture:
                     {
-                        var data = (DATATexture)DATA;
+                        var data = (D_Texture)DATA;
                         try
                         {
                             nodes.AddRange([
@@ -171,7 +169,7 @@ namespace GameX.Valve.Formats
                     break;
                 case ResourceType.Panorama:
                     {
-                        var data = (DATAPanorama)DATA;
+                        var data = (D_Panorama)DATA;
                         nodes.AddRange([
                             new(null, new MetaContent { Type = "DataGrid", Name = "Panorama Names", Value = data.Names }),
                             new("Panorama", items: [
@@ -183,16 +181,16 @@ namespace GameX.Valve.Formats
                 case ResourceType.PanoramaLayout: break;
                 case ResourceType.PanoramaScript: break;
                 case ResourceType.PanoramaStyle: break;
-                case ResourceType.Particle: nodes.Add(new MetaInfo(null, new MetaContent { Type = "Particle", Name = "Particle", Value = this, Dispose = this })); break;
+                case ResourceType.ParticleSystem: nodes.Add(new MetaInfo(null, new MetaContent { Type = "ParticleSystem", Name = "ParticleSystem", Value = this, Dispose = this })); break;
                 case ResourceType.Sound:
                     {
-                        var sound = (DATASound)DATA;
+                        var sound = (D_Sound)DATA;
                         var stream = sound.GetSoundStream();
                         nodes.Add(new(null, new MetaContent { Type = "AudioPlayer", Name = "Sound", Value = stream, Tag = $".{sound.SoundType}", Dispose = this }));
                     }
                     break;
-                case ResourceType.World: nodes.Add(new(null, new MetaContent { Type = "World", Name = "World", Value = (DATAWorld)DATA, Dispose = this })); break;
-                case ResourceType.WorldNode: nodes.Add(new(null, new MetaContent { Type = "World", Name = "World Node", Value = (DATAWorldNode)DATA, Dispose = this })); break;
+                case ResourceType.World: nodes.Add(new(null, new MetaContent { Type = "World", Name = "World", Value = (D_World)DATA, Dispose = this })); break;
+                case ResourceType.WorldNode: nodes.Add(new(null, new MetaContent { Type = "World", Name = "World Node", Value = (D_WorldNode)DATA, Dispose = this })); break;
                 case ResourceType.Model: nodes.Add(new(null, new MetaContent { Type = "Model", Name = "Model", Value = this, Dispose = this })); break;
                 case ResourceType.Mesh: nodes.Add(new(null, new MetaContent { Type = "Model", Name = "Mesh", Value = this, Dispose = this })); break;
                 case ResourceType.Material: nodes.Add(new(null, new MetaContent { Type = "Material", Name = "Material", Value = this, Dispose = this })); break;
@@ -210,10 +208,10 @@ namespace GameX.Valve.Formats
                 if (block is DATA)
                     switch (DataType)
                     {
-                        case ResourceType.Sound: tab.Value = ((DATASound)block).ToString(); break;
-                        case ResourceType.Particle:
+                        case ResourceType.Sound: tab.Value = ((D_Sound)block).ToString(); break;
+                        case ResourceType.ParticleSystem:
                         case ResourceType.Mesh:
-                            if (block is DATABinaryKV3 kv3) tab.Value = kv3.ToString();
+                            if (block is XKV3 kv3) tab.Value = kv3.ToString();
                             else if (block is NTRO blockNTRO) tab.Value = blockNTRO.ToString();
                             break;
                         default: tab.Value = block.ToString(); break;
@@ -259,12 +257,12 @@ namespace GameX.Valve.Formats
                 var size = FileSize;
                 if (DataType == ResourceType.Sound)
                 {
-                    var data = (DATASound)DATA;
+                    var data = (D_Sound)DATA;
                     size += data.StreamingDataSize;
                 }
                 else if (DataType == ResourceType.Texture)
                 {
-                    var data = (DATATexture)DATA;
+                    var data = (D_Texture)DATA;
                     size += (uint)data.CalculateTextureDataSize();
                 }
                 return size;
@@ -291,14 +289,14 @@ namespace GameX.Valve.Formats
                 var position = r.BaseStream.Position;
                 var offset = (uint)position + r.ReadUInt32();
                 var size = r.ReadUInt32();
-                var block = size >= 4 && blockType == "DATA" && !DATA.IsHandledType(DataType) ? r.Peek(z =>
+                var block = size >= 4 && blockType == "DATA" && !Block.IsHandledType(DataType) ? r.Peek(z =>
                 {
                     var magic = z.ReadUInt32();
-                    return magic == DATABinaryKV3.MAGIC || magic == DATABinaryKV3.MAGIC2 || magic == DATABinaryKV3.MAGIC3
-                        ? (Block)new DATABinaryKV3()
-                        : magic == DATABinaryKV1.MAGIC ? (Block)new DATABinaryKV1() : null;
+                    return magic == XKV3.MAGIC || magic == XKV3.MAGIC2 || magic == XKV3.MAGIC3
+                        ? new XKV3()
+                        : magic == XKV1.MAGIC ? (Block)new XKV1() : null;
                 }) : null;
-                block ??= Factory(this, blockType);
+                block ??= Block.Factory(this, blockType);
                 block.Offset = offset;
                 block.Size = size;
                 if (blockType == "REDI" || blockType == "RED2" || blockType == "NTRO") block.Read(this, r);
@@ -309,14 +307,14 @@ namespace GameX.Valve.Formats
                         // Try to determine resource type by looking at first compiler indentifier
                         if (DataType == ResourceType.Unknown && REDI.Structs.TryGetValue(REDI.REDIStruct.SpecialDependencies, out var specialBlock))
                         {
-                            var specialDeps = (REDISpecialDependencies)specialBlock;
-                            if (specialDeps.List.Count > 0) DataType = DetermineTypeByCompilerIdentifier(specialDeps.List[0]);
+                            var specialDeps = (R_SpecialDependencies)specialBlock;
+                            if (specialDeps.List.Count > 0) DataType = Block.DetermineTypeByCompilerIdentifier(specialDeps.List[0]);
                         }
                         // Try to determine resource type by looking at the input dependency if there is only one
                         if (DataType == ResourceType.Unknown && REDI.Structs.TryGetValue(REDI.REDIStruct.InputDependencies, out var inputBlock))
                         {
-                            var inputDeps = (REDIInputDependencies)inputBlock;
-                            if (inputDeps.List.Count == 1) DataType = DetermineResourceTypeByFileExtension(Path.GetExtension(inputDeps.List[0].ContentRelativeFilename));
+                            var inputDeps = (R_InputDependencies)inputBlock;
+                            if (inputDeps.List.Count == 1) DataType = Block.DetermineResourceTypeByFileExtension(Path.GetExtension(inputDeps.List[0].ContentRelativeFilename));
                         }
                         break;
                     case NTRO ntro:
@@ -337,7 +335,7 @@ namespace GameX.Valve.Formats
             {
                 if (DataType == ResourceType.Texture)
                 {
-                    var data = (DATATexture)DATA;
+                    var data = (D_Texture)DATA;
                     // TODO: We do not currently have a way of calculating buffer size for these types, Texture.GenerateBitmap also just reads until end of the buffer
                     if (data.Format == VTexFormat.JPEG_DXT5 || data.Format == VTexFormat.JPEG_RGBA8888) return;
                     // TODO: Valve added null bytes after the png for whatever reason, so assume we have the full file if the buffer is bigger than the size we calculated
