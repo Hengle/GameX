@@ -13,7 +13,7 @@ class MurmurHash3:
     def hash2(data: bytes) -> int:
         h = MurmurHash3.Seed; k = 0; l = 0
         r = BytesIO(data)
-        chunk = r.read(4)
+        chunk = r.readBytes(4)
         while (chunkLength := len(chunk)) > 0:
             l += chunkLength
             match chunkLength:
@@ -23,7 +23,7 @@ class MurmurHash3:
                 case 3: k = (chunk[0] | chunk[1] << 8 | chunk[2] << 16); k = k*MurmurHash3.C1&0xffffffff; k = MurmurHash3._rotl32(k, 15); k = k*MurmurHash3.C2&0xffffffff; h ^= k
                 case 2: k = (chunk[0] | chunk[1] << 8); k = k*MurmurHash3.C1&0xffffffff; k = MurmurHash3._rotl32(k, 15); k = k*MurmurHash3.C2&0xffffffff; h ^= k
                 case 1: k = (chunk[0]); k = k*MurmurHash3.C1&0xffffffff; k = MurmurHash3._rotl32(k, 15); k = k*MurmurHash3.C2&0xffffffff; h ^= k
-            chunk = r.read(4)
+            chunk = r.readBytes(4)
         h ^= l
         h = MurmurHash3._fmix(h)
         return h

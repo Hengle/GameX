@@ -125,10 +125,10 @@ namespace GameX.Unity.Formats
 
                 public FileDependency(BinaryReader r, uint format, bool endian)
                 {
-                    BufferedPath = format >= 6 ? r.ReadZAString(1000) : null;
+                    BufferedPath = format >= 6 ? r.ReadVAString(1000) : null;
                     Guid = format >= 5 ? r.ReadGuid() : Guid.Empty;
                     Type = format >= 5 ? r.ReadUInt32X(endian) : 0U;
-                    AssetPath = r.ReadZAString(1000);
+                    AssetPath = r.ReadVAString(1000);
                 }
             }
 
@@ -365,8 +365,8 @@ namespace GameX.Unity.Formats
 
                 public TypeField_07(bool hasTypeTree, BinaryReader r, uint version, bool endian)
                 {
-                    Type = r.ReadZAString(256);
-                    Name = r.ReadZAString(256);
+                    Type = r.ReadVAString(256);
+                    Name = r.ReadVAString(256);
                     Size = r.ReadUInt32X(endian);
                     if (version == 2) r.Skip(4);
                     else if (version == 3) Index = unchecked((uint)-1);
@@ -421,7 +421,7 @@ namespace GameX.Unity.Formats
                     HasTypeTree = true;
                     if (version > 6)
                     {
-                        UnityVersion = r.ReadZAString(64);
+                        UnityVersion = r.ReadVAString(64);
                         if (UnityVersion[0] < '0' || UnityVersion[0] > '9') { FieldCount = 0; return; }
                         Platform = r.ReadUInt32X(endian);
                     }
@@ -474,7 +474,7 @@ namespace GameX.Unity.Formats
                 Preloads = format >= 0x0B ? r.ReadL32FArray(_ => new Preload(r, format, endian), endian: endian) : new Preload[0];
                 Dependencies = r.ReadL32FArray(_ => new FileDependency(r, format, endian), endian: endian);
                 SecondaryTypes = format >= 0x14 ? r.ReadL32FArray(_ => new Type_0D(Tree.HasTypeTree, r, format, endian), endian: endian) : new Type_0D[0];
-                Unknown = r.ReadZAString();
+                Unknown = r.ReadVAString();
                 // verify
                 Success = Verify(r);
             }
@@ -1490,7 +1490,7 @@ namespace GameX.Unity.Formats
                         Offset = _.ReadUInt64E(),
                         DecompressedSize = _.ReadUInt64E(),
                         Flags = _.ReadUInt32E(),
-                        Name = _.ReadZAString(400),
+                        Name = _.ReadVAString(400),
                     }, endian: true);
                 }
             }
@@ -1544,7 +1544,7 @@ namespace GameX.Unity.Formats
 
             public BundleFile(BinaryReader r)
             {
-                Signature = r.ReadZAString(13);
+                Signature = r.ReadVAString(13);
                 FileVersion = Signature == "UnityArchive" ? 6 : r.ReadUInt32E();
                 // early exit
                 if (FileVersion >= 6)
@@ -1557,8 +1557,8 @@ namespace GameX.Unity.Formats
                 }
 
                 // parse remaining header
-                MinPlayerVersion = r.ReadZAString(24);
-                FileEngineVersion = r.ReadZAString(64);
+                MinPlayerVersion = r.ReadVAString(24);
+                FileEngineVersion = r.ReadVAString(64);
                 var hasCompression = false;
                 if (FileVersion >= 6)
                 {
@@ -1621,7 +1621,7 @@ namespace GameX.Unity.Formats
                         r.Seek(DataOffs);
                         Directories3 = r.ReadL32FArray(_ => new Directory
                         {
-                            Name = _.ReadZAString(400),
+                            Name = _.ReadVAString(400),
                             Offset = _.ReadUInt32E(),
                             DecompressedSize = _.ReadUInt32E(),
                         }, endian: true);

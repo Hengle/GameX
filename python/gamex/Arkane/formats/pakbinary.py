@@ -21,7 +21,7 @@ class PakBinary_Danae(PakBinaryT):
         # move to fat table
         r.seek(r.readUInt32())
         fatSize = r.readUInt32()
-        fatBytes = bytearray(r.read(fatSize)); b = 0
+        fatBytes = bytearray(r.readBytes(fatSize)); b = 0
 
         # read int32
         def readInt32() -> int:
@@ -76,7 +76,7 @@ class PakBinary_Danae(PakBinaryT):
         r.seek(file.offset)
         return BytesIO(
             decompressBlast(r, file.packedSize, file.fileSize) if (file.compressed & 1) != 0 else \
-            r.read(file.packedSize)
+            r.readBytes(file.packedSize)
             )
 
 #endregion
@@ -121,7 +121,7 @@ class PakBinary_Void(PakBinaryT):
                 pathSize = r.readUInt32()
                 if pathSize == SubMarker: first = False; pathSize = r.readUInt32()
                 elif pathSize == EndMarker: break
-                path = r.readFString(pathSize).replace('\\', '/')
+                path = r.readFAString(pathSize).replace('\\', '/')
                 packId = 0 if first else r.readUInt16()
                 if not path.endswith('.index'): continue
                 files.append(FileSource(

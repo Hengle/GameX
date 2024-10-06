@@ -161,7 +161,7 @@ class PakBinary_Ba2(PakBinaryT):
         if file.fileInfo == None:
             return BytesIO(
                 decompressZlib2(r, file.packedSize, file.fileSize) if file.compressed != 0 else \
-                r.read(file.fileSize)
+                r.readBytes(file.fileSize)
                 )
 
         # Texture BA2 Format
@@ -285,7 +285,7 @@ class PakBinary_Bsa(PakBinaryT):
             fileX = 0
             source.files = files = [None] * header.fileCount
             for i in range(header.folderCount):
-                folderName = r.readFString(r.readByte() - 1).replace('\\', '/')
+                folderName = r.readFAString(r.readByte() - 1).replace('\\', '/')
                 r.skip(1)
                 headerFiles = r.readSArray(self.OB_File, foldersFiles[i])
                 for headerFile in headerFiles:
@@ -341,7 +341,7 @@ class PakBinary_Bsa(PakBinaryT):
 
         # not compressed
         if fileSize <= 0 or file.compressed == 0:
-            return BytesIO(r.read(fileSize))
+            return BytesIO(r.readBytes(fileSize))
 
         # compressed
         newFileSize = r.readUInt32(); fileSize -= 4

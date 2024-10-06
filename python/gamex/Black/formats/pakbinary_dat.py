@@ -106,7 +106,7 @@ class PakBinary_Dat(PakBinaryT):
         if magic == self.F1_HEADER_FILEID:
             r.seek(file.offset)
             return BytesIO(
-                r.read(file.packedSize) if file.compressed == 0 else \
+                r.readBytes(file.packedSize) if file.compressed == 0 else \
                 decompressLzss(r, file.packedSize, file.fileSize)
                 )
         # F2
@@ -114,6 +114,6 @@ class PakBinary_Dat(PakBinaryT):
             r.seek(file.offset)
             return BytesIO(
                 decompressZlib(r, file.packedSize, -1) if r.peek(lambda z : z.readUInt16()) == 0xda78 else \
-                r.read(file.packedSize)
+                r.readBytes(file.packedSize)
                 )
         else: raise Exception('BAD MAGIC')

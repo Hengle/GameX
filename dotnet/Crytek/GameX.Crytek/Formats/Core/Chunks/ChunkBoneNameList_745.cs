@@ -10,7 +10,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
         {
             base.Read(r);
 
-            BoneNames = r.ReadCString().Split(' ').ToList();
+            BoneNames = r.ReadVUString().Split(' ').ToList();
         }
     }
 }

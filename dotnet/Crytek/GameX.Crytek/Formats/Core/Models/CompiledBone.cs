@@ -50,7 +50,7 @@ namespace GameX.Crytek.Formats.Models
             WorldToBone = r.ReadMatrix3x4();
             BindPoseMatrix = WorldToBone.ConvertToTransformMatrix();
             BoneToWorld = r.ReadMatrix3x4();
-            boneName = r.ReadFYString(256);
+            boneName = r.ReadFUString(256);
             limbID = r.ReadInt32();
             offsetParent = r.ReadInt32();
             numChildren = r.ReadUInt32();
@@ -67,7 +67,7 @@ namespace GameX.Crytek.Formats.Models
             ControllerID = r.ReadUInt32();                 // unique id of bone (generated from bone name)
             limbID = r.ReadInt32();
             r.Skip(208);
-            boneName = r.ReadFYString(48);
+            boneName = r.ReadFUString(48);
             offsetParent = r.ReadInt32();
             numChildren = r.ReadUInt32();
             offsetChild = r.ReadInt32();

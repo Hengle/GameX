@@ -644,7 +644,7 @@ namespace GameX.Bethesda.Formats.Records
         public FormId<Record> Item; // The ID of the item
         public CNTOField(BinaryReader r, int dataSize, FormType format)
         {
-            if (format == TES3) { ItemCount = r.ReadUInt32(); Item = new FormId<Record>(r.ReadZString(32)); return; }
+            if (format == TES3) { ItemCount = r.ReadUInt32(); Item = new FormId<Record>(r.ReadFAString(32)); return; }
             Item = new FormId<Record>(r.ReadUInt32()); ItemCount = r.ReadUInt32();
         }
     }
@@ -899,7 +899,7 @@ namespace GameX.Bethesda.Formats.Records
                 _ => throw new InvalidOperationException($"{type}"),
             };
         public static STRVField ReadSTRV(this BinaryReader r, int length) => new() { Value = r.ReadYEncoding(length) };
-        public static STRVField ReadSTRV_ZPad(this BinaryReader r, int length) => new() { Value = r.ReadZString(length) };
+        public static STRVField ReadSTRV_ZPad(this BinaryReader r, int length) => new() { Value = r.ReadFAString(length) };
         public static FILEField ReadFILE(this BinaryReader r, int length) => new() { Value = r.ReadYEncoding(length) };
         public static BYTVField ReadBYTV(this BinaryReader r, int length) => new() { Value = r.ReadBytes(length) };
         public static UNKNField ReadUNKN(this BinaryReader r, int length) => new() { Value = r.ReadBytes(length) };
@@ -931,7 +931,7 @@ namespace GameX.Bethesda.Formats.Records
     public struct FMIDField<TRecord>(BinaryReader r, int dataSize) where TRecord : Record
     {
         public override readonly string ToString() => $"{Value}";
-        public FormId<TRecord> Value = dataSize == 4 ? new FormId<TRecord>(r.ReadUInt32()) : new FormId<TRecord>(r.ReadZString(dataSize));
+        public FormId<TRecord> Value = dataSize == 4 ? new FormId<TRecord>(r.ReadUInt32()) : new FormId<TRecord>(r.ReadFAString(dataSize));
         public object AddName(string name) => Value = Value.AddName(name);
     }
 
@@ -1370,7 +1370,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.NAME => NAME = new FMIDField<Record>(r, dataSize),
             FieldType.DATA => DATA = new REFRRecord.DATAField(r, dataSize),
             FieldType.XPCI => XPCI = new FMIDField<CELLRecord>(r, dataSize),
-            FieldType.FULL => XPCI.Value.AddName(r.ReadFString(dataSize)),
+            FieldType.FULL => XPCI.Value.AddName(r.ReadFAString(dataSize)),
             FieldType.XLOD => XLOD = r.ReadBYTV(dataSize),
             FieldType.XESP => XESP = new REFRRecord.XESPField(r, dataSize),
             FieldType.XMRC => XMRC = new FMIDField<REFRRecord>(r, dataSize),
@@ -2146,7 +2146,7 @@ namespace GameX.Bethesda.Formats.Records
             FieldType.XCHG => XCHG = r.ReadS<FLTVField>(dataSize),
             FieldType.XHLT => XCHG = r.ReadS<FLTVField>(dataSize),
             FieldType.XPCI => (_nextFull = 1, XPCI = new FMIDField<CELLRecord>(r, dataSize)),
-            FieldType.FULL => _nextFull == 1 ? XPCI.Value.AddName(r.ReadFString(dataSize)) : _nextFull == 2 ? XMRKs.Last().FULL = r.ReadSTRV(dataSize) : _nextFull = 0,
+            FieldType.FULL => _nextFull == 1 ? XPCI.Value.AddName(r.ReadFAString(dataSize)) : _nextFull == 2 ? XMRKs.Last().FULL = r.ReadSTRV(dataSize) : _nextFull = 0,
             FieldType.XLCM => XLCM = r.ReadS<IN32Field>(dataSize),
             FieldType.XRTM => XRTM = new FMIDField<REFRRecord>(r, dataSize),
             FieldType.XACT => XACT = r.ReadS<UI32Field>(dataSize),
@@ -2795,8 +2795,8 @@ namespace GameX.Bethesda.Formats.Records
         {
             public float Version = r.ReadSingle();
             public uint FileType = r.ReadUInt32();
-            public string CompanyName = r.ReadZString(32);
-            public string FileDescription = r.ReadZString(256);
+            public string CompanyName = r.ReadFAString(32);
+            public string FileDescription = r.ReadFAString(256);
             public uint NumRecords = r.ReadUInt32();
         }
 
@@ -3140,16 +3140,16 @@ namespace GameX.Bethesda.Formats.Records
                 {
                     Index = r.ReadByte();
                     Type = r.ReadByte();
-                    FunctionId = r.ReadFString(2);
+                    FunctionId = r.ReadFAString(2);
                     CompareOp = (byte)(r.ReadByte() << 1);
-                    Name = r.ReadFString(dataSize - 5);
+                    Name = r.ReadFAString(dataSize - 5);
                     ComparisonValue = Parameter1 = Parameter2 = 0;
                     return;
                 }
                 CompareOp = r.ReadByte();
                 r.Skip(3); // Unused
                 ComparisonValue = r.ReadSingle();
-                FunctionId = r.ReadFString(4);
+                FunctionId = r.ReadFAString(4);
                 Parameter1 = r.ReadInt32();
                 Parameter2 = r.ReadInt32();
                 if (dataSize != 24) r.Skip(4); // Unused
@@ -3162,7 +3162,7 @@ namespace GameX.Bethesda.Formats.Records
         public class SCHDField(BinaryReader r, int dataSize)
         {
             public override string ToString() => $"{Name}";
-            public string Name = r.ReadZString(32);
+            public string Name = r.ReadFAString(32);
             public int NumShorts = r.ReadInt32();
             public int NumLongs = r.ReadInt32();
             public int NumFloats = r.ReadInt32();
@@ -4009,13 +4009,13 @@ namespace GameX.Bethesda.Formats.Records
             public float Y = r.ReadSingle();
             public float Z = r.ReadSingle();
             public short Duration = r.ReadInt16();
-            public string Id = r.ReadZString(32);
+            public string Id = r.ReadFAString(32);
             public short Unknown = r.ReadInt16();
         }
 
         public struct AI_AField(BinaryReader r, int dataSize)
         {
-            public string Name = r.ReadZString(32);
+            public string Name = r.ReadFAString(32);
             public byte Unknown = r.ReadByte();
         }
 
@@ -4168,7 +4168,7 @@ namespace GameX.Bethesda.Formats.Records
             {
                 if (format == FormType.TES3)
                 {
-                    EffectId = r.ReadFString(2);
+                    EffectId = r.ReadFAString(2);
                     SkillId = r.ReadByte();
                     AttributeId = r.ReadByte();
                     Type = r.ReadInt32();
@@ -4178,7 +4178,7 @@ namespace GameX.Bethesda.Formats.Records
                     MagnitudeMax = r.ReadInt32();
                     return;
                 }
-                EffectId = r.ReadFString(4);
+                EffectId = r.ReadFAString(4);
                 MagnitudeMin = r.ReadInt32();
                 Area = r.ReadInt32();
                 Duration = r.ReadInt32();
@@ -4202,7 +4202,7 @@ namespace GameX.Bethesda.Formats.Records
                 ScriptFormId = r.ReadInt32();
                 if (dataSize == 4) return;
                 School = r.ReadInt32();
-                VisualEffect = r.ReadFString(4);
+                VisualEffect = r.ReadFAString(4);
                 Flags = dataSize > 12 ? r.ReadUInt32() : 0;
             }
             public object FULLField(BinaryReader r, int dataSize) => Name = r.ReadYEncoding(dataSize);
@@ -5371,7 +5371,7 @@ namespace GameX.Bethesda.Formats.Records
             {
                 if (format == FormType.TES3)
                 {
-                    Sound = new FormId<SOUNRecord>(r.ReadZString(32));
+                    Sound = new FormId<SOUNRecord>(r.ReadFAString(32));
                     Flags = 0;
                     Chance = r.ReadByte();
                     return;

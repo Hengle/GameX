@@ -493,7 +493,7 @@ namespace GameX.Bethesda.Formats
                 source.Files = files = new FileSource[header.FileCount];
                 for (var i = 0; i < header.FolderCount; i++)
                 {
-                    var folderName = r.ReadFString(r.ReadByte() - 1).Replace('\\', '/');
+                    var folderName = r.ReadFAString(r.ReadByte() - 1).Replace('\\', '/');
                     r.Skip(1);
                     var headerFiles = r.ReadSArray<OB_File>((int)foldersFiles[i]);
                     foreach (var headerFile in headerFiles)
@@ -512,7 +512,7 @@ namespace GameX.Bethesda.Formats
                 }
 
                 // read-all names
-                foreach (var file in files) file.Path = $"{file.Path}/{r.ReadCString()}";
+                foreach (var file in files) file.Path = $"{file.Path}/{r.ReadVUString()}";
             }
             // Morrowind
             else if (magic == MW_BSAHEADER_FILEID)
@@ -543,7 +543,7 @@ namespace GameX.Bethesda.Formats
                 for (var i = 0; i < files.Length; i++)
                 {
                     r.Seek(filenamesPosition + filenameOffsets[i]);
-                    files[i].Path = r.ReadZAString(1000).Replace('\\', '/');
+                    files[i].Path = r.ReadVAString(1000).Replace('\\', '/');
                 }
             }
             else throw new InvalidOperationException("BAD MAGIC");

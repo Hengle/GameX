@@ -10,7 +10,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
         {
             base.Read(r);
 
-            Name = r.ReadFYString(64);
+            Name = r.ReadFUString(64);
             if (string.IsNullOrEmpty(Name)) Name = "unknown";
             ObjectNodeID = r.ReadInt32(); // Object reference ID
             ParentNodeID = r.ReadInt32();
@@ -52,7 +52,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
             RotCtrlID = r.ReadInt32();
             SclCtrlID = r.ReadInt32();
 
-            Properties = r.ReadL32String();
+            Properties = r.ReadL32UString();
         }
     }
 }

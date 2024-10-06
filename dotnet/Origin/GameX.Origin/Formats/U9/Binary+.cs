@@ -506,7 +506,7 @@ namespace GameX.Origin.Formats.U9
         {
             ScriptId = r.ReadUInt32();
             IconId = r.ReadUInt16();
-            ToolTip = r.ReadCString();
+            ToolTip = r.ReadVUString();
         }
 
         // IHaveMetaInfo

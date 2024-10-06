@@ -1,8 +1,8 @@
 import os
 from gamex import Family, FamilyGame
 from gamex.pak import BinaryPakFile
-from .Base.binary import Binary_Dds
-from .Bethesda.pakbinary import PakBinary_Ba2, PakBinary_Bsa, PakBinary_Esm
+from .Base.formats.binary import Binary_Dds
+from .Bethesda.formats.pakbinary import PakBinary_Ba2, PakBinary_Bsa, PakBinary_Esm
 from .util import _pathExtension
 
 # typedefs

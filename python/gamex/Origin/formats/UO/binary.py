@@ -98,7 +98,7 @@ class Binary_AsciiFont(IHaveMetaInfo):
                 length = width * height
                 dt = np.uint16
                 # dt = dt.newbyteorder('>')
-                bd = list(np.frombuffer(r.read(length << 1), dtype = dt))
+                bd = list(np.frombuffer(r.readBytes(length << 1), dtype = dt))
                 for j in range(length):
                     if bd[j] != 0: bd[j] ^= 0x8000
                 self.characters[i] = np.array(bd).tobytes()
@@ -384,12 +384,12 @@ class Binary_CalibrationInfo(IHaveMetaInfo):
             if line.lower() != 'begin': continue
 
             mask, vals, detx, dety, detz, detf
-            if (mask := ReadBytes(r)) == None: continue
-            if (vals := ReadBytes(r)) == None: continue
-            if (detx := ReadBytes(r)) == None: continue
-            if (dety := ReadBytes(r)) == None: continue
-            if (detz := ReadBytes(r)) == None: continue
-            if (detf := ReadBytes(r)) == None: continue
+            if (mask := readBytes(r)) == None: continue
+            if (vals := readBytes(r)) == None: continue
+            if (detx := readBytes(r)) == None: continue
+            if (dety := readBytes(r)) == None: continue
+            if (detz := readBytes(r)) == None: continue
+            if (detf := readBytes(r)) == None: continue
             self.records.append(self.Record(mask, vals, detx, dety, detz, detf))
         self.records += self.defaultRecords
 
@@ -445,7 +445,7 @@ class Binary_Gump(IHaveMetaInfo, ITexture):
         height = self.height = extra & 0xFFFF
         self.pixels = []
         if width <= 0 | height <= 0: return
-        self.load(r.read(length), width, height)
+        self.load(r.readBytes(length), width, height)
 
     def load(self, data: bytes, width: int, height: int) -> None:
         bd = self.pixels = bytearray(width * height << 1)

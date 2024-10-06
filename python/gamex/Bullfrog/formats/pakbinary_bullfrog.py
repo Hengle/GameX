@@ -66,7 +66,7 @@ class PakBinary_Bullfrog(PakBinaryT):
                 pathSize = r.readUInt32()
                 if pathSize == SubMarker: first = False; pathSize = r.readUInt32()
                 elif pathSize == EndMarker: break
-                path = r.readFString(pathSize).replace('\\', '/')
+                path = r.readFAString(pathSize).replace('\\', '/')
                 packId = 0 if first else r.readUInt16()
                 if not path.endswith('.index'): continue
                 files.append(FileSource(

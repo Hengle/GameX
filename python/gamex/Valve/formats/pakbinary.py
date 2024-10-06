@@ -23,7 +23,7 @@ class PakBinary_Vpk(PakBinaryT):
         # move to fat table
         r.seek(r.readUInt32())
         fatSize = r.readUInt32()
-        fatBytes = bytearray(r.read(fatSize)); b = 0
+        fatBytes = bytearray(r.readBytes(fatSize)); b = 0
 
         # read int32
         def readInt32() -> int:
@@ -78,7 +78,7 @@ class PakBinary_Vpk(PakBinaryT):
         r.seek(file.offset)
         return BytesIO(
             decompressBlast(r, file.packedSize, file.fileSize) if (file.compressed & 1) != 0 else \
-            r.read(file.packedSize)
+            r.readBytes(file.packedSize)
             )
 
 #endregion
@@ -149,7 +149,7 @@ class PakBinary_Wad(PakBinaryT):
     def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
         r.seek(file.offset)
         return BytesIO(
-            r.read(file.fileSize) if file.compressed == 0 else \
+            r.readBytes(file.fileSize) if file.compressed == 0 else \
             _throw('NotSupportedException')
             )
 

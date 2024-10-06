@@ -15,7 +15,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
             ID = r.ReadInt32();
             SkipBytes(r, 4);
             RCVersion = r.ReadPArray<uint>("I", 4);
-            RCVersionString = r.ReadFYString(16);
+            RCVersionString = r.ReadFUString(16);
             SkipBytesRemaining(r);
         }
     }

@@ -226,7 +226,7 @@ namespace GameX.Bioware.Formats
                 var headerFiles = r.ReadSArray<KEY_HeaderFile>((int)header.NumFiles).Select(x =>
                 {
                     r.Seek(x.FileNameOffset);
-                    return (file: x, path: r.ReadFString(x.FileNameSize - 1));
+                    return (file: x, path: r.ReadFAString(x.FileNameSize - 1));
                 }).ToArray();
                 r.Seek(header.KeysOffset);
                 var headerKeys = r.ReadSArray<KEY_HeaderKey>((int)header.NumKeys).ToDictionary(x => x.Id, x => UnsafeX.FixedAString(x.Name, 0x10));

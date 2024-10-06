@@ -92,7 +92,7 @@ class PakBinary_Hogg(PakBinaryT):
         with Reader(self.readData(source, r, dataListFile)) as r2:
             if r2.readUInt32() != 0: raise Exception('BAD DataList')
             count = r2.readInt32()
-            for i in range(count): fileAttribs[i] = r2.read(r2.readUInt32())
+            for i in range(count): fileAttribs[i] = r2.readBytes(r2.readUInt32())
 
         # read file journal
         r.seek(fileJournalPosition)
@@ -102,7 +102,7 @@ class PakBinary_Hogg(PakBinaryT):
             action = r.readByte()
             targetId = r.readInt32()
             match action:
-                case 1: fileAttribs[targetId] = r.read(r.readUInt32())
+                case 1: fileAttribs[targetId] = r.readBytes(r.readUInt32())
                 case 2: del fileAttribs[targetId]
 
         # assign file path
@@ -119,5 +119,5 @@ class PakBinary_Hogg(PakBinaryT):
         r.seek(file.offset)
         return BytesIO(
             decompressZlib(r, file.packedSize, file.fileSize) if file.compressed != 0 else \
-            r.read(file.fileSize)
+            r.readBytes(file.fileSize)
             )

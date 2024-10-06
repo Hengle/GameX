@@ -203,7 +203,7 @@ namespace GameX.Lucas.Formats
                         ClassData = new uint[count];
                         for (var i = 0; i < count; i++)
                         {
-                            var name = r.ReadCString(40, Encoding.UTF8);
+                            var name = r.ReadFUString(40);
                             ObjectIDMap[name] = i;
                             ObjectStateTable[i] = r.ReadByte();
                             ObjectRoomTable[i] = r.ReadByte();
@@ -239,7 +239,7 @@ namespace GameX.Lucas.Formats
             {
                 var values = new string[r.ReadUInt16()];
                 for (var i = 0; i < values.Length; i++)
-                    values[i] = r.ReadCString(9, Encoding.UTF8);
+                    values[i] = r.ReadFUString(9);
                 return values;
             }
 

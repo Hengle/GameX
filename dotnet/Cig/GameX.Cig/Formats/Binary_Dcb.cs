@@ -232,7 +232,7 @@ namespace GameX.Cig.Formats
             while (r.BaseStream.Position < maxPosition)
             {
                 var offset = r.BaseStream.Position - startPosition;
-                var str = r.ReadCString();
+                var str = r.ReadVUString();
                 b.Add(str);
                 ValueMap[(uint)offset] = str;
             }

@@ -10,7 +10,7 @@ namespace GameX.Crytek.Formats.Core.Chunks
         {
             base.Read(r);
 
-            Name = r.ReadFYString(128);
+            Name = r.ReadFUString(128);
             NumChildren = (int)r.ReadUInt32();
             MatType = NumChildren == 0 ? MtlNameType.Single : MtlNameType.Library;
             PhysicsType = new MtlNamePhysicsType[NumChildren];

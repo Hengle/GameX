@@ -135,7 +135,7 @@ namespace GameX.Arkane.Formats
                     var pathSize = r.ReadUInt32();
                     if (pathSize == SubMarker) { first = false; pathSize = r.ReadUInt32(); }
                     else if (pathSize == EndMarker) break;
-                    var path = r.ReadFString((int)pathSize).Replace('\\', '/');
+                    var path = r.ReadFAString((int)pathSize).Replace('\\', '/');
                     var packId = first ? 0 : r.ReadUInt16();
                     if (!path.EndsWith(".index")) continue;
                     files.Add(new FileSource

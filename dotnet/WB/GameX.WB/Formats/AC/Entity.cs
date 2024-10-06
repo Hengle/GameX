@@ -920,7 +920,7 @@ namespace GameX.WB.Formats.AC.Entity
     //: Entity.Generator
     public class Generator(BinaryReader r) : IHaveMetaInfo
     {
-        public readonly string Name = r.ReadL16StringObfuscated();
+        public readonly string Name = r.ReadL16OString();
         public readonly uint Id = r.Align().ReadUInt32();
         public readonly Generator[] Items = r.ReadL32FArray(x => new Generator(x));
 
@@ -1140,7 +1140,7 @@ namespace GameX.WB.Formats.AC.Entity
         public readonly uint VowelContainingSubstringLength = r.ReadUInt32();
         public readonly uint ExtraAllowedCharacters = r.ReadUInt32();
         public readonly byte Unknown = r.ReadByte();
-        public readonly string[] CompoundLetterGroups = r.ReadL32FArray(x => x.ReadCU32String());
+        public readonly string[] CompoundLetterGroups = r.ReadL32FArray(x => x.ReadC32UString());
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new($"MaximumVowelsInARow: {MaximumVowelsInARow}"),
@@ -1890,8 +1890,8 @@ namespace GameX.WB.Formats.AC.Entity
         }
         public SpellBase(BinaryReader r)
         {
-            Name = r.ReadL16StringObfuscated(); r.Align();
-            Desc = r.ReadL16StringObfuscated(); r.Align();
+            Name = r.ReadL16OString(); r.Align();
+            Desc = r.ReadL16OString(); r.Align();
             School = (MagicSchool)r.ReadUInt32();
             Icon = r.ReadUInt32();
             Category = (SpellCategory)r.ReadUInt32();
@@ -2007,13 +2007,13 @@ namespace GameX.WB.Formats.AC.Entity
     //: Entity.SpellComponentBase
     public class SpellComponentBase(BinaryReader r) : IHaveMetaInfo
     {
-        public readonly string Name = r.ReadL16StringObfuscated();
+        public readonly string Name = r.ReadL16OString();
         public readonly uint Category = r.Align().ReadUInt32();
         public readonly uint Icon = r.ReadUInt32();
         public readonly uint Type = r.ReadUInt32();
         public readonly uint Gesture = r.ReadUInt32();
         public readonly float Time = r.ReadSingle();
-        public readonly string Text = r.ReadL16StringObfuscated();
+        public readonly string Text = r.ReadL16OString();
         public readonly float CDM = r.Align().ReadSingle(); // Unsure what this is
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
@@ -2141,9 +2141,9 @@ namespace GameX.WB.Formats.AC.Entity
     public class StringTableData(BinaryReader r) : IHaveMetaInfo
     {
         public readonly uint Id = r.ReadUInt32();
-        public readonly string[] VarNames = r.ReadL16FArray(x => x.ReadCU32String());
-        public readonly string[] Vars = r.ReadL16FArray(x => x.ReadCU32String());
-        public readonly string[] Strings = r.ReadL32FArray(x => x.ReadCU32String());
+        public readonly string[] VarNames = r.ReadL16FArray(x => x.ReadC32UString());
+        public readonly string[] Vars = r.ReadL16FArray(x => x.ReadC32UString());
+        public readonly string[] Strings = r.ReadL32FArray(x => x.ReadC32UString());
         public readonly uint[] Comments = r.ReadL32PArray<uint>("I");
         public readonly byte Unknown = r.ReadByte();
 

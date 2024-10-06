@@ -25,6 +25,12 @@ namespace GameX.Valve.Formats
 
         #region Headers
 
+        struct BSP_Lump
+        {
+            public int Offset;
+            public int Length;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         struct BSP_Header
         {
@@ -45,14 +51,6 @@ namespace GameX.Valve.Formats
             public BSP_Lump Edges;
             public BSP_Lump SurfEdges;
             public BSP_Lump Models;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct BSP_Lump
-        {
-            public static (string, int) Struct = ("<2i", sizeof(BSP_Lump));
-            public int Offset;
-            public int Length;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -528,13 +526,15 @@ namespace GameX.Valve.Formats
 
     public unsafe class Binary_Wad3 : ITexture, IHaveMetaInfo
     {
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Wad3(r, f));
+
+        [StructLayout(LayoutKind.Sequential)]
         struct CharInfo
         {
+            public static (string, int) Struct = ("<2H", sizeof(CharInfo));
             public ushort StartOffset;
             public ushort CharWidth;
         }
-
-        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Wad3(r, f));
 
         enum Formats : byte
         {
@@ -559,7 +559,7 @@ namespace GameX.Valve.Formats
             Format = transparent
                 ? (type, (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnityFormat.RGBA32)
                 : (type, (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24);
-            if (type == Formats.Tex2 || type == Formats.Tex) name = r.ReadFYString(16); // r.Skip(16); // Skip name
+            if (type == Formats.Tex2 || type == Formats.Tex) name = r.ReadFUString(16);
             width = (int)r.ReadUInt32();
             height = (int)r.ReadUInt32();
 
@@ -570,7 +570,7 @@ namespace GameX.Valve.Formats
             // read pixel offsets
             if (type == Formats.Tex2 || type == Formats.Tex)
             {
-                var offsets = new[] { r.ReadUInt32(), r.ReadUInt32(), r.ReadUInt32(), r.ReadUInt32() }; // r.Skip(16); // Skip pixel offsets
+                uint[] offsets = [r.ReadUInt32(), r.ReadUInt32(), r.ReadUInt32(), r.ReadUInt32()];
                 if (r.BaseStream.Position != offsets[0]) throw new Exception("BAD OFFSET");
             }
             else if (type == Formats.Fnt)
@@ -612,43 +612,17 @@ namespace GameX.Valve.Formats
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
-            static void PaletteRgba8(Span<byte> data, byte[] source, byte[] palette)
-            {
-                fixed (byte* _ = data)
-                    for (int i = 0, pi = 0; i < source.Length; i++, pi += 4)
-                    {
-                        var pa = source[i] * 3;
-                        //if (pa + 3 > palette.Length) continue;
-                        _[pi + 0] = palette[pa + 0];
-                        _[pi + 1] = palette[pa + 1];
-                        _[pi + 2] = palette[pa + 2];
-                        _[pi + 3] = 0xFF;
-                    }
-            }
-            static void PaletteRgb8(Span<byte> data, byte[] source, byte[] palette)
-            {
-                fixed (byte* _ = data)
-                    for (int i = 0, pi = 0; i < source.Length; i++, pi += 3)
-                    {
-                        var pa = source[i] * 3;
-                        //if (pa + 3 > palette.Length) continue;
-                        _[pi + 0] = palette[pa + 0];
-                        _[pi + 1] = palette[pa + 1];
-                        _[pi + 2] = palette[pa + 2];
-                    }
-            }
-
-            var bytes = new byte[pixels.Sum(x => x.Length) * 4];
+            var bbp = transparent ? 4 : 3;
+            var buf = new byte[pixels.Sum(x => x.Length) * bbp];
             var spans = new Range[pixels.Length];
-            byte[] p;
-            for (int index = 0, offset = 0; index < pixels.Length; index++, offset += p.Length * 4)
+            int size;
+            for (int index = 0, offset = 0; index < pixels.Length; index++, offset += size)
             {
-                p = pixels[index];
-                var span = spans[index] = new Range(offset, offset + p.Length * 4);
-                if (transparent) PaletteRgba8(bytes.AsSpan(span), p, palette);
-                else PaletteRgb8(bytes.AsSpan(span), p, palette);
+                var p = pixels[index];
+                size = p.Length * bbp; var span = spans[index] = new Range(offset, offset + size);
+                Rasterize.CopyPixelsByPalette(buf.AsSpan(span), bbp, p, palette);
             }
-            return (bytes, (Platform.Type)platform switch
+            return (buf, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Unity => Format.unity,
@@ -663,6 +637,7 @@ namespace GameX.Valve.Formats
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
             new("Texture", items: [
+                new($"Name: {name}"),
                 new($"Format: {Format.type}"),
                 new($"Width: {Width}"),
                 new($"Height: {Height}"),

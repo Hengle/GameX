@@ -148,7 +148,7 @@ class PakBinary_UO(PakBinaryT):
                 if not extra: continue
                 def peekLambda(x):
                     r.seek(file.offset)
-                    extra = r.read(8)
+                    extra = r.readBytes(8)
                     extra1 = ((extra[3] << 24) | (extra[2] << 16) | (extra[1] << 8) | extra[0]) & 0xffff
                     extra2 = ((extra[7] << 24) | (extra[6] << 16) | (extra[5] << 8) | extra[4]) & 0xffff
                     file.offset += 8
@@ -316,4 +316,4 @@ class PakBinary_UO(PakBinaryT):
         if (file.fileSize & (1 << 31)) != 0:
             return Binary_Verdata.instance.readData(file.offset, fileSize)
         r.seek(file.offset)
-        return BytesIO(r.read(fileSize))
+        return BytesIO(r.readBytes(fileSize))

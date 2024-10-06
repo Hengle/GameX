@@ -42,23 +42,23 @@ namespace GameX.Cryptic.Formats
         {
             var header = r.ReadS<Header_M>();
             if (header.Magic != MAGIC) throw new FormatException("BAD MAGIC");
-            var type = r.ReadL16String(maxLength: 4096); r.Align();
+            var type = r.ReadL16UString(maxLength: 4096); r.Align();
             if (type != PARSE_M) throw new FormatException("BAD TYPE");
 
             // file section
-            var filesTag = r.ReadL16String(20); r.Align();
+            var filesTag = r.ReadL16UString(20); r.Align();
             if (filesTag != "Files1") throw new FormatException("BAD Tag");
             var fileSectionEnd = r.ReadUInt32() + r.Tell();
             var files = r.ReadL32FArray(x =>
             {
-                var name = x.ReadL16String(maxLength: 260); x.Align();
+                var name = x.ReadL16UString(maxLength: 260); x.Align();
                 var timestamp = x.ReadUInt32();
                 return (name, timestamp);
             });
             if (r.Tell() != fileSectionEnd) throw new FormatException("did not read blob file entry correctly");
 
             // extra section
-            var extraTag = r.ReadL16String(20); r.Align();
+            var extraTag = r.ReadL16UString(20); r.Align();
             if (extraTag != "Files1") throw new FormatException("BAD Tag");
             var extraSectionEnd = r.ReadUInt32() + r.Tell();
             var extras = r.ReadL32FArray(x =>
@@ -68,13 +68,13 @@ namespace GameX.Cryptic.Formats
             if (r.Tell() != extraSectionEnd) throw new FormatException("did not read blob file entry correctly");
 
             // dependency section
-            var dependencyTag = r.ReadL16String(20); r.Align();
+            var dependencyTag = r.ReadL16UString(20); r.Align();
             if (dependencyTag != "Depen1") throw new FormatException("BAD Tag");
             var dependencySectionEnd = r.ReadUInt32() + r.Tell();
             var dependencys = r.ReadL32FArray(x =>
             {
                 var type = x.ReadUInt32();
-                var name = x.ReadL16String(maxLength: 260); x.Align();
+                var name = x.ReadL16UString(maxLength: 260); x.Align();
                 var hash = x.ReadUInt32();
                 return (type, name, hash);
             });

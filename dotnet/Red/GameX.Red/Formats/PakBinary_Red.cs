@@ -461,7 +461,7 @@ namespace GameX.Red.Formats
 
                         // parts
                         r.Seek(header.FilesOffset);
-                        var headerFiles = r.ReadSArray<KEY_HeaderFile>((int)header.NumFiles).Select(x => { r.Seek(x.FileNameOffset); return (file: x, path: r.ReadFString((int)x.FileNameSize)); }).ToArray();
+                        var headerFiles = r.ReadSArray<KEY_HeaderFile>((int)header.NumFiles).Select(x => { r.Seek(x.FileNameOffset); return (file: x, path: r.ReadFAString((int)x.FileNameSize)); }).ToArray();
                         r.Seek(header.KeysOffset);
                         var headerKeys = r.ReadSArray<KEY_HeaderKey>((int)header.NumKeys).ToDictionary(x => (x.Id, x.ResourceId), x => UnsafeX.FixedAString(x.Name, 0x10));
 
@@ -635,7 +635,7 @@ namespace GameX.Red.Formats
 
                             // name block
                             var filePaths = new string[header.NumFiles];
-                            for (var i = 0; i < header.NumFiles; i++) filePaths[i] = r.ReadZAString(1000);
+                            for (var i = 0; i < header.NumFiles; i++) filePaths[i] = r.ReadVAString(1000);
 
                             // file block
                             var headerFiles = r.ReadSArray<CACHE_TEX_HeaderFile>((int)header.NumFiles);
@@ -656,7 +656,7 @@ namespace GameX.Red.Formats
                                 ? r.ReadS<CACHE_CS3W_Header>()
                                 : r.ReadS<CACHE_CS3W_HeaderV1>().ToHeader();
                             r.Seek((long)header.NameOffset);
-                            var name = r.ReadFString((int)header.NameSize);
+                            var name = r.ReadFAString((int)header.NameSize);
                         }
                         else
                         {

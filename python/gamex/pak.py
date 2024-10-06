@@ -250,7 +250,7 @@ class ManyPakFile(BinaryPakFile):
 
     def readData(self, r: Reader, file: FileSource) -> BytesIO:
         return file.pak.readData(r, file) if file.pak else \
-            BytesIO(self.fileSystem.openReader(file.path).read(file.fileSize))
+            BytesIO(self.fileSystem.openReader(file.path).readBytes(file.fileSize))
     #endregion
 
 # MultiPakFile

@@ -106,7 +106,7 @@ namespace GameX.IW.Formats
                     if (argCount > 0)
                     {
                         var argsValues = r.ReadPArray<int>("i", argCount);
-                        var argsNames = r.ReadFArray(r => r.ReadZAString(), argCount);
+                        var argsNames = r.ReadFArray(r => r.ReadVAString(), argCount);
                         if (argsNames[argCount - 1] == "\u0005") { argCount--; r.Skip(-2); }
                         for (var i = 0; i < argCount; i++) args[argsNames[i] ?? $"${i}"] = argsValues[i];
                     }
@@ -364,7 +364,7 @@ namespace GameX.IW.Formats
             public COD_Shader(BinaryReader r)
             {
                 Pointers = r.ReadPArray<int>("I", 36);  // 36 pointers (0x90 bytes) (bytes 0x19 up to 0x22 say if we get any content at all?)
-                Name = r.ReadZAString();                          // Then techset file name (0x00 termination) if pointer is 0xFFFFFFFF?
+                Name = r.ReadVAString();                          // Then techset file name (0x00 termination) if pointer is 0xFFFFFFFF?
 
                 // start of shader pack
                 while (r.ReadInt32() != -1) // pointer (-1)

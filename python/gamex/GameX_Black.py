@@ -1,6 +1,6 @@
 import os
 from gamex.pak import BinaryPakFile
-from .Black.pakbinary_dat import PakBinary_Dat
+from .Black.formats.pakbinary_dat import PakBinary_Dat
 from .util import _pathExtension
 
 # typedefs

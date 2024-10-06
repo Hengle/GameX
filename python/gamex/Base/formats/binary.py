@@ -1,8 +1,7 @@
 import os, numpy as np
 from PIL import Image
 from enum import Enum
-from openstk.gfx.gfx_dds import DDS_HEADER
-from openstk.gfx.gfx_texture import ITexture, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
+from openstk.gfx.gfx_texture import DDS_HEADER, ITexture, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinary
 from gamex.meta import MetaManager, MetaInfo, MetaContent, IHaveMetaInfo
@@ -24,7 +23,7 @@ class Binary_Bik(IHaveMetaInfo):
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Bik(r, f.fileSize)
 
     def __init__(self, r: Reader, fileSize: int):
-        self.data = r.read(fileSize)
+        self.data = r.readBytes(fileSize)
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = 'BIK Video'))
@@ -93,7 +92,7 @@ class Binary_Fsb(IHaveMetaInfo):
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Fsb(r, f.fileSize)
 
     def __init__(self, r: Reader, fileSize: int):
-        self.data = r.read(fileSize)
+        self.data = r.readBytes(fileSize)
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = 'FSB Audio'))
@@ -172,8 +171,8 @@ class Binary_Img(IHaveMetaInfo, ITexture):
             ])
         ]
 
-    # print(r.read(f.fileSize))
-    # self.image = iio.imread(r.read(f.fileSize))
+    # print(r.readBytes(f.fileSize))
+    # self.image = iio.imread(r.readBytes(f.fileSize))
     # self.image = iio.imread('imageio:chelsea.bsdf')
     # match len(self.image.shape):
     #     case 2: self.width, self.height = self.image.shape; self.channels = 1
@@ -222,7 +221,7 @@ class Binary_Snd(IHaveMetaInfo):
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Snd(r, f.fileSize)
 
     def __init__(self, r: Reader, fileSize: int):
-        self.data = r.read(fileSize)
+        self.data = r.readBytes(fileSize)
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'AudioPlayer', name = os.path.basename(file.path), value = self.data, tag = _pathExtension(file.path)))
@@ -238,7 +237,7 @@ class Binary_Txt(IHaveMetaInfo):
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Txt(r, f.fileSize)
 
     def __init__(self, r: Reader, fileSize: int):
-        self.data = r.read(fileSize).decode('utf8', 'ignore')
+        self.data = r.readBytes(fileSize).decode('utf8', 'ignore')
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = self.data))

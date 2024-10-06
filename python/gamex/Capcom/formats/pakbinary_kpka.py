@@ -58,8 +58,8 @@ class PakBinary_Kpka(PakBinaryT):
         tr = r
         if header.feature == 8:
             entrySize = K_FileV2.struct[1] if header.majorVersion == 2 else K_FileV4.struct[1]
-            table = r.read(header.numFiles * entrySize)
-            key = r.read(128)
+            table = r.readBytes(header.numFiles * entrySize)
+            key = r.readBytes(128)
             # tr = BinaryReader(decryptTable(table, decryptKey(key)))
 
         # get files
@@ -104,7 +104,7 @@ Exponent = int.from_bytes([
 
 @staticmethod
 def _decompress(r: Reader, compressed: int, length: int, newLength: int = 0, full: bool = True) -> bytes:
-    return r.read(length) if compressed == 0 else \
+    return r.readBytes(length) if compressed == 0 else \
         decompressZlib(r, length, newLength, noHeader = True, full = full) if compressed == 'Z' else \
         decompressZstd(r, length, newLength) if compressed == 'S' else \
         None

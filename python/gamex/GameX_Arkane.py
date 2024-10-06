@@ -1,9 +1,9 @@
 import os
 from gamex.pak import BinaryPakFile
-from .Base.binary import Binary_Dds, Binary_Img, Binary_Snd, Binary_Txt
-from .Arkane.danae.binary import Binary_Ftl, Binary_Fts, Binary_Tea
-from .Arkane.pakbinary import PakBinary_Danae, PakBinary_Void
-from .Valve.pakbinary import PakBinary_Vpk
+from .Base.formats.binary import Binary_Dds, Binary_Img, Binary_Snd, Binary_Txt
+from .Arkane.formats.danae.binary import Binary_Ftl, Binary_Fts, Binary_Tea
+from .Arkane.formats.pakbinary import PakBinary_Danae, PakBinary_Void
+from .Valve.formats.pakbinary import PakBinary_Vpk
 from .GameX_Valve import ValvePakFile
 from .util import _pathExtension
 
