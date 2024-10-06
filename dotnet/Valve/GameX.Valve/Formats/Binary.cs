@@ -433,7 +433,11 @@ namespace GameX.Valve.Formats
 
         public Binary_Spr(BinaryReader r, FileSource f)
         {
-            Format = ((TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnityFormat.RGBA32);
+            Format = (
+                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGBA32,
+                TextureUnityFormat.RGBA32);
 
             // read file
             var header = r.ReadS<SPR_Header>();
@@ -472,30 +476,16 @@ namespace GameX.Valve.Formats
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
-            static void FlattenPalette(Span<byte> data, byte[] source, byte[] palette)
-            {
-                fixed (byte* _ = data)
-                    for (int i = 0, pi = 0; i < source.Length; i++, pi += 4)
-                    {
-                        var pa = source[i] * 3;
-                        //if (pa + 3 > palette.Length) continue;
-                        _[pi + 0] = palette[pa + 0];
-                        _[pi + 1] = palette[pa + 1];
-                        _[pi + 2] = palette[pa + 2];
-                        _[pi + 3] = 0xFF;
-                    }
-            }
-
-            var bytes = new byte[pixels.Sum(x => x.Length) * 4];
+            var buf = new byte[pixels.Sum(x => x.Length) * 4];
             var spans = new Range[pixels.Length];
-            byte[] p;
-            for (int index = 0, offset = 0; index < pixels.Length; index++, offset += p.Length * 4)
+            int size;
+            for (int index = 0, offset = 0; index < pixels.Length; index++, offset += size)
             {
-                p = pixels[index];
-                var span = spans[index] = new Range(offset, offset + p.Length * 4);
-                FlattenPalette(bytes.AsSpan(span), p, palette);
+                var p = pixels[index];
+                size = p.Length * 4; var span = spans[index] = new Range(offset, offset + size);
+                Rasterize.CopyPixelsByPalette(buf.AsSpan(span), 4, p, palette);
             }
-            return (bytes, (Platform.Type)platform switch
+            return (buf, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Unity => Format.unity,
@@ -528,6 +518,8 @@ namespace GameX.Valve.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Wad3(r, f));
 
+        #region Headers
+
         [StructLayout(LayoutKind.Sequential)]
         struct CharInfo
         {
@@ -544,6 +536,8 @@ namespace GameX.Valve.Formats
             Tex = 0x43,
             Fnt = 0x46
         }
+
+        #endregion
 
         public Binary_Wad3(BinaryReader r, FileSource f)
         {

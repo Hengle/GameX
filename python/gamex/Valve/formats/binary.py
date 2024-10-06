@@ -138,15 +138,106 @@ class Binary_Spr(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Spr(r)
 
+    data: dict[str, object] = None
+    width: int = 0
+    height: int = 0
+    depth: int = 0
+    mipMaps: int = 1
+    flags: TextureFlags = 0
+
+    #region Header
+
+    SPR_MAGIC = 0x50534449 #: IDSP
+
+    class SprType(Enum):
+        VP_PARALLEL_UPRIGHT = 0
+        FACING_UPRIGHT = 1
+        VP_PARALLEL = 2
+        ORIENTED = 3
+        VP_PARALLEL_ORIENTED = 4
+
+    class SprTextFormat(Enum):
+        SPR_NORMAL = 0
+        SPR_ADDITIVE = 1
+        SPR_INDEXALPHA = 2
+        SPR_ALPHTEST = 3
+
+    class SprSynchType(Enum):
+        Synchronized = 0
+        Random = 1
+
+    class SPR_Header:
+        struct = ('<I3if3ifi', 40)
+        def __init__(self, tuple):
+            self.signature, \
+            self.version, \
+            self.type, \
+            self.textFormat, \
+            self.boundingRadius, \
+            self.maxWidth, \
+            self.maxHeight, \
+            self.numFrames, \
+            self.beamLen, \
+            self.synchType = tuple
+
+    class SPR_Frame:
+        struct = ('<5i', 20)
+        def __init__(self, tuple):
+            self.group, \
+            self.originX, \
+            self.originY, \
+            self.width, \
+            self.height = tuple
+
+    #endregion
+
     def __init__(self, r: Reader):
-        pass
+        self.format = (
+              (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+              (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+              TextureUnityFormat.RGBA32,
+              TextureUnityFormat.RGBA32)
+
+        # read file
+        header = r.readS(self.SPR_Header)
+        if header.signature != self.SPR_MAGIC: raise Exception('BAD MAGIC')
+
+        # load palette
+        self.palette = r.readBytes(r.readUInt16() * 3)
+
+        # load frames
+        frames = self.frames = [self.SPR_Frame] * header.numFrames
+        pixels = self.pixels = [bytearray] * header.numFrames
+        for i in range(header.numFrames):
+            frame = frames[i] = r.readS(self.SPR_Frame)
+            pixelSize = frame.width * frame.height
+            pixels[i] = r.readBytes(pixelSize)
+        self.width = frames[0].width
+        self.height = frames[0].height
+        self.mipMaps = len(pixels)
+
+    def begin(self, platform: int) -> (bytes, object, list[object]):
+        buf = bytearray(sum([len(x) for x in self.pixels]) * 4); mv = memoryview(buf)
+        spans = [range(0, 0)] * len(self.pixels); offset = 0
+        for i, p in enumerate(self.pixels):
+            size = len(p) * 4; span = spans[i] = range(offset, offset + size); offset += size
+            Rasterize.copyPixelsByPalette(mv[span.start:span.stop], 4, p, self.palette)
+        match platform:
+            case Platform.Type.OpenGL: format = self.format[1]
+            case Platform.Type.Vulken: format = self.format[2]
+            case Platform.Type.Unity: format = self.format[3]
+            case Platform.Type.Unreal: format = self.format[4]
+            case _: raise Exception(f'Unknown {platform}')
+        return buf, format, spans
+    def end(self): pass
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
-        # MetaInfo(None, MetaContent(type = 'Texture', name = os.path.basename(file.path), value = self)),
-        MetaInfo('Bsp', items = [
-            # MetaInfo(f'Width: {self.width}'),
-            # MetaInfo(f'Height: {self.height}'),
-            # MetaInfo(f'Mipmaps: {self.mipMaps}')
+        MetaInfo(None, MetaContent(type = 'Texture', name = os.path.basename(file.path), value = self)),
+        MetaInfo('Texture', items = [
+            MetaInfo(f'Format: {self.format[0]}'),
+            MetaInfo(f'Width: {self.width}'),
+            MetaInfo(f'Height: {self.height}'),
+            MetaInfo(f'Mipmaps: {self.mipMaps}')
             ])
         ]
 
@@ -166,6 +257,8 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
     mipMaps: int = 1
     flags: TextureFlags = 0
 
+    #region Header
+
     class CharInfo:
         struct = ('<2H', 4)
         def __init__(self, tuple):
@@ -178,6 +271,8 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
         Pic = 0x42
         Tex = 0x43
         Fnt = 0x46
+
+    #endregion
 
     def __init__(self, r: Reader, f: FileSource):
         match _pathExtension(f.path):
@@ -211,6 +306,7 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
         pixelSize = self.width * self.height
         self.pixels = [r.readBytes(pixelSize), r.readBytes(pixelSize >> 2), r.readBytes(pixelSize >> 4), r.readBytes(pixelSize >> 8)] if type == self.Formats.Tex2 or type == self.Formats.Tex \
             else [r.readBytes(pixelSize)]
+        self.mipMaps = len(pixels)
 
         # read pallet
         r.skip(2)

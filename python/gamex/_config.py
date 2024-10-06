@@ -471,7 +471,7 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:4",
+            ForcePath = "sample:5",
             Family = "Valve",
             Game = "HL", # Half-Life [open, read, texture:GL]
             # Game = "TF", # Team Fortress Classic [open, read, texture:GL]
