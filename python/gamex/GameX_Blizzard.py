@@ -1,6 +1,6 @@
 import os
 from gamex.pak import BinaryPakFile
-from .util import _pathExtension
+from gamex.util import _pathExtension
 
 # typedefs
 class FamilyGame: pass

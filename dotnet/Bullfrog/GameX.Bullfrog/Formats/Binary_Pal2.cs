@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace GameX.Bullfrog.Formats
 {
-    public unsafe class Binary_Pal2 : IHaveMetaInfo
+    /*
+    public unsafe class Binary_Pal2x : IHaveMetaInfo
     {
-        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pal2(r));
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pal2x(r));
 
         #region Palette
 
@@ -21,7 +22,7 @@ namespace GameX.Bullfrog.Formats
         public byte Bpp;
         public byte[][] Records;
 
-        public Binary_Pal2 ConvertVgaPalette()
+        public Binary_Pal2x ConvertVgaPalette()
         {
             for (var i = 0; i < 256; i++)
             {
@@ -35,7 +36,7 @@ namespace GameX.Bullfrog.Formats
 
         #endregion
 
-        public Binary_Pal2(BinaryReader r)
+        public Binary_Pal2x(BinaryReader r)
         {
             using var r2 = new BinaryReader(new MemoryStream(Rnc.Read(r)));
             var numRecords = (int)(r2.BaseStream.Length / 3);
@@ -51,4 +52,5 @@ namespace GameX.Bullfrog.Formats
                 ])
             ];
     }
+    */
 }

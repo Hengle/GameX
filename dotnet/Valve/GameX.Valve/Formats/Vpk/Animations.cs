@@ -115,9 +115,9 @@ namespace GameX.Valve.Formats.Vpk
             return animArray.Select(anim => new Animation(anim, segmentArray)).ToArray();
         }
 
-        public static IEnumerable<Animation> FromResource(Binary_Pak parent, IDictionary<string, object> decodeKey, Skeleton skeleton) => FromData(GetAnimationData(parent), decodeKey, skeleton);
+        public static IEnumerable<Animation> FromResource(Binary_Src parent, IDictionary<string, object> decodeKey, Skeleton skeleton) => FromData(GetAnimationData(parent), decodeKey, skeleton);
 
-        static IDictionary<string, object> GetAnimationData(Binary_Pak parent) => parent.DATA.AsKeyValue();
+        static IDictionary<string, object> GetAnimationData(Binary_Src parent) => parent.DATA.AsKeyValue();
 
         /// <summary>
         /// Get the animation matrix for each bone.
@@ -235,7 +235,7 @@ namespace GameX.Valve.Formats.Vpk
 
     public static class AnimationGroupLoader
     {
-        public static IEnumerable<Animation> LoadAnimationGroup(Binary_Pak resource, IOpenGfx gfx, Skeleton skeleton)
+        public static IEnumerable<Animation> LoadAnimationGroup(Binary_Src resource, IOpenGfx gfx, Skeleton skeleton)
         {
             var data = resource.DATA.AsKeyValue();
             var decodeKey = data.GetSub("m_decodeKey"); // Get the key to decode the animations
@@ -251,7 +251,7 @@ namespace GameX.Valve.Formats.Vpk
             var animArray = data.Get<string[]>("m_localHAnimArray").Where(a => a != null); // Get the list of animation files
             foreach (var animationFile in animArray)
             {
-                var animResource = gfx.LoadFileObject<Binary_Pak>($"{animationFile}_c").Result;
+                var animResource = gfx.LoadFileObject<Binary_Src>($"{animationFile}_c").Result;
                 if (animResource != null) animationList.AddRange(Animation.FromResource(animResource, decodeKey, skeleton)); // Build animation classes
             }
             return animationList;

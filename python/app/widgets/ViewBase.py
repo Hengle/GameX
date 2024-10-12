@@ -1,6 +1,6 @@
 import sys, os
 import numpy as np
-from typing import Any, TypeVar
+from typing import TypeVar
 from OpenGL.GL import *
 from openstk.gfx.gfx_render import IRenderer, RenderPass
 from openstk.gfx.gfx_texture import ITextureSelect
@@ -24,9 +24,9 @@ class ViewBase(OpenGLView):
     # ui
     id: int = 0
 
-    def __init__(self, parent, tab):
-        super().__init__()
-        self.parent: Any = parent
+    def __init__(self, parent: object, tab: object, interval: float = None):
+        super().__init__(interval)
+        self.parent: object = parent
         self.gfx: IOpenGLGfx = parent.gfx
         self.source: object = tab.value
         

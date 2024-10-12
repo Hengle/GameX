@@ -2,7 +2,7 @@ import os
 from io import BytesIO
 from enum import Enum
 from openstk.gfx.gfx_render import Rasterize
-from openstk.gfx.gfx_texture import ITexture, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
+from openstk.gfx.gfx_texture import ITexture, ITextureFrames, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinary
 from gamex.meta import MetaInfo, MetaContent, IHaveMetaInfo
@@ -115,13 +115,14 @@ class Binary_Bsp(IHaveMetaInfo):
 
 #endregion
 
-#region Binary_Pak
+#region Binary_Src
 
-# Binary_Pak
-class Binary_Pak(IHaveMetaInfo):
+# Binary_Src
+class Binary_Src(IHaveMetaInfo):
     @staticmethod
-    def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Pak(r)
-
+    def factory(r: Reader, f: FileSource, s: PakFile):
+        pass
+        
     def __init__(self, r: Reader):
         pass
 
@@ -134,7 +135,7 @@ class Binary_Pak(IHaveMetaInfo):
 #region Binary_Spr
 
 # Binary_Spr
-class Binary_Spr(IHaveMetaInfo):
+class Binary_Spr(IHaveMetaInfo, ITextureFrames):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Spr(r)
 
@@ -144,6 +145,7 @@ class Binary_Spr(IHaveMetaInfo):
     depth: int = 0
     mipMaps: int = 1
     flags: TextureFlags = 0
+    fps: int = 60
 
     #region Header
 
@@ -210,31 +212,34 @@ class Binary_Spr(IHaveMetaInfo):
         pixels = self.pixels = [bytearray] * header.numFrames
         for i in range(header.numFrames):
             frame = frames[i] = r.readS(self.SPR_Frame)
-            pixelSize = frame.width * frame.height
-            pixels[i] = r.readBytes(pixelSize)
+            pixels[i] = r.readBytes(frame.width * frame.height)
         self.width = frames[0].width
         self.height = frames[0].height
-        self.mipMaps = len(pixels)
+        self.bytes = bytearray(self.width * self.height << 4)
+        self.frame = 0
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
-        buf = bytearray(sum([len(x) for x in self.pixels]) * 4); mv = memoryview(buf)
-        spans = [range(0, 0)] * len(self.pixels); offset = 0
-        for i, p in enumerate(self.pixels):
-            size = len(p) * 4; span = spans[i] = range(offset, offset + size); offset += size
-            Rasterize.copyPixelsByPalette(mv[span.start:span.stop], 4, p, self.palette)
         match platform:
             case Platform.Type.OpenGL: format = self.format[1]
             case Platform.Type.Vulken: format = self.format[2]
             case Platform.Type.Unity: format = self.format[3]
             case Platform.Type.Unreal: format = self.format[4]
             case _: raise Exception(f'Unknown {platform}')
-        return buf, format, spans
+        return self.bytes, format, None
     def end(self): pass
 
+    def hasFrames(self) -> bool: return self.frame < len(self.frames)
+
+    def decodeFrame(self) -> bool:
+        p = self.pixels[self.frame]
+        Rasterize.copyPixelsByPalette(self.bytes, 4, p, self.palette)
+        self.frame += 1
+        return True
+
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
-        MetaInfo(None, MetaContent(type = 'Texture', name = os.path.basename(file.path), value = self)),
-        MetaInfo('Texture', items = [
-            MetaInfo(f'Format: {self.format[0]}'),
+        MetaInfo(None, MetaContent(type = 'VideoTexture', name = os.path.basename(file.path), value = self)),
+        MetaInfo('Sprite', items = [
+            MetaInfo(f'Frames: {len(self.frames)}'),
             MetaInfo(f'Width: {self.width}'),
             MetaInfo(f'Height: {self.height}'),
             MetaInfo(f'Mipmaps: {self.mipMaps}')
@@ -304,7 +309,7 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
 
         # read pixels
         pixelSize = self.width * self.height
-        self.pixels = [r.readBytes(pixelSize), r.readBytes(pixelSize >> 2), r.readBytes(pixelSize >> 4), r.readBytes(pixelSize >> 8)] if type == self.Formats.Tex2 or type == self.Formats.Tex \
+        pixels = self.pixels = [r.readBytes(pixelSize), r.readBytes(pixelSize >> 2), r.readBytes(pixelSize >> 4), r.readBytes(pixelSize >> 8)] if type == self.Formats.Tex2 or type == self.Formats.Tex \
             else [r.readBytes(pixelSize)]
         self.mipMaps = len(pixels)
 

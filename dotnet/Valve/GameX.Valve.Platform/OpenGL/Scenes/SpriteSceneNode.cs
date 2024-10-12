@@ -21,7 +21,7 @@ namespace GameX.Valve.OpenGL.Scenes
         readonly Vector3 position;
         readonly float size;
 
-        public SpriteSceneNode(Scene scene, Binary_Pak resource, Vector3 position) : base(scene)
+        public SpriteSceneNode(Scene scene, Binary_Src resource, Vector3 position) : base(scene)
         {
             var gfx = scene.Gfx as IOpenGLGfx;
             (material, _) = gfx.MaterialManager.CreateMaterial(resource);

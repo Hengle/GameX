@@ -109,21 +109,120 @@ namespace GameX.Valve.Formats
 
     #endregion
 
-    #region Binary_Pak
+    #region Binary_Src
     //was:Resource/Resource
 
-    public class Binary_Pak : IDisposable, IHaveMetaInfo, IRedirected<ITexture>, IRedirected<IMaterial>, IRedirected<IMesh>, IRedirected<IModel>, IRedirected<IParticleSystem>
+    public class Binary_Src : IDisposable, IHaveMetaInfo, IRedirected<ITexture>, IRedirected<IMaterial>, IRedirected<IMesh>, IRedirected<IModel>, IRedirected<IParticleSystem>
     {
         internal const ushort KnownHeaderVersion = 12;
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s)
+        {
+            if (r.BaseStream.Length < 6) return null;
+            var input = r.Peek(z => z.ReadBytes(6));
+            var magic = BitConverter.ToUInt32(input, 0);
+            var magicResourceVersion = BitConverter.ToUInt16(input, 4);
+            if (magic == PakBinary_Vpk.MAGIC) throw new InvalidOperationException("Pak File");
+            else if (magic == CompiledShader.MAGIC) return Task.FromResult((object)new CompiledShader(r, f.Path));
+            else if (magic == ClosedCaptions.MAGIC) return Task.FromResult((object)new ClosedCaptions(r));
+            else if (magic == ToolsAssetInfo.MAGIC) return Task.FromResult((object)new ToolsAssetInfo(r));
+            else if (magic == XKV3.MAGIC || magic == XKV3.MAGIC2) { var kv3 = new XKV3 { Size = (uint)r.BaseStream.Length }; kv3.Read(null, r); return Task.FromResult((object)kv3); }
+            else if (magicResourceVersion == KnownHeaderVersion) return Task.FromResult((object)new Binary_Src(r));
+            //else if (magicResourceVersion == BinaryPak.KnownHeaderVersion)
+            //{
+            //    var pak = new BinaryPak(r);
+            //    switch (pak.DataType)
+            //    {
+            //        //case DATA.DataType.Mesh: return Task.FromResult((object)new DATAMesh(pak));
+            //        default: return Task.FromResult((object)pak);
+            //    }
+            //}
+            else return null;
+        }
 
-        public Binary_Pak() { }
-        public Binary_Pak(BinaryReader r) => Read(r);
+        public Binary_Src() { }
+        public Binary_Src(BinaryReader r) => Read(r);
 
         public void Dispose()
         {
             Reader?.Dispose();
             Reader = null;
             GC.SuppressFinalize(this);
+        }
+
+        public void Read(BinaryReader r, bool verifyFileSize = false) //:true
+        {
+            Reader = r;
+            FileSize = r.ReadUInt32();
+            if (FileSize == 0x55AA1234) throw new FormatException("VPK file");
+            else if (FileSize == CompiledShader.MAGIC) throw new FormatException("Shader file");
+            else if (FileSize != r.BaseStream.Length) { }
+            var headerVersion = r.ReadUInt16();
+            if (headerVersion != KnownHeaderVersion) throw new FormatException($"Bad Magic: {headerVersion}, expected {KnownHeaderVersion}");
+            //if (FileName != null) DataType = DetermineResourceTypeByFileExtension();
+            Version = r.ReadUInt16();
+            var blockOffset = r.ReadUInt32();
+            var blockCount = r.ReadUInt32();
+            r.Skip(blockOffset - 8); // 8 is uint32 x2 we just read
+            for (var i = 0; i < blockCount; i++)
+            {
+                var blockType = Encoding.UTF8.GetString(r.ReadBytes(4));
+                var position = r.BaseStream.Position;
+                var offset = (uint)position + r.ReadUInt32();
+                var size = r.ReadUInt32();
+                var block = size >= 4 && blockType == "DATA" && !Block.IsHandledType(DataType) ? r.Peek(z =>
+                {
+                    var magic = z.ReadUInt32();
+                    return magic == XKV3.MAGIC || magic == XKV3.MAGIC2 || magic == XKV3.MAGIC3
+                        ? new XKV3()
+                        : magic == XKV1.MAGIC ? (Block)new XKV1() : null;
+                }) : null;
+                block ??= Block.Factory(this, blockType);
+                block.Offset = offset;
+                block.Size = size;
+                if (blockType == "REDI" || blockType == "RED2" || blockType == "NTRO") block.Read(this, r);
+                Blocks.Add(block);
+                switch (block)
+                {
+                    case REDI redi:
+                        // Try to determine resource type by looking at first compiler indentifier
+                        if (DataType == ResourceType.Unknown && REDI.Structs.TryGetValue(REDI.REDIStruct.SpecialDependencies, out var specialBlock))
+                        {
+                            var specialDeps = (R_SpecialDependencies)specialBlock;
+                            if (specialDeps.List.Count > 0) DataType = Block.DetermineTypeByCompilerIdentifier(specialDeps.List[0]);
+                        }
+                        // Try to determine resource type by looking at the input dependency if there is only one
+                        if (DataType == ResourceType.Unknown && REDI.Structs.TryGetValue(REDI.REDIStruct.InputDependencies, out var inputBlock))
+                        {
+                            var inputDeps = (R_InputDependencies)inputBlock;
+                            if (inputDeps.List.Count == 1) DataType = Block.DetermineResourceTypeByFileExtension(Path.GetExtension(inputDeps.List[0].ContentRelativeFilename));
+                        }
+                        break;
+                    case NTRO ntro:
+                        if (DataType == ResourceType.Unknown && ntro.ReferencedStructs.Count > 0)
+                            switch (ntro.ReferencedStructs[0].Name)
+                            {
+                                case "VSoundEventScript_t": DataType = ResourceType.SoundEventScript; break;
+                                case "CWorldVisibility": DataType = ResourceType.WorldVisibility; break;
+                            }
+                        break;
+                }
+                r.BaseStream.Position = position + 8;
+            }
+            foreach (var block in Blocks) if (!(block is REDI) && !(block is RED2) && !(block is NTRO)) block.Read(this, r);
+
+            var fullFileSize = FullFileSize;
+            if (verifyFileSize && Reader.BaseStream.Length != fullFileSize)
+            {
+                if (DataType == ResourceType.Texture)
+                {
+                    var data = (D_Texture)DATA;
+                    // TODO: We do not currently have a way of calculating buffer size for these types, Texture.GenerateBitmap also just reads until end of the buffer
+                    if (data.Format == VTexFormat.JPEG_DXT5 || data.Format == VTexFormat.JPEG_RGBA8888) return;
+                    // TODO: Valve added null bytes after the png for whatever reason, so assume we have the full file if the buffer is bigger than the size we calculated
+                    if (data.Format == VTexFormat.PNG_DXT5 || data.Format == VTexFormat.PNG_RGBA8888 && Reader.BaseStream.Length > fullFileSize) return;
+                }
+                throw new InvalidDataException($"File size ({Reader.BaseStream.Length}) does not match size specified in file ({fullFileSize}) ({DataType}).");
+            }
         }
 
         ITexture IRedirected<ITexture>.Value => DATA as ITexture;
@@ -135,12 +234,12 @@ namespace GameX.Valve.Formats
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
         {
             var nodes = new List<MetaInfo> {
-                new("BinaryPak", items: new List<MetaInfo> {
+                new("BinaryPak", items: [
                     new($"FileSize: {FileSize}"),
                     new($"Version: {Version}"),
                     new($"Blocks: {Blocks.Count}"),
                     new($"DataType: {DataType}"),
-                })
+                ])
             };
             switch (DataType)
             {
@@ -266,82 +365,6 @@ namespace GameX.Valve.Formats
                 return size;
             }
         }
-
-        public void Read(BinaryReader r, bool verifyFileSize = false) //:true
-        {
-            Reader = r;
-            FileSize = r.ReadUInt32();
-            if (FileSize == 0x55AA1234) throw new FormatException("VPK file");
-            else if (FileSize == CompiledShader.MAGIC) throw new FormatException("Shader file");
-            else if (FileSize != r.BaseStream.Length) { }
-            var headerVersion = r.ReadUInt16();
-            if (headerVersion != KnownHeaderVersion) throw new FormatException($"Bad Magic: {headerVersion}, expected {KnownHeaderVersion}");
-            //if (FileName != null) DataType = DetermineResourceTypeByFileExtension();
-            Version = r.ReadUInt16();
-            var blockOffset = r.ReadUInt32();
-            var blockCount = r.ReadUInt32();
-            r.Skip(blockOffset - 8); // 8 is uint32 x2 we just read
-            for (var i = 0; i < blockCount; i++)
-            {
-                var blockType = Encoding.UTF8.GetString(r.ReadBytes(4));
-                var position = r.BaseStream.Position;
-                var offset = (uint)position + r.ReadUInt32();
-                var size = r.ReadUInt32();
-                var block = size >= 4 && blockType == "DATA" && !Block.IsHandledType(DataType) ? r.Peek(z =>
-                {
-                    var magic = z.ReadUInt32();
-                    return magic == XKV3.MAGIC || magic == XKV3.MAGIC2 || magic == XKV3.MAGIC3
-                        ? new XKV3()
-                        : magic == XKV1.MAGIC ? (Block)new XKV1() : null;
-                }) : null;
-                block ??= Block.Factory(this, blockType);
-                block.Offset = offset;
-                block.Size = size;
-                if (blockType == "REDI" || blockType == "RED2" || blockType == "NTRO") block.Read(this, r);
-                Blocks.Add(block);
-                switch (block)
-                {
-                    case REDI redi:
-                        // Try to determine resource type by looking at first compiler indentifier
-                        if (DataType == ResourceType.Unknown && REDI.Structs.TryGetValue(REDI.REDIStruct.SpecialDependencies, out var specialBlock))
-                        {
-                            var specialDeps = (R_SpecialDependencies)specialBlock;
-                            if (specialDeps.List.Count > 0) DataType = Block.DetermineTypeByCompilerIdentifier(specialDeps.List[0]);
-                        }
-                        // Try to determine resource type by looking at the input dependency if there is only one
-                        if (DataType == ResourceType.Unknown && REDI.Structs.TryGetValue(REDI.REDIStruct.InputDependencies, out var inputBlock))
-                        {
-                            var inputDeps = (R_InputDependencies)inputBlock;
-                            if (inputDeps.List.Count == 1) DataType = Block.DetermineResourceTypeByFileExtension(Path.GetExtension(inputDeps.List[0].ContentRelativeFilename));
-                        }
-                        break;
-                    case NTRO ntro:
-                        if (DataType == ResourceType.Unknown && ntro.ReferencedStructs.Count > 0)
-                            switch (ntro.ReferencedStructs[0].Name)
-                            {
-                                case "VSoundEventScript_t": DataType = ResourceType.SoundEventScript; break;
-                                case "CWorldVisibility": DataType = ResourceType.WorldVisibility; break;
-                            }
-                        break;
-                }
-                r.BaseStream.Position = position + 8;
-            }
-            foreach (var block in Blocks) if (!(block is REDI) && !(block is RED2) && !(block is NTRO)) block.Read(this, r);
-
-            var fullFileSize = FullFileSize;
-            if (verifyFileSize && Reader.BaseStream.Length != fullFileSize)
-            {
-                if (DataType == ResourceType.Texture)
-                {
-                    var data = (D_Texture)DATA;
-                    // TODO: We do not currently have a way of calculating buffer size for these types, Texture.GenerateBitmap also just reads until end of the buffer
-                    if (data.Format == VTexFormat.JPEG_DXT5 || data.Format == VTexFormat.JPEG_RGBA8888) return;
-                    // TODO: Valve added null bytes after the png for whatever reason, so assume we have the full file if the buffer is bigger than the size we calculated
-                    if (data.Format == VTexFormat.PNG_DXT5 || data.Format == VTexFormat.PNG_RGBA8888 && Reader.BaseStream.Length > fullFileSize) return;
-                }
-                throw new InvalidDataException($"File size ({Reader.BaseStream.Length}) does not match size specified in file ({fullFileSize}) ({DataType}).");
-            }
-        }
     }
 
     #endregion
@@ -349,9 +372,17 @@ namespace GameX.Valve.Formats
     #region Binary_Spr
     // https://github.com/yuraj11/HL-Texture-Tools
 
-    public unsafe class Binary_Spr : ITexture, IHaveMetaInfo
+    public unsafe class Binary_Spr : ITextureFrames, IHaveMetaInfo
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Spr(r, f));
+
+        (object gl, object vulken, object unity, object unreal) Format;
+        public int Width => width;
+        public int Height => height;
+        public int Depth => 0;
+        public int MipMaps => 1;
+        public TextureFlags Flags => 0;
+        public int Fps { get; } = 60;
 
         #region Headers
 
@@ -431,6 +462,14 @@ namespace GameX.Valve.Formats
 
         #endregion
 
+        int width;
+        int height;
+        SPR_Frame[] frames;
+        byte[][] pixels;
+        byte[] palette;
+        int frame;
+        byte[] bytes;
+
         public Binary_Spr(BinaryReader r, FileSource f)
         {
             Format = (
@@ -453,39 +492,16 @@ namespace GameX.Valve.Formats
             {
                 frames[i] = r.ReadS<SPR_Frame>();
                 ref SPR_Frame frame = ref frames[i];
-                var pixelSize = frame.Width * frame.Height;
-                pixels[i] = r.ReadBytes(pixelSize);
+                pixels[i] = r.ReadBytes(frame.Width * frame.Height);
             }
             width = frames[0].Width;
             height = frames[0].Height;
+            bytes = new byte[width * height << 2];
         }
-
-        int width;
-        int height;
-        SPR_Frame[] frames;
-        byte[][] pixels;
-        byte[] palette;
-
-        (object gl, object vulken, object unity, object unreal) Format;
-
-        public int Width => width;
-        public int Height => height;
-        public int Depth => 0;
-        public int MipMaps => pixels.Length;
-        public TextureFlags Flags => 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
-            var buf = new byte[pixels.Sum(x => x.Length) * 4];
-            var spans = new Range[pixels.Length];
-            int size;
-            for (int index = 0, offset = 0; index < pixels.Length; index++, offset += size)
-            {
-                var p = pixels[index];
-                size = p.Length * 4; var span = spans[index] = new Range(offset, offset + size);
-                Rasterize.CopyPixelsByPalette(buf.AsSpan(span), 4, p, palette);
-            }
-            return (buf, (Platform.Type)platform switch
+            return (bytes, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Unity => Format.unity,
@@ -493,13 +509,24 @@ namespace GameX.Valve.Formats
                 Platform.Type.Vulken => Format.vulken,
                 Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, spans);
+            }, null);
         }
         public void End() { }
 
+        public bool HasFrames => frame < frames.Length;
+
+        public bool DecodeFrame()
+        {
+            var p = pixels[frame];
+            Rasterize.CopyPixelsByPalette(bytes, 4, p, palette);
+            frame++;
+            return true;
+        }
+
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
-            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new("Texture", items: [
+            new(null, new MetaContent { Type = "VideoTexture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Sprite", items: [
+                new($"Frames: {frames.Length}"),
                 new($"Width: {Width}"),
                 new($"Height: {Height}"),
                 new($"Mipmaps: {MipMaps}"),

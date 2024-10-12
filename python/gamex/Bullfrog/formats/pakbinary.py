@@ -3,7 +3,7 @@ from io import BytesIO
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinaryT
 from gamex.util import _pathExtension
-from .Bullfrog.binary_fli import Binary_Fli
+from gamex.Bullfrog.formats.binary import Binary_Fli
 
 # typedefs
 class Reader: pass
@@ -12,22 +12,13 @@ class FamilyGame: pass
 class IFileSystem: pass
 class FileOption: pass
 
-S_FLIFILES = ['INTRO.DAT', 'MBRIEF.DAT', 'MBRIEOUT.DAT', 'MCONFOUT.DAT', 'MCONFUP.DAT', 'MDEBRIEF.DAT', 'MDEOUT.DAT', 'MENDLOSE.DAT', 'MENDWIN.DAT', 'MGAMEWIN.DAT', 'MLOSA.DAT', 'MLOSAOUT.DAT', 'MLOSEGAM.DAT', 'MMAP.DAT', 'MMAPOUT.DAT', 'MOPTION.DAT', 'MOPTOUT.DAT', 'MRESOUT.DAT', 'MRESRCH.DAT', 'MSCRENUP.DAT', 'MSELECT.DAT', 'MSELOUT.DAT', 'MTITLE.DAT', 'MMULTI.DAT', 'MMULTOUT.DAT']
+#region PakBinary_Bullfrog
 
-# PakBinary_Void
+# PakBinary_Bullfrog
 class PakBinary_Bullfrog(PakBinaryT):
     @staticmethod
     def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match game.id:
-            case 'S':
-                match os.path.basename(source.path).upper():
-                    case x if x in S_FLIFILES: return (0, Binary_Fli.factory)
-                    ## case 'MCONSCR.DAT': return (0, Binary_Raw.FactoryMethod()),
-                    ## case 'MLOGOS.DAT': return (0, Binary_Raw.FactoryMethod()),
-                    ## case 'MMAPBLK.DAT': return (0, Binary_Raw.FactoryMethod()),
-                    ## case 'MMINLOGO.DAT': return (0, Binary_Raw.FactoryMethod()),
-                    # case 'HFNT01.DAT': return (0, Binary_Syndicate.Factory_Font),
-                    case _: return (0, None)
             case _: return (0, None)
 
     #region Headers
@@ -112,3 +103,72 @@ class PakBinary_Bullfrog(PakBinaryT):
     # readData
     def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
         pass
+
+#endregion
+
+#region PakBinary_Populus
+
+# PakBinary_Populus
+class PakBinary_Populus(PakBinaryT):
+    @staticmethod
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+        match game.id:
+            case _: return (0, None)
+
+    #region Headers
+
+    MAGIC_SPR = 0x42465350
+
+    class SPR_Record:
+        struct = ('<2HI', 12)
+        def __init__(self, tuple):
+            self.width, \
+            self.height, \
+            self.offset = tuple
+
+    class DAT_Sprite:
+        struct = ('<2bI', 10)
+        def __init__(self, tuple):
+            self.width, \
+            self.height, \
+            self.unknown, \
+            self.offset = tuple
+
+    #endregion
+
+    # read
+    def read(self, source: BinaryPakFile, r: Reader, tag: object = None) -> None:
+        source.files = files = []
+
+    # readData
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+        pass
+
+#endregion
+
+#region PakBinary_Syndicate
+
+S_FLIFILES = ['INTRO.DAT', 'MBRIEF.DAT', 'MBRIEOUT.DAT', 'MCONFOUT.DAT', 'MCONFUP.DAT', 'MDEBRIEF.DAT', 'MDEOUT.DAT', 'MENDLOSE.DAT', 'MENDWIN.DAT', 'MGAMEWIN.DAT', 'MLOSA.DAT', 'MLOSAOUT.DAT', 'MLOSEGAM.DAT', 'MMAP.DAT', 'MMAPOUT.DAT', 'MOPTION.DAT', 'MOPTOUT.DAT', 'MRESOUT.DAT', 'MRESRCH.DAT', 'MSCRENUP.DAT', 'MSELECT.DAT', 'MSELOUT.DAT', 'MTITLE.DAT', 'MMULTI.DAT', 'MMULTOUT.DAT']
+
+# PakBinary_Syndicate
+class PakBinary_Syndicate(PakBinaryT):
+    @staticmethod
+    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+        match os.path.basename(source.path).upper():
+            case x if x in S_FLIFILES: return (0, Binary_Fli.factory)
+            ## case 'MCONSCR.DAT': return (0, Binary_Raw.FactoryMethod()),
+            ## case 'MLOGOS.DAT': return (0, Binary_Raw.FactoryMethod()),
+            ## case 'MMAPBLK.DAT': return (0, Binary_Raw.FactoryMethod()),
+            ## case 'MMINLOGO.DAT': return (0, Binary_Raw.FactoryMethod()),
+            # case 'HFNT01.DAT': return (0, Binary_Syndicate.Factory_Font),
+            case _: return (0, None)
+
+    # read
+    def read(self, source: BinaryPakFile, r: Reader, tag: object = None) -> None:
+        source.files = files = []
+
+    # readData
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+        pass
+
+#endregion

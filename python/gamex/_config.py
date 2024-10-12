@@ -3,6 +3,7 @@ __version__ = "0.0.1"
 # __current__ = "Unknown"
 # __current__ = "Arkane"
 # __current__ = "Bethesda"
+# __current__ = "Bullfrog"
 __current__ = "Valve"
 
 class GlobalOption:
@@ -113,7 +114,7 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:*",
+            ForcePath = "sample:0",
             Family = "Bullfrog",
             # Game = "P", # Populous
             # Game = "P2", # Populous II: Trials of the Olympian Gods

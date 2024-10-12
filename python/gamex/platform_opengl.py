@@ -67,11 +67,11 @@ class OpenGLTextureBuilder(TextureBuilderBase):
         id = reuse if reuse != None else glGenTextures(1)
         numMipMaps = max(1, source.mipMaps)
         level = range(level2.start if level2 else 0, numMipMaps)
-        
+
         # bind
         glBindTexture(GL_TEXTURE_2D, id)
         if level.start > 0: glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level.start)
-        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, level.stop - level.start - 1)
+        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, level.stop - 1)
         bytes, fmt, spans = source.begin(Platform.Type.OpenGL)
         pixels = []
 

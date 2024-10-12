@@ -7,12 +7,16 @@
   "samples": [
     "ValveFamily.Sample.json"
   ],
+  "engines": {
+    "GoldSrc": {},
+    "Source": {}
+  },
   "games": {
     "*": {
       "pakFileType": "GameX.Valve.ValvePakFile, GameX.Valve",
-      "engine": "HL",
+      "engine": "GoldSrc",
       "searchBy": "AllDir",
-      "pakExt": ".wad"
+      "pakExt": [".wad", ".bsp"]
     },
     "HL": {
       "name": "Half-Life",

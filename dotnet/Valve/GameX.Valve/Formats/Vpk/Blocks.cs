@@ -114,7 +114,7 @@ namespace GameX.Valve.Formats.Vpk
         /// </summary>
         public uint Size { get; set; }
 
-        public abstract void Read(Binary_Pak parent, BinaryReader r);
+        public abstract void Read(Binary_Src parent, BinaryReader r);
 
         /// <summary>
         /// Returns a string that represents the current object.
@@ -134,7 +134,7 @@ namespace GameX.Valve.Formats.Vpk
         public virtual void WriteText(IndentedTextWriter w) => w.WriteLine("{0:X8}", Offset);
 
         //was:Resource.ConstructFromType()
-        public static Block Factory(Binary_Pak source, string value)
+        public static Block Factory(Binary_Src source, string value)
             => value switch
             {
                 "DATA" => Factory(source),
@@ -160,7 +160,7 @@ namespace GameX.Valve.Formats.Vpk
             };
 
         //was:Resource.ConstructResourceType()
-        internal static DATA Factory(Binary_Pak source) => source.DataType switch
+        internal static DATA Factory(Binary_Src source) => source.DataType switch
         {
             var x when x == ResourceType.Panorama || x == ResourceType.PanoramaScript || x == ResourceType.PanoramaTypescript || x == ResourceType.PanoramaDynamicImages || x == ResourceType.PanoramaVectorGraphic => new D_Panorama(),
             ResourceType.PanoramaStyle => new D_PanoramaStyle(),
@@ -286,7 +286,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public IDictionary<string, object> KeyValues { get; private set; }
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.BaseStream.Position = Offset;
             //KeyValues = KVSerializer.Create(KVSerializationFormat.KeyValues1Binary).Deserialize(r.BaseStream);
@@ -369,7 +369,7 @@ namespace GameX.Valve.Formats.Vpk
         long currentEightBytesOffset = -1;
         long currentBinaryBytesOffset = -1;
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             var magic = r.ReadUInt32();
@@ -417,7 +417,7 @@ namespace GameX.Valve.Formats.Vpk
             s.Seek(0, SeekOrigin.Begin);
 
             strings = new string[r2.ReadUInt32()];
-            for (var i = 0; i < strings.Length; i++) strings[i] = r2.ReadZUTF8();
+            for (var i = 0; i < strings.Length; i++) strings[i] = r2.ReadVUString();
 
             Data = (IDictionary<string, object>)ParseBinaryKV3(r2, null, true);
 
@@ -461,7 +461,7 @@ namespace GameX.Valve.Formats.Vpk
             r2.BaseStream.Position += countOfEightByteValues * 8;
 
             strings = new string[countOfStrings];
-            for (var i = 0; i < countOfStrings; i++) strings[i] = r2.ReadZUTF8();
+            for (var i = 0; i < countOfStrings; i++) strings[i] = r2.ReadVUString();
 
             // bytes after the string table is kv types, minus 4 static bytes at the end
             var typesLength = r2.BaseStream.Length - 4 - r2.BaseStream.Position;
@@ -564,7 +564,7 @@ namespace GameX.Valve.Formats.Vpk
             var stringArrayStartPosition = r2.BaseStream.Position;
 
             strings = new string[countOfStrings];
-            for (var i = 0; i < countOfStrings; i++) strings[i] = r2.ReadZUTF8();
+            for (var i = 0; i < countOfStrings; i++) strings[i] = r2.ReadVUString();
 
             var typesLength = stringAndTypesBufferSize - (r2.BaseStream.Position - stringArrayStartPosition);
             types = new byte[typesLength];
@@ -776,14 +776,14 @@ namespace GameX.Valve.Formats.Vpk
     public class XKV3_NTRO : DATA
     {
         readonly string IntrospectionStructName;
-        protected Binary_Pak Parent { get; private set; }
+        protected Binary_Src Parent { get; private set; }
         public IDictionary<string, object> Data { get; private set; }
         DATA BackingData;
 
         public XKV3_NTRO() { }
         public XKV3_NTRO(string introspectionStructName) => IntrospectionStructName = introspectionStructName;
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             Parent = parent;
             if (!parent.ContainsBlockType<NTRO>())
@@ -978,7 +978,7 @@ namespace GameX.Valve.Formats.Vpk
         public List<ResourceDiskStruct> ReferencedStructs { get; } = new List<ResourceDiskStruct>();
         public List<ResourceDiskEnum> ReferencedEnums { get; } = new List<ResourceDiskEnum>();
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             IntrospectionVersion = r.ReadUInt32();
@@ -1157,7 +1157,7 @@ namespace GameX.Valve.Formats.Vpk
             return default;
         }
 
-        public override void Read(Binary_Pak parent, BinaryReader r) { }
+        public override void Read(Binary_Src parent, BinaryReader r) { }
     }
 
     #endregion
@@ -1236,7 +1236,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public IDictionary<string, object> SearchableUserData { get; private set; }
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             var kv3 = new XKV3
             {
@@ -1313,7 +1313,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public Dictionary<REDIStruct, REDI> Structs { get; private set; } = new Dictionary<REDIStruct, REDI>();
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             for (var i = REDIStruct.InputDependencies; i < REDIStruct.End; i++)
@@ -1384,7 +1384,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public string this[ulong id] => RERLInfos.FirstOrDefault(c => c.Id == id)?.Name;
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             var offset = r.ReadUInt32();
@@ -1398,7 +1398,7 @@ namespace GameX.Valve.Formats.Vpk
                 var previousPosition = r.BaseStream.Position;
                 // jump to string: offset is counted from current position, so we will need to add 8 to position later
                 r.BaseStream.Position += r.ReadInt64();
-                RERLInfos.Add(new RERLInfo { Id = id, Name = r.ReadZUTF8() });
+                RERLInfos.Add(new RERLInfo { Id = id, Name = r.ReadVUString() });
                 r.BaseStream.Position = previousPosition + 8; // 8 is to account for string offset
             }
         }
@@ -1432,7 +1432,7 @@ namespace GameX.Valve.Formats.Vpk
     /// </summary>
     public class SNAP : Block
     {
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             throw new NotImplementedException();
@@ -1478,7 +1478,7 @@ namespace GameX.Valve.Formats.Vpk
             }
         }
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             var vertexBufferOffset = r.ReadUInt32();
@@ -1526,7 +1526,7 @@ namespace GameX.Valve.Formats.Vpk
                 {
                     var attribute = default(OnDiskBufferData.Attribute);
                     var previousPosition = r.BaseStream.Position;
-                    attribute.SemanticName = r.ReadZUTF8().ToUpperInvariant(); //32 bytes long null-terminated string
+                    attribute.SemanticName = r.ReadVUString().ToUpperInvariant(); //32 bytes long null-terminated string
                     r.BaseStream.Position = previousPosition + 32; // Offset is always 40 bytes from the start
                     attribute.SemanticIndex = r.ReadInt32();
                     attribute.Format = (DXGI_FORMAT)r.ReadUInt32();
@@ -1756,7 +1756,7 @@ namespace GameX.Valve.Formats.Vpk
     /// </summary>
     public class VXVS : Block
     {
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             throw new NotImplementedException();
@@ -1879,14 +1879,14 @@ namespace GameX.Valve.Formats.Vpk
                         EntityFieldType.UInt => r.ReadUInt32(),
                         EntityFieldType.Integer64 => r.ReadUInt64(),
                         var x when x == EntityFieldType.Vector || x == EntityFieldType.QAngle => new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle()),
-                        EntityFieldType.CString => r.ReadZUTF8(), // null term variable
+                        EntityFieldType.CString => r.ReadVUString(), // null term variable
                         _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unknown type {type}"),
                     }
                 };
                 entity.Properties.Add(keyHash, entityProperty);
             }
             for (var i = 0; i < hashedFieldsCount; i++) ReadTypedValue(r.ReadUInt32(), null); // murmur2 hashed field name (see EntityLumpKeyLookup)
-            for (var i = 0; i < stringFieldsCount; i++) ReadTypedValue(r.ReadUInt32(), r.ReadZUTF8());
+            for (var i = 0; i < stringFieldsCount; i++) ReadTypedValue(r.ReadUInt32(), r.ReadVUString());
             if (connections.Length > 0) entity.Connections = connections.ToList();
             return entity;
         }
@@ -8226,7 +8226,7 @@ namespace GameX.Valve.Formats.Vpk
         public Dictionary<string, Vector4> VectorAttributes { get; } = [];
         public Dictionary<string, string> StringAttributes { get; } = [];
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             base.Read(parent, r);
             Name = Data.Get<string>("m_materialName");
@@ -8286,7 +8286,7 @@ namespace GameX.Valve.Formats.Vpk
         public Vector3 MaxBounds { get; private set; }
         public D_Morph MorphData { get; set; }
 
-        public D_Mesh(Binary_Pak pak) : base("PermRenderMeshData_t") { }
+        public D_Mesh(Binary_Src pak) : base("PermRenderMeshData_t") { }
 
         public void GetBounds()
         {
@@ -8320,7 +8320,7 @@ namespace GameX.Valve.Formats.Vpk
                 var morphSetPath = Data.Get<string>("m_morphSet");
                 if (!string.IsNullOrEmpty(morphSetPath))
                 {
-                    var morphSetResource = await fileLoader.LoadFileObject<Binary_Pak>(morphSetPath + "_c");
+                    var morphSetResource = await fileLoader.LoadFileObject<Binary_Src>(morphSetPath + "_c");
                     if (morphSetResource != null)
                     {
                         //MorphData = morphSetResource.GetBlockByType<MRPH>() as DATAMorph;
@@ -8459,7 +8459,7 @@ namespace GameX.Valve.Formats.Vpk
             // Load animations from referenced animation groups
             foreach (var animGroupPath in animGroupPaths)
             {
-                var animGroup = gfx.LoadFileObject<Binary_Pak>($"{animGroupPath}_c").Result;
+                var animGroup = gfx.LoadFileObject<Binary_Src>($"{animGroupPath}_c").Result;
                 if (animGroup != default) animations.AddRange(AnimationGroupLoader.LoadAnimationGroup(animGroup, gfx, Skeleton));
             }
 
@@ -8621,11 +8621,11 @@ namespace GameX.Valve.Formats.Vpk
     //was:Resource/ResourceTypes/NTRO
     public class D_NTRO : DATA
     {
-        protected Binary_Pak Parent;
+        protected Binary_Src Parent;
         public IDictionary<string, object> Data;
         public string StructName;
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             Parent = parent;
             Data = ReadStructure(r, StructName != null
@@ -8780,7 +8780,7 @@ namespace GameX.Valve.Formats.Vpk
         public byte[] Data { get; private set; }
         public uint Crc32 { get; private set; }
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             Crc32 = r.ReadUInt32();
@@ -8788,7 +8788,7 @@ namespace GameX.Valve.Formats.Vpk
             for (var i = 0; i < size; i++)
                 Names.Add(new NameEntry
                 {
-                    Name = r.ReadZUTF8(),
+                    Name = r.ReadVUString(),
                     Unknown1 = r.ReadUInt32(),
                     Unknown2 = r.ReadUInt32(),
                 });
@@ -8812,7 +8812,7 @@ namespace GameX.Valve.Formats.Vpk
     {
         XKV3 _layoutContent;
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             base.Read(parent, r);
             _layoutContent = parent.GetBlockByType<LACO>();
@@ -8943,7 +8943,7 @@ namespace GameX.Valve.Formats.Vpk
     {
         XKV3 SourceMap;
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             base.Read(parent, r);
             SourceMap = parent.GetBlockByType<SRMA>();
@@ -9027,7 +9027,7 @@ namespace GameX.Valve.Formats.Vpk
     {
         public new string Data;
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             Data = Encoding.UTF8.GetString(r.ReadBytes((int)Size));
@@ -9147,7 +9147,7 @@ namespace GameX.Valve.Formats.Vpk
     {
         public List<List<string>> Resources { get; private set; }
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             if (parent.ContainsBlockType<NTRO>())
@@ -9175,7 +9175,7 @@ namespace GameX.Valve.Formats.Vpk
                     var returnOffset = r.BaseStream.Position;
                     var stringOffset = r.ReadInt32();
                     r.Seek(returnOffset + stringOffset);
-                    strings.Add(r.ReadZUTF8());
+                    strings.Add(r.ReadVUString());
                     r.Seek(returnOffset + 4);
                 }
                 r.Seek(originalOffset + 8);
@@ -9289,9 +9289,9 @@ namespace GameX.Valve.Formats.Vpk
 
         public uint StreamingDataSize { get; private set; }
 
-        protected Binary_Pak Parent { get; private set; }
+        protected Binary_Src Parent { get; private set; }
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             Parent = parent;
             r.Seek(Offset);
@@ -9499,7 +9499,7 @@ namespace GameX.Valve.Formats.Vpk
     {
         public Dictionary<string, string> SoundEventScriptValue = [];
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             base.Read(parent, r);
 
@@ -9537,7 +9537,7 @@ namespace GameX.Valve.Formats.Vpk
     {
         public Dictionary<string, string> SoundStackScriptValue = [];
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             var version = r.ReadInt32();
@@ -9549,9 +9549,9 @@ namespace GameX.Valve.Formats.Vpk
                 var offsetToName = offset + r.ReadInt32(); offset += 4;
                 var offsetToValue = offset + r.ReadInt32(); offset += 4;
                 r.Seek(offsetToName);
-                var name = r.ReadZUTF8();
+                var name = r.ReadVUString();
                 r.Seek(offsetToValue);
-                var value = r.ReadZUTF8();
+                var value = r.ReadVUString();
                 r.Seek(offset);
                 if (SoundStackScriptValue.ContainsKey(name)) SoundStackScriptValue.Remove(name); // duplicates last wins
                 SoundStackScriptValue.Add(name, value);
@@ -9696,7 +9696,7 @@ namespace GameX.Valve.Formats.Vpk
 
         #endregion
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             Reader = r;
@@ -9817,7 +9817,7 @@ namespace GameX.Valve.Formats.Vpk
                 r.Peek(z =>
                 {
                     z.Seek(nameOffset);
-                    sequence.Name = z.ReadZUTF8();
+                    sequence.Name = z.ReadVUString();
 
                     if (floatParamsCount > 0)
                     {
@@ -9828,7 +9828,7 @@ namespace GameX.Valve.Formats.Vpk
                             var floatValue = r.ReadSingle();
                             var offsetNextParam = r.BaseStream.Position;
                             r.Seek(floatParamNameOffset);
-                            var floatName = r.ReadZUTF8();
+                            var floatName = r.ReadVUString();
                             r.Seek(offsetNextParam);
                             sequence.FloatParams.Add(floatName, floatValue);
                         }
@@ -9881,7 +9881,7 @@ namespace GameX.Valve.Formats.Vpk
             w.WriteLine($"{"Format",-12} = {(int)Format} (VTEX_FORMAT_{Format})");
             w.WriteLine($"{"Flags",-12} = 0x{(int)Flags:X8}");
             foreach (Enum value in Enum.GetValues(Flags.GetType())) if (Flags.HasFlag(value)) w.WriteLine($"{"",-12} | 0x{(Convert.ToInt32(value)):X8} = VTEX_FLAG_{value}");
-            w.WriteLine($"{"Extra Data",-12} = {ExtraData.Count} entries:");
+            w.WriteLine($"{"Data Data",-12} = {ExtraData.Count} entries:");
             var entry = 0;
             foreach (var b in ExtraData)
             {
@@ -9983,7 +9983,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public List<AdditionalRelatedFile> List = [];
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             for (var i = 0; i < Size; i++)
@@ -10028,7 +10028,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public List<ArgumentDependency> List { get; } = [];
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             for (var i = 0; i < Size; i++)
@@ -10072,7 +10072,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public List<ReferenceInfo> List = [];
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             for (var i = 0; i < Size; i++)
@@ -10098,7 +10098,7 @@ namespace GameX.Valve.Formats.Vpk
 
     public class R_CustomDependencies : REDI
     {
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             if (Size > 0) throw new NotImplementedException("CustomDependencies block is not handled.");
@@ -10133,7 +10133,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public List<EditFloatData> List { get; } = new List<EditFloatData>();
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             for (var i = 0; i < Size; i++) List.Add(new EditFloatData
@@ -10173,7 +10173,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public List<EditIntData> List { get; } = new List<EditIntData>();
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             for (var i = 0; i < Size; i++) List.Add(new EditIntData
@@ -10222,7 +10222,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public List<EditStringData> List { get; } = new List<EditStringData>();
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             for (var i = 0; i < Size; i++) List.Add(new EditStringData
@@ -10266,7 +10266,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public List<InputDependency> List = [];
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             for (var i = 0; i < Size; i++)
@@ -10319,7 +10319,7 @@ namespace GameX.Valve.Formats.Vpk
 
         public List<SpecialDependency> List = [];
 
-        public override void Read(Binary_Pak parent, BinaryReader r)
+        public override void Read(Binary_Src parent, BinaryReader r)
         {
             r.Seek(Offset);
             for (var i = 0; i < Size; i++)

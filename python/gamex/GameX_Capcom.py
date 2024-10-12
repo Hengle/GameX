@@ -1,13 +1,13 @@
 import os
 from gamex.pak import BinaryPakFile
-from .Base.pakbinary_zip import PakBinary_Zip
-from .Capcom.pakbinary_arc import PakBinary_Arc
-from .Capcom.pakbinary_big import PakBinary_Big
-from .Capcom.pakbinary_bundle import PakBinary_Bundle
-from .Capcom.pakbinary_kpka import PakBinary_Kpka
-from .Capcom.pakbinary_plist import PakBinary_Plist
-from .Unity.pakbinary_unity import PakBinary_Unity
-from .util import _pathExtension
+from gamex.Base.pakbinary_zip import PakBinary_Zip
+from gamex.Capcom.pakbinary_arc import PakBinary_Arc
+from gamex.Capcom.pakbinary_big import PakBinary_Big
+from gamex.Capcom.pakbinary_bundle import PakBinary_Bundle
+from gamex.Capcom.pakbinary_kpka import PakBinary_Kpka
+from gamex.Capcom.pakbinary_plist import PakBinary_Plist
+from gamex.Unity.pakbinary_unity import PakBinary_Unity
+from gamex.util import _pathExtension
 
 # typedefs
 class FamilyGame: pass

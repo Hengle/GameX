@@ -1,5 +1,3 @@
-using OpenStack.Gfx;
-using OpenStack.Gfx.Gl;
 using OpenStack.Gfx.Gl.Renders;
 using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
@@ -9,6 +7,8 @@ namespace GameX.App.Explorer.Controls
     public class ViewVideoTexture : ViewBase<ITextureFrames>
     {
         int FrameDelay;
+
+        public ViewVideoTexture() : base(new TimeSpan(1)) { }
 
         protected override void SetViewport(int x, int y, int width, int height)
         {

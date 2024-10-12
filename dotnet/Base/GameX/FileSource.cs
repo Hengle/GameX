@@ -24,7 +24,7 @@ namespace GameX
         public IList<FileSource> Parts;
         public object Tag;
         // extra
-        public byte[] Extra;
+        public byte[] Data;
         public object ExtraArgs;
         // cached
         internal Func<BinaryReader, FileSource, PakFile, Task<object>> CachedObjectFactory;

@@ -127,7 +127,7 @@ namespace GameX.Valve.OpenGL.Scenes
             // Load referred meshes from file (only load meshes with LoD 1)
             foreach (var refMesh in GetLod1RefMeshes())
             {
-                var newResource = Scene.Gfx.LoadFileObject<Binary_Pak>($"{refMesh.MeshName}_c").Result;
+                var newResource = Scene.Gfx.LoadFileObject<Binary_Src>($"{refMesh.MeshName}_c").Result;
                 if (newResource == null) continue;
 
                 if (!newResource.ContainsBlockType<VBIB>()) { Console.WriteLine("Old style model, no VBIB!"); continue; }

@@ -1,4 +1,7 @@
 ﻿using GameX.Meta;
+using GameX.Platforms;
+using OpenStack.Gfx.Renders;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,9 +10,283 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static OpenStack.Debug;
 
 namespace GameX.Bullfrog.Formats
 {
+    #region Binary_Fli
+
+    public unsafe class Binary_Fli : IDisposable, ITextureFrames, IHaveMetaInfo
+    {
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Fli(r, f));
+
+        // logging
+        //static StreamWriter F;
+        //static void FO(string x) { F = File.CreateText("C:\\T_\\FROG\\Fli2.txt"); }
+        //static void FW(string x) { F.Write(x); F.Flush(); }
+        //FO("C:\\T_\\FROG\\Fli2.txt");
+
+        (object gl, object vulken, object unity, object unreal) Format;
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth => 0;
+        public int MipMaps => 0;
+        public TextureFlags Flags => 0;
+        public int Fps { get; }
+
+        #region Headers
+
+        public const int MAGIC = 0xAF12;
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public unsafe struct X_Header
+        {
+            public static (string, int) Struct = ("<I4H", sizeof(X_Header));
+            public uint Size;
+            public ushort Type;
+            public ushort Frames;
+            public ushort Width;
+            public ushort Height;
+        }
+
+        public enum ChunkType : ushort
+        {
+            COLOR_256 = 0x4,    // COLOR_256
+            DELTA_FLC = 0x7,    // DELTA_FLC (FLI_SS2)
+            BYTE_RUN = 0xF,     // BYTE_RUN
+            FRAME = 0xF1FA,     // FRAME_TYPE
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public unsafe struct X_ChunkHeader
+        {
+            public static (string, int) Struct = ("<IH", sizeof(X_ChunkHeader));
+            public uint Size;
+            public ChunkType Type;
+            public bool IsValid => Type == ChunkType.COLOR_256 || Type == ChunkType.DELTA_FLC || Type == ChunkType.BYTE_RUN || Type == ChunkType.FRAME;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public unsafe struct X_FrameHeader
+        {
+            public static (string, int) Struct = ("<5H", sizeof(X_FrameHeader));
+            public ushort NumChunks;
+            public ushort Delay;
+            public ushort Reserved;
+            public ushort WidthOverride;
+            public ushort HeightOverride;
+        }
+
+        public enum OpCode : ushort
+        {
+            PACKETCOUNT = 0,    // PACKETCOUNT
+            UNDEFINED = 1,      // UNDEFINED
+            LASTPIXEL = 2,      // LASTPIXEL
+            LINESKIPCOUNT = 3,  // LINESKIPCOUNT
+        }
+
+        #endregion
+
+        public BinaryReader R;
+        public byte[] Pixels;
+        public byte[] Palette;
+        //public byte[][] Palette = new byte[256][];
+        public S.Event[] Events;
+        public int Frames;
+        public int NumFrames;
+        public byte[] Bytes;
+
+        public Binary_Fli(BinaryReader r, FileSource f)
+        {
+            // read events
+            Events = S.GetEvents($"{Path.GetFileNameWithoutExtension(f.Path).ToLowerInvariant()}.evt");
+
+            // read header
+            var header = r.ReadS<X_Header>();
+            if (header.Type != MAGIC) throw new FormatException("BAD MAGIC");
+            Format = (
+                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                TextureUnityFormat.RGB24,
+                TextureUnrealFormat.Unknown);
+            Width = header.Width;
+            Height = header.Height;
+            Frames = NumFrames = header.Frames;
+
+            // set values
+            R = r;
+            Fps = Path.GetFileName(f.Path).StartsWith("mscren", StringComparison.OrdinalIgnoreCase) ? 20 : 15;
+            Pixels = new byte[Width * Height];
+            Palette = new byte[256 * 3];
+            Bytes = new byte[Width * Height * 3];
+        }
+
+        public void Dispose() => R.Close();
+
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+            => (Bytes, (Platform.Type)platform switch
+            {
+                Platform.Type.OpenGL => Format.gl,
+                Platform.Type.Unity => Format.unity,
+                Platform.Type.Unreal => Format.unreal,
+                Platform.Type.Vulken => Format.vulken,
+                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
+            }, null);
+        public void End() { }
+
+        public bool HasFrames => NumFrames > 0;
+
+        public bool DecodeFrame()
+        {
+            var r = R;
+            X_FrameHeader frameHeader;
+            var header = r.ReadS<X_ChunkHeader>();
+            do
+            {
+                var nextPosition = r.BaseStream.Position + (header.Size - 6);
+                switch (header.Type)
+                {
+                    case ChunkType.COLOR_256: SetPalette(r); break;
+                    case ChunkType.DELTA_FLC: DecodeDeltaFLC(r); break;
+                    case ChunkType.BYTE_RUN: DecodeByteRun(r); break;
+                    case ChunkType.FRAME:
+                        frameHeader = r.ReadS<X_FrameHeader>();
+                        NumFrames--;
+                        //Log($"Frames Remaining: {NumFrames}, Chunks: {frameHeader.NumChunks}");
+                        break;
+                    default:
+                        Log($"Unknown Type: {header.Type}");
+                        r.Skip(header.Size);
+                        break;
+                }
+                if (header.Type != ChunkType.FRAME && r.BaseStream.Position != nextPosition) r.Seek(nextPosition);
+                header = r.ReadS<X_ChunkHeader>();
+            }
+            while (header.IsValid && header.Type != ChunkType.FRAME);
+            Rasterize.CopyPixelsByPalette(Bytes, 3, Pixels, Palette);
+            if (header.Type == ChunkType.FRAME) r.Skip(-sizeof(X_ChunkHeader));
+            return header.IsValid;
+        }
+
+        void SetPalette(BinaryReader r)
+        {
+            var numPackets = r.ReadUInt16();
+            if (r.ReadUInt16() == 0) // special case
+            {
+                var data = r.ReadBytes(256 * 3);
+                for (int i = 0; i < data.Length; i += 3)
+                {
+                    Palette[i + 0] = (byte)((data[i + 0] << 2) | (data[i + 0] & 3));
+                    Palette[i + 1] = (byte)((data[i + 1] << 2) | (data[i + 1] & 3));
+                    Palette[i + 2] = (byte)((data[i + 2] << 2) | (data[i + 2] & 3));
+                }
+                return;
+            }
+            r.Skip(-2);
+            var palPos = 0;
+            while (numPackets-- != 0)
+            {
+                palPos += r.ReadByte() * 3;
+                var change = r.ReadByte();
+                var data = r.ReadBytes(change * 3);
+                for (int i = 0; i < data.Length; i += 3)
+                {
+                    Palette[palPos + i + 0] = (byte)((data[i + 0] << 2) | (data[i + 0] & 3));
+                    Palette[palPos + i + 1] = (byte)((data[i + 1] << 2) | (data[i + 1] & 3));
+                    Palette[palPos + i + 2] = (byte)((data[i + 2] << 2) | (data[i + 2] & 3));
+                }
+                palPos += change;
+            }
+        }
+
+        void DecodeDeltaFLC(BinaryReader r)
+        {
+            var linesInChunk = r.ReadUInt16();
+            int curLine = 0, numPackets = 0, value;
+            while (linesInChunk-- > 0)
+            {
+                // first process all the opcodes.
+                OpCode opcode;
+                do
+                {
+                    value = r.ReadUInt16();
+                    opcode = (OpCode)((value >> 14) & 3);
+                    switch (opcode)
+                    {
+                        case OpCode.PACKETCOUNT: numPackets = value; break;
+                        case OpCode.UNDEFINED: break;
+                        case OpCode.LASTPIXEL: Pixels[(curLine * Width) + (Width - 1)] = (byte)(value & 0xFF); break;
+                        case OpCode.LINESKIPCOUNT: curLine += -(short)value; break;
+                    }
+                } while (opcode != OpCode.PACKETCOUNT);
+
+                // now interpret the RLE data
+                value = 0;
+                while (numPackets-- > 0)
+                {
+                    value += r.ReadByte();
+                    var pixels = Pixels.AsSpan((curLine * Width) + value);
+                    fixed (byte* _ = pixels)
+                    {
+                        var count = (int)r.ReadSByte();
+                        if (count > 0)
+                        {
+                            var size = count << 1;
+                            Unsafe.CopyBlock(ref *_, ref r.ReadBytes(size)[0], (uint)size);
+                            value += size;
+                        }
+                        else if (count < 0)
+                        {
+                            var __ = (ushort*)_;
+                            count = -count;
+                            var size = count << 1;
+                            var data = r.ReadUInt16();
+                            while (count-- != 0) *__++ = data;
+                            value += size;
+                        }
+                        else return;
+                    }
+                }
+                curLine++;
+            }
+        }
+
+        void DecodeByteRun(BinaryReader r)
+        {
+            fixed (byte* _ = Pixels)
+            {
+                byte* ptr = _, endPtr = _ + (Width * Height);
+                while (ptr < endPtr)
+                {
+                    var numChunks = r.ReadByte();
+                    while (numChunks-- != 0)
+                    {
+                        var count = (int)r.ReadSByte();
+                        if (count > 0) { Unsafe.InitBlock(ref *ptr, r.ReadByte(), (uint)count); ptr += count; }
+                        else { count = -count; Unsafe.CopyBlock(ref *ptr, ref r.ReadBytes(count)[0], (uint)count); ptr += count; }
+                    }
+                }
+            }
+        }
+
+        // IHaveMetaInfo
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
+        {
+            return [
+                new(null, new MetaContent { Type = "VideoTexture", Name = Path.GetFileName(file.Path), Value = this }),
+                new("Video", items: [
+                    new($"Width: {Width}"),
+                    new($"Height: {Height}"),
+                    new($"Frames: {Frames}")
+                ])
+            ];
+        }
+    }
+
+    #endregion
+
+    #region Binary_Syndicate
+
     public unsafe class Binary_Syndicate : IHaveMetaInfo
     {
         public enum Kind { Font, Game, MapColumn, MapData, MapTile, Mission, Palette, Raw, Req, SoundData, SoundTab, SpriteAnim, SpriteFrame, SpriteElement, SpriteTab, SpriteData };
@@ -521,13 +798,11 @@ namespace GameX.Bullfrog.Formats
                 case Kind.SoundTab: // Skips Kind.SoundData
                     {
                         var data = ((MemoryStream)s.LoadFileData(Path.ChangeExtension(f.Path, ".DAT")).Result).ToArray();
-
                         const int OFFSET = 58;
                         var sounds = new List<byte[]>();
                         r2.Seek(OFFSET);
                         var offset = 0;
-                        var count = (int)((streamSize - OFFSET) / sizeof(X_SoundTab)) + 1;
-                        Obj = r2.ReadSArray<X_SoundTab>(count).Select((t, i) =>
+                        Obj = r2.ReadSArray<X_SoundTab>((int)((streamSize - OFFSET) / sizeof(X_SoundTab)) + 1).Select((t, i) =>
                         {
                             if (t.Size <= 144) return null;
                             var sample = data[offset..(offset + (int)t.Size)];
@@ -716,16 +991,14 @@ namespace GameX.Bullfrog.Formats
                             };
                         }
 
-                        var count = (int)(streamSize / sizeof(X_SpriteTab));
-                        Obj = r2.ReadSArray<X_SpriteTab>(count).Select(t =>
+                        Obj = r2.ReadSArray<X_SpriteTab>((int)streamSize / sizeof(X_SpriteTab)).Select(t =>
                             LoadSprite(r3, ref t, false)
                         ).ToArray();
                         break;
                     }
                 case Kind.SpriteElement:
                     {
-                        var count = (int)(streamSize / sizeof(X_SpriteElement));
-                        Obj = r2.ReadSArray<X_SpriteElement>(count).Select(t => new SpriteElement
+                        Obj = r2.ReadSArray<X_SpriteElement>((int)streamSize / sizeof(X_SpriteElement)).Select(t => new SpriteElement
                         {
                             Sprite = t.Sprite / 6,
                             OffsetX = (t.OffsetX & (1 << 15)) != 0 ? -(65536 - t.OffsetX) : t.OffsetX,
@@ -737,8 +1010,7 @@ namespace GameX.Bullfrog.Formats
                     }
                 case Kind.SpriteFrame:
                     {
-                        var count = (int)(streamSize / sizeof(X_SpriteFrame));
-                        Obj = r2.ReadSArray<X_SpriteFrame>(count).Select(t => new SpriteFrame
+                        Obj = r2.ReadSArray<X_SpriteFrame>((int)streamSize / sizeof(X_SpriteFrame)).Select(t => new SpriteFrame
                         {
                             FirstElement = t.FirstElement,
                             Width = t.Width,
@@ -750,8 +1022,7 @@ namespace GameX.Bullfrog.Formats
                     }
                 case Kind.SpriteAnim:
                     {
-                        var count = (int)(streamSize / sizeof(ushort));
-                        Obj = r2.ReadPArray<ushort>("H", count);
+                        Obj = r2.ReadPArray<ushort>("H", (int)streamSize / sizeof(ushort));
                         break;
                     }
                 case Kind.Mission:
@@ -794,13 +1065,13 @@ namespace GameX.Bullfrog.Formats
 
         // IHaveMetaInfo
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-        {
-            return new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "Bullfrog" }),
-                new MetaInfo("Bullfrog", items: new List<MetaInfo> {
-                    //new MetaInfo($"Records: {Records.Length}"),
-                })
-            };
-        }
+            => [
+                new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "Bullfrog" }),
+                new("Bullfrog", items: [
+                    //new($"Records: {Records.Length}"),
+                ])
+            ];
     }
+
+    #endregion
 }

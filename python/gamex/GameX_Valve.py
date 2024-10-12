@@ -2,7 +2,7 @@ import os
 from gamex.pak import BinaryPakFile
 from .Base.formats.binary import Binary_Img, Binary_Snd, Binary_Txt
 from .Valve.formats.pakbinary import PakBinary_Vpk, PakBinary_Wad
-from .Valve.formats.binary import Binary_Wad3, Binary_Bsp, Binary_Spr
+from .Valve.formats.binary import Binary_Wad3, Binary_Src, Binary_Bsp, Binary_Spr
 from .util import _pathExtension
 
 # typedefs
@@ -28,16 +28,14 @@ class ValvePakFile(BinaryPakFile):
     def getPakBinary(game: FamilyGame, extension: str) -> object:
         match game.engine:
             # case 'Unity': return PakBinary_Unity()
+            case 'GoldSrc': return PakBinary_Wad()
             case 'Source': return PakBinary_Vpk()
-            case 'HL': return PakBinary_Wad()
             case _: raise Exception(f'Unknown: {game.engine}')
 
     @staticmethod
     def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
-        def binaryPakFactory(r: Reader, f: FileSource, s: PakFile) -> (FileOption, callable):
-            pass
         match game.engine:
-            case 'HL':
+            case 'GoldSrc':
                 match _pathExtension(source.path).lower():
                     case x if x == '.txt' or x == '.ini' or x == '.asl': return (0, Binary_Txt.factory)
                     case '.wav': return (0, Binary_Snd.factory)
@@ -46,7 +44,8 @@ class ValvePakFile(BinaryPakFile):
                     case '.bsp': return (0, Binary_Bsp.factory)
                     case '.spr': return (0, Binary_Spr.factory)
                     case _: None
-            case _: return (0, binaryPakFactory)
+            case 'Source': return (0, Binary_Src.factory)
+            case _: raise Exception(f'Unknown: {game.engine}')
     #endregion
 
 #endregion

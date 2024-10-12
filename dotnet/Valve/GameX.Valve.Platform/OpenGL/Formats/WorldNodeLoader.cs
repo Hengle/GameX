@@ -39,7 +39,7 @@ namespace GameX.Valve.OpenGL.Formats
 
                 if (renderableModel != null)
                 {
-                    var newResource = Gfx.LoadFileObject<Binary_Pak>($"{renderableModel}_c").Result;
+                    var newResource = Gfx.LoadFileObject<Binary_Src>($"{renderableModel}_c").Result;
                     if (newResource == null) continue;
                     var modelNode = new ModelSceneNode(scene, (IValveModel)newResource.DATA, null, false)
                     {
@@ -54,7 +54,7 @@ namespace GameX.Valve.OpenGL.Formats
                 var renderable = sceneObject.Get<string>("m_renderable");
                 if (renderable != null)
                 {
-                    var newResource = Gfx.LoadFileObject<Binary_Pak>($"{renderable}_c").Result;
+                    var newResource = Gfx.LoadFileObject<Binary_Src>($"{renderable}_c").Result;
                     if (newResource == null) continue;
                     var meshNode = new MeshSceneNode(scene, new D_Mesh(newResource), 0)
                     {
@@ -75,7 +75,7 @@ namespace GameX.Valve.OpenGL.Formats
                 var renderableModel = sceneObject.Get<string>("m_renderableModel");
                 if (renderableModel != null)
                 {
-                    var newResource = Gfx.LoadFileObject<Binary_Pak>($"{renderableModel}_c").Result;
+                    var newResource = Gfx.LoadFileObject<Binary_Src>($"{renderableModel}_c").Result;
                     if (newResource == null) continue;
 
                     var layerIndex = sceneObject.Get<int>("m_nLayer");

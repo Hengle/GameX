@@ -21,6 +21,8 @@ namespace GameX.App.Explorer.Controls
         readonly HashSet<Key> KeyDowns = [];
         int Id = 0;
 
+        public ViewBase(TimeSpan? interval = null) : base(interval) { }
+
         public static readonly DependencyProperty GfxProperty = DependencyProperty.Register(nameof(Gfx), typeof(object), typeof(ViewBase<TObj>),
             new PropertyMetadata((d, e) => (d as ViewBase<TObj>).OnSourceChanged()));
 

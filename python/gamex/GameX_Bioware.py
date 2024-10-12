@@ -1,9 +1,9 @@
 import os
 from gamex.pak import BinaryPakFile
-from .Base.pakbinary_zip import PakBinary_Zip
-from .Bioware.pakbinary_aurora import PakBinary_Aurora
-from .Bioware.pakbinary_myp import PakBinary_Myp
-from .util import _pathExtension
+from gamex.Base.pakbinary_zip import PakBinary_Zip
+from gamex.Bioware.pakbinary_aurora import PakBinary_Aurora
+from gamex.Bioware.pakbinary_myp import PakBinary_Myp
+from gamex.util import _pathExtension
 
 # typedefs
 class FamilyGame: pass

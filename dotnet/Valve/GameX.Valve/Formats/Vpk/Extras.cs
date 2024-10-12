@@ -155,7 +155,7 @@ namespace GameX.Valve.Formats.Vpk
             {
                 prevPos = r.BaseStream.Position;
 
-                name = r.ReadZUTF8();
+                name = r.ReadVUString();
                 r.Seek(prevPos + 128);
 
                 var type = r.ReadUInt32();
@@ -164,7 +164,7 @@ namespace GameX.Valve.Formats.Vpk
                 if (type == 1)
                 {
                     prevPos = r.BaseStream.Position;
-                    var subname = r.ReadZUTF8();
+                    var subname = r.ReadVUString();
                     b_.AppendLine(subname);
                     r.BaseStream.Position = prevPos + 64;
                     r.ReadUInt32();
@@ -197,14 +197,14 @@ namespace GameX.Valve.Formats.Vpk
             for (var i = 0; i < count; i++)
             {
                 prevPos = r.BaseStream.Position;
-                name = r.ReadZUTF8();
+                name = r.ReadVUString();
                 r.BaseStream.Position = prevPos + 64;
                 prevPos = r.BaseStream.Position;
-                var desc = r.ReadZUTF8();
+                var desc = r.ReadVUString();
                 r.BaseStream.Position = prevPos + 84;
                 var subcount = r.ReadUInt32();
                 b_.AppendLine($"Name: {name} - Desc: {desc} - Count: {subcount} - Offset: {r.BaseStream.Position}");
-                for (var j = 0; j < subcount; j++) b_.AppendLine($"     {r.ReadZUTF8()}");
+                for (var j = 0; j < subcount; j++) b_.AppendLine($"     {r.ReadVUString()}");
             }
 
             count = r.ReadUInt32();
@@ -232,7 +232,7 @@ namespace GameX.Valve.Formats.Vpk
             for (var i = 0; i < count; i++)
             {
                 var previousPosition = r.BaseStream.Position;
-                var name = r.ReadZUTF8();
+                var name = r.ReadVUString();
                 r.BaseStream.Position = previousPosition + 128;
 
                 var unk1_a = r.ReadInt32();
@@ -274,7 +274,7 @@ namespace GameX.Valve.Formats.Vpk
             for (var i = 0; i < count; i++)
             {
                 var previousPosition = r.BaseStream.Position;
-                var name = r.ReadZUTF8();
+                var name = r.ReadVUString();
                 r.BaseStream.Position = previousPosition + 128;
 
                 var unk3_a = r.ReadInt32();
@@ -314,7 +314,7 @@ namespace GameX.Valve.Formats.Vpk
             for (var i = 0; i < count; i++)
             {
                 var previousPosition = r.BaseStream.Position;
-                var name = r.ReadZUTF8();
+                var name = r.ReadVUString();
                 r.BaseStream.Position = previousPosition + 128; // ??
 
                 var hasDesc = r.ReadInt32();
@@ -323,7 +323,7 @@ namespace GameX.Valve.Formats.Vpk
                 var desc = string.Empty;
 
                 if (hasDesc > 0)
-                    desc = r.ReadZUTF8();
+                    desc = r.ReadVUString();
 
                 r.BaseStream.Position = previousPosition + 200;
                 var type = r.ReadInt32();
@@ -369,7 +369,7 @@ namespace GameX.Valve.Formats.Vpk
                 var unk6_d = r.ReadUInt32();
 
                 var previousPosition = r.BaseStream.Position;
-                var name = r.ReadZUTF8();
+                var name = r.ReadVUString();
                 r.BaseStream.Position = previousPosition + 256;
 
                 b_.AppendLine($"{unk6_b} {unk6_d} {name}");
@@ -382,7 +382,7 @@ namespace GameX.Valve.Formats.Vpk
             for (var i = 0; i < count; i++)
             {
                 var prevPos = r.BaseStream.Position;
-                var name = r.ReadZUTF8(8);
+                var name = r.ReadVUString(8);
                 r.BaseStream.Position = prevPos + 64;
 
                 var a = r.ReadUInt32();
@@ -393,7 +393,7 @@ namespace GameX.Valve.Formats.Vpk
                 for (var j = 0; j < subCount; j++)
                 {
                     var previousPosition = r.BaseStream.Position;
-                    var subname = r.ReadZUTF8();
+                    var subname = r.ReadVUString();
                     r.BaseStream.Position = previousPosition + 64;
 
                     var bufferOffset = r.ReadUInt32(); // Offset in the buffer
@@ -420,9 +420,9 @@ namespace GameX.Valve.Formats.Vpk
 
                     for (var i = 0; i < count; i++)
                     {
-                        var name = r.ReadZUTF8();
-                        var type = r.ReadZUTF8();
-                        var option = r.ReadZUTF8();
+                        var name = r.ReadVUString();
+                        var type = r.ReadVUString();
+                        var option = r.ReadVUString();
                         var unk = r.ReadUInt32(); // 0, 1, 2, 13 or 14
                         b_.AppendLine($"     Name: {name}, Type: {type}, Option: {option}, Unknown uint: {unk}");
                     }
@@ -954,7 +954,7 @@ namespace GameX.Valve.Formats.Vpk
         static void ReadStringsBlock(BinaryReader r, ICollection<string> output)
         {
             var count = r.ReadUInt32();
-            for (var i = 0U; i < count; i++) output.Add(r.ReadZUTF8());
+            for (var i = 0U; i < count; i++) output.Add(r.ReadVUString());
         }
 
         public override string ToString()

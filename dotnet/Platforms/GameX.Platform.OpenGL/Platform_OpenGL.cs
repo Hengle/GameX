@@ -81,7 +81,7 @@ namespace GameX.Platforms
             // bind
             GL.BindTexture(TextureTarget.Texture2D, id);
             if (level.start > 0) GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, level.start);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, level.stop - level.start - 1);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, level.stop - 1);
             var (bytes, fmt, spans) = source.Begin((int)Platform.Type.OpenGL);
             if (bytes == null) return DefaultTexture;
 

@@ -18,25 +18,16 @@ namespace GameX.Valve.Formats
     {
         #region Headers
 
-        public const int MAGIC = 0x55aa1234;
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        struct HeaderV1
-        {
-            public static (string, int) Struct = ("<I", sizeof(HeaderV1));
-            public uint TreeSize;
-        }
+        public const int MAGIC = 0x55AA1234;
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct HeaderV2
         {
             public static (string, int) Struct = ("<5I", sizeof(HeaderV2));
-            public uint TreeSize;
             public uint FileDataSectionSize;
             public uint ArchiveMd5SectionSize;
             public uint OtherMd5SectionSize;
             public uint SignatureSectionSize;
-            public int ArchiveMd5Entries => (int)ArchiveMd5SectionSize / sizeof(ArchiveMd5Entry); // 28 is sizeof(VPK_MD5SectionEntry), which is int + int + int + 16 chars
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -53,52 +44,73 @@ namespace GameX.Valve.Formats
         /// </summary>
         class Verification
         {
-            public ArchiveMd5Entry[] ArchiveMd5Entries; // Gets the archive MD5 checksum section entries. Also known as cache line hashes.
-            public byte[] TreeChecksum; // Gets the MD5 checksum of the file tree.
-            public byte[] ArchiveMd5EntriesChecksum; // Gets the MD5 checksum of the archive MD5 checksum section entries.
-            public byte[] WholeFileChecksum; // Gets the MD5 checksum of the complete package until the signature structure.
-            public byte[] PublicKey; // Gets the public key.
-            public byte[] Signature; // Gets the signature.
+            public (long p, ArchiveMd5Entry[] h) ArchiveMd5Entries; // Gets the archive MD5 checksum section entries. Also known as cache line hashes.
+            public byte[] TreeChecksum;                     // Gets the MD5 checksum of the file tree.
+            public byte[] ArchiveMd5EntriesChecksum;        // Gets the MD5 checksum of the archive MD5 checksum section entries.
+            public (long p, byte[] h) WholeFileChecksum;    // Gets the MD5 checksum of the complete package until the signature structure.
+            public byte[] PublicKey;                        // Gets the public key.
+            public (long p, byte[] h) Signature;            // Gets the signature.
 
-#if true
+            public Verification(BinaryReader r, ref HeaderV2 h)
+            {
+                // archive md5
+                if (h.ArchiveMd5SectionSize != 0)
+                {
+                    ArchiveMd5Entries = (r.Tell(), r.ReadSArray<ArchiveMd5Entry>((int)h.ArchiveMd5SectionSize / sizeof(ArchiveMd5Entry)));
+                }
+                // other md5
+                if (h.OtherMd5SectionSize != 0)
+                {
+                    TreeChecksum = r.ReadBytes(16);
+                    ArchiveMd5EntriesChecksum = r.ReadBytes(16);
+                    WholeFileChecksum = (r.Tell(), r.ReadBytes(16));
+                }
+                // signature
+                if (h.SignatureSectionSize != 0)
+                {
+                    var position = r.Tell();
+                    var publicKeySize = r.ReadInt32();
+                    if (h.SignatureSectionSize == 20 && publicKeySize == MAGIC) return; // CS2 has this
+                    PublicKey = r.ReadBytes(publicKeySize);
+                    Signature = (position, r.ReadBytes(r.ReadInt32()));
+                }
+            }
+
             /// <summary>
             /// Verify checksums and signatures provided in the VPK
             /// </summary>
-            void VerifyHashesV2(BinaryReader r, int version, ref HeaderV2 header, long headerPosition)
+            public void VerifyHashes(BinaryReader r, uint treeSize, ref HeaderV2 h, long headerPosition)
             {
-                if (version != 2) throw new InvalidDataException("Only version 2 is supported.");
-                using (var md5 = MD5.Create())
-                {
-                    r.Seek(0);
-                    var hash = md5.ComputeHash(r.ReadBytes((int)(headerPosition + header.TreeSize + header.FileDataSectionSize + header.ArchiveMd5SectionSize + 32)));
-                    if (!hash.SequenceEqual(WholeFileChecksum)) throw new InvalidDataException($"Package checksum mismatch ({BitConverter.ToString(hash)} != expected {BitConverter.ToString(WholeFileChecksum)})");
+                byte[] hash;
+                using var md5 = MD5.Create();
+                r.Seek(headerPosition);
+                hash = md5.ComputeHash(r.ReadBytes((int)treeSize));
+                if (!hash.SequenceEqual(TreeChecksum)) throw new InvalidDataException($"File tree checksum mismatch ({BitConverter.ToString(hash)} != expected {BitConverter.ToString(TreeChecksum)})");
 
-                    r.Seek(headerPosition);
-                    hash = md5.ComputeHash(r.ReadBytes((int)header.TreeSize));
-                    if (!hash.SequenceEqual(TreeChecksum)) throw new InvalidDataException($"File tree checksum mismatch ({BitConverter.ToString(hash)} != expected {BitConverter.ToString(TreeChecksum)})");
+                r.Seek(ArchiveMd5Entries.p);
+                hash = md5.ComputeHash(r.ReadBytes((int)h.ArchiveMd5SectionSize));
+                if (!hash.SequenceEqual(ArchiveMd5EntriesChecksum)) throw new InvalidDataException($"Archive MD5 entries checksum mismatch ({BitConverter.ToString(hash)} != expected {BitConverter.ToString(ArchiveMd5EntriesChecksum)})");
 
-                    r.Seek(headerPosition + header.TreeSize + header.FileDataSectionSize);
-                    hash = md5.ComputeHash(r.ReadBytes((int)header.ArchiveMd5SectionSize));
-                    if (!hash.SequenceEqual(ArchiveMd5EntriesChecksum)) throw new InvalidDataException($"Archive MD5 entries checksum mismatch ({BitConverter.ToString(hash)} != expected {BitConverter.ToString(ArchiveMd5EntriesChecksum)})");
-                }
-                if (PublicKey == null || Signature == null) return;
-                if (!IsSignatureValidV2(r, ref header, headerPosition)) throw new InvalidDataException("VPK signature is not valid.");
+                r.Seek(0);
+                hash = md5.ComputeHash(r.ReadBytes((int)WholeFileChecksum.p));
+                if (!hash.SequenceEqual(WholeFileChecksum.h)) throw new InvalidDataException($"Package checksum mismatch ({BitConverter.ToString(hash)} != expected {BitConverter.ToString(WholeFileChecksum.h)})");
             }
 
             /// <summary>
             /// Verifies the RSA signature.
             /// </summary>
             /// <returns>True if signature is valid, false otherwise.</returns>
-            bool IsSignatureValidV2(BinaryReader r, ref HeaderV2 header, long headerPosition)
+            public void VerifySignature(BinaryReader r)
             {
+                if (PublicKey == null || Signature.h == null) return;
+
+                using var rsa = RSA.Create();
+                rsa.ImportSubjectPublicKeyInfo(PublicKey, out _);
+                //rsa.ImportParameters(new AsnKeyParser(PublicKey).ParseRSAPublicKey());
                 r.Seek(0);
-                var keyParser = new AsnKeyParser(PublicKey);
-                var rsa = RSA.Create();
-                rsa.ImportParameters(keyParser.ParseRSAPublicKey());
-                var data = r.ReadBytes((int)(headerPosition + header.TreeSize + header.FileDataSectionSize + header.ArchiveMd5SectionSize + header.OtherMd5SectionSize));
-                return rsa.VerifyData(data, Signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+                var data = r.ReadBytes((int)Signature.p);
+                if (!rsa.VerifyData(data, Signature.h, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1)) throw new InvalidDataException("VPK signature is not valid.");
             }
-#endif
         }
 
         #endregion
@@ -107,19 +119,7 @@ namespace GameX.Valve.Formats
         {
             var files = source.Files = [];
 
-            // header
-            if (r.ReadUInt32() != MAGIC) throw new FormatException("BAD MAGIC");
-            var version = r.ReadUInt32();
-            if (version > 2) throw new FormatException($"Bad VPK version. ({version})");
-            var headerV1 = version == 1 ? r.ReadS<HeaderV1>() : default;
-            var headerV2 = version != 1 ? r.ReadS<HeaderV2>() : default;
-            var headerPosition = (uint)r.Tell();
-            var headerTreeSize = version == 1 ? headerV1.TreeSize : headerV2.TreeSize;
-
-            // sourceFilePath
-            var sourceFilePath = source.PakPath;
-            var sourceFileDirVpk = sourceFilePath.EndsWith("_dir.vpk", StringComparison.OrdinalIgnoreCase);
-            if (sourceFileDirVpk) sourceFilePath = sourceFilePath[..^8];
+            // file mask
             source.FileMask = path =>
             {
                 var extension = Path.GetExtension(path);
@@ -128,37 +128,52 @@ namespace GameX.Valve.Formats
                 return $"{Path.GetFileNameWithoutExtension(path)}{extension}";
             };
 
-            // types
+            // pakPath
+            var pakPath = source.PakPath;
+            var dirVpk = pakPath.EndsWith("_dir.vpk", StringComparison.OrdinalIgnoreCase);
+            if (dirVpk) pakPath = pakPath[..^8];
+
+            // header
+            if (r.ReadUInt32() != MAGIC) throw new FormatException("BAD MAGIC");
+            var version = r.ReadUInt32();
+            var treeSize = r.ReadUInt32();
+            if (version == 0x00030002) throw new FormatException($"Unsupported VPK: Apex Legends, Titanfall");
+            else if (version > 2) throw new FormatException($"Bad VPK version. ({version})");
+            var headerV2 = version == 2 ? r.ReadS<HeaderV2>() : default;
+            var headerPosition = (uint)r.Tell();
+
+            // read entires
+            var ms = new MemoryStream();
             while (true)
             {
-                var typeName = r.ReadZUTF8(); if (typeName?.Length == 0) break;
+                var typeName = r.ReadVUString(ms: ms); if (string.IsNullOrEmpty(typeName)) break;
                 // directories
                 while (true)
                 {
-                    var directoryName = r.ReadZUTF8(); if (directoryName?.Length == 0) break;
+                    var directoryName = r.ReadVUString(ms: ms); if (string.IsNullOrEmpty(directoryName)) break;
                     // files
                     while (true)
                     {
-                        var fileName = r.ReadZUTF8(); if (fileName?.Length == 0) break;
-
+                        var fileName = r.ReadVUString(ms: ms); if (string.IsNullOrEmpty(fileName)) break;
                         var metadata = new FileSource
                         {
                             Path = $"{(directoryName[0] != ' ' ? $"{directoryName}/" : null)}{fileName}.{typeName}",
                             Hash = r.ReadUInt32(),
-                            Extra = new byte[r.ReadUInt16()],
+                            Data = new byte[r.ReadUInt16()],
                             Id = r.ReadUInt16(),
                             Offset = r.ReadUInt32(),
                             FileSize = r.ReadUInt32(),
                         };
+                        var terminator = r.ReadUInt16();
+                        if (terminator != 0xFFFF) throw new FormatException($"Invalid terminator, was 0x{terminator:X} but expected 0x{0xFFFF:X}");
+                        if (metadata.Data.Length > 0) r.Read(metadata.Data, 0, metadata.Data.Length);
                         if (metadata.Id != 0x7FFF)
                         {
-                            if (!sourceFileDirVpk) throw new FormatException("Given VPK is not a _dir, but entry is referencing an external archive.");
-                            metadata.Tag = $"{sourceFilePath}_{metadata.Id:D3}.vpk";
+                            if (!dirVpk) throw new FormatException("Given VPK is not a _dir, but entry is referencing an external archive.");
+                            metadata.Tag = $"{pakPath}_{metadata.Id:D3}.vpk";
                         }
-                        else metadata.Tag = (long)(headerPosition + headerTreeSize);
+                        else metadata.Tag = (long)(headerPosition + treeSize);
                         files.Add(metadata);
-                        if (r.ReadUInt16() != 0xFFFF) throw new FormatException("Invalid terminator.");
-                        if (metadata.Extra.Length > 0) r.Read(metadata.Extra, 0, metadata.Extra.Length);
                     }
                 }
             }
@@ -166,44 +181,36 @@ namespace GameX.Valve.Formats
             // verification
             if (version == 2)
             {
-                if (headerV2.OtherMd5SectionSize != 48) throw new FormatException($"Encountered OtherMD5Section with size of {headerV2.OtherMd5SectionSize} (should be 48)");
-                // Skip over file data, if any
+                // skip over file data, if any
                 r.Skip(headerV2.FileDataSectionSize);
-                source.Tag = new Verification
-                {
-                    // archive md5
-                    ArchiveMd5Entries = headerV2.ArchiveMd5SectionSize != 0 ? r.ReadSArray<ArchiveMd5Entry>((int)headerV2.ArchiveMd5Entries) : null,
-                    // other md5
-                    TreeChecksum = r.ReadBytes(16),
-                    ArchiveMd5EntriesChecksum = r.ReadBytes(16),
-                    WholeFileChecksum = r.ReadBytes(16),
-                    // signature
-                    PublicKey = headerV2.SignatureSectionSize != 0 ? r.ReadBytes(r.ReadInt32()) : null,
-                    Signature = headerV2.SignatureSectionSize != 0 ? r.ReadBytes(r.ReadInt32()) : null
-                };
+                var v = new Verification(r, ref headerV2);
+                v.VerifyHashes(r, treeSize, ref headerV2, headerPosition);
+                v.VerifySignature(r);
             }
+
             return Task.CompletedTask;
         }
 
         public override Task<Stream> ReadData(BinaryPakFile source, BinaryReader r, FileSource file, FileOption option = default)
         {
-            var data = new byte[file.Extra.Length + file.FileSize];
-            if (file.Extra.Length > 0) file.Extra.CopyTo(data, 0);
+            var data = new byte[file.Data.Length + file.FileSize];
+            if (file.Data.Length > 0) file.Data.CopyTo(data, 0);
             if (file.FileSize > 0)
             {
                 if (file.Tag is string path)
                     source.GetReader(path).Action(r2 =>
                     {
                         r2.Seek(file.Offset);
-                        r2.Read(data, file.Extra.Length, (int)file.FileSize);
+                        r2.Read(data, file.Data.Length, (int)file.FileSize);
                     });
                 else
                 {
                     r.Seek(file.Offset + (long)file.Tag);
-                    r.Read(data, file.Extra.Length, (int)file.FileSize);
+                    r.Read(data, file.Data.Length, (int)file.FileSize);
                 }
             }
-            if (file.Hash != Crc32Digest.Compute(data)) throw new InvalidDataException("CRC32 mismatch for read data.");
+            var actualChecksum = Crc32Digest.Compute(data);
+            if (file.Hash != actualChecksum) throw new InvalidDataException($"CRC32 mismatch for read data (expected {file.Hash:X2}, got {actualChecksum:X2})");
             return Task.FromResult((Stream)new MemoryStream(data));
         }
     }
