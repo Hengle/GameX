@@ -1,39 +1,36 @@
-﻿using GameX.Blizzard.Formats;
-using GameX.Blizzard.Transforms;
+﻿using GameX.Cyanide.Formats;
+using GameX.Cyanide.Transforms;
 using GameX.Formats;
 using GameX.Formats.Unknown;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace GameX.Blizzard
+namespace GameX.Cyanide
 {
+    #region CyanidePakFile
+
     /// <summary>
-    /// BlizzardPakFile
+    /// CyanidePakFile
     /// </summary>
     /// <seealso cref="GameX.Formats.BinaryPakFile" />
-    public class BlizzardPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
+    public class CyanidePakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BlizzardPakFile" /> class.
+        /// Initializes a new instance of the <see cref="CyanidePakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public BlizzardPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
+        public CyanidePakFile(PakState state) : base(state, PakBinary_Cpk.Current)
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
-            UseReader = false;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
 
-        static PakBinary GetPakBinary(FamilyGame game, string extension)
-            => PakBinary_Blizzard.Current;
-
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 ".dds" => (0, Binary_Dds.Factory),
-                var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
                 _ => (0, null),
             };
 
@@ -46,4 +43,6 @@ namespace GameX.Blizzard
 
         #endregion
     }
+
+    #endregion
 }

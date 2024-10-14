@@ -1,6 +1,7 @@
 import os
 from gamex.pak import BinaryPakFile
-from .util import _pathExtension
+from gamex.GameX import UnknownPakFile
+from gamex.util import _pathExtension
 
 # typedefs
 class FamilyGame: pass
@@ -20,7 +21,8 @@ class FrictionalPakFile(BinaryPakFile):
         pass
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
-            case _: return (0, None)
+            case _: return UnknownPakFile.objectFactory(source, game)
+
     #endregion

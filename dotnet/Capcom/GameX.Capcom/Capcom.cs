@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace GameX.Capcom
 {
+    #region CapcomPakFile
+
     /// <summary>
     /// CapcomPakFile
     /// </summary>
@@ -23,8 +25,8 @@ namespace GameX.Capcom
         {
             ObjectFactoryFunc = state.Game.Engine switch
             {
-                "Unity" => Unity.UnityPakFile.ObjectFactoryFactory,
-                _ => ObjectFactoryFactory,
+                "Unity" => Unity.UnityPakFile.ObjectFactory,
+                _ => ObjectFactory,
             };
         }
 
@@ -50,7 +52,7 @@ namespace GameX.Capcom
                 },
             };
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 ".png" => (0, Binary_Img.Factory),
@@ -67,4 +69,6 @@ namespace GameX.Capcom
 
         #endregion
     }
+
+    #endregion
 }

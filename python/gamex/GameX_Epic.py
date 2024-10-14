@@ -1,17 +1,18 @@
 import os
 from gamex.pak import BinaryPakFile
-from .util import _pathExtension
+from gamex.GameX import UnknownPakFile
+from gamex.util import _pathExtension
 
 # typedefs
 class FamilyGame: pass
 class PakBinary: pass
-class state: pass
+class PakState: pass
 class FileSource: pass
 class FileOption: pass
 
 # EpicPakFile
 class EpicPakFile(BinaryPakFile):
-    def __init__(self, state: state):
+    def __init__(self, state: PakState):
         super().__init__(state, self.getPakBinary(state.game, _pathExtension(state.path).lower()))
 
     #region Factories
@@ -20,7 +21,8 @@ class EpicPakFile(BinaryPakFile):
         pass
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
-            case _: return (0, None)
+            case _: return UnknownPakFile.objectFactory(source, game)
+
     #endregion

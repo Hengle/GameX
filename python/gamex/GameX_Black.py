@@ -1,6 +1,7 @@
 import os
 from gamex.pak import BinaryPakFile
 from gamex.Black.formats.pakbinary_dat import PakBinary_Dat
+from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
 
 # typedefs
@@ -21,7 +22,8 @@ class BlackPakFile(BinaryPakFile):
         return PakBinary_Dat()
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
-            case _: return (0, None)
+            case _: return UnknownPakFile.objectFactory(source, game)
+
     #endregion

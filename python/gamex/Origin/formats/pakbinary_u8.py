@@ -17,7 +17,7 @@ class PakBinary_U8(PakBinaryT):
     #region Factories
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match source.path.lower():
             case _: pass
 

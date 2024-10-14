@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace GameX.Ubisoft
 {
+    #region UbisoftPakFile
+
     /// <summary>
     /// UbisoftPakFile
     /// </summary>
@@ -20,7 +22,7 @@ namespace GameX.Ubisoft
         /// <param name="state">The state.</param>
         public UbisoftPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
@@ -30,7 +32,7 @@ namespace GameX.Ubisoft
                 ? PakBinary_Ubi.Current
                 : PakBinary_Zip.GetPakBinary(game);
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
            => Path.GetExtension(source.Path).ToLowerInvariant() switch
            {
                ".dds" => (0, Binary_Dds.Factory),
@@ -46,4 +48,6 @@ namespace GameX.Ubisoft
 
         #endregion
     }
+
+    #endregion
 }

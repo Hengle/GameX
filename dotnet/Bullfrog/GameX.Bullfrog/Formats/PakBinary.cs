@@ -14,7 +14,7 @@ namespace GameX.Bullfrog.Formats
     {
         #region Factories
 
-        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
          => game.Id switch
          {
              _ => default
@@ -210,7 +210,7 @@ namespace GameX.Bullfrog.Formats
     {
         #region Factories
 
-        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => source.Path.ToLowerInvariant() switch
             {
                 _ => Path.GetExtension(source.Path).ToLowerInvariant() switch
@@ -365,7 +365,7 @@ namespace GameX.Bullfrog.Formats
         #region Factories
 
         static readonly string[] S_FLIFILES = ["INTRO.DAT", "MBRIEF.DAT", "MBRIEOUT.DAT", "MCONFOUT.DAT", "MCONFUP.DAT", "MDEBRIEF.DAT", "MDEOUT.DAT", "MENDLOSE.DAT", "MENDWIN.DAT", "MGAMEWIN.DAT", "MLOSA.DAT", "MLOSAOUT.DAT", "MLOSEGAM.DAT", "MMAP.DAT", "MMAPOUT.DAT", "MOPTION.DAT", "MOPTOUT.DAT", "MRESOUT.DAT", "MRESRCH.DAT", "MSCRENUP.DAT", "MSELECT.DAT", "MSELOUT.DAT", "MTITLE.DAT", "MMULTI.DAT", "MMULTOUT.DAT"];
-        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
          => Path.GetFileName(source.Path).ToUpperInvariant() switch
          {
              var x when S_FLIFILES.Contains(x) => (0, Binary_Fli.Factory),

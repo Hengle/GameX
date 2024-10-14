@@ -1,6 +1,6 @@
 import os
 from gamex.pak import BinaryPakFile
-from gamex.Base.pakbinary_zip import PakBinary_Zip
+from gamex.Base.formats.pakbinary import PakBinary_Zip
 from gamex.Capcom.pakbinary_arc import PakBinary_Arc
 from gamex.Capcom.pakbinary_big import PakBinary_Big
 from gamex.Capcom.pakbinary_bundle import PakBinary_Bundle
@@ -35,4 +35,5 @@ class CapcomPakFile(BinaryPakFile):
             case '.bundle': return PakBinary_Bundle()
             case '.mbundle': return PakBinary_Plist()
             case _: raise Exception(f'Unknown: {extension}')
+
     #endregion

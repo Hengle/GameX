@@ -19,7 +19,7 @@ class PakBinary_UO(PakBinaryT):
     #region Factories
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match source.path.lower():
             case 'animdata.mul': return (0, Binary_Animdata.factory)
             case 'fonts.mul': return (0, Binary_AsciiFont.factory)

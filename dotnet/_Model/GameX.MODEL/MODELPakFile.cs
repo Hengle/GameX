@@ -20,12 +20,12 @@ namespace GameX.MODEL
         /// <param name="state">The state.</param>
         public MODELPakFile(PakState state) : base(state, PakBinary_Hpl.Instance)
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),

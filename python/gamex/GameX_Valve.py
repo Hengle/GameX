@@ -1,9 +1,9 @@
 import os
 from gamex.pak import BinaryPakFile
-from .Base.formats.binary import Binary_Img, Binary_Snd, Binary_Txt
-from .Valve.formats.pakbinary import PakBinary_Vpk, PakBinary_Wad
-from .Valve.formats.binary import Binary_Wad3, Binary_Src, Binary_Bsp, Binary_Spr
-from .util import _pathExtension
+from gamex.Valve.formats.pakbinary import PakBinary_Bsp, PakBinary_Vpk, PakBinary_Wad
+from gamex.Valve.formats.binary import Binary_Wad3, Binary_Src, Binary_Bsp, Binary_Spr
+from gamex.GameX import UnknownPakFile
+from gamex.util import _pathExtension
 
 # typedefs
 class Reader: pass
@@ -20,12 +20,13 @@ class FileOption: pass
 class ValvePakFile(BinaryPakFile):
     def __init__(self, state: PakState):
         super().__init__(state, self.getPakBinary(state.game, _pathExtension(state.path).lower()))
-        self.objectFactoryFunc = self.objectFactoryFactory
+        self.objectFactoryFunc = self.objectFactory
         # self.pathFinders.add(typeof(object), FindBinary)
 
     #region Factories
     @staticmethod
     def getPakBinary(game: FamilyGame, extension: str) -> object:
+        if extension == '.bsp': return PakBinary_Bsp()
         match game.engine:
             # case 'Unity': return PakBinary_Unity()
             case 'GoldSrc': return PakBinary_Wad()
@@ -33,19 +34,17 @@ class ValvePakFile(BinaryPakFile):
             case _: raise Exception(f'Unknown: {game.engine}')
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match game.engine:
             case 'GoldSrc':
                 match _pathExtension(source.path).lower():
-                    case x if x == '.txt' or x == '.ini' or x == '.asl': return (0, Binary_Txt.factory)
-                    case '.wav': return (0, Binary_Snd.factory)
-                    case x if x == '.bmp' or x == '.jpg': return (0, Binary_Img.factory)
                     case x if x == '.pic' or x == '.tex' or x == '.tex2' or x == '.fnt': return (0, Binary_Wad3.factory)
                     case '.bsp': return (0, Binary_Bsp.factory)
                     case '.spr': return (0, Binary_Spr.factory)
-                    case _: None
+                    case _: return UnknownPakFile.objectFactory(source, game)
             case 'Source': return (0, Binary_Src.factory)
             case _: raise Exception(f'Unknown: {game.engine}')
+
     #endregion
 
 #endregion

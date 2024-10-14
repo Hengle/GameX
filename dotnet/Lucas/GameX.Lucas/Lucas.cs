@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace GameX.Lucas
 {
+    #region LucasPakFile
+
     /// <summary>
     /// LucasPakFile
     /// </summary>
@@ -20,7 +22,7 @@ namespace GameX.Lucas
         /// <param name="state">The state.</param>
         public LucasPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
@@ -33,7 +35,7 @@ namespace GameX.Lucas
                 _ => null,
             };
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
@@ -54,4 +56,6 @@ namespace GameX.Lucas
 
         #endregion
     }
+
+    #endregion
 }

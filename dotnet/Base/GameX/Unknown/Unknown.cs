@@ -1,4 +1,5 @@
-﻿using GameX.Meta;
+﻿using GameX.Formats;
+using GameX.Meta;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,7 +34,7 @@ namespace GameX.Unknown
         public UnknownPakFile(PakState state) : base(state)
         {
             Name = "Unknown";
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Base
@@ -51,11 +52,19 @@ namespace GameX.Unknown
 
         #region Factories
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
-            => source.Path switch
+        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
+            => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                "testtri.gfx" => (0, Binary_TestTri.Factory),
-                _ => (0, null),
+                var x when x == ".txt" || x == ".ini" || x == ".cfg" || x == ".xml" => (0, Binary_Txt.Factory),
+                ".wav" => (0, Binary_Snd.Factory),
+                var x when x == ".bmp" || x == ".jpg" => (0, Binary_Img.Factory),
+                ".tga" => (0, Binary_Tga.Factory),
+                ".dds" => (0, Binary_Dds.Factory),
+                _ => source.Path switch
+                {
+                    "testtri.gfx" => (0, Binary_TestTri.Factory),
+                    _ => (0, null),
+                }
             };
 
         #endregion

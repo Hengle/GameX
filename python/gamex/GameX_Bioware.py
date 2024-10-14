@@ -1,8 +1,8 @@
 import os
 from gamex.pak import BinaryPakFile
-from gamex.Base.pakbinary_zip import PakBinary_Zip
-from gamex.Bioware.pakbinary_aurora import PakBinary_Aurora
-from gamex.Bioware.pakbinary_myp import PakBinary_Myp
+from gamex.Base.formats.pakbinary import PakBinary_Zip
+from gamex.Bioware.formats.pakbinary import PakBinary_Aurora, PakBinary_Myp
+from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
 
 # typedefs
@@ -27,7 +27,8 @@ class BiowarePakFile(BinaryPakFile):
             case _: raise Exception(f'Unknown: {game.engine}')
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
-            case _: return (0, None)
+            case _: return UnknownPakFile.objectFactory(source, game)
+
     #endregion

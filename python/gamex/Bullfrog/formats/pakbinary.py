@@ -17,7 +17,7 @@ class FileOption: pass
 # PakBinary_Bullfrog
 class PakBinary_Bullfrog(PakBinaryT):
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match game.id:
             case _: return (0, None)
 
@@ -111,7 +111,7 @@ class PakBinary_Bullfrog(PakBinaryT):
 # PakBinary_Populus
 class PakBinary_Populus(PakBinaryT):
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match game.id:
             case _: return (0, None)
 
@@ -153,7 +153,7 @@ S_FLIFILES = ['INTRO.DAT', 'MBRIEF.DAT', 'MBRIEOUT.DAT', 'MCONFOUT.DAT', 'MCONFU
 # PakBinary_Syndicate
 class PakBinary_Syndicate(PakBinaryT):
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match os.path.basename(source.path).upper():
             case x if x in S_FLIFILES: return (0, Binary_Fli.factory)
             ## case 'MCONSCR.DAT': return (0, Binary_Raw.FactoryMethod()),

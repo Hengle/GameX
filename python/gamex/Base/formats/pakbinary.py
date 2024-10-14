@@ -8,6 +8,8 @@ from gamex.pak import PakBinaryT
 # typedefs
 class Reader: pass
 
+#region PakBinary_Zip
+
 # PakBinary_Zip
 class PakBinary_Zip(PakBinaryT):
     def __init__(self, key: str | bytes = None):
@@ -33,3 +35,5 @@ class PakBinary_Zip(PakBinaryT):
     def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
         pak: ZipFile = source.tag
         print(pak.read(file.path))
+
+#endregion

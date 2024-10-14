@@ -1,4 +1,5 @@
 ﻿using GameX.Algorithms;
+using GameX.Meta;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,6 +12,98 @@ using System.Threading.Tasks;
 
 namespace GameX.Valve.Formats
 {
+    #region PakBinary_Bsp
+    // https://hlbsp.sourceforge.net/index.php?content=bspdef
+    // https://github.com/bernhardmgruber/hlbsp/tree/master/src
+
+    public unsafe class PakBinary_Bsp : PakBinary<PakBinary_Bsp>
+    {
+        #region Headers
+
+        struct BSP_Lump
+        {
+            public int Offset;
+            public int Length;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct BSP_Header
+        {
+            public static (string, int) Struct = ("<31i", sizeof(BSP_Header));
+            public int Version;
+            public BSP_Lump Entities;
+            public BSP_Lump Planes;
+            public BSP_Lump Textures;
+            public BSP_Lump Vertices;
+            public BSP_Lump Visibility;
+            public BSP_Lump Nodes;
+            public BSP_Lump TexInfo;
+            public BSP_Lump Faces;
+            public BSP_Lump Lighting;
+            public BSP_Lump ClipNodes;
+            public BSP_Lump Leaves;
+            public BSP_Lump MarkSurfaces;
+            public BSP_Lump Edges;
+            public BSP_Lump SurfEdges;
+            public BSP_Lump Models;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct SPR_Frame
+        {
+            public static (string, int) Struct = ("<5i", sizeof(SPR_Frame));
+            public int Group;
+            public int OriginX;
+            public int OriginY;
+            public int Width;
+            public int Height;
+        }
+
+        const int MAX_MAP_HULLS = 4;
+
+        const int MAX_MAP_MODELS = 400;
+        const int MAX_MAP_BRUSHES = 4096;
+        const int MAX_MAP_ENTITIES = 1024;
+        const int MAX_MAP_ENTSTRING = (128 * 1024);
+
+        const int MAX_MAP_PLANES = 32767;
+        const int MAX_MAP_NODES = 32767;
+        const int MAX_MAP_CLIPNODES = 32767;
+        const int MAX_MAP_LEAFS = 8192;
+        const int MAX_MAP_VERTS = 65535;
+        const int MAX_MAP_FACES = 65535;
+        const int MAX_MAP_MARKSURFACES = 65535;
+        const int MAX_MAP_TEXINFO = 8192;
+        const int MAX_MAP_EDGES = 256000;
+        const int MAX_MAP_SURFEDGES = 512000;
+        const int MAX_MAP_TEXTURES = 512;
+        const int MAX_MAP_MIPTEX = 0x200000;
+        const int MAX_MAP_LIGHTING = 0x200000;
+        const int MAX_MAP_VISIBILITY = 0x200000;
+
+        const int MAX_MAP_PORTALS = 65536;
+
+        #endregion
+
+        public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
+        {
+            var files = source.Files = [];
+
+            // read file
+            var header = r.ReadS<BSP_Header>();
+            if (header.Version != 30) throw new FormatException("BAD VERSION");
+            return Task.CompletedTask;
+        }
+
+        public override Task<Stream> ReadData(BinaryPakFile source, BinaryReader r, FileSource file, FileOption option = default)
+        {
+            r.Seek(file.Offset);
+            return Task.FromResult<Stream>(new MemoryStream(r.ReadBytes((int)file.FileSize)));
+        }
+    }
+
+    #endregion
+
     #region PakBinary_Vpk
 
     // https://developer.valvesoftware.com/wiki/VPK_File_Format
@@ -33,6 +126,7 @@ namespace GameX.Valve.Formats
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct ArchiveMd5Entry
         {
+            public static (string, int) Struct = ("<3I16x", sizeof(ArchiveMd5Entry));
             public uint ArchiveIndex; // Gets or sets the CRC32 checksum of this entry.
             public uint Offset; // Gets or sets the offset in the package.
             public uint Length; // Gets or sets the length in bytes.

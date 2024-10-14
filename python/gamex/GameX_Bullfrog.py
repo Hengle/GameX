@@ -1,8 +1,9 @@
 import os
 from gamex import Family, FamilyGame
 from gamex.pak import BinaryPakFile
-from gamex.util import _pathExtension
 from gamex.Bullfrog.formats.pakbinary import PakBinary_Bullfrog, PakBinary_Populus, PakBinary_Syndicate
+from gamex.GameX import UnknownPakFile
+from gamex.util import _pathExtension
 
 # typedefs
 class PakBinary: pass
@@ -27,7 +28,7 @@ class BullfrogGame(FamilyGame):
 class BullfrogPakFile(BinaryPakFile):
     def __init__(self, state: PakState):
         super().__init__(state, self.getPakBinary(state.game, state.path))
-        self.objectFactoryFunc = self.objectFactoryFactory
+        self.objectFactoryFunc = self.objectFactory
 
     #region Factories
     @staticmethod
@@ -41,10 +42,11 @@ class BullfrogPakFile(BinaryPakFile):
             case _: raise Exception(f'Unknown: {game.id}')
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match game.id:
-            case x if x == 'DK' or x == 'DK2': return PakBinary_Bullfrog.objectFactoryFactory(source, game)
-            case x if x == 'P' or x == 'P2' or x == 'P3': return PakBinary_Populus.objectFactoryFactory(source, game)
-            case x if x == 'S' or x == 'S2': return PakBinary_Syndicate.objectFactoryFactory(source, game)
+            case x if x == 'DK' or x == 'DK2': return PakBinary_Bullfrog.objectFactory(source, game)
+            case x if x == 'P' or x == 'P2' or x == 'P3': return PakBinary_Populus.objectFactory(source, game)
+            case x if x == 'S' or x == 'S2': return PakBinary_Syndicate.objectFactory(source, game)
             case _: raise Exception(f'Unknown: {game.id}')
+
     #endregion

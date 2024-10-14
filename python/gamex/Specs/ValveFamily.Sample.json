@@ -3,11 +3,11 @@
     "name": "Half-Life",
     "files": [
       {
-        "path": "valve/cached.wad:LOADING.pic",
-        "type": "Texture"
+        "path": "valve/game.tga",
+        "type": "Image"
       },
       {
-        "path": "valve/decals.wad:REFLECT1.tex",
+        "path": "valve/cached.wad:LOADING.pic",
         "type": "Texture"
       },
       {
@@ -18,7 +18,6 @@
         "path": "valve/fonts.wad:FONT2.fnt",
         "type": "Texture:Font"
       },
-
       {
         "path": "valve/sprites:640hud1.spr",
         "type": "Sprite"
@@ -52,35 +51,87 @@
   },
   "HL:OF": {
     "name": "Half-Life: Opposing Force",
-    "files": []
+    "files": [
+      {
+        "path": "game.tga",
+        "type": "Image"
+      }
+    ]
   },
   "CS": {
     "name": "Counter-Strike",
-    "files": []
+    "files": [
+      {
+        "path": "game.tga",
+        "type": "Image"
+      }
+    ]
   },
   "Ricochet": {
     "name": "Ricochet",
-    "files": []
+    "files": [
+      {
+        "path": "game.tga",
+        "type": "Image"
+      }
+    ]
   },
   "DM": {
     "name": "Deathmatch Classic",
-    "files": []
+    "files": [
+      {
+        "path": "game.tga",
+        "type": "Image"
+      }
+    ]
   },
   "HL:BS": {
     "name": "Half-Life: Blue Shift",
-    "files": []
+    "files": [
+      {
+        "path": "game.tga",
+        "type": "Image"
+      }
+    ]
   },
   "DOD": {
     "name": "Day of Defeat",
-    "files": []
+    "files": [
+      {
+        "path": "game.tga",
+        "type": "Image"
+      }
+    ]
   },
   "CS:CZ": {
     "name": "Counter-Strike: Condition Zero",
-    "files": []
+    "files": [
+      {
+        "path": "game.tga",
+        "type": "Image"
+      },
+      {
+        "path": "gfx/vgui/leet.tga",
+        "type": "Image"
+      },
+      {
+        "path": "gfx/vgui/sas.tga",
+        "type": "Image"
+      },
+      {
+        "path": "resource/background/800_3_d_loading.tga",
+        "type": "Image"
+      }
+    ]
   },
   "HL:Src": {
     "name": "Half-Life: Source",
-    "files": []
+    "files": [
+      {
+        "path": "hl1/hl1_pak_dir.vpk:textures/dev/albedo_chart.vtex_c",
+        "type": "Texture"
+      }
+    ]
   },
   "CS:Src": {
     "name": "Counter-Strike: Source",

@@ -8,7 +8,7 @@ namespace GameX.Origin.Formats
 {
     public unsafe class PakBinary_U8 : PakBinary<PakBinary_U8>
     {
-        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => source.Path.ToLowerInvariant() switch
             {
                 _ => Path.GetExtension(source.Path).ToLowerInvariant() switch

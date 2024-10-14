@@ -1,52 +1,54 @@
-﻿using GameX.Bioware.Formats;
-using GameX.Bioware.Transforms;
+﻿using GameX.Crytek.Formats;
+using GameX.Crytek.Transforms;
 using GameX.Formats;
 using GameX.Formats.Unknown;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace GameX.Bioware
+[assembly: InternalsVisibleTo("GameX.Cig")]
+
+namespace GameX.Crytek
 {
+    #region CrytekPakFile
+
     /// <summary>
-    /// BiowarePakFile
+    /// CrytekPakFile
     /// </summary>
     /// <seealso cref="GameX.Formats.BinaryPakFile" />
-    public class BiowarePakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
+    public class CrytekPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BiowarePakFile" /> class.
+        /// Initializes a new instance of the <see cref="CrytekPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public BiowarePakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
+        public CrytekPakFile(PakState state) : base(state, GetPakBinary(state.Game))
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
 
         static readonly ConcurrentDictionary<string, PakBinary> PakBinarys = new ConcurrentDictionary<string, PakBinary>();
 
-        static PakBinary GetPakBinary(FamilyGame game, string extension)
-            => extension != ".zip"
-                ? PakBinarys.GetOrAdd(game.Id, _ => PakBinaryFactory(game))
-                : PakBinary_Zip.GetPakBinary(game);
+        static PakBinary GetPakBinary(FamilyGame game)
+            => PakBinarys.GetOrAdd(game.Id, _ => PakBinaryFactory(game));
 
         static PakBinary PakBinaryFactory(FamilyGame game)
             => game.Engine switch
             {
-                //"Infinity" => PakBinary_Infinity.Instance,
-                "Aurora" => PakBinary_Aurora.Current,
-                "HeroEngine" => PakBinary_Myp.Current,
-                _ => throw new ArgumentOutOfRangeException(nameof(game.Engine))
+                "ArcheAge" => new PakBinary_ArcheAge((byte[])game.Key),
+                _ => new PakBinary_Cry3((byte[])game.Key),
             };
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
+                ".xml" => (0, CryXmlFile.Factory),
                 ".dds" => (0, Binary_Dds.Factory),
-                var x when x == ".dlg" || x == ".qdb" || x == ".qst" => (0, Binary_Gff.Factory),
+                var x when x == ".cgf" || x == ".cga" || x == ".chr" || x == ".skin" || x == ".anim" => (0, CryFile.Factory),
                 _ => (0, null),
             };
 
@@ -59,4 +61,6 @@ namespace GameX.Bioware
 
         #endregion
     }
+
+    #endregion
 }

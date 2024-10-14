@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace GameX.Black
 {
+    #region BlackPakFile
+
     /// <summary>
     /// BlackPakFile
     /// </summary>
@@ -20,7 +22,7 @@ namespace GameX.Black
         /// <param name="state">The state.</param>
         public BlackPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
@@ -36,7 +38,7 @@ namespace GameX.Black
         //    _ => throw new ArgumentOutOfRangeException(nameof(extension)),
         //};
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 var x when x.StartsWith(".fr") => (0, Binary_Frm.Factory),
@@ -54,4 +56,6 @@ namespace GameX.Black
 
         #endregion
     }
+
+    #endregion
 }

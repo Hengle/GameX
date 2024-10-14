@@ -45,7 +45,7 @@ namespace GameX.Bullfrog
         /// </summary>
         /// <param name="state">The state.</param>
         public BullfrogPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
-            => ObjectFactoryFunc = ObjectFactoryFactory;
+            => ObjectFactoryFunc = ObjectFactory;
 
         #region Factories
 
@@ -60,12 +60,12 @@ namespace GameX.Bullfrog
                 _ => throw new ArgumentOutOfRangeException(),
             };
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => game.Id switch
             {
-                var x when x == "DK" || x == "DK2" => PakBinary_Bullfrog.ObjectFactoryFactory(source, game),
-                var x when x == "P" || x == "P2" || x == "P3" => PakBinary_Populus.ObjectFactoryFactory(source, game),
-                var x when x == "S" || x == "S2" => PakBinary_Syndicate.ObjectFactoryFactory(source, game),
+                var x when x == "DK" || x == "DK2" => PakBinary_Bullfrog.ObjectFactory(source, game),
+                var x when x == "P" || x == "P2" || x == "P3" => PakBinary_Populus.ObjectFactory(source, game),
+                var x when x == "S" || x == "S2" => PakBinary_Syndicate.ObjectFactory(source, game),
                 _ => throw new ArgumentOutOfRangeException(),
             };
 

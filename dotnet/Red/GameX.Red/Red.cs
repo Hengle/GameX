@@ -1,34 +1,39 @@
-﻿using GameX.Formats;
+﻿using GameX.Bioware.Formats;
+using GameX.Formats;
 using GameX.Formats.Unknown;
-using GameX.EA.Formats;
-using GameX.EA.Transforms;
+using GameX.Red.Formats;
+using GameX.Red.Transforms;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace GameX.EA
+namespace GameX.Red
 {
+    #region RedPakFile
+
     /// <summary>
-    /// EAPakFile
+    /// RedPakFile
     /// </summary>
     /// <seealso cref="GameX.Formats.BinaryPakFile" />
-    public class EAPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
+    public class RedPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EAPakFile" /> class.
+        /// Initializes a new instance of the <see cref="RedPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public EAPakFile(PakState state) : base(state, PakBinary_Hpl.Current)
+        public RedPakFile(PakState state) : base(state, PakBinary_Red.Current)
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
+                ".dds" => (0, Binary_Dds.Factory),
+                // witcher 1
+                var x when x == ".dlg" || x == ".qdb" || x == ".qst" => (0, Binary_Gff.Factory),
                 _ => (0, null),
             };
 
@@ -41,4 +46,6 @@ namespace GameX.EA
 
         #endregion
     }
+
+    #endregion
 }

@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace GameX.Cig
 {
+    #region CigPakFile
+
     /// <summary>
     /// CigPakFile
     /// </summary>
@@ -21,12 +23,12 @@ namespace GameX.Cig
         /// <param name="state">The state.</param>
         public CigPakFile(PakState state) : base(state, PakBinary_P4k.Current)
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
 
-        internal static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        internal static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 //".cfg" => (0, BinaryDcb.Factory),
@@ -48,4 +50,6 @@ namespace GameX.Cig
 
         #endregion
     }
+
+    #endregion
 }

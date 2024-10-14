@@ -1,7 +1,8 @@
 import os
 from gamex.pak import BinaryPakFile
-from .Cryptic.pakbinary_hogg import PakBinary_Hogg
-from .util import _pathExtension
+from gamex.Cryptic.formats.pakbinary import PakBinary_Hogg
+from gamex.GameX import UnknownPakFile
+from gamex.util import _pathExtension
 
 # typedefs
 class FamilyGame: pass
@@ -21,7 +22,8 @@ class CrypticPakFile(BinaryPakFile):
         return PakBinary_Hogg()
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
-            case _: return (0, None)
+            case _: return UnknownPakFile.objectFactory(source, game)
+
     #endregion

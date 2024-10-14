@@ -2,6 +2,7 @@
 using GameX.Bethesda.Transforms;
 using GameX.Formats;
 using GameX.Formats.Unknown;
+using GameX.Unknown;
 using OpenStack.Gfx;
 using OpenStack.Gfx.Textures;
 using System;
@@ -53,7 +54,7 @@ namespace GameX.Bethesda
         /// <param name="state">The state.</param>
         public BethesdaPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
             PathFinders.Add(typeof(ITexture), FindTexture);
         }
 
@@ -95,12 +96,11 @@ namespace GameX.Bethesda
 
         static Task<object> NiFactory(BinaryReader r, FileSource f, PakFile s) { var file = new NiFile(Path.GetFileNameWithoutExtension(f.Path)); file.Read(r); return Task.FromResult((object)file); }
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                ".dds" => (0, Binary_Dds.Factory),
                 ".nif" => (0, NiFactory),
-                _ => (0, null),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

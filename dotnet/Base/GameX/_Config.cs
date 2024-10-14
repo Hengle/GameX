@@ -526,10 +526,10 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            ForcePath = "sample:0",
+            ForcePath = "sample:6",
             Family = "Valve",
-            //Game = "HL", // Half-Life [open, read, texture:GL]
-            Game = "TF", // Team Fortress Classic [open, read, texture:GL]
+            Game = "HL", // Half-Life [open, read, texture:GL]
+            //Game = "TF", // Team Fortress Classic [open, read, texture:GL]
             //Game = "CS", // Counter-Strike [open, read]
             //Game = "Ricochet", // Ricochet [open, read]
             //Game = "HL:BS", // Half-Life: Blue Shift [open, read]

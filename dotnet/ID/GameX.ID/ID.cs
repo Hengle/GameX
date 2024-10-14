@@ -4,10 +4,37 @@ using GameX.ID.Formats;
 using GameX.ID.Transforms;
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace GameX.ID
 {
+    #region IDGame
+
+    /// <summary>
+    /// IDGame
+    /// </summary>
+    /// <seealso cref="GameX.FamilyGame" />
+    public class IDGame(Family family, string id, JsonElement elem, FamilyGame dgame) : FamilyGame(family, id, elem, dgame)
+    {
+        /// <summary>
+        /// Ensures this instance.
+        /// </summary>
+        /// <returns></returns>
+        public override FamilyGame Ensure()
+        {
+            switch (Id)
+            {
+                case "Q": Games.Q.Database.Ensure(this); return this;
+                default: return this;
+            }
+        }
+    }
+
+    #endregion
+
+    #region IDPakFile
+
     /// <summary>
     /// IDPakFile
     /// </summary>
@@ -20,7 +47,7 @@ namespace GameX.ID
         /// <param name="state">The state.</param>
         public IDPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
@@ -35,11 +62,11 @@ namespace GameX.ID
                  _ => throw new ArgumentOutOfRangeException(),
              };
 
-        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => game.Id switch
             {
-                //var x when x == "Q" || x == "Q2" || x == "Q3" || x == "D3" || x == "Q:L" => PakBinary_Pak.ObjectFactoryFactory(source, game),
-                _ => PakBinary_Pak.ObjectFactoryFactory(source, game) // throw new ArgumentOutOfRangeException(),
+                //var x when x == "Q" || x == "Q2" || x == "Q3" || x == "D3" || x == "Q:L" => PakBinary_Pak.ObjectFactory(source, game),
+                _ => PakBinary_Pak.ObjectFactory(source, game) // throw new ArgumentOutOfRangeException(),
             };
         //=> Path.GetExtension(source.Path).ToLowerInvariant() switch
         //{
@@ -57,4 +84,6 @@ namespace GameX.ID
 
         #endregion
     }
+
+    #endregion
 }

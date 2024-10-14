@@ -3,6 +3,7 @@ using GameX.Arkane.Formats.Danae;
 using GameX.Arkane.Transforms;
 using GameX.Formats;
 using GameX.Formats.Unknown;
+using GameX.Unknown;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -26,11 +27,11 @@ namespace GameX.Arkane
         {
             ObjectFactoryFunc = state.Game.Engine switch
             {
-                "CryEngine" => Crytek.CrytekPakFile.ObjectFactoryFactory,
-                "Unreal" => Epic.EpicPakFile.ObjectFactoryFactory,
-                "Valve" => Valve.ValvePakFile.ObjectFactoryFactory,
-                "idTech7" => ID.IDPakFile.ObjectFactoryFactory,
-                _ => ObjectFactoryFactory,
+                "CryEngine" => Crytek.CrytekPakFile.ObjectFactory,
+                "Unreal" => Epic.EpicPakFile.ObjectFactory,
+                "Valve" => Valve.ValvePakFile.ObjectFactory,
+                "idTech7" => ID.IDPakFile.ObjectFactory,
+                _ => ObjectFactory,
             };
             UseFileId = true;
         }
@@ -51,13 +52,10 @@ namespace GameX.Arkane
                 _ => throw new ArgumentOutOfRangeException(nameof(game.Engine)),
             });
 
-        internal static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        internal static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".txt" || x == ".ini" || x == ".asl" => (0, Binary_Txt.Factory),
-                ".wav" => (0, Binary_Snd.Factory),
-                var x when x == ".bmp" || x == ".jpg" || x == ".tga" => (0, Binary_Img.Factory),
-                ".dds" => (0, Binary_Dds.Factory),
+                var x when x == ".asl" => (0, Binary_Txt.Factory),
                 // Danae (AF)
                 ".ftl" => (0, Binary_Ftl.Factory),
                 ".fts" => (0, Binary_Fts.Factory),
@@ -65,7 +63,7 @@ namespace GameX.Arkane
                 //
                 //".llf" => (0, Binary_Flt.Factory),
                 //".dlf" => (0, Binary_Flt.Factory),
-                _ => (0, null),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

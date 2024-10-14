@@ -1,38 +1,37 @@
-﻿using GameX.Formats;
+﻿using GameX.Epic.Formats;
+using GameX.Epic.Transforms;
+using GameX.Formats;
 using GameX.Formats.Unknown;
-using GameX.Monolith.Formats;
-using GameX.Monolith.Transforms;
-using System;
 using System.IO;
+using System;
 using System.Threading.Tasks;
 
-namespace GameX.Monolith
+namespace GameX.Epic
 {
+    #region EpicPakFile
+
     /// <summary>
-    /// MonolithPakFile
+    /// EpicPakFile
     /// </summary>
     /// <seealso cref="GameX.Formats.BinaryPakFile" />
-    public class MonolithPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
+    public class EpicPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MonolithPakFile" /> class.
+        /// Initializes a new instance of the <see cref="EpicPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public MonolithPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
+        public EpicPakFile(PakState state) : base(state, PakBinary_Pck.Current)
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
 
-        static PakBinary GetPakBinary(FamilyGame game, string filePath)
-            => filePath == null || Path.GetExtension(filePath).ToLowerInvariant() != ".zip"
-                ? PakBinary_Lith.Current
-                : PakBinary_Zip.GetPakBinary(game);
-
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        // object factory
+        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
+                var x when x == ".cfg" || x == ".txt" => (0, Binary_Txt.Factory),
                 ".dds" => (0, Binary_Dds.Factory),
                 _ => (0, null),
             };
@@ -46,4 +45,6 @@ namespace GameX.Monolith
 
         #endregion
     }
+
+    #endregion
 }

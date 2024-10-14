@@ -1,10 +1,10 @@
 import os
 from gamex.pak import BinaryPakFile
-from gamex.Base.formats.binary import Binary_Dds, Binary_Img, Binary_Snd, Binary_Txt
 from gamex.Arkane.formats.danae.binary import Binary_Ftl, Binary_Fts, Binary_Tea
 from gamex.Arkane.formats.pakbinary import PakBinary_Danae, PakBinary_Void
 from gamex.Valve.formats.pakbinary import PakBinary_Vpk
 from gamex.GameX_Valve import ValvePakFile
+from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
 
 # typedefs
@@ -21,11 +21,11 @@ class ArkanePakFile(BinaryPakFile):
     def __init__(self, state: PakState):
         super().__init__(state, self.getPakBinary(state.game, _pathExtension(state.path).lower()))
         match state.game.engine:
-            # case 'CryEngine': self.objectFactoryFunc = Crytek.CrytekPakFile.ObjectFactoryFactory
-            # case 'Unreal': self.objectFactoryFunc = Epic.EpicPakFile.ObjectFactoryFactory
-            case 'Valve': self.objectFactoryFunc = ValvePakFile.ObjectFactoryFactory
-            # case 'idTech7': self.objectFactoryFunc = Id.IdPakFile.ObjectFactoryFactory
-            case _: self.objectFactoryFunc = self.objectFactoryFactory
+            # case 'CryEngine': self.objectFactoryFunc = Crytek.CrytekPakFile.ObjectFactory
+            # case 'Unreal': self.objectFactoryFunc = Epic.EpicPakFile.ObjectFactory
+            case 'Valve': self.objectFactoryFunc = ValvePakFile.ObjectFactory
+            # case 'idTech7': self.objectFactoryFunc = Id.IdPakFile.ObjectFactory
+            case _: self.objectFactoryFunc = self.objectFactory
         self.useFileId = True
 
     #region Factories
@@ -42,12 +42,9 @@ class ArkanePakFile(BinaryPakFile):
             case _: raise Exception(f'Unknown: {game.engine}')
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
-            case x if x == '.txt' or x == '.ini' or x == '.asl': return (0, Binary_Txt.factory)
-            case '.wav': return (0, Binary_Snd.factory)
-            case x if x == '.bmp' or x == '.jpg' or x == '.tga': return (0, Binary_Img.factory)
-            case '.dds': return (0, Binary_Dds.factory)
+            case x if x == '.asl': return (0, Binary_Txt.factory)
             # Danae (AF)
             case '.ftl': return (0, Binary_Ftl.factory)
             case '.fts': return (0, Binary_Fts.factory)
@@ -55,7 +52,7 @@ class ArkanePakFile(BinaryPakFile):
             #
             #case ".llf": return (0, Binary_Flt.factory)
             #case ".dlf": return (0, Binary_Flt.factory)
-            case _: return (0, None)
+            case _: return UnknownPakFile.objectFactory(source, game)
 
     #endregion
 

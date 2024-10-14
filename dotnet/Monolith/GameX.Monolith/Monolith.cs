@@ -1,31 +1,38 @@
-﻿using GameX.Cyanide.Formats;
-using GameX.Cyanide.Transforms;
-using GameX.Formats;
+﻿using GameX.Formats;
 using GameX.Formats.Unknown;
+using GameX.Monolith.Formats;
+using GameX.Monolith.Transforms;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace GameX.Cyanide
+namespace GameX.Monolith
 {
+    #region MonolithPakFile
+
     /// <summary>
-    /// CyanidePakFile
+    /// MonolithPakFile
     /// </summary>
     /// <seealso cref="GameX.Formats.BinaryPakFile" />
-    public class CyanidePakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
+    public class MonolithPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CyanidePakFile" /> class.
+        /// Initializes a new instance of the <see cref="MonolithPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public CyanidePakFile(PakState state) : base(state, PakBinary_Cpk.Current)
+        public MonolithPakFile(PakState state) : base(state, GetPakBinary(state.Game, state.Path))
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static PakBinary GetPakBinary(FamilyGame game, string filePath)
+            => filePath == null || Path.GetExtension(filePath).ToLowerInvariant() != ".zip"
+                ? PakBinary_Lith.Current
+                : PakBinary_Zip.GetPakBinary(game);
+
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 ".dds" => (0, Binary_Dds.Factory),
@@ -41,4 +48,6 @@ namespace GameX.Cyanide
 
         #endregion
     }
+
+    #endregion
 }

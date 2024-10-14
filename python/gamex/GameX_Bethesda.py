@@ -3,6 +3,7 @@ from gamex import Family, FamilyGame
 from gamex.pak import BinaryPakFile
 from gamex.Base.formats.binary import Binary_Dds
 from gamex.Bethesda.formats.pakbinary import PakBinary_Ba2, PakBinary_Bsa, PakBinary_Esm
+from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
 
 # typedefs
@@ -35,7 +36,7 @@ class BethesdaGame(FamilyGame):
 class BethesdaPakFile(BinaryPakFile):
     def __init__(self, state: PakState):
         super().__init__(state, self.getPakBinary(state.game, _pathExtension(state.path).lower()))
-        self.objectFactoryFunc = self.objectFactoryFactory
+        self.objectFactoryFunc = self.objectFactory
 
     #region Factories
     @staticmethod
@@ -51,11 +52,12 @@ class BethesdaPakFile(BinaryPakFile):
     # def NiFactory(r: Reader, f: FileSource, s: PakFile): file = NiFile(Path.GetFileNameWithoutExtension(f.Path)); file.Read(r); return file
 
     @staticmethod
-    def objectFactoryFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
+    def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
             case '.dds': return (0, Binary_Dds.factory)
             # case '.nif': return (0, NiFactory)
-            case _: return (0, None)
+            case _: return UnknownPakFile.objectFactory(source, game)
+
     #endregion
 
 #endregion

@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace GameX.Cryptic
 {
+    #region CrypticPakFile
+
     /// <summary>
     /// CrypticPakFile
     /// </summary>
@@ -20,7 +22,7 @@ namespace GameX.Cryptic
         /// <param name="state">The state.</param>
         public CrypticPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
@@ -29,7 +31,7 @@ namespace GameX.Cryptic
             => PakBinary_Hogg.Current;
 
         //ref https://github.com/PlumberTaskForce/Datamining-Guide/blob/master/README.md
-        internal static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        internal static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 var x when x == ".png" => (0, Binary_Img.Factory),
@@ -50,4 +52,6 @@ namespace GameX.Cryptic
 
         #endregion
     }
+
+    #endregion
 }

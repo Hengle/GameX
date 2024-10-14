@@ -6,10 +6,38 @@ using GameX.Volition.Transforms;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace GameX.Volition
 {
+    #region VolitionGame
+
+    /// <summary>
+    /// VolitionGame
+    /// </summary>
+    /// <seealso cref="GameX.FamilyGame" />
+    public class VolitionGame(Family family, string id, JsonElement elem, FamilyGame dgame) : FamilyGame(family, id, elem, dgame)
+    {
+        /// <summary>
+        /// Ensures this instance.
+        /// </summary>
+        /// <returns></returns>
+        public override FamilyGame Ensure()
+        {
+            switch (Id)
+            {
+                case "D": Games.D.Database.Ensure(this); return this;
+                case "D2": Games.D2.Database.Ensure(this); return this;
+                default: return this;
+            }
+        }
+    }
+
+    #endregion
+
+    #region VolitionPakFile
+
     /// <summary>
     /// VolitionPakFile
     /// </summary>
@@ -22,7 +50,7 @@ namespace GameX.Volition
         /// <param name="state">The state.</param>
         public VolitionPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
@@ -39,7 +67,7 @@ namespace GameX.Volition
                 _ => throw new ArgumentOutOfRangeException(nameof(game.Engine)),
             });
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
@@ -60,4 +88,6 @@ namespace GameX.Volition
 
         #endregion
     }
+
+    #endregion
 }

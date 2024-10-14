@@ -1,34 +1,37 @@
 ﻿using GameX.Formats;
 using GameX.Formats.Unknown;
-using GameX.Frontier.Formats;
-using GameX.Frontier.Transforms;
+using GameX.Unity.Formats;
+using GameX.Unity.Transforms;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace GameX.Frontier
+namespace GameX.Unity
 {
+    #region UnityPakFile
+
     /// <summary>
-    /// FrontierPakFile
+    /// UnityPakFile
     /// </summary>
     /// <seealso cref="GameX.Formats.BinaryPakFile" />
-    public class FrontierPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
+    public class UnityPakFile : BinaryPakFile, ITransformFileObject<IUnknownFileModel>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FrontierPakFile" /> class.
+        /// Initializes a new instance of the <see cref="UnityPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public FrontierPakFile(PakState state) : base(state, PakBinary_Frontier.Current)
+        public UnityPakFile(PakState state) : base(state, PakBinary_Unity.Current)
         {
-            ObjectFactoryFunc = ObjectFactoryFactory;
+            ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
 
-        static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
+                var x when x == ".cfg" || x == ".txt" => (0, Binary_Txt.Factory),
+                ".dds" => (0, Binary_Dds.Factory),
                 _ => (0, null),
             };
 
@@ -41,4 +44,6 @@ namespace GameX.Frontier
 
         #endregion
     }
+
+    #endregion
 }

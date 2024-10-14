@@ -568,7 +568,14 @@ namespace GameX.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Img(r, f));
 
-        #region BMP
+        (string type, object gl, object vulken, object unity, object unreal) Format;
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth { get; } = 0;
+        public int MipMaps { get; } = 1;
+        public TextureFlags Flags { get; } = 0;
+
+        #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct BmpHeader
@@ -602,6 +609,9 @@ namespace GameX.Formats
 
         //enum Formats { Bmp, Gif, Exif, Jpg, Png, Tiff }
 
+        readonly byte[] Bytes;
+        readonly Bitmap Image;
+
         public Binary_Img(BinaryReader r, FileSource f)
         {
             Image = new Bitmap(new MemoryStream(r.ReadBytes((int)f.FileSize)));
@@ -632,16 +642,6 @@ namespace GameX.Formats
                     break;
             }
         }
-
-        readonly byte[] Bytes;
-        readonly Bitmap Image;
-        readonly (string type, object gl, object vulken, object unity, object unreal) Format;
-
-        public int Width { get; }
-        public int Height { get; }
-        public int Depth { get; } = 0;
-        public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
@@ -1100,17 +1100,24 @@ namespace GameX.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Tga(r, f));
 
-        #region Header
+        (object gl, object vulken, object unity, object unreal) Format;
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth { get; } = 0;
+        public int MipMaps { get; } = 1;
+        public TextureFlags Flags { get; } = 0;
 
-        // Image pixel format.
+        #region Headers
+
+        // Image pixel format
         // The pixel data are all in little-endian. E.g. a PIXEL_ARGB32 format image, a single pixel is stored in the memory in the order of BBBBBBBB GGGGGGGG RRRRRRRR AAAAAAAA.
         enum PIXEL
         {
-            BW8, // Single channel format represents grayscale, 8-bit integer.
-            BW16, // Single channel format represents grayscale, 16-bit integer.
+            BW8,    // Single channel format represents grayscale, 8-bit integer.
+            BW16,   // Single channel format represents grayscale, 16-bit integer.
             RGB555, // A 16-bit pixel format. The topmost bit is assumed to an attribute bit, usually ignored. Because of little-endian, this format pixel is stored in the memory in the order of GGGBBBBB ARRRRRGG.
-            RGB24, // RGB color format, 8-bit per channel.
-            ARGB32 // RGB color with alpha format, 8-bit per channel.
+            RGB24,  // RGB color format, 8-bit per channel.
+            ARGB32  // RGB color with alpha format, 8-bit per channel.
         };
 
         enum TYPE : byte
@@ -1124,7 +1131,7 @@ namespace GameX.Formats
             RLE_GRAYSCALE = 11,
         };
 
-        // Gets the bytes per pixel by pixel format.
+        // Gets the bytes per pixel by pixel format
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static int PixelFormatToPixelSize(PIXEL format)
             => format switch
@@ -1151,15 +1158,15 @@ namespace GameX.Formats
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_Header
         {
-            public static (string, int) Struct = ("<3x2Hx4H2x", sizeof(X_Header));
+            public static (string, int) Struct = ("<3b2Hb4H2b", sizeof(X_Header));
             public byte IdLength;
             public byte MapType;
             public TYPE ImageType;
-            // Color map specification
+            // color map specification
             public ushort MapFirstEntry;
             public ushort MapLength;
             public byte MapEntrySize;
-            // Image specification.
+            // image specification
             public ushort ImageXOrigin;
             public ushort ImageYOrigin;
             public ushort ImageWidth;
@@ -1167,28 +1174,28 @@ namespace GameX.Formats
             public byte PixelDepth;
             public byte ImageDescriptor;
 
-            public readonly bool IS_SUPPORTED_IMAGE_TYPE =>
+            public bool IS_SUPPORTED_IMAGE_TYPE =>
                 ImageType == TYPE.COLOR_MAPPED ||
                 ImageType == TYPE.TRUE_COLOR ||
                 ImageType == TYPE.GRAYSCALE ||
                 ImageType == TYPE.RLE_COLOR_MAPPED ||
                 ImageType == TYPE.RLE_TRUE_COLOR ||
                 ImageType == TYPE.RLE_GRAYSCALE;
-            public readonly bool IS_COLOR_MAPPED =>
+            public bool IS_COLOR_MAPPED =>
                 ImageType == TYPE.COLOR_MAPPED ||
                 ImageType == TYPE.RLE_COLOR_MAPPED;
-            public readonly bool IS_TRUE_COLOR =>
+            public bool IS_TRUE_COLOR =>
                 ImageType == TYPE.TRUE_COLOR ||
                 ImageType == TYPE.RLE_TRUE_COLOR;
-            public readonly bool IS_GRAYSCALE =>
+            public bool IS_GRAYSCALE =>
                 ImageType == TYPE.GRAYSCALE ||
                 ImageType == TYPE.RLE_GRAYSCALE;
-            public readonly bool IS_RLE =>
+            public bool IS_RLE =>
                 ImageType == TYPE.RLE_COLOR_MAPPED ||
                 ImageType == TYPE.RLE_TRUE_COLOR ||
                 ImageType == TYPE.RLE_GRAYSCALE;
 
-            public readonly void Check()
+            public void Check()
             {
                 const int MAX_IMAGE_DIMENSIONS = 65535;
                 if (MapType > 1) throw new FormatException("UNSUPPORTED_COLOR_MAP_TYPE");
@@ -1197,7 +1204,7 @@ namespace GameX.Formats
                 else if (ImageWidth <= 0 || ImageWidth > MAX_IMAGE_DIMENSIONS || ImageHeight <= 0 || ImageHeight > MAX_IMAGE_DIMENSIONS) throw new FormatException("INVALID_IMAGE_DIMENSIONS");
             }
 
-            public readonly ColorMap GetColorMap(BinaryReader r)
+            public ColorMap GetColorMap(BinaryReader r)
             {
                 var mapSize = MapLength * BitsToBytes(MapEntrySize);
                 var s = new ColorMap();
@@ -1212,7 +1219,7 @@ namespace GameX.Formats
                 return s;
             }
 
-            public readonly PIXEL GetPixelFormat()
+            public PIXEL GetPixelFormat()
             {
                 if (IS_COLOR_MAPPED)
                 {
@@ -1243,6 +1250,12 @@ namespace GameX.Formats
 
         #endregion
 
+        readonly X_Header Header;
+        readonly ColorMap Map;
+        readonly PIXEL PixelFormat;
+        readonly int PixelSize;
+        readonly MemoryStream Body;
+
         public Binary_Tga(BinaryReader r, FileSource f)
         {
             Header = r.ReadS<X_Header>();
@@ -1254,7 +1267,6 @@ namespace GameX.Formats
             Body = new MemoryStream(r.ReadToEnd());
             PixelFormat = Header.GetPixelFormat();
             PixelSize = PixelFormatToPixelSize(PixelFormat);
-
             Format = PixelFormat switch
             {
                 PIXEL.BW8 => throw new NotSupportedException(),
@@ -1277,19 +1289,6 @@ namespace GameX.Formats
                 _ => throw new ArgumentOutOfRangeException(nameof(PixelFormat), $"{PixelFormat}")
             };
         }
-
-        readonly X_Header Header;
-        readonly ColorMap Map;
-        readonly PIXEL PixelFormat;
-        readonly int PixelSize;
-        readonly MemoryStream Body;
-        readonly (object gl, object vulken, object unity, object unreal) Format;
-
-        public int Width { get; }
-        public int Height { get; }
-        public int Depth { get; } = 0;
-        public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static ushort PixelToMapIndex(byte[] pixelPtr, int offset) => pixelPtr[offset];
@@ -1356,14 +1355,16 @@ namespace GameX.Formats
                 var s = Body; var o = 0;
                 var pixelCount = Width * Height;
                 if (isColorMapped)
+                {
                     for (; pixelCount > 0; --pixelCount)
                     {
                         s.Read(data, o, pixelSize);
-                        // In color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map.
+                        // in color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map.
                         GetColorFromMap(data, o, PixelToMapIndex(data, o), Map);
                         o += Map.BytesPerEntry;
                     }
-                else s.Read(data, o, pixelCount * pixelSize);
+                }
+                else s.Read(data, 0, pixelCount * pixelSize);
             }
 
             var bytes = new byte[Width * Height * PixelSize];
@@ -1371,7 +1372,7 @@ namespace GameX.Formats
             else Decode(bytes);
             Map.Pixels = null;
 
-            // Flip the image if necessary, to keep the origin in upper left corner.
+            // flip the image if necessary, to keep the origin in upper left corner.
             var flipH = (Header.ImageDescriptor & 0x10) != 0;
             var flipV = (Header.ImageDescriptor & 0x20) == 0;
             if (flipH) FlipH(bytes);
@@ -1410,7 +1411,7 @@ namespace GameX.Formats
                 {
                     var p1 = GetPixel(i, j);
                     var p2 = GetPixel(Width - 1 - i, j);
-                    // Swap two pixels.
+                    // swap two pixels
                     Buffer.BlockCopy(data, p1, temp, 0, pixelSize);
                     Buffer.BlockCopy(data, p2, data, p1, pixelSize);
                     Buffer.BlockCopy(temp, 0, data, p2, pixelSize);
@@ -1427,7 +1428,7 @@ namespace GameX.Formats
                 {
                     var p1 = GetPixel(j, i);
                     var p2 = GetPixel(j, Height - 1 - i);
-                    // Swap two pixels.
+                    // swap two pixels
                     Buffer.BlockCopy(data, p1, temp, 0, pixelSize);
                     Buffer.BlockCopy(data, p2, data, p1, pixelSize);
                     Buffer.BlockCopy(temp, 0, data, p2, pixelSize);
@@ -1437,7 +1438,7 @@ namespace GameX.Formats
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
             new($"{nameof(Binary_Tga)}", items: [
-                new($"PixelFormat: {PixelFormat}"),
+                new($"Format: {PixelFormat}"),
                 new($"Width: {Width}"),
                 new($"Height: {Height}"),
             ])

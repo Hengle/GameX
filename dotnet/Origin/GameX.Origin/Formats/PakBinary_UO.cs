@@ -14,7 +14,7 @@ namespace GameX.Origin.Formats
 
         #region Factories
 
-        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactoryFactory(FileSource source, FamilyGame game)
+        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => source.Path.ToLowerInvariant() switch
             {
                 "animdata.mul" => (0, Binary_Animdata.Factory),
