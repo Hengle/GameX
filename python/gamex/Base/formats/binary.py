@@ -2,6 +2,7 @@ import os, numpy as np
 from io import BytesIO
 from PIL import Image
 from enum import Enum
+from openstk.gfx.gfx_render import Rasterize
 from openstk.gfx.gfx_texture import DDS_HEADER, ITexture, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinary
@@ -116,41 +117,45 @@ class Binary_Img(IHaveMetaInfo, ITexture):
     flags: TextureFlags = 0
 
     def __init__(self, r: Reader, f: FileSource):
-        self.image = Image.open(r)
+        self.image = Image.open(r.f)
         self.width, self.height = self.image.size
-        formatType = self.image.format
         match self.image.mode:
             case '1': # 1-bit pixels, black and white
-                self.format = (formatType,
+                self.format = (self.image.format,
                 (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
                 (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
                 TextureUnityFormat.RGB24,
                 TextureUnrealFormat.Unknown)
             case 'L': # 8-bit pixels, Grayscale
-                self.format = (formatType,
+                self.format = (self.image.format,
                 (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
                 (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
                 TextureUnityFormat.RGB24,
                 TextureUnrealFormat.Unknown)
             case 'P': # 8-bit pixels, mapped to any other mode using a color palette
-                self.format = (formatType,
+                self.format = (self.image.format,
                 (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
                 (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
                 TextureUnityFormat.RGB24,
                 TextureUnrealFormat.Unknown)
             case 'RGB': # 3×8-bit pixels, true color
-                self.format = (formatType,
+                self.format = (self.image.format,
                 (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
                 (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
                 TextureUnityFormat.RGB24,
                 TextureUnrealFormat.Unknown)
             case 'RGBA': # 4×8-bit pixels, true color with transparency mask
-                self.format = (formatType,
+                self.format = (self.image.format,
                 (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
                 (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
                 TextureUnityFormat.RGBA32,
                 TextureUnrealFormat.Unknown)
-        # print(f'format: {self.format}')
+        # print(f'mode: {self.image.mode}')
+        bytes = self.image.tobytes(); palette = self.image.getpalette()
+        if not palette: self.bytes = bytes
+        else: 
+            self.bytes = bytearray(self.width * self.height * 3)
+            Rasterize.copyPixelsByPalette(self.bytes, 3, bytes, palette)
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
         match platform:
@@ -159,7 +164,7 @@ class Binary_Img(IHaveMetaInfo, ITexture):
             case Platform.Type.Unity: format = self.format[3]
             case Platform.Type.Unreal: format = self.format[4]
             case _: raise Exception(f'Unknown {platform}')
-        return self.image.tobytes(), format, None
+        return self.bytes, format, None
     def end(self): pass
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
@@ -171,30 +176,6 @@ class Binary_Img(IHaveMetaInfo, ITexture):
             MetaInfo(f'Mipmaps: {self.mipMaps}')
             ])
         ]
-
-    # print(r.readBytes(f.fileSize))
-    # self.image = iio.imread(r.readBytes(f.fileSize))
-    # self.image = iio.imread('imageio:chelsea.bsdf')
-    # match len(self.image.shape):
-    #     case 2: self.width, self.height = self.image.shape; self.channels = 1
-    #     case 3: self.width, self.height, self.channels = self.image.shape
-    #     case 4: _, self.width, self.height, self.channels = self.image.shape
-    # match self.channels:
-    #     case 1: self.format = (formatType,
-    #         (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
-    #         (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
-    #         TextureUnityFormat.RGB24,
-    #         TextureUnrealFormat.Unknown)
-    #     case 3: self.format = (formatType,
-    #         (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-    #         (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-    #         TextureUnityFormat.RGB24,
-    #         TextureUnrealFormat.Unknown)
-    #     case 4: self.format = (formatType,
-    #         (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-    #         (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-    #         TextureUnityFormat.RGB24,
-    #         TextureUnrealFormat.Unknown)
 
 #endregion
 
@@ -423,14 +404,33 @@ class Binary_Tga(IHaveMetaInfo, ITexture):
         # Buffer.BlockCopy(map.pixels, map.bytesPerEntry * index, dest, offset, map.bytesPerEntry)
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
-
         # decodeRle
         def decodeRle(data: bytearray):
             isColorMapped = self.header.IS_COLOR_MAPPED
             pixelSize = self.pixelSize
             s = self.body; o = 0
             pixelCount = self.width * self.height
-            print('decodeRle')
+
+            isRunLengthPacket = False
+            packetCount = 0
+            pixelBuffer = bytearray(map.bytesPerEntry if isColorMapped else pixelSize); mv = memoryview(pixelBuffer)
+            
+            for _ in range(pixelCount, 0, -1):
+                if packetCount == 0:
+                    repetitionCountField = int.from_bytes(s.read(1), 'little', signed=False)
+                    isRunLengthPacket = (repetitionCountField & 0x80) != 0
+                    packetCount = (repetitionCountField & 0x7F) + 1
+                    if isRunLengthPacket:
+                        s.readinto(mv[0:pixelSize])
+                        # in color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map.
+                        if isColorMapped: getColorFromMap(pixelBuffer, 0, pixelToMapIndex(pixelBuffer, o), map)
+                if isRunLengthPacket: data[o:o+pixelSize] = pixelBuffer[0:pixelSize]
+                else:
+                    s.readinto(data[o:o+pixelSize])
+                    # in color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map.
+                    if isColorMapped: getColorFromMap(data, o, pixelToMapIndex(data, o), map)
+                packetCount -= 1
+                o += pixelSize
 
         # decode
         def decode(data: bytearray):
@@ -438,14 +438,14 @@ class Binary_Tga(IHaveMetaInfo, ITexture):
             pixelSize = self.pixelSize
             s = self.body; o = 0
             pixelCount = self.width * self.height
+
+            # in color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map
             if isColorMapped:
-                print('isColorMapped')
                 for _ in range(pixelCount, 0, -1):
                     s.readinto(data[o:o+pixelSize])
-                    # in color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map
                     getColorFromMap(data, o, pixelToMapIndex(data, o), map)
                     o += map.bytesPerEntry
-            else: s.readinto(data[0:pixelCount*pixelSize])
+            else: s.readinto(data[:pixelCount*pixelSize])
 
         header = self.header
         bytes = bytearray(self.width * self.height * self.pixelSize); mv = memoryview(bytes)

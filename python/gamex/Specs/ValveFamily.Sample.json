@@ -7,6 +7,14 @@
         "type": "Image"
       },
       {
+        "path": "valve/overviews/boot_camp.bmp",
+        "type": "Image"
+      },
+      {
+        "path": "valve/overviews/boot_camp.tga",
+        "type": "Image"
+      },
+      {
         "path": "valve/cached.wad:LOADING.pic",
         "type": "Texture"
       },
@@ -19,16 +27,16 @@
         "type": "Texture:Font"
       },
       {
-        "path": "valve/sprites:640hud1.spr",
+        "path": "valve/sprites/640hud1.spr",
         "type": "Sprite"
       },
       {
-        "path": "valve/sprites:640_logo.spr",
+        "path": "valve/sprites/640_logo.spr",
         "type": "Sprite"
       },
       {
-        "path": "valve/maps/boot_camp.bsp",
-        "type": "Map"
+        "path": "valve/maps/boot_camp.bsp:entities.txt",
+        "type": "Bsp"
       }
     ]
   },
@@ -40,12 +48,28 @@
         "type": "Image"
       },
       {
+        "path": "overviews/2fort.bmp",
+        "type": "Image"
+      },
+      {
+        "path": "overviews/2fort.tga",
+        "type": "Image"
+      },
+      {
         "path": "cached.wad:CONBACK640.pic",
         "type": "Texture"
       },
       {
-        "path": "tfc.WAD:{EASTLINE1.pic",
+        "path": "tfc2.wad:{EASTLINE1.tex",
         "type": "Texture"
+      },
+      {
+        "path": "sprites/tfchud01.spr",
+        "type": "Sprite"
+      },
+      {
+        "path": "maps/2fort.bsp:entities.txt",
+        "type": "Bsp"
       }
     ]
   },
@@ -55,6 +79,30 @@
       {
         "path": "game.tga",
         "type": "Image"
+      },
+      {
+        "path": "overviews/2fort.bmp",
+        "type": "Image"
+      },
+      {
+        "path": "overviews/2fort.tga",
+        "type": "Image"
+      },
+      {
+        "path": "cached.wad:CONBACK.pic",
+        "type": "Texture"
+      },
+      {
+        "path": "tswad.wad:TSHULL.tex",
+        "type": "Texture"
+      },
+      {
+        "path": "sprites/640hud1.spr",
+        "type": "Sprite"
+      },
+      {
+        "path": "maps/2fort.bsp:entities.txt",
+        "type": "Bsp"
       }
     ]
   },
@@ -64,6 +112,18 @@
       {
         "path": "game.tga",
         "type": "Image"
+      },
+      {
+        "path": "cached.wad:CONBACK.pic",
+        "type": "Texture"
+      },
+      {
+        "path": "sprites/640hud1.spr",
+        "type": "Sprite"
+      },
+      {
+        "path": "maps/cs_747.bsp:entities.txt",
+        "type": "Bsp"
       }
     ]
   },
@@ -73,6 +133,18 @@
       {
         "path": "game.tga",
         "type": "Image"
+      },
+      {
+        "path": "cached.wad:CONBACK640.pic",
+        "type": "Texture"
+      },
+      {
+        "path": "sprites/640_0bounce.spr",
+        "type": "Sprite"
+      },
+      {
+        "path": "maps/rc_arena.bsp:entities.txt",
+        "type": "Bsp"
       }
     ]
   },
@@ -82,6 +154,26 @@
       {
         "path": "game.tga",
         "type": "Image"
+      },
+      {
+        "path": "overviews/dmc_dm2.bmp",
+        "type": "Image"
+      },
+      {
+        "path": "overviews/dmc_dm2.tga",
+        "type": "Image"
+      },
+      {
+        "path": "cached.wad:CONBACK.pic",
+        "type": "Texture"
+      },
+      {
+        "path": "sprites/640hud1.spr",
+        "type": "Sprite"
+      },
+      {
+        "path": "maps/dmc_dm2.bsp:entities.txt",
+        "type": "Bsp"
       }
     ]
   },
@@ -91,6 +183,18 @@
       {
         "path": "game.tga",
         "type": "Image"
+      },
+      {
+        "path": "cached.wad:CONBACK.pic",
+        "type": "Texture"
+      },
+      {
+        "path": "sprites/640hud1.spr",
+        "type": "Sprite"
+      },
+      {
+        "path": "maps/ba_canal1.bsp:entities.txt",
+        "type": "Bsp"
       }
     ]
   },
@@ -100,6 +204,18 @@
       {
         "path": "game.tga",
         "type": "Image"
+      },
+      {
+        "path": "overviews/dod_anzio.bmp",
+        "type": "Image"
+      },
+      {
+        "path": "sprites/weapons1.spr",
+        "type": "Sprite"
+      },
+      {
+        "path": "maps/dod_anzio.bsp:entities.txt",
+        "type": "Bsp"
       }
     ]
   },
@@ -111,7 +227,7 @@
         "type": "Image"
       },
       {
-        "path": "gfx/vgui/leet.tga",
+        "path": "overviews/cs_downed_cz.bmp",
         "type": "Image"
       },
       {
@@ -119,14 +235,22 @@
         "type": "Image"
       },
       {
-        "path": "resource/background/800_3_d_loading.tga",
-        "type": "Image"
+        "path": "maps/cs_downed_cz.bsp:entities.txt",
+        "type": "Bsp"
       }
     ]
   },
   "HL:Src": {
     "name": "Half-Life: Source",
     "files": [
+      {
+        "path": "platform/platform_misc_dir.vpk:scripts/preload_xbox.xsc",
+        "type": "Text"
+      },
+      {
+        "path": "hl1/hl1_pak_dir.vpk:console.log",
+        "type": "Text"
+      },
       {
         "path": "hl1/hl1_pak_dir.vpk:textures/dev/albedo_chart.vtex_c",
         "type": "Texture"

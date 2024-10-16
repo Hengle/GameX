@@ -41,7 +41,7 @@ namespace GameX.Valve
                     "Source" => PakBinary_Vpk.Current,
                     _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine),
                 })
-                : PakBinary_Bsp.Current;
+                : PakBinary_Bsp30.Current;
 
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => game.Engine switch
@@ -49,7 +49,6 @@ namespace GameX.Valve
                 "GoldSrc" => Path.GetExtension(source.Path).ToLowerInvariant() switch
                 {
                     var x when x == ".pic" || x == ".tex" || x == ".tex2" || x == ".fnt" => (0, Binary_Wad3.Factory),
-                    ".bsp" => (0, Binary_Bsp.Factory),
                     ".spr" => (0, Binary_Spr.Factory),
                     _ => UnknownPakFile.ObjectFactory(source, game),
                 },

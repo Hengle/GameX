@@ -472,17 +472,18 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:6",
+            ForcePath = "sample:1",
             Family = "Valve",
-            Game = "HL", # Half-Life [open, read, texture:GL]
+            # Game = "HL", # Half-Life [open, read, texture:GL]
             # Game = "TF", # Team Fortress Classic [open, read, texture:GL]
             # Game = "CS", # Counter-Strike [open, read]
             # Game = "Ricochet", # Ricochet [open, read]
+            # Game = "DM", # Deathmatch Classic [open, read]
             # Game = "HL:BS", # Half-Life: Blue Shift [open, read]
             # Game = "DOD", # Day of Defeat [open, read]
             # Game = "CS:CZ", # Counter-Strike: Condition Zero [open, read]
 
-            # Game = "HL:Src", # Half-Life: Source [open, read]
+            Game = "HL:Src", # Half-Life: Source [open, read]
             # Game = "CS:Src", # Counter-Strike: Source [open, read]
             # Game = "HL2", # Half-Life 2 [open, read]
             # Game = "HL2:DM", # Half-Life 2: Deathmatch [open, read]

@@ -1,8 +1,10 @@
 using GameX.Meta;
 using GameX.Platforms;
+using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -616,40 +618,55 @@ namespace GameX.Formats
         {
             Image = new Bitmap(new MemoryStream(r.ReadBytes((int)f.FileSize)));
             Width = Image.Width; Height = Image.Height;
-            var formatType = Image.RawFormat.ToString();
             switch (Image.PixelFormat)
             {
-                case PixelFormat.Format8bppIndexed:
-                    Format = (formatType,
+                case PixelFormat.Format16bppGrayScale:
+                    Format = (Image.RawFormat.ToString(),
                         (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
                         (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
                         TextureUnityFormat.Unknown,
                         TextureUnrealFormat.Unknown);
                     break;
+                case PixelFormat.Format8bppIndexed:
+                    Format = (Image.RawFormat.ToString(),
+                        (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                        (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                        TextureUnityFormat.RGB24,
+                        TextureUnrealFormat.Unknown);
+                    break;
                 case PixelFormat.Format24bppRgb:
-                    Format = (formatType,
+                    Format = (Image.RawFormat.ToString(),
                         (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
                         (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
                         TextureUnityFormat.RGB24,
                         TextureUnrealFormat.Unknown);
                     break;
                 case PixelFormat.Format32bppArgb:
-                    Format = (formatType,
+                    Format = (Image.RawFormat.ToString(),
                         (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
                         (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
                         TextureUnityFormat.RGBA32,
                         TextureUnrealFormat.Unknown);
                     break;
             }
-        }
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-        {
+            // get bytes
             var data = Image.LockBits(new Rectangle(0, 0, Image.Width, Image.Height), ImageLockMode.ReadOnly, Image.PixelFormat);
             var bytes = new byte[data.Stride * data.Height];
             Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
             Image.UnlockBits(data);
-            return (bytes, (Platform.Type)platform switch
+            var palette = Image.Palette;
+            if (palette == null) Bytes = bytes;
+            else
+            {
+                var pal = palette.Entries.SelectMany<Color, byte>(x => [x.R, x.G, x.B]).ToArray();
+                Bytes = new byte[Width * Height * 3];
+                Rasterize.CopyPixelsByPalette(Bytes, 3, bytes, pal);
+            }
+        }
+
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+            => (Bytes, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
@@ -657,7 +674,6 @@ namespace GameX.Formats
                 Platform.Type.Unreal => Format.unreal,
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
             }, null);
-        }
         public void End() { }
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
@@ -1303,18 +1319,17 @@ namespace GameX.Formats
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
-            // DecodeRle
-            void DecodeRle(byte[] data)
+            // decodeRle
+            void decodeRle(byte[] data)
             {
                 var isColorMapped = Header.IS_COLOR_MAPPED;
                 var pixelSize = PixelSize;
                 var s = Body; var o = 0;
                 var pixelCount = Width * Height;
+
                 var isRunLengthPacket = false;
                 var packetCount = 0;
                 var pixelBuffer = new byte[isColorMapped ? Map.BytesPerEntry : pixelSize];
-                // The actual pixel size of the image, In order not to be confused with the name of the parameter pixel_size, named data element.
-                var dataElementSize = pixelSize;
 
                 for (; pixelCount > 0; --pixelCount)
                 {
@@ -1326,40 +1341,38 @@ namespace GameX.Formats
                         if (isRunLengthPacket)
                         {
                             s.Read(pixelBuffer, 0, pixelSize);
-                            if (isColorMapped)
-                                // In color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map.
-                                GetColorFromMap(pixelBuffer, 0, PixelToMapIndex(pixelBuffer, o), Map);
+                            // in color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map.
+                            if (isColorMapped) GetColorFromMap(pixelBuffer, 0, PixelToMapIndex(pixelBuffer, o), Map);
                         }
                     }
 
-                    if (isRunLengthPacket)
-                        Buffer.BlockCopy(pixelBuffer, 0, data, o, dataElementSize);
+                    if (isRunLengthPacket) Buffer.BlockCopy(pixelBuffer, 0, data, o, pixelSize);
                     else
                     {
                         s.Read(data, o, pixelSize);
-                        if (isColorMapped)
-                            // In color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map.
-                            GetColorFromMap(data, o, PixelToMapIndex(data, o), Map);
+                        // In color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map.
+                        if (isColorMapped) GetColorFromMap(data, o, PixelToMapIndex(data, o), Map);
                     }
 
                     --packetCount;
-                    o += dataElementSize;
+                    o += pixelSize;
                 }
             }
 
-            // Decode
-            void Decode(byte[] data)
+            // decode
+            void decode(byte[] data)
             {
                 var isColorMapped = Header.IS_COLOR_MAPPED;
                 var pixelSize = PixelSize;
                 var s = Body; var o = 0;
                 var pixelCount = Width * Height;
+
+                // in color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map.
                 if (isColorMapped)
                 {
                     for (; pixelCount > 0; --pixelCount)
                     {
                         s.Read(data, o, pixelSize);
-                        // in color mapped image, the pixel as the index value of the color map. The actual pixel value is found from the color map.
                         GetColorFromMap(data, o, PixelToMapIndex(data, o), Map);
                         o += Map.BytesPerEntry;
                     }
@@ -1368,8 +1381,8 @@ namespace GameX.Formats
             }
 
             var bytes = new byte[Width * Height * PixelSize];
-            if (Header.IS_RLE) DecodeRle(bytes);
-            else Decode(bytes);
+            if (Header.IS_RLE) decodeRle(bytes);
+            else decode(bytes);
             Map.Pixels = null;
 
             // flip the image if necessary, to keep the origin in upper left corner.

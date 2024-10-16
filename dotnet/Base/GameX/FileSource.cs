@@ -22,10 +22,9 @@ namespace GameX
         public ulong Hash;
         public BinaryPakFile Pak;
         public IList<FileSource> Parts;
-        public object Tag;
-        // extra
         public byte[] Data;
-        public object ExtraArgs;
+        public object Tag;
+        public object Tag2;
         // cached
         internal Func<BinaryReader, FileSource, PakFile, Task<object>> CachedObjectFactory;
         internal FileOption CachedObjectOption;

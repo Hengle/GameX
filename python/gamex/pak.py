@@ -181,6 +181,7 @@ class BinaryPakFile(PakFile):
             (p, f2) = self.getFileSource(path, throwOnError)
             return p.loadFileObject(type, f2, option, throwOnError) if p else None
         f = path
+        if self.game.isPakFile(f.path): return None
         data = self.loadFileData(f, option, throwOnError)
         if not data: return None
         objectFactory = self._ensureCachedObjectFactory(f)

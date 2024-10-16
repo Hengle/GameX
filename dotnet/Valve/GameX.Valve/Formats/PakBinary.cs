@@ -1,87 +1,87 @@
 ﻿using GameX.Algorithms;
-using GameX.Meta;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GameX.Valve.Formats
 {
-    #region PakBinary_Bsp
+    #region PakBinary_Bsp30
     // https://hlbsp.sourceforge.net/index.php?content=bspdef
     // https://github.com/bernhardmgruber/hlbsp/tree/master/src
+    // https://developer.valvesoftware.com/wiki/BSP_(Source)
+    // https://developer.valvesoftware.com/wiki/BSP_(GoldSrc)
 
-    public unsafe class PakBinary_Bsp : PakBinary<PakBinary_Bsp>
+    public unsafe class PakBinary_Bsp30 : PakBinary<PakBinary_Bsp30>
     {
         #region Headers
 
-        struct BSP_Lump
+        struct B_Lump
         {
             public int Offset;
             public int Length;
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        struct BSP_Header
+        struct B_Header
         {
-            public static (string, int) Struct = ("<31i", sizeof(BSP_Header));
+            public static (string, int) Struct = ("<31i", sizeof(B_Header));
             public int Version;
-            public BSP_Lump Entities;
-            public BSP_Lump Planes;
-            public BSP_Lump Textures;
-            public BSP_Lump Vertices;
-            public BSP_Lump Visibility;
-            public BSP_Lump Nodes;
-            public BSP_Lump TexInfo;
-            public BSP_Lump Faces;
-            public BSP_Lump Lighting;
-            public BSP_Lump ClipNodes;
-            public BSP_Lump Leaves;
-            public BSP_Lump MarkSurfaces;
-            public BSP_Lump Edges;
-            public BSP_Lump SurfEdges;
-            public BSP_Lump Models;
+            public B_Lump Entities;
+            public B_Lump Planes;
+            public B_Lump Textures;
+            public B_Lump Vertices;
+            public B_Lump Visibility;
+            public B_Lump Nodes;
+            public B_Lump TexInfo;
+            public B_Lump Faces;
+            public B_Lump Lighting;
+            public B_Lump ClipNodes;
+            public B_Lump Leaves;
+            public B_Lump MarkSurfaces;
+            public B_Lump Edges;
+            public B_Lump SurfEdges;
+            public B_Lump Models;
+
+            public void ForGameId(string id)
+            {
+                if (id == "HL:BS") (Entities, Planes) = (Planes, Entities);
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        struct SPR_Frame
+        struct B_Texture
         {
-            public static (string, int) Struct = ("<5i", sizeof(SPR_Frame));
-            public int Group;
-            public int OriginX;
-            public int OriginY;
-            public int Width;
-            public int Height;
+            public static (string, int) Struct = ("<16s6I", sizeof(B_Texture));
+            public fixed byte Name[16];
+            public uint Width;
+            public uint Height;
+            public fixed uint Offsets[4];
         }
 
         const int MAX_MAP_HULLS = 4;
-
-        const int MAX_MAP_MODELS = 400;
-        const int MAX_MAP_BRUSHES = 4096;
-        const int MAX_MAP_ENTITIES = 1024;
-        const int MAX_MAP_ENTSTRING = (128 * 1024);
-
-        const int MAX_MAP_PLANES = 32767;
-        const int MAX_MAP_NODES = 32767;
-        const int MAX_MAP_CLIPNODES = 32767;
-        const int MAX_MAP_LEAFS = 8192;
-        const int MAX_MAP_VERTS = 65535;
-        const int MAX_MAP_FACES = 65535;
-        const int MAX_MAP_MARKSURFACES = 65535;
-        const int MAX_MAP_TEXINFO = 8192;
-        const int MAX_MAP_EDGES = 256000;
-        const int MAX_MAP_SURFEDGES = 512000;
-        const int MAX_MAP_TEXTURES = 512;
-        const int MAX_MAP_MIPTEX = 0x200000;
-        const int MAX_MAP_LIGHTING = 0x200000;
-        const int MAX_MAP_VISIBILITY = 0x200000;
-
-        const int MAX_MAP_PORTALS = 65536;
+        //const int MAX_MAP_MODELS = 400;
+        //const int MAX_MAP_BRUSHES = 4096;
+        //const int MAX_MAP_ENTITIES = 1024;
+        //const int MAX_MAP_ENTSTRING = (128 * 1024);
+        //const int MAX_MAP_PLANES = 32767;
+        //const int MAX_MAP_NODES = 32767;
+        //const int MAX_MAP_CLIPNODES = 32767;
+        //const int MAX_MAP_LEAFS = 8192;
+        //const int MAX_MAP_VERTS = 65535;
+        //const int MAX_MAP_FACES = 65535;
+        //const int MAX_MAP_MARKSURFACES = 65535;
+        //const int MAX_MAP_TEXINFO = 8192;
+        //const int MAX_MAP_EDGES = 256000;
+        //const int MAX_MAP_SURFEDGES = 512000;
+        //const int MAX_MAP_TEXTURES = 512;
+        //const int MAX_MAP_MIPTEX = 0x200000;
+        //const int MAX_MAP_LIGHTING = 0x200000;
+        //const int MAX_MAP_VISIBILITY = 0x200000;
+        //const int MAX_MAP_PORTALS = 65536;
 
         #endregion
 
@@ -90,8 +90,32 @@ namespace GameX.Valve.Formats
             var files = source.Files = [];
 
             // read file
-            var header = r.ReadS<BSP_Header>();
+            int start, stop, stride;
+            var header = r.ReadS<B_Header>();
             if (header.Version != 30) throw new FormatException("BAD VERSION");
+            header.ForGameId(source.Game.Id);
+            files.Add(new FileSource { Path = "entities.txt", Offset = header.Entities.Offset, FileSize = header.Entities.Length });
+            files.Add(new FileSource { Path = "planes.dat", Offset = header.Planes.Offset, FileSize = header.Planes.Length });
+            r.Seek(start = header.Textures.Offset);
+            foreach (var o in r.ReadL32PArray<uint>("I"))
+            {
+                r.Seek(start + o);
+                var tex = r.ReadS<B_Texture>();
+                files.Add(new FileSource { Path = $"textures/{UnsafeX.FixedAString(tex.Name, 16)}.tex", Tag = tex });
+            }
+            files.Add(new FileSource { Path = "vertices.dat", Offset = header.Vertices.Offset, FileSize = header.Vertices.Length });
+            files.Add(new FileSource { Path = "visibility.dat", Offset = header.Visibility.Offset, FileSize = header.Visibility.Length });
+            files.Add(new FileSource { Path = "nodes.dat", Offset = header.Nodes.Offset, FileSize = header.Nodes.Length });
+            files.Add(new FileSource { Path = "texInfo.dat", Offset = header.TexInfo.Offset, FileSize = header.TexInfo.Length });
+            files.Add(new FileSource { Path = "faces.dat", Offset = header.Faces.Offset, FileSize = header.Faces.Length });
+            files.Add(new FileSource { Path = "lighting.dat", Offset = header.Lighting.Offset, FileSize = header.Lighting.Length });
+            files.Add(new FileSource { Path = "clipNodes.dat", Offset = header.ClipNodes.Offset, FileSize = header.ClipNodes.Length });
+            files.Add(new FileSource { Path = "leaves.dat", Offset = header.Leaves.Offset, FileSize = header.Leaves.Length });
+            files.Add(new FileSource { Path = "markSurfaces.dat", Offset = header.MarkSurfaces.Offset, FileSize = header.MarkSurfaces.Length });
+            files.Add(new FileSource { Path = "edges.dat", Offset = header.Edges.Offset, FileSize = header.Edges.Length });
+            files.Add(new FileSource { Path = "surfEdges.dat", Offset = header.SurfEdges.Offset, FileSize = header.SurfEdges.Length });
+            start = header.Models.Offset; stop = start + header.Models.Length; stride = 33 + (MAX_MAP_HULLS << 2);
+            for (var o = start; o < stop; o += stride) files.Add(new FileSource { Path = $"models/model{o}.dat", Offset = o, FileSize = stride });
             return Task.CompletedTask;
         }
 
@@ -114,9 +138,9 @@ namespace GameX.Valve.Formats
         public const int MAGIC = 0x55AA1234;
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        struct HeaderV2
+        struct V_HeaderV2
         {
-            public static (string, int) Struct = ("<5I", sizeof(HeaderV2));
+            public static (string, int) Struct = ("<4I", sizeof(V_HeaderV2));
             public uint FileDataSectionSize;
             public uint ArchiveMd5SectionSize;
             public uint OtherMd5SectionSize;
@@ -124,13 +148,13 @@ namespace GameX.Valve.Formats
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        struct ArchiveMd5Entry
+        struct V_ArchiveMd5
         {
-            public static (string, int) Struct = ("<3I16x", sizeof(ArchiveMd5Entry));
-            public uint ArchiveIndex; // Gets or sets the CRC32 checksum of this entry.
-            public uint Offset; // Gets or sets the offset in the package.
-            public uint Length; // Gets or sets the length in bytes.
-            public fixed byte Checksum[16];// Gets or sets the expected Checksum checksum.
+            public static (string, int) Struct = ("<3I16s", sizeof(V_ArchiveMd5));
+            public uint ArchiveIndex;       // Gets or sets the CRC32 checksum of this entry.
+            public uint Offset;             // Gets or sets the offset in the package.
+            public uint Length;             // Gets or sets the length in bytes.
+            public fixed byte Checksum[16]; // Gets or sets the expected Checksum checksum.
         }
 
         /// <summary>
@@ -138,19 +162,19 @@ namespace GameX.Valve.Formats
         /// </summary>
         class Verification
         {
-            public (long p, ArchiveMd5Entry[] h) ArchiveMd5Entries; // Gets the archive MD5 checksum section entries. Also known as cache line hashes.
+            public (long p, V_ArchiveMd5[] h) ArchiveMd5s;  // Gets the archive MD5 checksum section entries. Also known as cache line hashes.
             public byte[] TreeChecksum;                     // Gets the MD5 checksum of the file tree.
             public byte[] ArchiveMd5EntriesChecksum;        // Gets the MD5 checksum of the archive MD5 checksum section entries.
             public (long p, byte[] h) WholeFileChecksum;    // Gets the MD5 checksum of the complete package until the signature structure.
             public byte[] PublicKey;                        // Gets the public key.
             public (long p, byte[] h) Signature;            // Gets the signature.
 
-            public Verification(BinaryReader r, ref HeaderV2 h)
+            public Verification(BinaryReader r, ref V_HeaderV2 h)
             {
                 // archive md5
                 if (h.ArchiveMd5SectionSize != 0)
                 {
-                    ArchiveMd5Entries = (r.Tell(), r.ReadSArray<ArchiveMd5Entry>((int)h.ArchiveMd5SectionSize / sizeof(ArchiveMd5Entry)));
+                    ArchiveMd5s = (r.Tell(), r.ReadSArray<V_ArchiveMd5>((int)h.ArchiveMd5SectionSize / sizeof(V_ArchiveMd5)));
                 }
                 // other md5
                 if (h.OtherMd5SectionSize != 0)
@@ -173,37 +197,35 @@ namespace GameX.Valve.Formats
             /// <summary>
             /// Verify checksums and signatures provided in the VPK
             /// </summary>
-            public void VerifyHashes(BinaryReader r, uint treeSize, ref HeaderV2 h, long headerPosition)
+            public void VerifyHashes(BinaryReader r, uint treeSize, ref V_HeaderV2 h, long headerPosition)
             {
                 byte[] hash;
                 using var md5 = MD5.Create();
+                // treeChecksum
                 r.Seek(headerPosition);
                 hash = md5.ComputeHash(r.ReadBytes((int)treeSize));
-                if (!hash.SequenceEqual(TreeChecksum)) throw new InvalidDataException($"File tree checksum mismatch ({BitConverter.ToString(hash)} != expected {BitConverter.ToString(TreeChecksum)})");
-
-                r.Seek(ArchiveMd5Entries.p);
+                if (!hash.SequenceEqual(TreeChecksum)) throw new InvalidDataException($"File tree checksum mismatch ({hash:X} != expected {TreeChecksum:X})");
+                // archiveMd5SectionSize
+                r.Seek(ArchiveMd5s.p);
                 hash = md5.ComputeHash(r.ReadBytes((int)h.ArchiveMd5SectionSize));
-                if (!hash.SequenceEqual(ArchiveMd5EntriesChecksum)) throw new InvalidDataException($"Archive MD5 entries checksum mismatch ({BitConverter.ToString(hash)} != expected {BitConverter.ToString(ArchiveMd5EntriesChecksum)})");
-
+                if (!hash.SequenceEqual(ArchiveMd5EntriesChecksum)) throw new InvalidDataException($"Archive MD5 checksum mismatch ({hash:X} != expected {ArchiveMd5EntriesChecksum:X})");
+                // wholeFileChecksum
                 r.Seek(0);
                 hash = md5.ComputeHash(r.ReadBytes((int)WholeFileChecksum.p));
-                if (!hash.SequenceEqual(WholeFileChecksum.h)) throw new InvalidDataException($"Package checksum mismatch ({BitConverter.ToString(hash)} != expected {BitConverter.ToString(WholeFileChecksum.h)})");
+                if (!hash.SequenceEqual(WholeFileChecksum.h)) throw new InvalidDataException($"Package checksum mismatch ({hash:X} != expected {WholeFileChecksum.h:X})");
             }
 
             /// <summary>
-            /// Verifies the RSA signature.
+            /// Verifies the RSA signature
             /// </summary>
-            /// <returns>True if signature is valid, false otherwise.</returns>
             public void VerifySignature(BinaryReader r)
             {
                 if (PublicKey == null || Signature.h == null) return;
-
                 using var rsa = RSA.Create();
                 rsa.ImportSubjectPublicKeyInfo(PublicKey, out _);
-                //rsa.ImportParameters(new AsnKeyParser(PublicKey).ParseRSAPublicKey());
                 r.Seek(0);
                 var data = r.ReadBytes((int)Signature.p);
-                if (!rsa.VerifyData(data, Signature.h, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1)) throw new InvalidDataException("VPK signature is not valid.");
+                if (!rsa.VerifyData(data, Signature.h, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1)) throw new InvalidDataException("VPK signature is not valid");
             }
         }
 
@@ -227,29 +249,32 @@ namespace GameX.Valve.Formats
             var dirVpk = pakPath.EndsWith("_dir.vpk", StringComparison.OrdinalIgnoreCase);
             if (dirVpk) pakPath = pakPath[..^8];
 
-            // header
+            // read header
             if (r.ReadUInt32() != MAGIC) throw new FormatException("BAD MAGIC");
             var version = r.ReadUInt32();
             var treeSize = r.ReadUInt32();
-            if (version == 0x00030002) throw new FormatException($"Unsupported VPK: Apex Legends, Titanfall");
+            if (version == 0x00030002) throw new FormatException("Unsupported VPK: Apex Legends, Titanfall");
             else if (version > 2) throw new FormatException($"Bad VPK version. ({version})");
-            var headerV2 = version == 2 ? r.ReadS<HeaderV2>() : default;
+            var headerV2 = version == 2 ? r.ReadS<V_HeaderV2>() : default;
             var headerPosition = (uint)r.Tell();
 
             // read entires
             var ms = new MemoryStream();
             while (true)
             {
-                var typeName = r.ReadVUString(ms: ms); if (string.IsNullOrEmpty(typeName)) break;
-                // directories
+                var typeName = r.ReadVUString(ms: ms);
+                if (string.IsNullOrEmpty(typeName)) break;
                 while (true)
                 {
-                    var directoryName = r.ReadVUString(ms: ms); if (string.IsNullOrEmpty(directoryName)) break;
-                    // files
+                    var directoryName = r.ReadVUString(ms: ms);
+                    if (string.IsNullOrEmpty(directoryName)) break;
+                    Debug.WriteLine($"[{directoryName}]");
                     while (true)
                     {
-                        var fileName = r.ReadVUString(ms: ms); if (string.IsNullOrEmpty(fileName)) break;
-                        var metadata = new FileSource
+                        var fileName = r.ReadVUString(ms: ms);
+                        if (string.IsNullOrEmpty(fileName)) break;
+                        // get file
+                        var file = new FileSource
                         {
                             Path = $"{(directoryName[0] != ' ' ? $"{directoryName}/" : null)}{fileName}.{typeName}",
                             Hash = r.ReadUInt32(),
@@ -260,14 +285,15 @@ namespace GameX.Valve.Formats
                         };
                         var terminator = r.ReadUInt16();
                         if (terminator != 0xFFFF) throw new FormatException($"Invalid terminator, was 0x{terminator:X} but expected 0x{0xFFFF:X}");
-                        if (metadata.Data.Length > 0) r.Read(metadata.Data, 0, metadata.Data.Length);
-                        if (metadata.Id != 0x7FFF)
+                        if (file.Data.Length > 0) r.Read(file.Data, 0, file.Data.Length);
+                        if (file.Id != 0x7FFF)
                         {
                             if (!dirVpk) throw new FormatException("Given VPK is not a _dir, but entry is referencing an external archive.");
-                            metadata.Tag = $"{pakPath}_{metadata.Id:D3}.vpk";
+                            file.Tag = $"{pakPath}_{file.Id:D3}.vpk";
                         }
-                        else metadata.Tag = (long)(headerPosition + treeSize);
-                        files.Add(metadata);
+                        else file.Tag = (long)(headerPosition + treeSize);
+                        // add file
+                        files.Add(file);
                     }
                 }
             }

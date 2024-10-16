@@ -67,7 +67,7 @@ namespace GameX.WB
 
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
         {
-            var (pakType, type) = ((PakType, PakFileType?))source.ExtraArgs;
+            var (pakType, type) = ((PakType, PakFileType?))source.Tag2;
             if ((uint)source.Id == Iteration.FILE_ID) return (0, (r, m, s) => Task.FromResult((object)new Iteration(r)));
             else if (type == null) return (0, null);
             else return type.Value switch

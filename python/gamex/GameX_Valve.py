@@ -1,7 +1,7 @@
 import os
 from gamex.pak import BinaryPakFile
-from gamex.Valve.formats.pakbinary import PakBinary_Bsp, PakBinary_Vpk, PakBinary_Wad
-from gamex.Valve.formats.binary import Binary_Wad3, Binary_Src, Binary_Bsp, Binary_Spr
+from gamex.Valve.formats.pakbinary import PakBinary_Bsp30, PakBinary_Vpk, PakBinary_Wad
+from gamex.Valve.formats.binary import Binary_Wad3, Binary_Src, Binary_Spr
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
 
@@ -26,7 +26,7 @@ class ValvePakFile(BinaryPakFile):
     #region Factories
     @staticmethod
     def getPakBinary(game: FamilyGame, extension: str) -> object:
-        if extension == '.bsp': return PakBinary_Bsp()
+        if extension == '.bsp': return PakBinary_Bsp30()
         match game.engine:
             # case 'Unity': return PakBinary_Unity()
             case 'GoldSrc': return PakBinary_Wad()

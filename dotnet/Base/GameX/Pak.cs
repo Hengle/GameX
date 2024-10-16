@@ -611,6 +611,7 @@ namespace GameX
                 return await p.LoadFileObject<T>(f2, option, throwOnError);
             }
             var f = (FileSource)path;
+            if (Game.IsPakFile(f.Path)) return default;
             var type = typeof(T);
             var data = await LoadFileData(f, option, throwOnError);
             if (data == null) return default;
