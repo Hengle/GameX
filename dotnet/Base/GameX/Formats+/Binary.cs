@@ -661,7 +661,7 @@ namespace GameX.Formats
             {
                 var pal = palette.Entries.SelectMany<Color, byte>(x => [x.R, x.G, x.B]).ToArray();
                 Bytes = new byte[Width * Height * 3];
-                Rasterize.CopyPixelsByPalette(Bytes, 3, bytes, pal);
+                Rasterize.CopyPixelsByPalette(Bytes, 3, bytes, pal, 3);
             }
         }
 

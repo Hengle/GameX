@@ -155,7 +155,7 @@ class Binary_Img(IHaveMetaInfo, ITexture):
         if not palette: self.bytes = bytes
         else: 
             self.bytes = bytearray(self.width * self.height * 3)
-            Rasterize.copyPixelsByPalette(self.bytes, 3, bytes, palette)
+            Rasterize.copyPixelsByPalette(self.bytes, 3, bytes, palette, 3)
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
         match platform:

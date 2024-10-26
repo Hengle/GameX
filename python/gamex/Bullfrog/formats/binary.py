@@ -134,7 +134,7 @@ class Binary_Fli(IHaveMetaInfo, ITextureFrames): #IDisposable
             if header.type != self.ChunkType.FRAME and r.tell() != nextPosition: r.seek(nextPosition)
             header = r.readS(self.X_ChunkHeader)
             if not header.isValid or header.type == self.ChunkType.FRAME: break
-        Rasterize.copyPixelsByPalette(self.bytes, 3, self.pixels, self.palette)
+        Rasterize.copyPixelsByPalette(self.bytes, 3, self.pixels, self.palette, 3)
         if header.type == self.ChunkType.FRAME: r.skip(-self.X_ChunkHeader.struct[1])
         return header.isValid
 

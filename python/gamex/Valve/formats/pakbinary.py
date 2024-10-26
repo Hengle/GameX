@@ -242,18 +242,12 @@ class PakBinary_Vpk(PakBinaryT):
             while True:
                 directoryName = r.readVUString(ms=ms)
                 if not directoryName: break
-                print(f'[{directoryName}] {directoryName[0] == '\x00'}')
                 while True:
                     fileName = r.readVUString(ms=ms)
                     if not fileName: break
-                    if typeName == 'log':
-                        print(f'{f'{directoryName}/' if directoryName[0] != '\x00' else ''}{fileName}.{typeName}')
-                        print(f'- [{directoryName}] {ord(directoryName[0])}')
-                        print(f'- [{fileName}]')
-                        print(f'- [{typeName}]')
                     # get file
                     file = FileSource(
-                        path = f'{f'{directoryName}/' if directoryName[0] != '\x00' else ''}{fileName}.{typeName}',
+                        path = f'{f'{directoryName}/' if directoryName[0] != ' ' else ''}{fileName}.{typeName}',
                         hash = r.readUInt32(),
                         data = bytearray(r.readUInt16()),
                         id = r.readUInt16(),
@@ -280,18 +274,21 @@ class PakBinary_Vpk(PakBinaryT):
 
     # readData
     def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
-        r.seek(file.offset)
-        return BytesIO(
-            decompressBlast(r, file.packedSize, file.fileSize) if (file.compressed & 1) != 0 else \
-            r.readBytes(file.packedSize)
-            )
+        fileDataLength = len(file.data)
+        data = bytearray(fileDataLength + file.fileSize); mv = memoryview(data)
+        if fileDataLength > 0: data[0:] = file.data
+        if file.fileSize == 0: pass
+        elif isinstance(file.tag, int): r.seek(file.offset + file.tag); r.read(mv, fileDataLength, file.fileSize)
+        elif isinstance(file.tag, str):
+            with source.getReader(file.tag) as r2: r2.seek(file.offset); r2.read(mv, fileDataLength, file.fileSize)
+        return BytesIO(data)
 
 #endregion
 
-#region PakBinary_Wad
+#region PakBinary_Wad3
 
-# PakBinary_Wad
-class PakBinary_Wad(PakBinaryT):
+# PakBinary_Wad3
+class PakBinary_Wad3(PakBinaryT):
 
     #region Headers
 

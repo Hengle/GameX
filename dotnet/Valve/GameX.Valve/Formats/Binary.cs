@@ -6,6 +6,7 @@ using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -30,7 +31,7 @@ namespace GameX.Valve.Formats
             if (magic == PakBinary_Vpk.MAGIC) throw new InvalidOperationException("Pak File");
             else if (magic == CompiledShader.MAGIC) return Task.FromResult((object)new CompiledShader(r, f.Path));
             else if (magic == ClosedCaptions.MAGIC) return Task.FromResult((object)new ClosedCaptions(r));
-            else if (magic == ToolsAssetInfo.MAGIC) return Task.FromResult((object)new ToolsAssetInfo(r));
+            else if (magic == ToolsAssetInfo.MAGIC || magic == ToolsAssetInfo.MAGIC2) return Task.FromResult((object)new ToolsAssetInfo(r));
             else if (magic == XKV3.MAGIC || magic == XKV3.MAGIC2) { var kv3 = new XKV3 { Size = (uint)r.BaseStream.Length }; kv3.Read(null, r); return Task.FromResult((object)kv3); }
             else if (magicResourceVersion == KnownHeaderVersion) return Task.FromResult((object)new Binary_Src(r));
             //else if (magicResourceVersion == BinaryPak.KnownHeaderVersion)
@@ -330,7 +331,7 @@ namespace GameX.Valve.Formats
         struct SPR_Header
         {
             public static (string, int) Struct = ("<I3if3ifi", sizeof(SPR_Header));
-            public uint Signature;
+            public uint Magic;
             public int Version;
             public SprType Type;
             public SprTextFormat TextFormat;
@@ -341,19 +342,6 @@ namespace GameX.Valve.Formats
             public float BeamLen;
             public SprSynchType SynchType;
         }
-
-        //[StructLayout(LayoutKind.Sequential)]
-        //struct WAD_Lump
-        //{
-        //    public const int SizeOf = 32;
-        //    public uint Offset;
-        //    public uint DiskSize;
-        //    public uint Size;
-        //    public byte Type;
-        //    public byte Compression;
-        //    public ushort Padding;
-        //    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)] public string Name;
-        //}
 
         [StructLayout(LayoutKind.Sequential)]
         struct SPR_Frame
@@ -386,7 +374,7 @@ namespace GameX.Valve.Formats
 
             // read file
             var header = r.ReadS<SPR_Header>();
-            if (header.Signature != SPR_MAGIC) throw new FormatException("BAD MAGIC");
+            if (header.Magic != SPR_MAGIC) throw new FormatException("BAD MAGIC");
 
             // load palette
             palette = r.ReadBytes(r.ReadUInt16() * 3);
@@ -424,7 +412,7 @@ namespace GameX.Valve.Formats
         public bool DecodeFrame()
         {
             var p = pixels[frame];
-            Rasterize.CopyPixelsByPalette(bytes, 4, p, palette);
+            Rasterize.CopyPixelsByPalette(bytes, 4, p, palette, 3);
             frame++;
             return true;
         }
@@ -511,13 +499,43 @@ namespace GameX.Valve.Formats
             // read pixels
             var pixelSize = width * height;
             pixels = type == Formats.Tex2 || type == Formats.Tex
-                ? [r.ReadBytes(pixelSize), r.ReadBytes(pixelSize >> 2), r.ReadBytes(pixelSize >> 4), r.ReadBytes(pixelSize >> 8)]
+                ? [r.ReadBytes(pixelSize), r.ReadBytes(pixelSize >> 2), r.ReadBytes(pixelSize >> 4), r.ReadBytes(pixelSize >> 6)]
                 : [r.ReadBytes(pixelSize)];
 
             // read pallet
             r.Skip(2);
-            palette = r.ReadBytes(0x100 * 3);
+            var pal = r.ReadBytes(0x100 * 3);
+            var p = palette = transparent ? new byte[0x100 * 4] : pal;
 
+            // decode pallet
+            if (type == Formats.Tex2) //e.g.: tempdecal.wad
+                if (transparent)
+                    for (int i = 0, j = 0; i < 0x100; i++, j += 4)
+                    {
+                        p[j + 0] = (byte)i;
+                        p[j + 1] = (byte)i;
+                        p[j + 2] = (byte)i;
+                        p[j + 3] = 0xFF;
+                    }
+                else
+                    for (int i = 0, j = 0; i < 0x100; i++, j += 3)
+                    {
+                        p[j + 0] = (byte)i;
+                        p[j + 1] = (byte)i;
+                        p[j + 2] = (byte)i;
+                    }
+            else if (transparent)
+                for (int i = 0, j = 0, k = 0; i < 0x100; i++, j += 4, k += 3)
+                {
+                    p[j + 0] = pal[k + 0];
+                    p[j + 1] = pal[k + 1];
+                    p[j + 2] = pal[k + 1];
+                    p[j + 3] = 0xFF;
+                }
+            // check for transparent (blue) color
+            if (transparent) p[0xFF * 4 - 1] = 0;
+
+            //
             //if (type == Formats.Pic) r.Skip(2);
             //r.EnsureComplete();
         }
@@ -547,7 +565,7 @@ namespace GameX.Valve.Formats
             {
                 var p = pixels[index];
                 size = p.Length * bbp; var span = spans[index] = new Range(offset, offset + size);
-                Rasterize.CopyPixelsByPalette(buf.AsSpan(span), bbp, p, palette);
+                Rasterize.CopyPixelsByPalette(buf.AsSpan(span), bbp, p, palette, transparent ? 4 : 3);
             }
             return (buf, (Platform.Type)platform switch
             {

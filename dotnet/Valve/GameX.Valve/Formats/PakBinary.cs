@@ -268,7 +268,6 @@ namespace GameX.Valve.Formats
                 {
                     var directoryName = r.ReadVUString(ms: ms);
                     if (string.IsNullOrEmpty(directoryName)) break;
-                    Debug.WriteLine($"[{directoryName}]");
                     while (true)
                     {
                         var fileName = r.ReadVUString(ms: ms);
@@ -313,22 +312,13 @@ namespace GameX.Valve.Formats
 
         public override Task<Stream> ReadData(BinaryPakFile source, BinaryReader r, FileSource file, FileOption option = default)
         {
-            var data = new byte[file.Data.Length + file.FileSize];
-            if (file.Data.Length > 0) file.Data.CopyTo(data, 0);
-            if (file.FileSize > 0)
-            {
-                if (file.Tag is string path)
-                    source.GetReader(path).Action(r2 =>
-                    {
-                        r2.Seek(file.Offset);
-                        r2.Read(data, file.Data.Length, (int)file.FileSize);
-                    });
-                else
-                {
-                    r.Seek(file.Offset + (long)file.Tag);
-                    r.Read(data, file.Data.Length, (int)file.FileSize);
-                }
-            }
+            var fileDataLength = file.Data.Length;
+            var data = new byte[fileDataLength + file.FileSize];
+            if (fileDataLength > 0) file.Data.CopyTo(data, 0);
+            if (file.FileSize == 0) { }
+            else if (file.Tag is long offset) { r.Seek(file.Offset + offset); r.Read(data, fileDataLength, (int)file.FileSize); }
+            else if (file.Tag is string pakPath)
+                source.GetReader(pakPath).Action(r2 => { r2.Seek(file.Offset); r2.Read(data, fileDataLength, (int)file.FileSize); });
             var actualChecksum = Crc32Digest.Compute(data);
             if (file.Hash != actualChecksum) throw new InvalidDataException($"CRC32 mismatch for read data (expected {file.Hash:X2}, got {actualChecksum:X2})");
             return Task.FromResult((Stream)new MemoryStream(data));
@@ -337,10 +327,10 @@ namespace GameX.Valve.Formats
 
     #endregion
 
-    #region PakBinary_Wad
+    #region PakBinary_Wad3
 
     // https://github.com/Rupan/HLLib/blob/master/HLLib/WADFile.h
-    public unsafe class PakBinary_Wad : PakBinary<PakBinary_Wad>
+    public unsafe class PakBinary_Wad3 : PakBinary<PakBinary_Wad3>
     {
         #region Headers
 

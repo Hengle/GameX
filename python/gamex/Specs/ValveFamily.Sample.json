@@ -77,52 +77,23 @@
     "name": "Half-Life: Opposing Force",
     "files": [
       {
-        "path": "game.tga",
+        "path": "gearbox/game.tga",
         "type": "Image"
       },
       {
-        "path": "overviews/2fort.bmp",
-        "type": "Image"
-      },
-      {
-        "path": "overviews/2fort.tga",
-        "type": "Image"
-      },
-      {
-        "path": "cached.wad:CONBACK.pic",
+        "path": "gearbox/cached.wad:CONBACK.pic",
         "type": "Texture"
       },
       {
-        "path": "tswad.wad:TSHULL.tex",
+        "path": "gearbox/op4ctf.wad:cp_jungle.tex",
         "type": "Texture"
       },
       {
-        "path": "sprites/640hud1.spr",
+        "path": "gearbox/sprites/640hud1.spr",
         "type": "Sprite"
       },
       {
-        "path": "maps/2fort.bsp:entities.txt",
-        "type": "Bsp"
-      }
-    ]
-  },
-  "CS": {
-    "name": "Counter-Strike",
-    "files": [
-      {
-        "path": "game.tga",
-        "type": "Image"
-      },
-      {
-        "path": "cached.wad:CONBACK.pic",
-        "type": "Texture"
-      },
-      {
-        "path": "sprites/640hud1.spr",
-        "type": "Sprite"
-      },
-      {
-        "path": "maps/cs_747.bsp:entities.txt",
+        "path": "gearbox/maps/of0a0.bsp:entities.txt",
         "type": "Bsp"
       }
     ]
@@ -144,6 +115,27 @@
       },
       {
         "path": "maps/rc_arena.bsp:entities.txt",
+        "type": "Bsp"
+      }
+    ]
+  },
+  "CS": {
+    "name": "Counter-Strike",
+    "files": [
+      {
+        "path": "game.tga",
+        "type": "Image"
+      },
+      {
+        "path": "cached.wad:CONBACK.pic",
+        "type": "Texture"
+      },
+      {
+        "path": "sprites/640hud1.spr",
+        "type": "Sprite"
+      },
+      {
+        "path": "maps/cs_747.bsp:entities.txt",
         "type": "Bsp"
       }
     ]
@@ -244,10 +236,6 @@
     "name": "Half-Life: Source",
     "files": [
       {
-        "path": "platform/platform_misc_dir.vpk:scripts/preload_xbox.xsc",
-        "type": "Text"
-      },
-      {
         "path": "hl1/hl1_pak_dir.vpk:console.log",
         "type": "Text"
       },
@@ -265,7 +253,7 @@
     "name": "Half-Life 2",
     "files": [
       {
-        "path": "pak01_dir.vpk:textures/dev/albedo_chart.vtex_c",
+        "path": "hl2/pak01_dir.vpk:textures/dev/albedo_chart.vtex_c",
         "type": "Texture"
       }
     ]

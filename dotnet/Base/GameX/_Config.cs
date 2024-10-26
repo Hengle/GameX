@@ -526,36 +526,38 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            ForcePath = "sample:1",
+            ForcePath = "sample:0",
             Family = "Valve",
-            //Game = "HL", // Half-Life [open, read, texture:GL]
-            //Game = "TF", // Team Fortress Classic [open, read, texture:GL]
-            //Game = "CS", // Counter-Strike [open, read]
-            //Game = "Ricochet", // Ricochet [open, read]
-            //Game = "DM", // Deathmatch Classic [open, read]
-            //Game = "HL:BS", // Half-Life: Blue Shift [open, read]
-            //Game = "DOD", // Day of Defeat [open, read]
-            //Game = "CS:CZ", // Counter-Strike: Condition Zero [open, read]
-
-            Game = "HL:Src", // Half-Life: Source [open, read]
-            //Game = "CS:Src", // Counter-Strike: Source [open, read]
-            //Game = "HL2", // Half-Life 2 [open, read]
-            //Game = "HL2:DM", // Half-Life 2: Deathmatch [open, read]
-            //Game = "HL:DM:Src", // Half-Life Deathmatch: Source [open, read]
-            //Game = "HL2:E1", // Half-Life 2: Episode One [open, read]
-            //Game = "Portal", // Portal [open, read]
-            //Game = "HL2:E2", // Half-Life 2: Episode Two [open]
-            //Game = "TF2", // Team Fortress 2 [open, read]
-            //Game = "L4D", // Left 4 Dead [open, read]
-            //Game = "L4D2", // Left 4 Dead 2 [open, read]
-            //Game = "DOD:Src", // Day of Defeat: Source [open, read]
-            //Game = "Portal2", // Portal 2 [open, read]
-            //Game = "CS:GO", // Counter-Strike: Global Offensive [open, read]
-            //Game = "D2", // Dota 2 [open, read, texture:GL, model:GL]
-            //Game = "TheLab:RR", // The Lab: Robot Repair [open, read, texture:GL, model:GL]
+            Game = "HL", // Half-Life
+            //Game = "TF", // Team Fortress Classic
+            //Game = "HL:OF", // Half-Life: Opposing Force
+            //Game = "Ricochet", // Ricochet
+            //Game = "CS", // Counter-Strike
+            //Game = "DM", // Deathmatch Classic
+            //Game = "HL:BS", // Half-Life: Blue Shift
+            //Game = "DOD", // Day of Defeat
+            //Game = "CS:CZ", // Counter-Strike: Condition Zero
+            //# Source
+            //Game = "HL:Src", // Half-Life: Source []
+            //Game = "CS:Src", // Counter-Strike: Source
+            //Game = "HL2", // Half-Life 2
+            //Game = "HL2:DM", // Half-Life 2: Deathmatch
+            //Game = "HL:DM:Src", // Half-Life Deathmatch: Source
+            //Game = "HL2:E1", // Half-Life 2: Episode One
+            //Game = "Portal", // Portal
+            //Game = "HL2:E2", // Half-Life 2: Episode Two
+            //Game = "TF2", // Team Fortress 2
+            //Game = "L4D", // Left 4 Dead
+            //Game = "L4D2", // Left 4 Dead 2
+            //Game = "DOD:Src", // Day of Defeat: Source
+            //Game = "Portal2", // Portal 2
+            //# Source2
+            //Game = "CS:GO", // Counter-Strike: Global Offensive
+            //Game = "D2", // Dota 2
+            //Game = "TheLab:RR", // The Lab: Robot Repair
             //Game = "TheLab:SS", // The Lab: Secret Shop [!unity]
             //Game = "TheLab:TL", // The Lab: The Lab [!unity]
-            //Game = "HL:Alyx", // Half-Life: Alyx [open, read, texture:GL, model:GL]
+            //Game = "HL:Alyx", // Half-Life: Alyx
         };
 #elif Volition
         static readonly string[] FamilyKeys = ["Volition", "Unknown"];

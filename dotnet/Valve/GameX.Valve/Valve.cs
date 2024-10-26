@@ -37,7 +37,7 @@ namespace GameX.Valve
                 ? PakBinarys.GetOrAdd(game.Id, _ => game.Engine switch
                 {
                     "Unity" => Unity.Formats.PakBinary_Unity.Current,
-                    "GoldSrc" => PakBinary_Wad.Current,
+                    "GoldSrc" => PakBinary_Wad3.Current,
                     "Source" => PakBinary_Vpk.Current,
                     _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine),
                 })

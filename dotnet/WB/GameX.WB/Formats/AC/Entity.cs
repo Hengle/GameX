@@ -1140,7 +1140,7 @@ namespace GameX.WB.Formats.AC.Entity
         public readonly uint VowelContainingSubstringLength = r.ReadUInt32();
         public readonly uint ExtraAllowedCharacters = r.ReadUInt32();
         public readonly byte Unknown = r.ReadByte();
-        public readonly string[] CompoundLetterGroups = r.ReadL32FArray(x => x.ReadC32UString());
+        public readonly string[] CompoundLetterGroups = r.ReadL32FArray(x => x.ReadC32WString());
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new($"MaximumVowelsInARow: {MaximumVowelsInARow}"),
@@ -2141,9 +2141,9 @@ namespace GameX.WB.Formats.AC.Entity
     public class StringTableData(BinaryReader r) : IHaveMetaInfo
     {
         public readonly uint Id = r.ReadUInt32();
-        public readonly string[] VarNames = r.ReadL16FArray(x => x.ReadC32UString());
-        public readonly string[] Vars = r.ReadL16FArray(x => x.ReadC32UString());
-        public readonly string[] Strings = r.ReadL32FArray(x => x.ReadC32UString());
+        public readonly string[] VarNames = r.ReadL16FArray(x => x.ReadC32WString());
+        public readonly string[] Vars = r.ReadL16FArray(x => x.ReadC32WString());
+        public readonly string[] Strings = r.ReadL32FArray(x => x.ReadC32WString());
         public readonly uint[] Comments = r.ReadL32PArray<uint>("I");
         public readonly byte Unknown = r.ReadByte();
 

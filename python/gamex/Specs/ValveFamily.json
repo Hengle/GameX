@@ -9,7 +9,8 @@
   ],
   "engines": {
     "GoldSrc": {},
-    "Source": {}
+    "Source": {},
+    "Source2": {}
   },
   "games": {
     "*": {
@@ -21,7 +22,7 @@
     "HL": {
       "name": "Half-Life",
       "url": "https://store.steampowered.com/app/70",
-      "date": "1998-11-08",
+      "date": "1998-11-19",
       "tags": "HalfLife",
       "path": [
         "valve",
@@ -32,28 +33,20 @@
     "TF": {
       "name": "Team Fortress Classic",
       "url": "https://store.steampowered.com/app/20",
-      "date": "1999-04-01",
+      "date": "1999-04-07",
       "tags": "TeamFortress",
       "path": "tfc",
       "status": "open;read;texture:GL"
     },
     "HL:OF": {
       "name": "Half-Life: Opposing Force",
-      "url": "https://store.steampowered.com/app/20",
-      "date": "1999-11-01",
+      "url": "https://store.steampowered.com/app/50",
+      "date": "1999-11-19",
       "tags": "HalfLife",
       "path": [
         "gearbox",
         "gearbox_hd"
       ],
-      "status": "open;read"
-    },
-    "CS": {
-      "name": "Counter-Strike",
-      "url": "https://store.steampowered.com/app/10",
-      "date": "2000-11-01",
-      "tags": "CounterStrike",
-      "path": "cstrike",
       "status": "open;read"
     },
     "Ricochet": {
@@ -64,10 +57,18 @@
       "path": "ricochet",
       "status": "open;read"
     },
+    "CS": {
+      "name": "Counter-Strike",
+      "url": "https://store.steampowered.com/app/10",
+      "date": "2000-11-09",
+      "tags": "CounterStrike",
+      "path": "cstrike",
+      "status": "open;read"
+    },
     "DM": {
       "name": "Deathmatch Classic",
       "url": "https://store.steampowered.com/app/40",
-      "date": "2001-06-01",
+      "date": "2001-06-07",
       "tags": "HalfLife",
       "path": "dmc",
       "status": "open;read"
@@ -75,7 +76,7 @@
     "HL:BS": {
       "name": "Half-Life: Blue Shift",
       "url": "https://store.steampowered.com/app/130",
-      "date": "2001-06-01",
+      "date": "2001-06-12",
       "tags": "HalfLife",
       "path": "bshift",
       "status": "open;read"
@@ -98,7 +99,7 @@
     },
     "*2": {
       "engine": "Source",
-      "pakExt": "dir.vpk"
+      "pakExt": "_dir.vpk"
     },
     "HL:Src": {
       "name": "Half-Life: Source",
@@ -264,6 +265,10 @@
         "update"
       ],
       "status": "open;read"
+    },
+    "*3": {
+      "engine": "Source2",
+      "pakExt": "_dir.vpk"
     },
     "CS:GO": {
       "name": "Counter-Strike: Global Offensive",
@@ -437,14 +442,14 @@
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 50",
         "dir": "Half-Life"
       },
-      "CS": {
-        "key": "Steam:10",
-        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 10",
-        "dir": "Half-Life"
-      },
       "Ricochet": {
         "key": "Steam:60",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 60",
+        "dir": "Half-Life"
+      },
+      "CS": {
+        "key": "Steam:10",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 10",
         "dir": "Half-Life"
       },
       "DM": {

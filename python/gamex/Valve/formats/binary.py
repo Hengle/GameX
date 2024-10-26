@@ -72,7 +72,7 @@ class Binary_Spr(IHaveMetaInfo, ITextureFrames):
     class SPR_Header:
         struct = ('<I3if3ifi', 40)
         def __init__(self, tuple):
-            self.signature, \
+            self.magic, \
             self.version, \
             self.type, \
             self.textFormat, \
@@ -103,7 +103,7 @@ class Binary_Spr(IHaveMetaInfo, ITextureFrames):
 
         # read file
         header = r.readS(self.SPR_Header)
-        if header.signature != self.SPR_MAGIC: raise Exception('BAD MAGIC')
+        if header.magic != self.SPR_MAGIC: raise Exception('BAD MAGIC')
 
         # load palette
         self.palette = r.readBytes(r.readUInt16() * 3)
@@ -133,7 +133,7 @@ class Binary_Spr(IHaveMetaInfo, ITextureFrames):
 
     def decodeFrame(self) -> bool:
         p = self.pixels[self.frame]
-        Rasterize.copyPixelsByPalette(self.bytes, 4, p, self.palette)
+        Rasterize.copyPixelsByPalette(self.bytes, 4, p, self.palette, 3)
         self.frame += 1
         return True
 
@@ -210,13 +210,40 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
 
         # read pixels
         pixelSize = self.width * self.height
-        pixels = self.pixels = [r.readBytes(pixelSize), r.readBytes(pixelSize >> 2), r.readBytes(pixelSize >> 4), r.readBytes(pixelSize >> 8)] if type == self.Formats.Tex2 or type == self.Formats.Tex \
+        pixels = self.pixels = [r.readBytes(pixelSize), r.readBytes(pixelSize >> 2), r.readBytes(pixelSize >> 4), r.readBytes(pixelSize >> 6)] if type == self.Formats.Tex2 or type == self.Formats.Tex \
             else [r.readBytes(pixelSize)]
         self.mipMaps = len(pixels)
 
         # read pallet
         r.skip(2)
-        self.palette = r.readBytes(0x100 * 3)
+        pal = r.readBytes(0x100 * 3)
+        p = self.palette = bytearray(0x100 * 4) if self.transparent else pal
+
+        # decode pallet
+        j = 0; k = 0
+        if type == self.Formats.Tex2:
+            if self.transparent:
+                for i in range(0x100):
+                    p[j + 0] = i
+                    p[j + 1] = i
+                    p[j + 2] = i
+                    p[j + 3] = 0xFF
+                    j += 4
+            else:
+                for i in range(0x100):
+                    p[j + 0] = i
+                    p[j + 1] = i
+                    p[j + 2] = i
+                    j += 3
+        elif self.transparent:
+            for i in range(0x100):
+                p[j + 0] = pal[k + 0]
+                p[j + 1] = pal[k + 1]
+                p[j + 2] = pal[k + 1]
+                p[j + 3] = 0xFF
+                j += 4; k += 3
+        # check for transparent (blue) color
+        if self.transparent: p[0xFF * 4 - 1] = 0
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
         bbp = 4 if self.transparent else 3
@@ -224,7 +251,7 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
         spans = [range(0, 0)] * len(self.pixels); offset = 0
         for i, p in enumerate(self.pixels):
             size = len(p) * bbp; span = spans[i] = range(offset, offset + size); offset += size
-            Rasterize.copyPixelsByPalette(mv[span.start:span.stop], bbp, p, self.palette)
+            Rasterize.copyPixelsByPalette(mv[span.start:span.stop], bbp, p, self.palette, 4 if self.transparent else 3)
         match platform:
             case Platform.Type.OpenGL: format = self.format[1]
             case Platform.Type.Vulken: format = self.format[2]
