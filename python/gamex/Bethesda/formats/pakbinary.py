@@ -4,7 +4,7 @@ from enum import Enum
 from gamex.filesrc import FileSource
 from gamex.pak import PakBinaryT
 from gamex.compression import decompressLz4, decompressZlib2
-from gamex.Bethesda.records import FormType, Header
+from gamex.Bethesda.formats.records import FormType, Header
 
 # typedefs
 class Reader: pass
@@ -326,7 +326,7 @@ class PakBinary_Bsa(PakBinaryT):
             filenamesPosition = r.tell()
             for i in range(header.fileCount):
                 r.seek(filenamesPosition + filenameOffsets[i])
-                files[i].path = r.readZAString(1000).replace('\\', '/')
+                files[i].path = r.readVAString(1000).replace('\\', '/')
         else: raise Exception('BAD MAGIC')
     
     # readData

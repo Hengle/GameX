@@ -1,8 +1,8 @@
 __title__ = "gamex"
 __version__ = "0.0.1"
 # __current__ = "Unknown"
-__current__ = "Arkane"
-# __current__ = "Bethesda"
+# __current__ = "Arkane"
+__current__ = "Bethesda"
 # __current__ = "Bullfrog"
 # __current__ = "Valve"
 
@@ -20,7 +20,7 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:1",
+            ForcePath = "sample:2",
             Family = "Arkane",
             Game = "AF", # Arx Fatalis [open, read, texture:GL]
             # Game = "DOM", # Dark Messiah of Might and Magic [open, read]
@@ -38,7 +38,7 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:2",
+            ForcePath = "sample:0",
             Family = "Bethesda",
             Game = "Morrowind", # The Elder Scrolls III: Morrowind
             # Game = "Oblivion", # The Elder Scrolls IV: Oblivion

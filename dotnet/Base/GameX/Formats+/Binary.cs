@@ -618,6 +618,11 @@ namespace GameX.Formats
         {
             Image = new Bitmap(new MemoryStream(r.ReadBytes((int)f.FileSize)));
             Width = Image.Width; Height = Image.Height;
+            var data = Image.LockBits(new Rectangle(0, 0, Image.Width, Image.Height), ImageLockMode.ReadOnly, Image.PixelFormat);
+            var bytes = new byte[data.Stride * data.Height];
+            Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
+            Image.UnlockBits(data);
+            var palette = Image.Palette?.Entries;
             switch (Image.PixelFormat)
             {
                 case PixelFormat.Format16bppGrayScale:
@@ -650,12 +655,7 @@ namespace GameX.Formats
                     break;
             }
 
-            // get bytes
-            var data = Image.LockBits(new Rectangle(0, 0, Image.Width, Image.Height), ImageLockMode.ReadOnly, Image.PixelFormat);
-            var bytes = new byte[data.Stride * data.Height];
-            Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
-            Image.UnlockBits(data);
-            var palette = Image.Palette?.Entries;
+            // decode
             if (palette == null || palette.Length == 0) Bytes = bytes;
             else
             {

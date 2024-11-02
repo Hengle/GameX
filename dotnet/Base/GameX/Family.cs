@@ -232,16 +232,21 @@ namespace GameX
         /// <returns></returns>
         internal static IFileSystem CreateFileSystem(Type fileSystemType, PathItem path, string subPath, Dictionary<string, byte[]> virtuals, Uri host = null)
         {
-            var firstPath = path?.Paths.FirstOrDefault();
             var system = host != null ? new HostFileSystem(host)
                 : fileSystemType != null ? (IFileSystem)Activator.CreateInstance(fileSystemType, path)
-                : path.Type switch
+                : null;
+            if (system == null)
+            {
+                var firstPath = path?.Paths.FirstOrDefault();
+                var root = string.IsNullOrEmpty(subPath) ? path.Root : Path.Combine(path.Root, subPath);
+                system = path.Type switch
                 {
-                    null => new StandardFileSystem(Path.Combine(path.Root, subPath ?? "", firstPath ?? "")),
-                    "zip" => new ZipFileSystem(Path.Combine(path.Root, subPath ?? ""), firstPath),
-                    "zip:iso" => new ZipIsoFileSystem(Path.Combine(path.Root, subPath ?? ""), firstPath),
+                    null => new StandardFileSystem(string.IsNullOrEmpty(firstPath) ? root : Path.Combine(root, firstPath)),
+                    "zip" => new ZipFileSystem(root, firstPath),
+                    "zip:iso" => new ZipIsoFileSystem(root, firstPath),
                     _ => throw new ArgumentOutOfRangeException(nameof(path.Type), $"Unknown {path.Type}")
                 };
+            }
             return virtuals == null ? system : new VirtualFileSystem(system, virtuals);
         }
 

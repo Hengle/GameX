@@ -211,7 +211,7 @@ class HostFileSystem(IFileSystem):
 
 # StandardFileSystem
 class StandardFileSystem(IFileSystem):
-    def __init__(self, root: str): self.root = root; self.skip = len(root) + (1 if root.endswith('/') else 0)
+    def __init__(self, root: str): self.root = root; self.skip = len(root) + 1
     def glob(self, path: str, searchPattern: str) -> list[str]:
         g = pathlib.Path(os.path.join(self.root, path)).glob(searchPattern if searchPattern else '**/*')
         return [str(x)[self.skip:] for x in g if x.is_file()]
@@ -235,7 +235,7 @@ class VirtualFileSystem(IFileSystem):
 class ZipFileSystem(IFileSystem):
     def __init__(self, root: str, path: str):
         self.pak = ZipFile(root)
-        self.root = '' if not root else f'{root}/'
+        self.root = '' if not path else f'{path}/'
     def glob(self, path: str, searchPattern: str) -> list[str]:
         root = os.path.join(self.root, path)
         skip = len(root)
@@ -248,7 +248,7 @@ class ZipFileSystem(IFileSystem):
 class ZipIsoFileSystem(IFileSystem):
     def __init__(self, root: str, path: str):
         self.pak = ZipFile(root)
-        self.root = '' if not root else f'{root}/'
+        self.root = '' if not path else f'{path}/'
     def glob(self, path: str, searchPattern: str) -> list[str]:
         root = os.path.join(self.root, path)
         skip = len(root)

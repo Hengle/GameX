@@ -340,7 +340,7 @@ namespace GameX
         public IEnumerable<string> Glob(string path, string searchPattern)
         {
             var matcher = new Matcher();
-            matcher.AddIncludePatterns(new[] { string.IsNullOrEmpty(searchPattern) ? "**/*" : searchPattern });
+            matcher.AddIncludePatterns([string.IsNullOrEmpty(searchPattern) ? "**/*" : searchPattern]);
             return matcher.GetResultsInFullPath(Path.Combine(Root, path)).Select(x => x[Skip..]).ToList();
         }
         public bool FileExists(string path) => File.Exists(Path.Combine(Root, path));
@@ -411,7 +411,7 @@ namespace GameX
     internal class ZipIsoFileSystem(string root, string path) : IFileSystem
     {
         readonly ZipArchive Pak = ZipFile.Open(root, ZipArchiveMode.Read);
-        //readonly string Root = path;
+        readonly string Root = path;
 
         public IEnumerable<string> Glob(string path, string searchPattern)
         {

@@ -119,6 +119,8 @@ class Binary_Img(IHaveMetaInfo, ITexture):
     def __init__(self, r: Reader, f: FileSource):
         self.image = Image.open(r.f)
         self.width, self.height = self.image.size
+        bytes = self.image.tobytes(); palette = self.image.getpalette()
+        # print(f'mode: {self.image.mode}')
         match self.image.mode:
             case '1': # 1-bit pixels, black and white
                 self.format = (self.image.format,
@@ -126,18 +128,14 @@ class Binary_Img(IHaveMetaInfo, ITexture):
                 (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
                 TextureUnityFormat.RGB24,
                 TextureUnrealFormat.Unknown)
-            case 'L': # 8-bit pixels, Grayscale
-                self.format = (self.image.format,
-                (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGB24,
-                TextureUnrealFormat.Unknown)
-            case 'P': # 8-bit pixels, mapped to any other mode using a color palette
+            case 'P' | 'L': # 8-bit pixels, mapped to any other mode using a color palette
                 self.format = (self.image.format,
                 (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
                 (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
                 TextureUnityFormat.RGB24,
                 TextureUnrealFormat.Unknown)
+                # 8-bit pixels, Grayscale
+                if self.image.mode == 'L': palette = [x for xs in [[x, x, x] for x in range(255)] for x in xs]
             case 'RGB': # 3×8-bit pixels, true color
                 self.format = (self.image.format,
                 (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
@@ -150,10 +148,10 @@ class Binary_Img(IHaveMetaInfo, ITexture):
                 (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
                 TextureUnityFormat.RGBA32,
                 TextureUnrealFormat.Unknown)
-        # print(f'mode: {self.image.mode}')
-        bytes = self.image.tobytes(); palette = self.image.getpalette()
+
+        # decode
         if not palette: self.bytes = bytes
-        else: 
+        else:
             self.bytes = bytearray(self.width * self.height * 3)
             Rasterize.copyPixelsByPalette(self.bytes, 3, bytes, palette, 3)
 

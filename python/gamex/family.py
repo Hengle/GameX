@@ -91,15 +91,16 @@ def createFileManager(elem: dict[str, object]) -> FileManager:
 # create FileSystem
 @staticmethod
 def createFileSystem(fileSystemType: str, path: FileManager.PathItem, subPath: str, virtuals: dict[str, object], host: str = None) -> IFileSystem:
-    firstPath = next(iter(path.paths), None) if path else None
     system = HostFileSystem(host) if host else \
-        findType(fileSystemType)(root) if fileSystemType else \
+        findType(fileSystemType)(path) if fileSystemType else \
         None
     if not system:
+        firstPath = next(iter(path.paths), None) if path else None
+        root = path.root if not subPath else os.path.join(path.root, subPath)
         match path.type:
-            case None: system = StandardFileSystem(os.path.join(path.root, subPath or '', firstPath or ''))
-            case 'zip': system = ZipFileSystem(os.path.join(path.root, subPath or ''), firstPath)
-            case 'zip:iso': system = ZipIsoFileSystem(os.path.join(path.root, subPath or ''), firstPath)
+            case None: system = StandardFileSystem(root if not firstPath else os.path.join(root, firstPath))
+            case 'zip': system = ZipFileSystem(root, firstPath)
+            case 'zip:iso': system = ZipIsoFileSystem(root, firstPath)
             case _: raise Exception(f'Unknown {path.type}')
     return system if not virtuals else VirtualFileSystem(system, virtuals)
 

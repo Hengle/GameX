@@ -1,5 +1,5 @@
-﻿#define Arkane
-//#define Bethesda
+﻿//#define Arkane
+#define Bethesda
 //#define Bioware
 //#define Black
 //#define Blizzard
@@ -49,13 +49,13 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            ForcePath = "sample:1",
+            ForcePath = "sample:4",
             Family = "Arkane",
-            Game = "AF", // Arx Fatalis [open, read, texture:GL]
-            //Game = "DOM", // Dark Messiah of Might and Magic [open, read]
+            Game = "AF", // Arx Fatalis
+            //Game = "DOM", // Dark Messiah of Might and Magic
             //Game = "D", // Dishonored [unreal]
-            //Game = "D2", // Dishonored 2 [open, read]
-            //Game = "P", // Prey [open, read]
+            //Game = "D2", // Dishonored 2
+            //Game = "P", // Prey
             //Game = "D:DOTO", // Dishonored: Death of the Outsider
             //Game = "W:YB", // Wolfenstein: Youngblood [id]
             //Game = "W:CP", // Wolfenstein: Cyberpilot [id]
@@ -68,7 +68,7 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            ForcePath = "sample:0",
+            //ForcePath = "sample:0",
             Family = "Bethesda",
             Game = "Morrowind", // The Elder Scrolls III: Morrowind
             //Game = "Oblivion", // The Elder Scrolls IV: Oblivion
