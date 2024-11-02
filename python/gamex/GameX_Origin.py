@@ -1,5 +1,5 @@
 import os
-from gamex.pak import BinaryPakFile
+from gamex import BinaryPakFile
 from gamex.Origin.UO.binary import Binary_Animdata, Binary_AsciiFont, Binary_BodyConverter, Binary_BodyTable, Binary_CalibrationInfo, Binary_Gump, Binary_GumpDef, Binary_Hues, Binary_Land, Binary_Light, Binary_MobType, Binary_MultiMap, Binary_MusicDef, Binary_Multi, Binary_RadarColor, Binary_SkillGroups, Binary_Skills, Binary_Sound, Binary_SpeechList, Binary_Static, Binary_StringTable, Binary_TileData, Binary_UnicodeFont, Binary_Verdata
 from gamex.Origin.pakbinary_u8 import PakBinary_U8
 from gamex.Origin.pakbinary_uo import PakBinary_UO

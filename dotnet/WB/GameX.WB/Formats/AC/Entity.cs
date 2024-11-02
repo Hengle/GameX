@@ -1,4 +1,3 @@
-using GameX.Meta;
 using GameX.WB.Formats.AC.AnimationHooks;
 using GameX.WB.Formats.AC.FileTypes;
 using GameX.WB.Formats.AC.Props;

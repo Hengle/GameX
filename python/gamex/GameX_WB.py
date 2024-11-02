@@ -1,6 +1,5 @@
 import os
-from gamex import FamilyGame
-from gamex.pak import BinaryPakFile
+from gamex import FamilyGame, BinaryPakFile
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
 

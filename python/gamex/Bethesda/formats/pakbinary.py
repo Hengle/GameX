@@ -1,8 +1,7 @@
 import os
 from io import BytesIO
 from enum import Enum
-from gamex.pak import FileOption, PakBinaryT
-from gamex.meta import FileSource
+from gamex import FileSource, FileOption, PakBinaryT
 from gamex.compression import decompressLz4, decompressZlib2
 from gamex.Bethesda.formats.records import FormType, Header
 

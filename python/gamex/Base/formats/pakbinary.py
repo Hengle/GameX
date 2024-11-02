@@ -1,8 +1,7 @@
 import os
 from io import BytesIO
 from zipfile import ZipFile
-from gamex.pak import FileOption, PakBinaryT, BinaryPakFile
-from gamex.meta import FileSource
+from gamex import FileSource, FileOption, PakBinaryT, BinaryPakFile
 
 # typedefs
 class Reader: pass

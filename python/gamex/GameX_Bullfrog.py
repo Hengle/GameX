@@ -1,6 +1,5 @@
 import os
-from gamex import Family, FamilyGame
-from gamex.pak import BinaryPakFile
+from gamex import Family, FamilyGame, BinaryPakFile
 from gamex.Bullfrog.formats.pakbinary import PakBinary_Bullfrog, PakBinary_Populus, PakBinary_Syndicate
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension

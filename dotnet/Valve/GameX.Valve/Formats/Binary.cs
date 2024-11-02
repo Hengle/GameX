@@ -1,4 +1,3 @@
-using GameX.Meta;
 using GameX.Platforms;
 using GameX.Valve.Formats.Vpk;
 using OpenStack.Gfx;

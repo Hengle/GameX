@@ -1,5 +1,4 @@
 using GameX.Formats;
-using GameX.Meta;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;

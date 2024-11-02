@@ -3,8 +3,7 @@ from io import BytesIO
 from enum import Enum
 from openstk.gfx.gfx_render import Rasterize
 from openstk.gfx.gfx_texture import ITexture, ITextureFrames, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
-from gamex.pak import PakBinary
-from gamex.meta import FileSource, MetaInfo, MetaContent, IHaveMetaInfo
+from gamex import PakBinary, FileSource, MetaInfo, MetaContent, IHaveMetaInfo
 from gamex.platform import Platform
 from gamex.util import _pathExtension
 

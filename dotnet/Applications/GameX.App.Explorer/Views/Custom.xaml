@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:model="clr-namespace:GameX.Meta;assembly=GameX"
+             xmlns:model="clr-namespace:GameX;assembly=GameX"
              xmlns:cigDataForge="clr-namespace:GameX.Cig.Apps.DataForge;assembly=GameX.Cig.Explorer"
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="200">

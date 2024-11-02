@@ -1,5 +1,5 @@
 import os
-from gamex.pak import BinaryPakFile
+from gamex import BinaryPakFile
 from gamex.Base.formats.pakbinary import PakBinary_Zip
 from gamex.Bioware.formats.pakbinary import PakBinary_Aurora, PakBinary_Myp
 from gamex.GameX import UnknownPakFile

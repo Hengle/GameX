@@ -1,7 +1,6 @@
 import os
 from io import BytesIO
-from gamex.pak import FileOption, PakBinaryT
-from gamex.meta import FileSource
+from gamex import FileSource, FileOption, PakBinaryT
 from gamex.compression import decompressBlast
 from gamex.util import _pathExtension
 

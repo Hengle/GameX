@@ -1,5 +1,4 @@
 using GameX.Formats;
-using GameX.Meta;
 using OpenStack.Gfx;
 using System;
 using System.Collections.Generic;

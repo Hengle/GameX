@@ -1,5 +1,4 @@
 using GameX.Formats;
-using GameX.Meta;
 using GameX.Origin.Games.U9;
 using GameX.Platforms;
 using OpenStack.Gfx;

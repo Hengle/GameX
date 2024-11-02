@@ -1,7 +1,5 @@
 import os
-from gamex import Family
-from gamex.pak import PakFile
-from gamex.meta import FileSource, MetaManager, MetaInfo, MetaContent, IHaveMetaInfo
+from gamex import Family, PakFile, FileSource, MetaManager, MetaInfo, MetaContent, IHaveMetaInfo
 from gamex.Base.formats.binary import Binary_Dds, Binary_Img, Binary_Snd, Binary_Tga, Binary_Txt
 from gamex.util import _pathExtension
 

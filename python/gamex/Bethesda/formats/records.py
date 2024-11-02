@@ -1,8 +1,7 @@
 import os
 from io import BytesIO
 from enum import Enum, IntFlag
-from gamex.pak import PakBinaryT
-from gamex.meta import FileSource
+from gamex import FileSource, PakBinaryT
 from gamex.compression import decompressLz4, decompressZlib2
 
 # typedefs

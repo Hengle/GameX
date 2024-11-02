@@ -1,4 +1,3 @@
-using GameX.Meta;
 using GameX.Origin.Structs.UO;
 using GameX.Platforms;
 using OpenStack.Gfx.Textures;

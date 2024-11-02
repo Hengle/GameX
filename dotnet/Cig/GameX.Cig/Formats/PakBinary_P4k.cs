@@ -1,5 +1,4 @@
 ﻿using GameX.Formats;
-using GameX.Meta;
 using ICSharpCode.SharpZipLib.Zip;
 using System;
 using System.Collections.Generic;

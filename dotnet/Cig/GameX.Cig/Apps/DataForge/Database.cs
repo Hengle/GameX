@@ -1,5 +1,4 @@
-﻿using GameX.Meta;
-using GameX.Cig.Formats;
+﻿using GameX.Cig.Formats;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

@@ -1,5 +1,5 @@
 import os
-from gamex.pak import BinaryPakFile
+from gamex import BinaryPakFile
 from gamex.Valve.formats.pakbinary import PakBinary_Bsp30, PakBinary_Vpk, PakBinary_Wad3
 from gamex.Valve.formats.binary import Binary_Wad3, Binary_Src, Binary_Spr
 from gamex.GameX import UnknownPakFile

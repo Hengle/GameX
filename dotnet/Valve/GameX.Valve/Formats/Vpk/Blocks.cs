@@ -1,6 +1,5 @@
 using GameX.Algorithms;
 using GameX.Formats;
-using GameX.Meta;
 using GameX.Platforms;
 using K4os.Compression.LZ4;
 using K4os.Compression.LZ4.Encoders;

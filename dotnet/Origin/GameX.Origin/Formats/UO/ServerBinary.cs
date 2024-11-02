@@ -1,5 +1,4 @@
 using GameX.Formats;
-using GameX.Meta;
 using GameX.Origin.Structs.UO;
 using System;
 using System.Collections.Generic;

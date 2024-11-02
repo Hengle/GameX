@@ -1,5 +1,5 @@
 import os
-from gamex.pak import BinaryPakFile
+from gamex import BinaryPakFile
 from gamex.Arkane.formats.danae.binary import Binary_Ftl, Binary_Fts, Binary_Tea
 from gamex.Arkane.formats.pakbinary import PakBinary_Danae, PakBinary_Void
 from gamex.Valve.formats.pakbinary import PakBinary_Vpk

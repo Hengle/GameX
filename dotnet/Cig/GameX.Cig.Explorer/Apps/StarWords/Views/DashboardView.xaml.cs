@@ -10,7 +10,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using GameX.Meta;
 using GameX.Formats;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;

@@ -1,5 +1,4 @@
-﻿using GameX.Meta;
-using GameX.Platforms;
+﻿using GameX.Platforms;
 using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
 using System;

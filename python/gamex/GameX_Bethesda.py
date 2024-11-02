@@ -1,6 +1,5 @@
 import os
-from gamex import Family, FamilyGame
-from gamex.pak import BinaryPakFile
+from gamex import Family, FamilyGame, BinaryPakFile
 from gamex.Base.formats.binary import Binary_Dds
 from gamex.Bethesda.formats.pakbinary import PakBinary_Ba2, PakBinary_Bsa, PakBinary_Esm
 from gamex.GameX import UnknownPakFile

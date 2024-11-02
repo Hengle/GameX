@@ -1,5 +1,5 @@
 import os
-from gamex.pak import BinaryPakFile
+from gamex import BinaryPakFile
 from gamex.Cryptic.formats.pakbinary import PakBinary_Hogg
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension

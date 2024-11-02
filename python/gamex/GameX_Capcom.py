@@ -1,5 +1,5 @@
 import os
-from gamex.pak import BinaryPakFile
+from gamex import BinaryPakFile
 from gamex.Base.formats.pakbinary import PakBinary_Zip
 from gamex.Capcom.pakbinary_arc import PakBinary_Arc
 from gamex.Capcom.pakbinary_big import PakBinary_Big
