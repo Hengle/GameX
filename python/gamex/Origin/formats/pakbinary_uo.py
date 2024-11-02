@@ -2,8 +2,8 @@ import os, numpy as np
 from ctypes import c_ulong, c_ulonglong
 from io import BytesIO
 from pathlib import Path
-from gamex.filesrc import FileSource
 from gamex.pak import FileOption, PakBinaryT
+from gamex.meta import FileSource
 from gamex.util import _pathExtension
 
 # typedefs

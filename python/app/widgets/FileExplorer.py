@@ -7,8 +7,7 @@ from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6 import QtCore, QtMultimedia
 from gamex import option
 from gamex.pak import PakFile
-from gamex.filesrc import FileSource
-from gamex.meta import MetaItem, MetaInfo
+from gamex.meta import FileSource, MetaItem, MetaInfo
 
 # https://doc.qt.io/qt-6/qtreeview.html
 # https://gist.github.com/skriticos/5415869

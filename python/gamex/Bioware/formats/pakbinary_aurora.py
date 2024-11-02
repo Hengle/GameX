@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
-from gamex.filesrc import FileSource
 from gamex.pak import PakBinaryT
+from gamex.meta import PakBinaryT
 
 # typedefs
 class Reader: pass

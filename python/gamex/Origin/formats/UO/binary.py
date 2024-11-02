@@ -1,9 +1,8 @@
 import os, re, struct, numpy as np
 from io import BytesIO
 from openstk.gfx_texture import ITexture, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
-from gamex.filesrc import FileSource
 from gamex.pak import PakBinary
-from gamex.meta import MetaInfo, MetaContent, IHaveMetaInfo
+from gamex.meta import FileSource, MetaInfo, MetaContent, IHaveMetaInfo
 
 # typedefs
 class Reader: pass

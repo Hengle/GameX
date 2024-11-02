@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
-from gamex.filesrc import FileSource
 from gamex.pak import FileOption, PakBinaryT
+from gamex.meta import FileSource
 from gamex.util import _pathExtension
 from gamex.Bullfrog.formats.binary import Binary_Fli
 

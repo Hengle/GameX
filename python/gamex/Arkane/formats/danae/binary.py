@@ -1,8 +1,7 @@
 import os
 from io import BytesIO
-from gamex.filesrc import FileSource
 from gamex.pak import PakBinary
-from gamex.meta import MetaInfo, MetaContent, IHaveMetaInfo
+from gamex.meta import FileSource, MetaInfo, MetaContent, IHaveMetaInfo
 
 # typedefs
 class Reader: pass

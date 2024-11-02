@@ -3,9 +3,8 @@ from enum import Enum
 from io import BytesIO
 from openstk.gfx.gfx_render import Rasterize
 from openstk.gfx.gfx_texture import ITextureFrames, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
-from gamex.filesrc import FileSource
 from gamex.pak import PakBinary
-from gamex.meta import MetaInfo, MetaContent, IHaveMetaInfo
+from gamex.meta import FileSource, MetaInfo, MetaContent, IHaveMetaInfo
 from gamex.platform import Platform
 
 # typedefs

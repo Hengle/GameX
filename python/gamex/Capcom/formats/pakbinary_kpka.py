@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
-from gamex.filesrc import FileSource
 from gamex.pak import FileOption, PakBinaryT
+from gamex.meta import FileSource
 from gamex.compression import decompressZlib, decompressZstd
 from gamex.util import _guessExtension
 from ..Resources.Capcom import RE

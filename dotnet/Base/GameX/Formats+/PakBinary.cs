@@ -1,4 +1,5 @@
-﻿using ICSharpCode.SharpZipLib.Zip;
+﻿using GameX.Meta;
+using ICSharpCode.SharpZipLib.Zip;
 using System.Collections.Concurrent;
 using System.IO;
 using System.IO.Compression;

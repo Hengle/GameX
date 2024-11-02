@@ -1,8 +1,7 @@
 import os
 from io import BytesIO
-from gamex.pak import BinaryPakFile
-from gamex.filesrc import FileSource
-from gamex.pak import PakBinaryT
+from gamex.pak import PakBinaryT, BinaryPakFile
+from gamex.meta import FileSource
 
 # typedefs
 class FamilyGame: pass

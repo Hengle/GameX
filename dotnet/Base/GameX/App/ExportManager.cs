@@ -1,4 +1,5 @@
 ﻿using GameX.Formats;
+using GameX.Meta;
 using System;
 using System.IO;
 using System.Linq;

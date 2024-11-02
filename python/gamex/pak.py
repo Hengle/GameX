@@ -2,8 +2,7 @@ import sys, os, re, time, itertools
 from enum import Enum, Flag
 from io import BytesIO
 from openstk.poly import Reader
-from gamex.filesrc import FileSource
-from gamex.meta import MetaManager, MetaItem
+from gamex.meta import FileSource, MetaManager, MetaItem
 from gamex.util import _throw
 
 # typedef
@@ -129,7 +128,8 @@ class BinaryPakFile(PakFile):
         if not self.fileSystem.fileExists(path): return None
         return self.fileSystem.openReader(path)
 
-    def reader(self, func: callable, path: str = None): with self.getReader(path) as r: return func(r)
+    def reader(self, func: callable, path: str = None):
+        with self.getReader(path) as r: return func(r)
 
     def opening(self) -> None:
         self.read()
