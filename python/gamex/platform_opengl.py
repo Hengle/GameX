@@ -2,8 +2,7 @@ import os, io, numpy as np
 from OpenGL.GL import *
 from OpenGL.GL.EXT import texture_compression_s3tc
 from openstk.gfx.gfx import IFixedMaterial, IParamMaterial
-from openstk.gfx.gl import IOpenGLGfx, QuadIndexBuffer, GLMeshBufferCache
-from openstk.gfx.gl_shader import ShaderDebugLoader
+from openstk.gfx.gl import IOpenGLGfx, QuadIndexBuffer, GLMeshBufferCache, ShaderDebugLoader
 from openstk.gfx.gl_render import GLRenderMaterial
 from openstk.gfx.gfx_texture import TextureGLFormat, TextureFlags
 from openstk.poly import IDisposable

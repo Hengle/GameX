@@ -110,6 +110,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{6D2DEF34-0211-49A7-B0CE-8AF7AE738D8A}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\Context\Readme.md = ..\docs\Context\Readme.md
+		Base\GameX\_Config.cs = Base\GameX\_Config.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unknown", "Unknown", "{991C1B68-70C3-4A86-8906-98914C9CE114}"

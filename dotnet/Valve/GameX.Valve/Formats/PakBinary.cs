@@ -19,11 +19,7 @@ namespace GameX.Valve.Formats
     {
         #region Headers
 
-        struct B_Lump
-        {
-            public int Offset;
-            public int Length;
-        }
+        struct B_Lump { public int Offset; public int Length; }
 
         [StructLayout(LayoutKind.Sequential)]
         struct B_Header

@@ -9,9 +9,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static GameX.Formats.Unknown.IUnknownFileObject;
 using static GameX.Valve.Formats.Vpk.D_Texture;
 
 namespace GameX.Valve.Formats
@@ -430,6 +432,333 @@ namespace GameX.Valve.Formats
 
     #endregion
 
+    #region Binary_Mdl
+
+    public unsafe class Binary_Mdl : IHaveMetaInfo
+    {
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Mdl(r, f, (BinaryPakFile)s));
+
+        #region Headers
+
+        const uint M_MAGIC = 0x54534449; //: IDST - Id for studio headers (main and texture headers)
+        const uint M_MAGIC2 = 0x50534449; //: IDSQ - Id for studio sequence groups
+        public const int CoordinateAxes = 6;
+        public const int SequenceBlendCount = 2;
+        public const int ControllerCount = 4;
+        //MAXCONTROLLERS = 4,
+        //MOUTHCONTROLLER = 4,
+        //MAXBLENDERS = 2
+
+        /// <summary>
+        /// header flags
+        /// </summary>
+        [Flags]
+        public enum HeaderFlags : int
+        {
+            ROCKET = 1,          //! leave a trail
+            GRENADE = 2,         //! leave a trail
+            GIB = 4,         //! leave a trail
+            ROTATE = 8,          //! rotate (bonus items)
+            TRACER = 16,         //! green split trail
+            ZOMGIB = 32,         //! small blood trail
+            TRACER2 = 64,            //! orange split trail + rotate
+            TRACER3 = 128,       //! purple trail
+            NOSHADELIGHT = 256,      //! No shade lighting
+            HITBOXCOLLISIONS = 512,      //! Use hitbox collisions
+            FORCESKYLIGHT = 1024,		//! Forces the model to be lit by skybox lighting
+        }
+
+        /// <summary>
+        /// lighting options
+        /// </summary>
+        [Flags]
+        public enum LightFlags : int
+        {
+            FLATSHADE = 0x0001,
+            CHROME = 0x0002,
+            FULLBRIGHT = 0x0004,
+            MIPMAPS = 0x0008,
+            ALPHA = 0x0010,
+            ADDITIVE = 0x0020,
+            MASKED = 0x0040,
+            RENDER_FLAGS = CHROME | ADDITIVE | MASKED | FULLBRIGHT
+        }
+
+        /// <summary>
+        /// motion flags
+        /// </summary>
+        [Flags]
+        public enum MotionFlags : int
+        {
+            X = 0x0001,
+            Y = 0x0002,
+            Z = 0x0004,
+            XR = 0x0008,
+            YR = 0x0010,
+            ZR = 0x0020,
+            LX = 0x0040,
+            LY = 0x0080,
+            LZ = 0x0100,
+            AX = 0x0200,
+            AY = 0x0400,
+            AZ = 0x0800,
+            AXR = 0x1000,
+            AYR = 0x2000,
+            AZR = 0x4000,
+            BONECONTROLLER_TYPES = X | Y | Z | XR | YR | ZR,
+            TYPES = 0x7FFF,
+            CONTROL_FIRST = X,
+            CONTROL_LAST = AZR,
+            RLOOP = 0x8000	// controller that wraps shortest distance
+        }
+
+        /// <summary>
+        /// sequence flags
+        /// </summary>
+        [Flags]
+        public enum SeqFlags : int
+        {
+            LOOPING = 0x0001
+        }
+
+        /// <summary>
+        /// bone flags
+        /// </summary>
+        [Flags]
+        public enum BoneFlags : int
+        {
+            NORMALS = 0x0001,
+            VERTICES = 0x0002,
+            BBOX = 0x0004,
+            CHROME = 0x0008	// if any of the textures have chrome on them
+        }
+
+        struct M_Lump { public int Num; public int Offset; }
+        struct M_Lump2 { public int Num; public int Offset; public int Offset2; }
+
+        // header for demand loaded sequence group data
+        struct M_SeqHeader
+        {
+            public int Magic;
+            public int Version;
+            public fixed byte Name[64];
+            public int Length;
+        }
+
+        // bones
+        struct M_Bone
+        {
+            public fixed char Name[32];    // bone name for symbolic links
+            public int parent;     // parent bone
+            public int flags;      // ??
+            public fixed int bonecontroller[CoordinateAxes]; // bone controller index, -1 == none
+            public fixed float value[CoordinateAxes];    // default DoF values
+            public fixed float scale[CoordinateAxes];   // scale for delta DoF values
+        }
+
+        // bone controllers
+        struct M_BoneController
+        {
+            public int Bone;   // -1 == 0
+            public int Type;   // X, Y, Z, XR, YR, ZR, M
+            public float Start, End;
+            public int Rest;   // byte index value at rest
+            public int Index;  // 0-3 user set controller, 4 mouth
+        }
+
+        // intersection boxes
+        struct M_BBox
+        {
+            public int Bone;
+            public int Group;          // intersection group
+            public Vector3 BBMin, BBMax;        // bounding box
+        }
+
+        //
+        // sequence groups
+        //
+        struct M_SeqGroup
+        {
+            public fixed byte Label[32]; // textual name
+            public fixed byte Name[64];  // file name
+            public int Unused1;    // was "cache"  - index pointer
+            public int Unused2;    // was "data" -  hack for group 0
+        }
+
+        // sequence descriptions
+        struct M_SeqDesc
+        {
+            public fixed byte Label[32]; // sequence label
+
+            public float Fps;      // frames per second	
+            public int Flags;      // looping/non-looping flags
+
+            public int Activity;
+            public int ActWeight;
+
+            public M_Lump Events;
+            public int NumFrames;  // number of frames per sequence
+            public M_Lump Pivots;  // number of foot pivots
+
+            public int MotionType;
+            public int MotionBone;
+            public Vector3 LinearMovement;
+            public int AutomovePosIndex;
+            public int AutomoveAngleIndex;
+
+            public Vector3 BBMin, BBMax;        // per sequence bounding box
+
+            public int NumBlends;
+            public int AnimIndex;      // mstudioanim_t pointer relative to start of sequence group data: [blend][bone][X, Y, Z, XR, YR, ZR]
+
+            public fixed int BlendType[SequenceBlendCount];  // X, Y, Z, XR, YR, ZR
+            public fixed float BlendStart[SequenceBlendCount];   // starting value
+            public fixed float BlendEnd[SequenceBlendCount]; // ending value
+            public int BlendParent;
+
+            public int SeqGroup;       // sequence group for demand loading
+
+            public int EntryNode;      // transition node at entry
+            public int ExitNode;       // transition node at exit
+            public int NodeFlags;      // transition rules
+
+            public int NextSeq;        // auto advancing sequences
+        }
+
+        // events
+        struct M_Event
+        {
+            public int Frame;
+            public int Event;
+            public int Type;
+            public fixed byte options[64];
+        }
+
+        // pivots
+        struct M_Pivot
+        {
+            public Vector3 Org;  // pivot point
+            public int Start, End;
+        }
+
+        // attachment
+        struct M_Attachment
+        {
+            public fixed byte Name[32]; // Name of this attachment. Unused in GoldSource.
+            public int Type; // Type of this attachment. Unused in GoldSource;
+            public int Bone; // Index of the bone this is attached to.
+            public Vector3 Org; // Offset from bone origin.
+            public fixed float Vectors[3 * 3]; // Directional vectors? Unused in GoldSource.
+        }
+
+        struct M_Anim
+        {
+            public fixed ushort offset[CoordinateAxes];
+        }
+
+        // body part index
+        struct M_Bodypart
+        {
+            public fixed byte Name[64];
+            public int NumModels;
+            public int Base;
+            public int ModelIndex; // index into models array
+        }
+
+        // skin info
+        struct M_Texture
+        {
+            public fixed byte Name[64];
+            public int Flags;
+            public int Width, Height;
+            public int Index;
+        }
+
+        // studio models
+        struct M_Model
+        {
+            public fixed byte Name[64];
+            public int Type;
+            public float BoundingRadius;
+            public M_Lump Meshs;
+            public M_Lump2 Verts;       // number of unique vertices, vertex bone info, vertex glm::vec3
+            public M_Lump2 Norms;       // number of unique surface normals, normal bone info, normal glm::vec3
+            public M_Lump Groups;      // deformation groups
+        }
+
+        // meshes
+        struct M_Mesh
+        {
+            public M_Lump Tris;
+            public int SkinRef;
+            public M_Lump Norms;       // per mesh normals, normal glm::vec3
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct M_Header
+        {
+            public static (string, int) Struct = ("<I3if3ifi", sizeof(M_Header));
+            public int Magic;
+            public int Version;
+            public fixed byte Name[64];
+            public int Length;
+            public Vector3 EyePosition;     // ideal eye position
+            public Vector3 Min, Max;        // ideal movement hull size
+            public Vector3 BBMin, BBMax;    // clipping bounding box
+            public HeaderFlags Flags;
+            public M_Lump Bones;            // bones
+            public M_Lump BoneControllers; 	// bone controllers
+            public M_Lump Hitboxs; 		    // complex bounding boxes
+            public M_Lump Seqs; 		    // animation sequences
+            public M_Lump SeqGroups; 		// lazy sequences
+            public M_Lump2 Textures;        // raw textures
+            public int NumSkinRef;          // replaceable textures
+            public M_Lump Skins;
+            public M_Lump BodyParts;
+            public M_Lump Attachments;      // attachable points
+            public M_Lump Sounds;           // This seems to be obsolete. Probably replaced by events that reference external sounds?
+            public M_Lump SoundGroups;      // This seems to be obsolete. Probably replaced by events that reference external sounds?
+            public M_Lump Transitions;      // animation node to animation node transition graph
+        }
+
+        #endregion
+
+        M_Header Header;
+        string HeaderName;
+
+        public Binary_Mdl(BinaryReader r, FileSource f, BinaryPakFile s)
+        {
+            // read file
+            var header = Header = r.ReadS<M_Header>();
+            if (header.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
+            HeaderName = UnsafeX.FixedAString(header.Name, 64);
+            if (string.IsNullOrEmpty(HeaderName)) throw new FormatException($"The file '{HeaderName}' is not a model main header file");
+
+            // load texture
+            if (header.Textures.Offset == 0)
+            {
+                var texPath = f.Path.Insert(f.Path.LastIndexOf('.'), "T");
+                s.Reader(r2 =>
+                {
+                    if (r2 == null) throw new Exception($"External texture file '{texPath}' does not exist or is currently opened by another program");
+                    var texHeader = r2.ReadS<M_Header>();
+                    if (texHeader.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
+                    return null;
+                }, texPath);
+            }
+
+        }
+
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Model", items: [
+                new($"Name: {HeaderName}"),
+            ]),
+        ];
+    }
+
+    #endregion
+
     #region Binary_Wad3
     // https://github.com/dreamstalker/rehlds/blob/master/rehlds/engine/model.cpp
     // https://greg-kennedy.com/hl_materials/
@@ -504,38 +833,15 @@ namespace GameX.Valve.Formats
 
             // read pallet
             r.Skip(2);
-            var pal = r.ReadBytes(0x100 * 3);
-            var p = palette = transparent ? new byte[0x100 * 4] : pal;
-
-            // decode pallet
+            var p = palette = r.ReadBytes(0x100 * 3);
             if (type == Formats.Tex2) //e.g.: tempdecal.wad
-                if (transparent)
-                    for (int i = 0, j = 0; i < 0x100; i++, j += 4)
-                    {
-                        p[j + 0] = (byte)i;
-                        p[j + 1] = (byte)i;
-                        p[j + 2] = (byte)i;
-                        p[j + 3] = 0xFF;
-                    }
-                else
-                    for (int i = 0, j = 0; i < 0x100; i++, j += 3)
-                    {
-                        p[j + 0] = (byte)i;
-                        p[j + 1] = (byte)i;
-                        p[j + 2] = (byte)i;
-                    }
-            else if (transparent)
-                for (int i = 0, j = 0, k = 0; i < 0x100; i++, j += 4, k += 3)
+                for (int i = 0, j = 0; i < 0x100; i++, j += 3)
                 {
-                    p[j + 0] = pal[k + 0];
-                    p[j + 1] = pal[k + 1];
-                    p[j + 2] = pal[k + 1];
-                    p[j + 3] = 0xFF;
+                    p[j + 0] = (byte)i;
+                    p[j + 1] = (byte)i;
+                    p[j + 2] = (byte)i;
                 }
-            // check for transparent (blue) color
-            if (transparent) p[0xFF * 4 - 1] = 0;
 
-            //
             //if (type == Formats.Pic) r.Skip(2);
             //r.EnsureComplete();
         }
@@ -565,7 +871,8 @@ namespace GameX.Valve.Formats
             {
                 var p = pixels[index];
                 size = p.Length * bbp; var span = spans[index] = new Range(offset, offset + size);
-                Rasterize.CopyPixelsByPalette(buf.AsSpan(span), bbp, p, palette, transparent ? 4 : 3);
+                if (transparent) Rasterize.CopyPixelsByPaletteWithAlpha(buf.AsSpan(span), bbp, p, palette, 3, 0xFF);
+                else Rasterize.CopyPixelsByPalette(buf.AsSpan(span), bbp, p, palette, 3);
             }
             return (buf, (Platform.Type)platform switch
             {

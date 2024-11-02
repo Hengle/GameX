@@ -216,34 +216,13 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
 
         # read pallet
         r.skip(2)
-        pal = r.readBytes(0x100 * 3)
-        p = self.palette = bytearray(0x100 * 4) if self.transparent else pal
-
-        # decode pallet
-        j = 0; k = 0
+        p = self.palette = r.readBytes(0x100 * 3); j = 0
         if type == self.Formats.Tex2:
-            if self.transparent:
-                for i in range(0x100):
-                    p[j + 0] = i
-                    p[j + 1] = i
-                    p[j + 2] = i
-                    p[j + 3] = 0xFF
-                    j += 4
-            else:
-                for i in range(0x100):
-                    p[j + 0] = i
-                    p[j + 1] = i
-                    p[j + 2] = i
-                    j += 3
-        elif self.transparent:
             for i in range(0x100):
-                p[j + 0] = pal[k + 0]
-                p[j + 1] = pal[k + 1]
-                p[j + 2] = pal[k + 1]
-                p[j + 3] = 0xFF
-                j += 4; k += 3
-        # check for transparent (blue) color
-        if self.transparent: p[0xFF * 4 - 1] = 0
+                p[j + 0] = i
+                p[j + 1] = i
+                p[j + 2] = i
+                j += 3
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
         bbp = 4 if self.transparent else 3
@@ -251,7 +230,9 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
         spans = [range(0, 0)] * len(self.pixels); offset = 0
         for i, p in enumerate(self.pixels):
             size = len(p) * bbp; span = spans[i] = range(offset, offset + size); offset += size
-            Rasterize.copyPixelsByPalette(mv[span.start:span.stop], bbp, p, self.palette, 4 if self.transparent else 3)
+            if self.transparent: Rasterize.copyPixelsByPaletteWithAlpha(mv[span.start:span.stop], bbp, p, self.palette, 3, 0xFF)
+            else: Rasterize.copyPixelsByPalette(mv[span.start:span.stop], bbp, p, self.palette, 3)
+
         match platform:
             case Platform.Type.OpenGL: format = self.format[1]
             case Platform.Type.Vulken: format = self.format[2]

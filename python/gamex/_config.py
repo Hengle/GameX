@@ -1,10 +1,10 @@
 __title__ = "gamex"
 __version__ = "0.0.1"
 # __current__ = "Unknown"
-# __current__ = "Arkane"
+__current__ = "Arkane"
 # __current__ = "Bethesda"
 # __current__ = "Bullfrog"
-__current__ = "Valve"
+# __current__ = "Valve"
 
 class GlobalOption:
     def __init__(self, Family:str=None, Game:str=None, Edition:str=None, ForcePath:str=None, ForceOpen:bool=False):
@@ -20,7 +20,7 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:2",
+            ForcePath = "sample:1",
             Family = "Arkane",
             Game = "AF", # Arx Fatalis [open, read, texture:GL]
             # Game = "DOM", # Dark Messiah of Might and Magic [open, read]
@@ -483,7 +483,7 @@ match __current__:
             # Game = "HL:BS", # Half-Life: Blue Shift
             # Game = "DOD", # Day of Defeat
             # Game = "CS:CZ", # Counter-Strike: Condition Zero
-
+            # Source
             # Game = "HL:Src", # Half-Life: Source
             # Game = "CS:Src", # Counter-Strike: Source
             # Game = "HL2", # Half-Life 2
@@ -497,7 +497,7 @@ match __current__:
             # Game = "L4D2", # Left 4 Dead 2
             # Game = "DOD:Src", # Day of Defeat: Source
             # Game = "Portal2", # Portal 2
-
+            # Source 2
             # Game = "CS:GO", # Counter-Strike: Global Offensive
             # Game = "D2", # Dota 2
             # Game = "TheLab:RR", # The Lab: Robot Repair

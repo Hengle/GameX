@@ -35,6 +35,14 @@
         "type": "Sprite"
       },
       {
+        "path": "valve/models/apache.mdl",
+        "type": "Model"
+      },
+      {
+        "path": "valve/models/aflock.mdl",
+        "type": "Model"
+      },
+      {
         "path": "valve/maps/boot_camp.bsp:entities.txt",
         "type": "Bsp"
       }

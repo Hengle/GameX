@@ -50,6 +50,7 @@ namespace GameX.Valve
                 {
                     var x when x == ".pic" || x == ".tex" || x == ".tex2" || x == ".fnt" => (0, Binary_Wad3.Factory),
                     ".spr" => (0, Binary_Spr.Factory),
+                    ".mdl" => (0, Binary_Mdl.Factory),
                     _ => UnknownPakFile.ObjectFactory(source, game),
                 },
                 "Source" => (0, Binary_Src.Factory),

@@ -655,11 +655,11 @@ namespace GameX.Formats
             var bytes = new byte[data.Stride * data.Height];
             Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
             Image.UnlockBits(data);
-            var palette = Image.Palette;
-            if (palette == null) Bytes = bytes;
+            var palette = Image.Palette?.Entries;
+            if (palette == null || palette.Length == 0) Bytes = bytes;
             else
             {
-                var pal = palette.Entries.SelectMany<Color, byte>(x => [x.R, x.G, x.B]).ToArray();
+                var pal = palette.SelectMany<Color, byte>(x => [x.R, x.G, x.B]).ToArray();
                 Bytes = new byte[Width * Height * 3];
                 Rasterize.CopyPixelsByPalette(Bytes, 3, bytes, pal, 3);
             }
