@@ -1,8 +1,8 @@
 import os
 from io import BytesIO
 from zipfile import ZipFile
-from gamex.pak import BinaryPakFile
 from gamex.filesrc import FileSource
+from gamex.pak import FileOption, BinaryPakFile
 from gamex.pak import PakBinaryT
 
 # typedefs
@@ -32,7 +32,7 @@ class PakBinary_Zip(PakBinaryT):
             ) for s in pak.infolist() if not s.is_dir()]
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         pak: ZipFile = source.tag
         print(pak.read(file.path))
 

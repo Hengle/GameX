@@ -56,6 +56,7 @@ class PakFile:
         self.tag = state.tag
         self.objectFactoryFunc = None
         self.gfx = None
+        self.sfx = None
     def __enter__(self): return self
     def __exit__(self, type, value, traceback): self.close()
     def __repr__(self): return f'{self.name}#{self.game.id}'
@@ -83,6 +84,8 @@ class PakFile:
     def getFileSource(self, path: FileSource | str | int, throwOnError: bool = True) -> (PakFile, FileSource): pass
     def loadFileData(self, path: FileSource | str | int, option: FileOption = FileOption.Default, throwOnError: bool = True) -> bytes: pass
     def loadFileObject(self, path: FileSource | str | int, option: FileOption = FileOption.Default, throwOnError: bool = True) -> object: pass
+    def openPakFile(self, res: object, throwOnError: bool = True) -> PakFile:
+        raise Exception('TODO')
     #region Transform
     def loadFileObject2(self, transformTo: object, source: object): pass
     def transformFileObject(self, transformTo: object, source: object): pass
@@ -125,15 +128,14 @@ class BinaryPakFile(PakFile):
         if not path: raise Exception('No Path')
         if not self.fileSystem.fileExists(path): return None
         return self.fileSystem.openReader(path)
-    
+
+    def reader(self, func: callable, path: str = None): with self.getReader(path) as r: return func(r)
+
     def opening(self) -> None:
-        if self.useReader and (ctx := self.getReader()):
-            with ctx as r: self.read(r)
-        else: self.read(None)
+        self.read()
         self.process()
 
-    def closing(self) -> None:
-        pass
+    def closing(self) -> None: pass
 
     def contains(self, path: FileSource | str | int) -> bool:
         match path:
@@ -171,9 +173,7 @@ class BinaryPakFile(PakFile):
             (p, f2) = self.getFileSource(path, throwOnError)
             return p.loadFileData(f2, option, throwOnError) if p else None
         f = path
-        if self.useReader and (ctx := self.getReader()):
-            with ctx as r: return self.readData(r, f)
-        else: return self.readData(None, f)
+        return self.readData(f, option)
 
     def loadFileObject(self, type: type, path: FileSource | str | int, option: FileOption = FileOption.Default, throwOnError: bool = True) -> object:
         if not path: return None
@@ -218,9 +218,13 @@ class BinaryPakFile(PakFile):
         return pak, (paths[1] if pak and len(paths) > 1 else None)
 
     #region PakBinary
-    def read(self, r: Reader, tag: object = None) -> None: return self.pakBinary.read(self, r, tag)
+    def read(self, tag: object = None) -> None: return \
+        self.reader(lambda r: self.pakBinary.read(self, r, tag)) if self.useReader else \
+        self.pakBinary.read(self, None, tag)
 
-    def readData(self, r: Reader, file: FileSource) -> bytes: return self.pakBinary.readData(self, r, file)
+    def readData(self, file: FileSource, option: FileOption = None) -> bytes: return \
+        self.reader(lambda r: self.pakBinary.readData(self, r, file, option)) if self.useReader else \
+        self.pakBinary.readData(self, None, file, option)
     #endregion
 
     #region Metadata
@@ -242,15 +246,15 @@ class ManyPakFile(BinaryPakFile):
         self.useReader = False
 
     #region PakBinary
-    def read(self, r: Reader, tag: object = None) -> None:
+    def read(self, tag: object = None) -> None:
         self.files = [FileSource(
             path = s.replace('\\', '/'),
             pak = self.game.createPakFileType(PakState(self.fileSystem, self.game, self.edition, s)) if self.game.isPakFile(s) else None,
             fileSize = self.fileSystem.fileInfo(s)[1])
             for s in self.paths]
 
-    def readData(self, r: Reader, file: FileSource) -> BytesIO:
-        return file.pak.readData(r, file) if file.pak else \
+    def readData(self, file: FileSource, option: FileOption = None) -> BytesIO:
+        return file.pak.readData(file, option) if file.pak else \
             BytesIO(self.fileSystem.openReader(file.path).readBytes(file.fileSize))
     #endregion
 

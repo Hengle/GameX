@@ -1,5 +1,5 @@
 ﻿//#define Arkane
-#define Bethesda
+//#define Bethesda
 //#define Bioware
 //#define Black
 //#define Blizzard
@@ -22,7 +22,7 @@
 //#define Ubisoft
 //#define Unity
 //#define Unknown
-//#define Valve
+#define Valve
 //#define Volition
 //#define WB
 

@@ -3,7 +3,7 @@ from ctypes import c_ulong, c_ulonglong
 from io import BytesIO
 from pathlib import Path
 from gamex.filesrc import FileSource
-from gamex.pak import PakBinaryT
+from gamex.pak import FileOption, PakBinaryT
 from gamex.util import _pathExtension
 
 # typedefs
@@ -310,7 +310,7 @@ class PakBinary_UO(PakBinaryT):
     #endregion
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         if file.offset < 0: return None
         fileSize = file.fileSize & 0x7FFFFFFF
         if (file.fileSize & (1 << 31)) != 0:

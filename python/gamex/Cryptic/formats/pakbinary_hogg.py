@@ -2,7 +2,7 @@ import os
 from io import BytesIO
 from openstk.poly import Reader
 from gamex.filesrc import FileSource
-from gamex.pak import PakBinaryT
+from gamex.pak import FileOption, PakBinaryT
 from gamex.compression import decompressLzss, decompressZlib
 
 # typedefs
@@ -78,12 +78,12 @@ class PakBinary_Hogg(PakBinaryT):
             s = fileEntries[i]
             a = attributeEntries[i]
             files[i] = FileSource(
-                        id = s.id,
-                        offset = s.offset,
-                        fileSize = s.fileSize,
-                        packedSize = a.uncompressedSize,
-                        compressed = 1 if a.uncompressedSize > 0 else 0
-                        )
+                id = s.id,
+                offset = s.offset,
+                fileSize = s.fileSize,
+                packedSize = a.uncompressedSize,
+                compressed = 1 if a.uncompressedSize > 0 else 0
+                )
 
         # read "Datalist" file
         dataListFile = files[0]
@@ -115,7 +115,7 @@ class PakBinary_Hogg(PakBinaryT):
         source.files = [x for x in files if x.fileSize != -1 and x.id != 0]
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         r.seek(file.offset)
         return BytesIO(
             decompressZlib(r, file.packedSize, file.fileSize) if file.compressed != 0 else \

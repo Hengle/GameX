@@ -740,13 +740,12 @@ namespace GameX.Valve.Formats
                 var texPath = f.Path.Insert(f.Path.LastIndexOf('.'), "T");
                 s.Reader(r2 =>
                 {
-                    if (r2 == null) throw new Exception($"External texture file '{texPath}' does not exist or is currently opened by another program");
+                    if (r2 == null) throw new Exception($"External texture file '{texPath}' does not exist");
                     var texHeader = r2.ReadS<M_Header>();
                     if (texHeader.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
                     return null;
                 }, texPath);
             }
-
         }
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [

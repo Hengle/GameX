@@ -6,7 +6,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization
 from gamex.filesrc import FileSource
-from gamex.pak import PakBinaryT
+from gamex.pak import FileOption, PakBinaryT
 from gamex.compression import decompressBlast
 from gamex.util import _throw, _pathExtension
 from openstk.poly import unsafe
@@ -119,7 +119,7 @@ class PakBinary_Bsp30(PakBinaryT):
         files.append(FileSource(path = 'markSurfaces.dat', offset = header.markSurfaces.offset, fileSize = header.markSurfaces.length))
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         r.seek(file.offset)
         return BytesIO(r.readBytes(file.fileSize))
 
@@ -273,7 +273,7 @@ class PakBinary_Vpk(PakBinaryT):
             v.verifySignature(r)
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         fileDataLength = len(file.data)
         data = bytearray(fileDataLength + file.fileSize); mv = memoryview(data)
         if fileDataLength > 0: data[0:] = file.data
@@ -348,7 +348,7 @@ class PakBinary_Wad3(PakBinaryT):
                 ))
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         r.seek(file.offset)
         return BytesIO(
             r.readBytes(file.fileSize) if file.compressed == 0 else \

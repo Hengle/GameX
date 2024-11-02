@@ -117,7 +117,7 @@ namespace GameX
         /// <summary>
         /// The status
         /// </summary>
-        public volatile PakStatus Status = PakStatus.Closed;
+        public volatile PakStatus Status;
 
         /// <summary>
         /// The filesystem.
@@ -172,6 +172,7 @@ namespace GameX
         public PakFile(PakState state)
         {
             string z;
+            Status = PakStatus.Closed;
             FileSystem = state.FileSystem ?? throw new ArgumentNullException(nameof(state.FileSystem));
             Family = state.Game.Family ?? throw new ArgumentNullException(nameof(state.Game.Family));
             Game = state.Game ?? throw new ArgumentNullException(nameof(state.Game));
@@ -179,6 +180,7 @@ namespace GameX
             PakPath = state.Path;
             Name = !string.IsNullOrEmpty(z = Path.GetFileName(state.Path)) ? z : Path.GetFileName(Path.GetDirectoryName(state.Path));
             Tag = state.Tag;
+            ObjectFactoryFunc = null;
             Gfx = null;
         }
 
@@ -331,8 +333,7 @@ namespace GameX
         /// <param name="path">The file path.</param>
         /// <param name="transformTo">The transformTo.</param>
         /// <returns></returns>
-        public async Task<T> LoadFileObject<T>(object path, PakFile transformTo)
-            => await TransformFileObject<T>(transformTo, await LoadFileObject<object>(path));
+        public async Task<T> LoadFileObject<T>(object path, PakFile transformTo) => await TransformFileObject<T>(transformTo, await LoadFileObject<object>(path));
 
         /// <summary>
         /// Transforms the file object asynchronous.
@@ -357,8 +358,7 @@ namespace GameX
         /// </summary>
         /// <param name="manager">The resource.</param>
         /// <returns></returns>
-        public virtual List<MetaItem.Filter> GetMetadataFilters(MetaManager manager)
-            => Family.FileManager != null && Family.FileManager.Filters.TryGetValue(Game.Id, out var z) ? z.Select(x => new MetaItem.Filter(x.Key, x.Value)).ToList() : null;
+        public virtual List<MetaItem.Filter> GetMetadataFilters(MetaManager manager) => Family.FileManager != null && Family.FileManager.Filters.TryGetValue(Game.Id, out var z) ? z.Select(x => new MetaItem.Filter(x.Key, x.Value)).ToList() : null;
 
         /// <summary>
         /// Gets the metadata infos.
@@ -366,16 +366,14 @@ namespace GameX
         /// <param name="manager">The resource.</param>
         /// <param name="item">The item.</param>
         /// <returns></returns>
-        public virtual Task<List<MetaInfo>> GetMetaInfos(MetaManager manager, MetaItem item)
-            => throw new NotImplementedException();
+        public virtual Task<List<MetaInfo>> GetMetaInfos(MetaManager manager, MetaItem item) => throw new NotImplementedException();
 
         /// <summary>
         /// Gets the metadata items.
         /// </summary>
         /// <param name="manager">The resource.</param>
         /// <returns></returns>
-        public virtual List<MetaItem> GetMetaItems(MetaManager manager)
-            => throw new NotImplementedException();
+        public virtual List<MetaItem> GetMetaItems(MetaManager manager) => throw new NotImplementedException();
 
         #endregion
     }
@@ -396,7 +394,6 @@ namespace GameX
     {
         public readonly PakBinary PakBinary = pakBinary;
         // options
-        public int RetainInPool = 10;
         public bool UseReader = true;
         public bool UseWriter = true;
         public bool UseFileId = false;
@@ -430,8 +427,8 @@ namespace GameX
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public GenericPool<BinaryReader> GetReader(string path = default)
-            => Readers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryReader>(() => FileSystem.OpenReader(path), RetainInPool) : default);
+        public GenericPool<BinaryReader> GetReader(string path = default, int retainInPool = 10)
+            => Readers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryReader>(() => FileSystem.OpenReader(path), retainInPool) : null);
 
         /// <summary>
         /// Reader
@@ -439,8 +436,7 @@ namespace GameX
         /// <param name="func">The func.</param>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public virtual Task Reader(Func<BinaryReader, Task> func, string path = default)
-            => UseReader ? GetReader(path).ActionAsync(async r => await func(r)) : func(null);
+        public virtual Task Reader(Func<BinaryReader, Task> func, string path = default) => GetReader(path).ActionAsync(r => func(r));
 
         /// <summary>
         /// Reader
@@ -448,16 +444,15 @@ namespace GameX
         /// <param name="func">The func.</param>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public virtual Task<TResult> Reader<TResult>(Func<BinaryReader, Task<TResult>> func, string path = default)
-            => UseReader ? GetReader(path).FuncAsync(async r => await func(r)) : func(null);
+        public virtual Task<TResult> Reader<TResult>(Func<BinaryReader, Task<TResult>> func, string path = default) => GetReader(path).FuncAsync(r => func(r));
 
         /// <summary>
         /// Gets the binary reader.
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public GenericPool<BinaryWriter> GetWriter(string path = default)
-            => Writers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryWriter>(() => FileSystem.OpenWriter(path), RetainInPool) : default);
+        public GenericPool<BinaryWriter> GetWriter(string path = default, int retainInPool = 10)
+            => Writers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryWriter>(() => FileSystem.OpenWriter(path), retainInPool) : null);
 
         /// <summary>
         /// Writer
@@ -465,8 +460,7 @@ namespace GameX
         /// <param name="func">The func.</param>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public Task Writer(Func<BinaryWriter, Task> func, string path = default)
-            => UseWriter ? GetWriter(path).ActionAsync(async w => await func(w)) : func(null);
+        public Task Writer(Func<BinaryWriter, Task> func, string path = default) => GetWriter(path).ActionAsync(w => func(w));
 
         /// <summary>
         /// Writer
@@ -474,8 +468,7 @@ namespace GameX
         /// <param name="func">The func.</param>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public Task<TResult> Writer<TResult>(Func<BinaryWriter, Task<TResult>> func, string path = default)
-            => UseWriter ? GetWriter(path).FuncAsync(async w => await func(w)) : func(null);
+        public Task<TResult> Writer<TResult>(Func<BinaryWriter, Task<TResult>> func, string path = default) => GetWriter(path).FuncAsync(w => func(w));
 
         #endregion
 
@@ -685,7 +678,9 @@ namespace GameX
         /// <param name="r">The r.</param>
         /// <param name="tag">The tag.</param>
         /// <returns></returns>
-        public virtual Task Read(object tag = default) => Reader(r => PakBinary.Read(this, r, tag));
+        public virtual Task Read(object tag = default) => UseReader
+            ? Reader(r => PakBinary.Read(this, r, tag))
+            : PakBinary.Read(this, null, tag);
 
         /// <summary>
         /// Reads the file data asynchronous.
@@ -693,7 +688,9 @@ namespace GameX
         /// <param name="file">The file.</param>
         /// <param name="option">The option.</param>
         /// <returns></returns>
-        public virtual Task<Stream> ReadData(FileSource file, FileOption option = default) => Reader(r => PakBinary.ReadData(this, r, file, option));
+        public virtual Task<Stream> ReadData(FileSource file, FileOption option = default) => UseReader
+            ? Reader(r => PakBinary.ReadData(this, r, file, option))
+            : PakBinary.ReadData(this, null, file, option);
 
         /// <summary>
         /// Writes the asynchronous.

@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 from gamex.filesrc import FileSource
-from gamex.pak import PakBinaryT
+from gamex.pak import FileOption, PakBinaryT
 from gamex.compression import decompressBlast
 from gamex.util import _pathExtension
 
@@ -72,7 +72,7 @@ class PakBinary_Danae(PakBinaryT):
                 files.append(file)
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         r.seek(file.offset)
         return BytesIO(
             decompressBlast(r, file.packedSize, file.fileSize) if (file.compressed & 1) != 0 else \
@@ -165,7 +165,7 @@ class PakBinary_Void(PakBinaryT):
                 ))
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         pass
 
 #endregion

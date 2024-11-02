@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 from gamex.filesrc import FileSource
-from gamex.pak import PakBinaryT
+from gamex.pak import FileOption, PakBinaryT
 from gamex.compression import decompressZlib, decompressZstd
 from gamex.util import _guessExtension
 from ..Resources.Capcom import RE
@@ -82,7 +82,7 @@ class PakBinary_Kpka(PakBinaryT):
             ) for x in tr.readTArray(self.K_FileV4, header.numFiles)]
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         r.seek(file.offset)
         return BytesIO(_decompress(r, file.compressed, file.packedSize, file.fileSize))
 

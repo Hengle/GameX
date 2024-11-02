@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 from gamex.filesrc import FileSource
-from gamex.pak import PakBinaryT
+from gamex.pak import FileOption, PakBinaryT
 from gamex.util import _pathExtension
 from gamex.Bullfrog.formats.binary import Binary_Fli
 
@@ -101,7 +101,7 @@ class PakBinary_Bullfrog(PakBinaryT):
                 ))
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         pass
 
 #endregion
@@ -141,7 +141,7 @@ class PakBinary_Populus(PakBinaryT):
         source.files = files = []
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         pass
 
 #endregion
@@ -168,7 +168,7 @@ class PakBinary_Syndicate(PakBinaryT):
         source.files = files = []
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         pass
 
 #endregion

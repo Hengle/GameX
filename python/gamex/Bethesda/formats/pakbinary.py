@@ -2,7 +2,7 @@ import os
 from io import BytesIO
 from enum import Enum
 from gamex.filesrc import FileSource
-from gamex.pak import PakBinaryT
+from gamex.pak import FileOption, PakBinaryT
 from gamex.compression import decompressLz4, decompressZlib2
 from gamex.Bethesda.formats.records import FormType, Header
 
@@ -154,7 +154,7 @@ class PakBinary_Ba2(PakBinaryT):
                 for file in files: file.path = path
 
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         r.seek(file.offset)
 
         # General BA2 Format
@@ -330,7 +330,7 @@ class PakBinary_Bsa(PakBinaryT):
         else: raise Exception('BAD MAGIC')
     
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         # position
         fileSize = file.fileSize
         r.seek(file.offset)

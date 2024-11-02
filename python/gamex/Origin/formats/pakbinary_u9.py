@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 from gamex.filesrc import FileSource
-from gamex.pak import PakBinaryT
+from gamex.pak import FileOption, PakBinaryT
 from gamex.util import _pathExtension
 
 # typedefs
@@ -38,5 +38,5 @@ class PakBinary_U9(PakBinaryT):
         pass
         
     # readData
-    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource) -> BytesIO:
+    def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
         pass
