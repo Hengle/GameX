@@ -5,14 +5,12 @@ using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static GameX.Formats.Unknown.IUnknownFileObject;
 using static GameX.Valve.Formats.Vpk.D_Texture;
 
 namespace GameX.Valve.Formats
@@ -439,8 +437,8 @@ namespace GameX.Valve.Formats
 
         #region Headers
 
-        const uint M_MAGIC = 0x54534449; //: IDST - Id for studio headers (main and texture headers)
-        const uint M_MAGIC2 = 0x50534449; //: IDSQ - Id for studio sequence groups
+        const uint M_MAGIC = 0x54534449; //: IDST
+        const uint M_MAGIC2 = 0x51534449; //: IDSQ
         public const int CoordinateAxes = 6;
         public const int SequenceBlendCount = 2;
         public const int ControllerCount = 4;
@@ -454,21 +452,21 @@ namespace GameX.Valve.Formats
         [Flags]
         public enum HeaderFlags : int
         {
-            ROCKET = 1,          //! leave a trail
-            GRENADE = 2,         //! leave a trail
-            GIB = 4,         //! leave a trail
-            ROTATE = 8,          //! rotate (bonus items)
-            TRACER = 16,         //! green split trail
-            ZOMGIB = 32,         //! small blood trail
-            TRACER2 = 64,            //! orange split trail + rotate
-            TRACER3 = 128,       //! purple trail
-            NOSHADELIGHT = 256,      //! No shade lighting
-            HITBOXCOLLISIONS = 512,      //! Use hitbox collisions
-            FORCESKYLIGHT = 1024,		//! Forces the model to be lit by skybox lighting
+            ROCKET = 1,             // leave a trail
+            GRENADE = 2,            // leave a trail
+            GIB = 4,                // leave a trail
+            ROTATE = 8,             // rotate (bonus items)
+            TRACER = 16,            // green split trail
+            ZOMGIB = 32,            // small blood trail
+            TRACER2 = 64,           // orange split trail + rotate
+            TRACER3 = 128,          // purple trail
+            NOSHADELIGHT = 256,     // No shade lighting
+            HITBOXCOLLISIONS = 512, // Use hitbox collisions
+            FORCESKYLIGHT = 1024,	// Forces the model to be lit by skybox lighting
         }
 
         /// <summary>
-        /// lighting options
+        /// lighting flags
         /// </summary>
         [Flags]
         public enum LightFlags : int
@@ -508,7 +506,7 @@ namespace GameX.Valve.Formats
             TYPES = 0x7FFF,
             CONTROL_FIRST = X,
             CONTROL_LAST = AZR,
-            RLOOP = 0x8000	// controller that wraps shortest distance
+            RLOOP = 0x8000 // controller that wraps shortest distance
         }
 
         /// <summary>
@@ -529,15 +527,17 @@ namespace GameX.Valve.Formats
             NORMALS = 0x0001,
             VERTICES = 0x0002,
             BBOX = 0x0004,
-            CHROME = 0x0008	// if any of the textures have chrome on them
+            CHROME = 0x0008 // if any of the textures have chrome on them
         }
 
-        struct M_Lump { public int Num; public int Offset; }
-        struct M_Lump2 { public int Num; public int Offset; public int Offset2; }
+        // lumps
+        public struct M_Lump { public int Num; public int Offset; }
+        public struct M_Lump2 { public int Num; public int Offset; public int Offset2; }
 
-        // header for demand loaded sequence group data
-        struct M_SeqHeader
+        // sequence header
+        public struct M_SeqHeader
         {
+            public static (string, int) Struct = ("<2I64sI", sizeof(M_SeqHeader));
             public int Magic;
             public int Version;
             public fixed byte Name[64];
@@ -545,19 +545,21 @@ namespace GameX.Valve.Formats
         }
 
         // bones
-        struct M_Bone
+        public struct M_Bone
         {
-            public fixed char Name[32];    // bone name for symbolic links
-            public int parent;     // parent bone
-            public int flags;      // ??
-            public fixed int bonecontroller[CoordinateAxes]; // bone controller index, -1 == none
-            public fixed float value[CoordinateAxes];    // default DoF values
-            public fixed float scale[CoordinateAxes];   // scale for delta DoF values
+            public static (string, int) Struct = ("<?", sizeof(M_Bone));
+            public fixed char Name[32]; // bone name for symbolic links
+            public int Parent; // parent bone
+            public BoneFlags Flags;
+            public fixed int BoneController[CoordinateAxes]; // bone controller index, -1 == none
+            public fixed float Value[CoordinateAxes];    // default DoF values
+            public fixed float Scale[CoordinateAxes];   // scale for delta DoF values
         }
 
         // bone controllers
-        struct M_BoneController
+        public struct M_BoneController
         {
+            public static (string, int) Struct = ("<?", sizeof(M_BoneController));
             public int Bone;   // -1 == 0
             public int Type;   // X, Y, Z, XR, YR, ZR, M
             public float Start, End;
@@ -566,18 +568,18 @@ namespace GameX.Valve.Formats
         }
 
         // intersection boxes
-        struct M_BBox
+        public struct M_BBox
         {
+            public static (string, int) Struct = ("<?", sizeof(M_BBox));
             public int Bone;
             public int Group;          // intersection group
             public Vector3 BBMin, BBMax;        // bounding box
         }
 
-        //
         // sequence groups
-        //
-        struct M_SeqGroup
+        public struct M_SeqGroup
         {
+            public static (string, int) Struct = ("<?", sizeof(M_SeqGroup));
             public fixed byte Label[32]; // textual name
             public fixed byte Name[64];  // file name
             public int Unused1;    // was "cache"  - index pointer
@@ -585,8 +587,9 @@ namespace GameX.Valve.Formats
         }
 
         // sequence descriptions
-        struct M_SeqDesc
+        public struct M_SeqDesc
         {
+            public static (string, int) Struct = ("<?", sizeof(M_SeqDesc));
             public fixed byte Label[32]; // sequence label
 
             public float Fps;      // frames per second	
@@ -625,24 +628,27 @@ namespace GameX.Valve.Formats
         }
 
         // events
-        struct M_Event
+        public struct M_Event
         {
+            public static (string, int) Struct = ("<?", sizeof(M_Event));
             public int Frame;
             public int Event;
             public int Type;
-            public fixed byte options[64];
+            public fixed byte Options[64];
         }
 
         // pivots
-        struct M_Pivot
+        public struct M_Pivot
         {
+            public static (string, int) Struct = ("<?", sizeof(M_Pivot));
             public Vector3 Org;  // pivot point
             public int Start, End;
         }
 
-        // attachment
-        struct M_Attachment
+        // attachments
+        public struct M_Attachment
         {
+            public static (string, int) Struct = ("<?", sizeof(M_Attachment));
             public fixed byte Name[32]; // Name of this attachment. Unused in GoldSource.
             public int Type; // Type of this attachment. Unused in GoldSource;
             public int Bone; // Index of the bone this is attached to.
@@ -650,14 +656,17 @@ namespace GameX.Valve.Formats
             public fixed float Vectors[3 * 3]; // Directional vectors? Unused in GoldSource.
         }
 
-        struct M_Anim
+        // animations
+        public struct M_Anim
         {
-            public fixed ushort offset[CoordinateAxes];
+            public static (string, int) Struct = ("<?", sizeof(M_Anim));
+            public fixed ushort Offset[CoordinateAxes];
         }
 
         // body part index
-        struct M_Bodypart
+        public struct M_Bodypart
         {
+            public static (string, int) Struct = ("<?", sizeof(M_Bodypart));
             public fixed byte Name[64];
             public int NumModels;
             public int Base;
@@ -665,8 +674,9 @@ namespace GameX.Valve.Formats
         }
 
         // skin info
-        struct M_Texture
+        public struct M_Texture
         {
+            public static (string, int) Struct = ("<?", sizeof(M_Texture));
             public fixed byte Name[64];
             public int Flags;
             public int Width, Height;
@@ -674,8 +684,9 @@ namespace GameX.Valve.Formats
         }
 
         // studio models
-        struct M_Model
+        public struct M_Model
         {
+            public static (string, int) Struct = ("<?", sizeof(M_Model));
             public fixed byte Name[64];
             public int Type;
             public float BoundingRadius;
@@ -686,17 +697,19 @@ namespace GameX.Valve.Formats
         }
 
         // meshes
-        struct M_Mesh
+        public struct M_Mesh
         {
+            public static (string, int) Struct = ("<?", sizeof(M_Mesh));
             public M_Lump Tris;
             public int SkinRef;
             public M_Lump Norms;       // per mesh normals, normal glm::vec3
         }
 
+        // header
         [StructLayout(LayoutKind.Sequential)]
-        struct M_Header
+        public struct M_Header
         {
-            public static (string, int) Struct = ("<I3if3ifi", sizeof(M_Header));
+            public static (string, int) Struct = ("<2I64sI15f27I", sizeof(M_Header));
             public int Magic;
             public int Version;
             public fixed byte Name[64];
@@ -722,28 +735,53 @@ namespace GameX.Valve.Formats
 
         #endregion
 
-        M_Header Header;
+        public M_Header Header;
+        public M_Header Texture;
+        public M_SeqHeader[] Sequences;
         string HeaderName;
+        public bool IsDol;
 
         public Binary_Mdl(BinaryReader r, FileSource f, BinaryPakFile s)
         {
             // read file
             var header = Header = r.ReadS<M_Header>();
             if (header.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
+            else if (header.Version != 10) throw new FormatException("BAD VERSION");
             HeaderName = UnsafeX.FixedAString(header.Name, 64);
             if (string.IsNullOrEmpty(HeaderName)) throw new FormatException($"The file '{HeaderName}' is not a model main header file");
+            string pathExt = Path.GetExtension(f.Path), pathName = f.Path[..^pathExt.Length];
+            IsDol = pathExt == ".dol";
 
             // load texture
             if (header.Textures.Offset == 0)
             {
-                var texPath = f.Path.Insert(f.Path.LastIndexOf('.'), "T");
-                s.Reader(r2 =>
+                var path = $"{pathName}T{pathExt}";
+                Texture = s.Reader(r2 =>
                 {
-                    if (r2 == null) throw new Exception($"External texture file '{texPath}' does not exist");
-                    var texHeader = r2.ReadS<M_Header>();
-                    if (texHeader.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
-                    return null;
-                }, texPath);
+                    if (r2 == null) throw new Exception($"External texture file '{path}' does not exist");
+                    var header = r2.ReadS<M_Header>();
+                    if (header.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
+                    else if (header.Version != 10) throw new FormatException("BAD VERSION");
+                    return Task.FromResult(header);
+                }, path).Result;
+            }
+
+            // load animations
+            if (header.SeqGroups.Num > 1)
+            {
+                Sequences = new M_SeqHeader[header.SeqGroups.Num - 1];
+                for (var i = 0; i < Sequences.Length; i++)
+                {
+                    var path = $"{pathName}{i + 1:00}{pathExt}";
+                    Sequences[i] = s.Reader(r2 =>
+                    {
+                        if (r2 == null) throw new Exception($"Sequence group file '{path}' does not exist");
+                        var header = r2.ReadS<M_SeqHeader>();
+                        if (header.Magic != M_MAGIC2) throw new FormatException("BAD MAGIC");
+                        else if (header.Version != 10) throw new FormatException("BAD VERSION");
+                        return Task.FromResult(header);
+                    }, path).Result;
+                }
             }
         }
 

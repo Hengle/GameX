@@ -14,7 +14,7 @@ class BinaryPakFile: pass
 # PakBinary_Ba2
 class PakBinary_Ba2(PakBinaryT):
 
-    #region Header : TES5
+    #region Headers : TES5
 
     # Default header data
     F4_BSAHEADER_FILEID = 0x58445442    # Magic for Fallout 4 BA2, the literal string "BTDX".
@@ -180,7 +180,7 @@ class PakBinary_Ba2(PakBinaryT):
 # PakBinary_Bsa
 class PakBinary_Bsa(PakBinaryT):
 
-    #region Header : TES4
+    #region Headers : TES4
 
     OB_BSAHEADER_FILEID = 0x00415342    # Magic for Oblivion BSA, the literal string "BSA\0".
     OB_BSAHEADER_VERSION = 0x67         # Version number of an Oblivion BSA
@@ -233,7 +233,7 @@ class PakBinary_Bsa(PakBinaryT):
 
     #endregion
 
-    #region Header : TES3
+    #region Headers : TES3
 
     MW_BSAHEADER_FILEID = 0x00000100    # Magic for Morrowind BSA
 

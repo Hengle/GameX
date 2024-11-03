@@ -117,7 +117,7 @@ namespace GameX.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Iif(r, (int)f.FileSize));
 
-        #region Header
+        #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct Chunk
@@ -709,7 +709,7 @@ namespace GameX.Formats
         public static Task<object> Factory_3(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pal(r, 3));
         public static Task<object> Factory_4(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pal(r, 4));
 
-        #region Palette
+        #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct RGB { public byte R; public byte G; public byte B; }
@@ -761,6 +761,8 @@ namespace GameX.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pcx(r, f));
 
+        #region Headers
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_Header
         {
@@ -784,6 +786,8 @@ namespace GameX.Formats
             public ushort VRes;             // vertical resolution of the source system's screen
             public fixed byte Reserved2[54]; // Second reserved field, intended for future extension
         }
+
+        #endregion
 
         public Binary_Pcx(BinaryReader r, FileSource f)
         {
@@ -1056,7 +1060,7 @@ namespace GameX.Formats
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Snd(r, (int)f.FileSize, null));
         public static Task<object> Factory_Wav(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Snd(r, (int)f.FileSize, ".wav"));
 
-        #region Header
+        #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct WavHeader

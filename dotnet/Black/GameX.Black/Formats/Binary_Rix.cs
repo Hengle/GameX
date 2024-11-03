@@ -13,7 +13,7 @@ namespace GameX.Black.Formats
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Rix(r, f));
 
         // Header
-        #region Header
+        #region Headers
         // https://falloutmods.fandom.com/wiki/RIX_File_Format
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]

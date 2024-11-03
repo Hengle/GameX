@@ -8,7 +8,7 @@ namespace GameX.Bullfrog.Formats
 
     public unsafe class Rnc
     {
-        #region Header
+        #region Headers
 
         public const uint RNC_MAGIC = 0x01434e52;
 

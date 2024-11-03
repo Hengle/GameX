@@ -243,7 +243,7 @@ namespace GameX.Bullfrog.Formats
 
         #endregion
 
-        #region Header
+        #region Headers
 
         const uint MAGIC_SPR = 0x42465350;
 

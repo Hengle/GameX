@@ -12,7 +12,7 @@ namespace GameX.Capcom.Formats
         public static readonly PakBinary Instance = new PakBinary_MBundle();
 
         // Header : F1
-        #region Header : F1
+        #region Headers : F1
         // https://github.com/darkxex/Rune-Factory-4-Special-Mbundle-Extractor/blob/main/mbundle%20extractor/Program.cs
 
         [StructLayout(LayoutKind.Sequential, Pack = 0x1)]

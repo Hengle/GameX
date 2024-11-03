@@ -12,7 +12,7 @@ namespace GameX.Capcom.Formats
     public unsafe class PakBinary_Kpka : PakBinary<PakBinary_Kpka>
     {
         // Header
-        #region Header
+        #region Headers
 
         const uint K_MAGIC = 0x414b504b;
 

@@ -724,9 +724,6 @@ class Record:
 
 #endregion
 
-
-
-
 #region 3000 : TES3.Plugin info
 
 class TES3Record(Record):

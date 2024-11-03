@@ -1,7 +1,7 @@
 import os
 from gamex import BinaryPakFile
 from gamex.Valve.formats.pakbinary import PakBinary_Bsp30, PakBinary_Vpk, PakBinary_Wad3
-from gamex.Valve.formats.binary import Binary_Wad3, Binary_Src, Binary_Spr
+from gamex.Valve.formats.binary import Binary_Src, Binary_Spr, Binary_Mdl, Binary_Wad3
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
 
@@ -39,8 +39,8 @@ class ValvePakFile(BinaryPakFile):
             case 'GoldSrc':
                 match _pathExtension(source.path).lower():
                     case x if x == '.pic' or x == '.tex' or x == '.tex2' or x == '.fnt': return (0, Binary_Wad3.factory)
-                    case '.bsp': return (0, Binary_Bsp.factory)
                     case '.spr': return (0, Binary_Spr.factory)
+                    case '.mdl': return (0, Binary_Mdl.factory)
                     case _: return UnknownPakFile.objectFactory(source, game)
             case 'Source': return (0, Binary_Src.factory)
             case _: raise Exception(f'Unknown: {game.engine}')

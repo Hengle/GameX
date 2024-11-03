@@ -35,11 +35,15 @@
         "type": "Sprite"
       },
       {
+        "path": "valve/models/aflock.mdl",
+        "type": "Model"
+      },
+      {
         "path": "valve/models/apache.mdl",
         "type": "Model"
       },
       {
-        "path": "valve/models/aflock.mdl",
+        "path": "valve/models/zombie.mdl",
         "type": "Model"
       },
       {

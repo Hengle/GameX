@@ -12,7 +12,7 @@ namespace GameX.Black.Formats
     public unsafe class PakBinary_Dat : PakBinary<PakBinary_Dat>
     {
         // Header : F1
-        #region Header : F1
+        #region Headers : F1
         // https://falloutmods.fandom.com/wiki/DAT_file_format
 
         const uint F1_HEADER_FILEID = 0x000000001;
@@ -53,7 +53,7 @@ namespace GameX.Black.Formats
         #endregion
 
         // Header : F2
-        #region Header : F2
+        #region Headers : F2
         // https://falloutmods.fandom.com/wiki/DAT_file_format
 
         const uint F2_HEADER_FILEID = 0x000000011;

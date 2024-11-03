@@ -18,7 +18,7 @@ namespace GameX.Bethesda.Formats
     public unsafe class PakBinary_Ba2 : PakBinary<PakBinary_Ba2>
     {
         // Header : TES5
-        #region Header : TES5
+        #region Headers : TES5
 
         // Default header data
         const uint F4_BSAHEADER_FILEID = 0x58445442; // Magic for Fallout 4 BA2, the literal string "BTDX".
@@ -357,7 +357,7 @@ namespace GameX.Bethesda.Formats
     public unsafe class PakBinary_Bsa : PakBinary<PakBinary_Bsa>
     {
         // Header : TES4
-        #region Header : TES4
+        #region Headers : TES4
 
         // Default header data
         const uint OB_BSAHEADER_FILEID = 0x00415342;    // Magic for Oblivion BSA, the literal string "BSA\0".
@@ -435,7 +435,7 @@ namespace GameX.Bethesda.Formats
         #endregion
 
         // Header : TES3
-        #region Header : TES3
+        #region Headers : TES3
 
         // Default header data
         const uint MW_BSAHEADER_FILEID = 0x00000100; // Magic for Morrowind BSA

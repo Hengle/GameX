@@ -13,7 +13,7 @@ namespace GameX.Black.Formats
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Frm(r, f, s));
 
         // Header
-        #region Header
+        #region Headers
         // https://falloutmods.fandom.com/wiki/FRM_File_Format
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]

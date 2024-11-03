@@ -15,6 +15,10 @@ class Binary_Ftl(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Ftl(r)
 
+    #region Headers
+
+    #endregion
+
     def __init__(self, r: Reader):
         pass
 
@@ -30,6 +34,10 @@ class Binary_Ftl(IHaveMetaInfo):
 class Binary_Fts(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Fts(r)
+
+    #region Headers
+
+    #endregion
 
     def __init__(self, r: Reader):
         pass
