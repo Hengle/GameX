@@ -472,7 +472,7 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:0",
+            ForcePath = "sample:10",
             Family = "Valve",
             Game = "HL", # Half-Life
             # Game = "TF", # Team Fortress Classic

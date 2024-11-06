@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os, json, glob, re, random
 from typing import Any
 from urllib.parse import urlparse
@@ -8,20 +9,6 @@ from gamex.pak import PakState, ManyPakFile, MultiPakFile
 from gamex.file import FileManager, HostFileSystem, StandardFileSystem, VirtualFileSystem
 from gamex.platform import Platform
 from .util import _throw, _value, _list, _method, _related, _dictTrim
-
-# typedef
-class PakFile: pass
-class IFileSystem: pass
-
-# forwards
-class Detector: pass
-class Family: pass
-class FamilyApp: pass
-class FamilyEngine: pass
-class FamilyGame: pass
-class FamilySample: pass
-class Edition: pass
-class DownloadableContent: pass
 
 # tag::createKey[]
 # parse key

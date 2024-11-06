@@ -1,17 +1,26 @@
 using GameX.Platforms;
 using GameX.Valve.Formats.Vpk;
+using ICSharpCode.SharpZipLib.Tar;
 using OpenStack.Gfx;
+using OpenStack.Gfx.Animates;
 using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
+using SevenZip.Compression.LZMA;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Numerics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static GameX.Formats.Unknown.IUnknownFileObject;
+using static GameX.Valve.Formats.Binary_Mdl;
 using static GameX.Valve.Formats.Vpk.D_Texture;
+using static OpenStack.Gfx.TextureSequences;
 
 namespace GameX.Valve.Formats
 {
@@ -440,11 +449,7 @@ namespace GameX.Valve.Formats
         const uint M_MAGIC = 0x54534449; //: IDST
         const uint M_MAGIC2 = 0x51534449; //: IDSQ
         public const int CoordinateAxes = 6;
-        public const int SequenceBlendCount = 2;
-        public const int ControllerCount = 4;
-        //MAXCONTROLLERS = 4,
-        //MOUTHCONTROLLER = 4,
-        //MAXBLENDERS = 2
+        public const int SequenceBlends = 2;
 
         /// <summary>
         /// header flags
@@ -537,7 +542,7 @@ namespace GameX.Valve.Formats
         // sequence header
         public struct M_SeqHeader
         {
-            public static (string, int) Struct = ("<2I64sI", sizeof(M_SeqHeader));
+            public static (string, int) Struct = ("<2i64si", sizeof(M_SeqHeader));
             public int Magic;
             public int Version;
             public fixed byte Name[64];
@@ -547,19 +552,47 @@ namespace GameX.Valve.Formats
         // bones
         public struct M_Bone
         {
-            public static (string, int) Struct = ("<?", sizeof(M_Bone));
-            public fixed char Name[32]; // bone name for symbolic links
+            public static (string, int) Struct = ("<32s8i12f", sizeof(M_Bone));
+            public fixed byte Name[32]; // bone name for symbolic links
             public int Parent; // parent bone
             public BoneFlags Flags;
             public fixed int BoneController[CoordinateAxes]; // bone controller index, -1 == none
-            public fixed float Value[CoordinateAxes];    // default DoF values
-            public fixed float Scale[CoordinateAxes];   // scale for delta DoF values
+            public fixed float Value[CoordinateAxes]; // default DoF values
+            public fixed float Scale[CoordinateAxes]; // scale for delta DoF values
+        }
+
+        public class BoneAxis(BoneController controller, float value, float scale)
+        {
+            public BoneController Controller = controller;
+            public float Value = value;
+            public float Scale = scale;
+        }
+
+        public class Bone(M_Bone s, int id, BoneController[] controllers)
+        {
+            public string Name = UnsafeX.FixedAString(s.Name, 32);
+            public Bone Parent;
+            public int ParentId = s.Parent;
+            public BoneFlags Flags = s.Flags;
+            public BoneAxis[] Axes = [
+                new BoneAxis(s.BoneController[0] != -1 ? controllers[s.BoneController[0]] : null, s.Value[0], s.Scale[0]),
+                new BoneAxis(s.BoneController[1] != -1 ? controllers[s.BoneController[1]] : null, s.Value[1], s.Scale[1]),
+                new BoneAxis(s.BoneController[2] != -1 ? controllers[s.BoneController[2]] : null, s.Value[2], s.Scale[2]),
+                new BoneAxis(s.BoneController[3] != -1 ? controllers[s.BoneController[3]] : null, s.Value[3], s.Scale[3]),
+                new BoneAxis(s.BoneController[4] != -1 ? controllers[s.BoneController[4]] : null, s.Value[4], s.Scale[4]),
+                new BoneAxis(s.BoneController[5] != -1 ? controllers[s.BoneController[5]] : null, s.Value[5], s.Scale[5])];
+            public int Id = id;
+
+            public static void Remap(Bone[] bones)
+            {
+                foreach (var bone in bones) if (bone.ParentId != -1) bone.Parent = bones[bone.ParentId];
+            }
         }
 
         // bone controllers
         public struct M_BoneController
         {
-            public static (string, int) Struct = ("<?", sizeof(M_BoneController));
+            public static (string, int) Struct = ("<2i2f2i", sizeof(M_BoneController));
             public int Bone;   // -1 == 0
             public int Type;   // X, Y, Z, XR, YR, ZR, M
             public float Start, End;
@@ -567,70 +600,189 @@ namespace GameX.Valve.Formats
             public int Index;  // 0-3 user set controller, 4 mouth
         }
 
+        public class BoneController(ref M_BoneController s, int id)
+        {
+            public int Type = s.Type;
+            public float Start = s.Start, End = s.End;
+            public int Rest = s.Rest;
+            public int Index = s.Index;
+            public int Id = id;
+        }
+
         // intersection boxes
         public struct M_BBox
         {
-            public static (string, int) Struct = ("<?", sizeof(M_BBox));
+            public static (string, int) Struct = ("<2i6f", sizeof(M_BBox));
             public int Bone;
-            public int Group;          // intersection group
-            public Vector3 BBMin, BBMax;        // bounding box
+            public int Group; // intersection group
+            public Vector3 BBMin, BBMax; // bounding box
+        }
+
+        public class BBox(ref M_BBox s, Bone[] bones)
+        {
+            public Bone Bone = bones[s.Bone];
+            public int Group = s.Group;
+            public Vector3 BBMin = s.BBMin, BBMax = s.BBMax;
         }
 
         // sequence groups
         public struct M_SeqGroup
         {
-            public static (string, int) Struct = ("<?", sizeof(M_SeqGroup));
+            public static (string, int) Struct = ("<32s64s2i", sizeof(M_SeqGroup));
             public fixed byte Label[32]; // textual name
-            public fixed byte Name[64];  // file name
-            public int Unused1;    // was "cache"  - index pointer
-            public int Unused2;    // was "data" -  hack for group 0
+            public fixed byte Name[64]; // file name
+            public int Unused1; // was "cache"  - index pointer
+            public int Unused2; // was "data" -  hack for group 0
+        }
+
+        public class SeqGroup(M_SeqGroup s)
+        {
+            public string Label = UnsafeX.FixedAString(s.Label, 32);
+            public string Name = UnsafeX.FixedAString(s.Name, 64);
+            public int Offset = s.Unused2;
         }
 
         // sequence descriptions
-        public struct M_SeqDesc
+        public struct M_Seq
         {
-            public static (string, int) Struct = ("<?", sizeof(M_SeqDesc));
+            public static (string, int) Struct = ("<32sf10i3f2i6f4i4f6i", sizeof(M_Seq));
             public fixed byte Label[32]; // sequence label
-
             public float Fps;      // frames per second	
             public int Flags;      // looping/non-looping flags
-
             public int Activity;
             public int ActWeight;
-
             public M_Lump Events;
             public int NumFrames;  // number of frames per sequence
             public M_Lump Pivots;  // number of foot pivots
-
             public int MotionType;
             public int MotionBone;
             public Vector3 LinearMovement;
             public int AutomovePosIndex;
             public int AutomoveAngleIndex;
-
             public Vector3 BBMin, BBMax;        // per sequence bounding box
-
             public int NumBlends;
             public int AnimIndex;      // mstudioanim_t pointer relative to start of sequence group data: [blend][bone][X, Y, Z, XR, YR, ZR]
-
-            public fixed int BlendType[SequenceBlendCount];  // X, Y, Z, XR, YR, ZR
-            public fixed float BlendStart[SequenceBlendCount];   // starting value
-            public fixed float BlendEnd[SequenceBlendCount]; // ending value
+            public fixed int BlendType[SequenceBlends];  // X, Y, Z, XR, YR, ZR
+            public fixed float BlendStart[SequenceBlends]; // starting value
+            public fixed float BlendEnd[SequenceBlends]; // ending value
             public int BlendParent;
-
             public int SeqGroup;       // sequence group for demand loading
-
             public int EntryNode;      // transition node at entry
             public int ExitNode;       // transition node at exit
             public int NodeFlags;      // transition rules
-
             public int NextSeq;        // auto advancing sequences
+        }
+
+        public class SeqBlend(int type, float start, float end)
+        {
+            public int Type = type;
+            public float Start = start;
+            public float End = end;
+        }
+
+        public class SeqPivot(Vector3 origin, int start, int end)
+        {
+            public Vector3 Origin = origin;
+            public int Start = start;
+            public int End = end;
+        }
+
+        public class SeqAnimation(M_AnimValue[][] axis)
+        {
+            //public struct Value(byte total, byte valid)
+            //{
+            //    public byte Total = total;
+            //    public byte Valid = valid;
+            //}
+            public M_AnimValue[][] Axis = axis;
+        }
+
+        public class Seq
+        {
+            public string Label;
+            public float Fps;
+            public int Flags;
+            public int Activity;
+            public int ActWeight;
+            public M_Event[] Events;
+            public M_Event[] SortedEvents;
+            public int NumFrames;
+            public M_Pivot[] Pivots;
+            public int MotionType;
+            public int MotionBone;
+            public Vector3 LinearMovement;
+            public Vector3 BBMin, BBMax;
+            public SeqAnimation[][] AnimationBlends;
+            public SeqBlend[] Blend;
+            public int EntryNode;
+            public int ExitNode;
+            public int NodeFlags;
+            public int NextSequence;
+
+            public Seq(BinaryReader r, M_Seq s, (BinaryReader r, M_SeqHeader h)[] sequences, int zeroGroupOffset, bool isXashModel, Bone[] bones)
+            {
+                if (s.SeqGroup < 0 || (s.SeqGroup != 0 && (s.SeqGroup - 1) >= sequences.Length)) throw new Exception("Invalid seqgroup value");
+                Label = UnsafeX.FixedAString(s.Label, 32);
+                Fps = s.Fps;
+                Flags = s.Flags;
+                Activity = s.Activity;
+                ActWeight = s.ActWeight;
+                r.Seek(s.Events.Offset); Events = r.ReadSArray<M_Event>(s.Events.Num);
+                SortedEvents = [.. Events.OrderBy(x => x.Frame)];
+                NumFrames = s.NumFrames;
+                if (isXashModel) { Pivots = []; }
+                else { r.Seek(s.Pivots.Offset); Pivots = r.ReadSArray<M_Pivot>(s.Pivots.Num); }
+                MotionType = s.MotionType;
+                MotionBone = s.MotionBone;
+                LinearMovement = s.LinearMovement;
+                BBMin = s.BBMin; BBMax = s.BBMax;
+                AnimationBlends = GetAnimationBlends(r, s, sequences, zeroGroupOffset, bones.Length);
+                Blend = [new SeqBlend(s.BlendType[0], s.BlendStart[0], s.BlendEnd[0]), new SeqBlend(s.BlendType[1], s.BlendStart[1], s.BlendEnd[1])];
+                EntryNode = s.EntryNode;
+                ExitNode = s.ExitNode;
+                NodeFlags = s.NodeFlags;
+                NextSequence = s.NextSeq;
+            }
+
+            static SeqAnimation[][] GetAnimationBlends(BinaryReader r, M_Seq s, (BinaryReader r, M_SeqHeader h)[] sequences, int zeroGroupOffset, int numBones)
+            {
+                BinaryReader sr; int so;
+                (sr, so) = s.SeqGroup == 0 ? (r, zeroGroupOffset + s.AnimIndex) : (sequences[s.SeqGroup - 1].r, s.AnimIndex);
+                sr.Seek(so);
+                var anim = sr.ReadS<M_Anim>();
+                var blends = new SeqAnimation[s.NumBlends][];
+                for (var i = 0; i < s.NumBlends; i++)
+                {
+                    var animations = new SeqAnimation[numBones];
+                    for (var b = 0; b < numBones; b++)
+                    {
+                        var animation = new SeqAnimation(new M_AnimValue[CoordinateAxes][]);
+                        for (var j = 0; j < CoordinateAxes; j++)
+                            if (anim.Offsets[j] != 0)
+                            {
+                                sr.Seek(so + anim.Offsets[j]);
+                                var values = new List<M_AnimValue> { sr.ReadS<M_AnimValue>() };
+                                if (s.NumFrames > 0)
+                                    for (var f = 0; f < s.NumFrames;)
+                                    {
+                                        var v = values[^1];
+                                        f += v.Total;
+                                        values.AddRange(sr.ReadSArray<M_AnimValue>(1 + v.Valid));
+                                    }
+                                animation.Axis[j] = values.ToArray();
+                            }
+                        animations[b] = animation;
+                    }
+                    blends[i] = animations;
+                }
+                return blends;
+            }
         }
 
         // events
         public struct M_Event
         {
-            public static (string, int) Struct = ("<?", sizeof(M_Event));
+            public static (string, int) Struct = ("<3i64s", sizeof(M_Event));
             public int Frame;
             public int Event;
             public int Type;
@@ -640,53 +792,99 @@ namespace GameX.Valve.Formats
         // pivots
         public struct M_Pivot
         {
-            public static (string, int) Struct = ("<?", sizeof(M_Pivot));
-            public Vector3 Org;  // pivot point
+            public static (string, int) Struct = ("<3f2i", sizeof(M_Pivot));
+            public Vector3 Org; // pivot point
             public int Start, End;
         }
 
         // attachments
         public struct M_Attachment
         {
-            public static (string, int) Struct = ("<?", sizeof(M_Attachment));
+            public static (string, int) Struct = ("<32s2i12f", sizeof(M_Attachment));
             public fixed byte Name[32]; // Name of this attachment. Unused in GoldSource.
             public int Type; // Type of this attachment. Unused in GoldSource;
             public int Bone; // Index of the bone this is attached to.
             public Vector3 Org; // Offset from bone origin.
-            public fixed float Vectors[3 * 3]; // Directional vectors? Unused in GoldSource.
+            public Vector3 Vector0, Vector1, Vector2; // Directional vectors? Unused in GoldSource.
+        }
+
+        public class Attachment(M_Attachment s, Bone[] bones)
+        {
+            public string Name = UnsafeX.FixedAString(s.Name, 32);
+            public int Type = s.Type;
+            public Bone Bone = bones[s.Bone];
+            public Vector3 Org = s.Org;
+            public Vector3[] Vectors = [s.Vector0, s.Vector1, s.Vector2];
         }
 
         // animations
         public struct M_Anim
         {
-            public static (string, int) Struct = ("<?", sizeof(M_Anim));
-            public fixed ushort Offset[CoordinateAxes];
+            public static (string, int) Struct = ("<6H", sizeof(M_Anim));
+            public fixed ushort Offsets[CoordinateAxes];
+        }
+
+        public struct M_AnimValue
+        {
+            public static (string, int) Struct = ("<2B", sizeof(M_AnimValue));
+            public byte Valid;
+            public byte Total;
         }
 
         // body part index
         public struct M_Bodypart
         {
-            public static (string, int) Struct = ("<?", sizeof(M_Bodypart));
+            public static (string, int) Struct = ("<64s3i", sizeof(M_Bodypart));
             public fixed byte Name[64];
-            public int NumModels;
+            public M_Lump2 Models;
+        }
+
+        public class Bodypart
+        {
+            public string Name;
             public int Base;
-            public int ModelIndex; // index into models array
+            public Model[] Models;
+
+            public Bodypart(BinaryReader r, M_Bodypart s, Bone[] bones)
+            {
+                Name = UnsafeX.FixedAString(s.Name, 64);
+                Base = s.Models.Offset;
+                r.Seek(s.Models.Offset2); Models = r.ReadSArray<M_Model>(s.Models.Num).Select(x => new Model(r, x, bones)).ToArray();
+            }
         }
 
         // skin info
         public struct M_Texture
         {
-            public static (string, int) Struct = ("<?", sizeof(M_Texture));
+            public static (string, int) Struct = ("<64s4i", sizeof(M_Texture));
             public fixed byte Name[64];
             public int Flags;
             public int Width, Height;
             public int Index;
         }
 
+        public class Texture
+        {
+            public string Name;
+            public int Flags;
+            public int Width, Height;
+            public byte[] Pixels;
+            public byte[] Palette;
+
+            public Texture(BinaryReader r, M_Texture s)
+            {
+                Name = UnsafeX.FixedAString(s.Name, 64);
+                Flags = s.Flags;
+                Width = s.Width; Height = s.Height;
+                Pixels = r.ReadBytes(Width * Height);
+                Palette = r.ReadBytes(3 * 255);
+            }
+        }
+
         // studio models
         public struct M_Model
         {
-            public static (string, int) Struct = ("<?", sizeof(M_Model));
+            public static (string, int) Struct = ("<64sif10i", sizeof(M_Model));
             public fixed byte Name[64];
             public int Type;
             public float BoundingRadius;
@@ -696,20 +894,68 @@ namespace GameX.Valve.Formats
             public M_Lump Groups;      // deformation groups
         }
 
+        public class ModelVertex(Bone bone, Vector3 vertex)
+        {
+            public Bone Bone = bone;
+            public Vector3 Vertex = vertex;
+            public static ModelVertex[] Create(BinaryReader r, M_Lump2 s, Bone[] bones)
+            {
+                r.Seek(s.Offset); var boneIds = r.ReadPArray<byte>("B", s.Num);
+                r.Seek(s.Offset2); var verts = r.ReadPArray<Vector3>("3f", s.Num);
+                return Enumerable.Range(0, s.Num).Select(i => new ModelVertex(bones[boneIds[i]], verts[i])).ToArray();
+            }
+        }
+
+        public class Model
+        {
+            public string Name;
+            public int Type;
+            public float BoundingRadius;
+            public Mesh[] Meshes;
+            public ModelVertex[] Vertices;
+            public ModelVertex[] Normals;
+
+            public Model(BinaryReader r, M_Model s, Bone[] bones)
+            {
+                Name = UnsafeX.FixedAString(s.Name, 64);
+                Type = s.Type;
+                BoundingRadius = s.BoundingRadius;
+                r.Seek(s.Meshs.Offset); Meshes = r.ReadSArray<M_Mesh>(s.Meshs.Num).Select(x => new Mesh(r, x)).ToArray();
+                Vertices = ModelVertex.Create(r, s.Verts, bones);
+                Normals = ModelVertex.Create(r, s.Norms, bones);
+            }
+        }
+
         // meshes
         public struct M_Mesh
         {
-            public static (string, int) Struct = ("<?", sizeof(M_Mesh));
+            public static (string, int) Struct = ("<5i", sizeof(M_Mesh));
             public M_Lump Tris;
             public int SkinRef;
-            public M_Lump Norms;       // per mesh normals, normal glm::vec3
+            public M_Lump Norms; // per mesh normals, normal vec3
+        }
+
+        public class Mesh
+        {
+            public short[] Triangles;
+            public int NumTriangles;
+            public int NumNorms;
+            public int SkinRef;
+
+            public Mesh(BinaryReader r, M_Mesh s)
+            {
+                r.Seek(s.Tris.Offset); Triangles = r.ReadPArray<short>("H", s.Tris.Num); //TODO
+                NumTriangles = s.Tris.Num;
+                NumNorms = s.Norms.Num;
+                SkinRef = s.SkinRef;
+            }
         }
 
         // header
         [StructLayout(LayoutKind.Sequential)]
         public struct M_Header
         {
-            public static (string, int) Struct = ("<2I64sI15f27I", sizeof(M_Header));
+            public static (string, int) Struct = ("<2i64si15f27i", sizeof(M_Header));
             public int Magic;
             public int Version;
             public fixed byte Name[64];
@@ -725,8 +971,8 @@ namespace GameX.Valve.Formats
             public M_Lump SeqGroups; 		// lazy sequences
             public M_Lump2 Textures;        // raw textures
             public int NumSkinRef;          // replaceable textures
-            public M_Lump Skins;
-            public M_Lump BodyParts;
+            public M_Lump SkinFamilies;
+            public M_Lump Bodyparts;
             public M_Lump Attachments;      // attachable points
             public M_Lump Sounds;           // This seems to be obsolete. Probably replaced by events that reference external sounds?
             public M_Lump SoundGroups;      // This seems to be obsolete. Probably replaced by events that reference external sounds?
@@ -735,60 +981,107 @@ namespace GameX.Valve.Formats
 
         #endregion
 
-        public M_Header Header;
-        public M_Header Texture;
-        public M_SeqHeader[] Sequences;
-        string HeaderName;
+        public string Name;
         public bool IsDol;
+        public bool IsXashModel;
+        public bool HasTextureFile;
+        public Vector3 EyePosition;
+        public Vector3 BoundingMin, BoundingMax;
+        public Vector3 ClippingMin, ClippingMax;
+        public HeaderFlags Flags;
+        public BoneController[] BoneControllers;
+        public Bone[] Bones;
+        public BBox[] Hitboxes;
+        public SeqGroup[] SequenceGroups;
+        public Seq[] Sequences;
+        public Attachment[] Attachments;
+        public Bodypart[] Bodyparts;
+        public byte[][] Transitions;
+        public Texture[] Textures;
+        public short[][] SkinFamilies;
 
         public Binary_Mdl(BinaryReader r, FileSource f, BinaryPakFile s)
         {
             // read file
-            var header = Header = r.ReadS<M_Header>();
+            var header = r.ReadS<M_Header>();
             if (header.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
             else if (header.Version != 10) throw new FormatException("BAD VERSION");
-            HeaderName = UnsafeX.FixedAString(header.Name, 64);
-            if (string.IsNullOrEmpty(HeaderName)) throw new FormatException($"The file '{HeaderName}' is not a model main header file");
-            string pathExt = Path.GetExtension(f.Path), pathName = f.Path[..^pathExt.Length];
+            Name = UnsafeX.FixedAString(header.Name, 64);
+            if (string.IsNullOrEmpty(Name)) throw new FormatException($"The file '{Name}' is not a model main header file");
+            string path = f.Path, pathExt = Path.GetExtension(path), pathName = path[..^pathExt.Length];
             IsDol = pathExt == ".dol";
+            if (IsDol) throw new NotImplementedException();
+            // Xash models store the offset to the second header in this variable.
+            IsXashModel = header.Sounds.Num != 0; // If it's not zero this is a Xash model.
+            HasTextureFile = header.Textures.Offset == 0;
 
             // load texture
-            if (header.Textures.Offset == 0)
-            {
-                var path = $"{pathName}T{pathExt}";
-                Texture = s.Reader(r2 =>
+            BinaryReader tr; M_Header theader;
+            (tr, theader) = HasTextureFile
+                ? s.ReaderT(r2 =>
                 {
                     if (r2 == null) throw new Exception($"External texture file '{path}' does not exist");
                     var header = r2.ReadS<M_Header>();
                     if (header.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
                     else if (header.Version != 10) throw new FormatException("BAD VERSION");
-                    return Task.FromResult(header);
-                }, path).Result;
-            }
+                    return Task.FromResult((r2, header));
+                }, path = $"{pathName}T{pathExt}", true).Result
+                : (r, header);
 
             // load animations
+            (BinaryReader r, M_SeqHeader h)[] sequences;
             if (header.SeqGroups.Num > 1)
             {
-                Sequences = new M_SeqHeader[header.SeqGroups.Num - 1];
-                for (var i = 0; i < Sequences.Length; i++)
-                {
-                    var path = $"{pathName}{i + 1:00}{pathExt}";
-                    Sequences[i] = s.Reader(r2 =>
+                sequences = new (BinaryReader, M_SeqHeader)[header.SeqGroups.Num - 1];
+                for (var i = 0; i < sequences.Length; i++)
+                    sequences[i] = s.ReaderT(r2 =>
                     {
                         if (r2 == null) throw new Exception($"Sequence group file '{path}' does not exist");
                         var header = r2.ReadS<M_SeqHeader>();
                         if (header.Magic != M_MAGIC2) throw new FormatException("BAD MAGIC");
                         else if (header.Version != 10) throw new FormatException("BAD VERSION");
-                        return Task.FromResult(header);
-                    }, path).Result;
-                }
+                        return Task.FromResult((r2, header));
+                    }, path = $"{pathName}{i + 1:00}{pathExt}", true).Result;
             }
+            else sequences = [];
+
+            // validate
+            if (header.Bones.Num < 0
+                || header.BoneControllers.Num < 0
+                || header.Hitboxs.Num < 0
+                || header.Seqs.Num < 0
+                || header.SeqGroups.Num < 0
+                || header.Bodyparts.Num < 0
+                || header.Attachments.Num < 0
+                || header.Transitions.Num < 0
+                || theader.Textures.Num < 0
+                || theader.SkinFamilies.Num < 0
+                || theader.NumSkinRef < 0) throw new Exception("Negative data chunk count value");
+
+            // build
+            EyePosition = header.EyePosition;
+            BoundingMin = header.Min;
+            BoundingMax = header.Max;
+            ClippingMin = header.BBMin;
+            ClippingMax = header.BBMax;
+            Flags = header.Flags;
+            r.Seek(header.BoneControllers.Offset); BoneControllers = r.ReadSArray<M_BoneController>(header.BoneControllers.Num).Select((x, i) => new BoneController(ref x, i)).ToArray();
+            r.Seek(header.Bones.Offset); Bones = r.ReadSArray<M_Bone>(header.Bones.Num).Select((x, i) => new Bone(x, i, BoneControllers)).ToArray(); Bone.Remap(Bones);
+            r.Seek(header.Hitboxs.Offset); Hitboxes = r.ReadSArray<M_BBox>(header.Hitboxs.Num).Select(x => new BBox(ref x, Bones)).ToArray();
+            r.Seek(header.SeqGroups.Offset); SequenceGroups = r.ReadSArray<M_SeqGroup>(header.SeqGroups.Num).Select(x => new SeqGroup(x)).ToArray();
+            var zeroGroupOffset = SequenceGroups.Length > 0 ? SequenceGroups[0].Offset : 0;
+            r.Seek(header.Seqs.Offset); Sequences = r.ReadSArray<M_Seq>(header.Seqs.Num).Select(x => new Seq(r, x, sequences, zeroGroupOffset, IsXashModel, Bones)).ToArray();
+            r.Seek(header.Attachments.Offset); Attachments = r.ReadSArray<M_Attachment>(header.Attachments.Num).Select(x => new Attachment(x, Bones)).ToArray();
+            r.Seek(header.Bodyparts.Offset); Bodyparts = r.ReadSArray<M_Bodypart>(header.Bodyparts.Num).Select(x => new Bodypart(r, x, Bones)).ToArray();
+            r.Seek(header.Transitions.Offset); Transitions = r.ReadFArray(x => x.ReadBytes(1), header.Transitions.Num);
+            tr.Seek(theader.Textures.Offset); Textures = tr.ReadSArray<M_Texture>(theader.Textures.Num).Select(x => new Texture(r, x)).ToArray();
+            tr.Seek(theader.SkinFamilies.Offset); SkinFamilies = tr.ReadFArray(x => x.ReadPArray<short>("H", theader.NumSkinRef), theader.SkinFamilies.Num);
         }
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = this }),
             new("Model", items: [
-                new($"Name: {HeaderName}"),
+                new($"Name: {Name}"),
             ]),
         ];
     }

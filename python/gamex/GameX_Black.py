@@ -1,15 +1,9 @@
+from __future__ import annotations
 import os
 from gamex import BinaryPakFile
 from gamex.Black.formats.pakbinary_dat import PakBinary_Dat
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
-
-# typedefs
-class FamilyGame: pass
-class PakBinary: pass
-class PakState: pass
-class FileSource: pass
-class FileOption: pass
 
 # BlackPakFile
 class BlackPakFile(BinaryPakFile):

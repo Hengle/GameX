@@ -1,16 +1,10 @@
+from __future__ import annotations
 import os
 from gamex import BinaryPakFile
 from gamex.Base.formats.pakbinary import PakBinary_Zip
 from gamex.Bioware.formats.pakbinary import PakBinary_Aurora, PakBinary_Myp
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
-
-# typedefs
-class FamilyGame: pass
-class PakBinary: pass
-class PakState: pass
-class FileSource: pass
-class FileOption: pass
 
 # BiowarePakFile
 class BiowarePakFile(BinaryPakFile):

@@ -1,9 +1,8 @@
+
+from __future__ import annotations
 import os
 from openstk.sfx.sys import ISystemSfx
 from gamex.platform import AudioBuilderBase, AudioManager
-
-# typedefs
-class PakFile: pass
 
 # SystemAudioBuilder
 class SystemAudioBuilder(AudioBuilderBase):

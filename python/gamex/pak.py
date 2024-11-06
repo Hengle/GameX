@@ -1,19 +1,10 @@
+from __future__ import annotations
 import sys, os, re, time, itertools
 from enum import Enum, Flag
 from io import BytesIO
-from openstk.poly import Reader
-from gamex.meta import FileSource, MetaManager, MetaItem
+from openstk.poly import Reader, GenericPool, SinglePool, StaticPool
+from gamex.meta import FileSource, MetaManager, MetaItem, MetaInfo
 from gamex.util import _throw
-
-# typedef
-class FamilyGame: pass
-class Edition: pass
-class IFileSystem: pass
-class PakBinary: pass
-class MetaInfo: pass
-
-# forwards
-class PakFile: pass
 
 # FileOption
 class FileOption(Flag):
@@ -105,6 +96,7 @@ class BinaryPakFile(PakFile):
         super().__init__(state)
         self.pakBinary = pakBinary
         # options
+        self.retainInPool = 10
         self.useReader = True
         self.useFileId = False
         # state
@@ -122,14 +114,16 @@ class BinaryPakFile(PakFile):
 
     def valid(self) -> bool: return self.files != None
 
-    def getReader(self, path: str = None, retainInPool: int = 10) -> Reader:
+    readers: dict[str, GenericPool] = {}
+    
+    def getReader(self, path: str = None, pooled: bool = True) -> Reader:
         path = path or self.pakPath
-        if not path: raise Exception('No Path')
-        if not self.fileSystem.fileExists(path): return None
-        return self.fileSystem.openReader(path)
+        return self.readers.get(path) or self.readers.setdefault(path, GenericPool[Reader](lambda: self.fileSystem.openReader(path)) if self.fileSystem.fileExists(path) else None) if pooled else \
+            SinglePool[Reader](self.fileSystem.openReader(path) if self.fileSystem.fileExists(path) else None) 
+    
+    def reader(self, func: callable, path: str = None, pooled: bool = False): self.getReader(path, pooled).action(func)
 
-    def reader(self, func: callable, path: str = None):
-        with self.getReader(path) as r: return func(r)
+    def readerT(self, func: callable, path: str = None, pooled: bool = False): return self.getReader(path, pooled).func(func)
 
     def opening(self) -> None:
         self.read()
@@ -361,11 +355,14 @@ class PakBinaryT(PakBinary):
             self.file = file
             self.source = source
             self.objectFactoryFunc = source.objectFactoryFunc
-            self.useReader = file == None
             # self.open()
 
-        def read(self, r: Reader, tag: object = None):
-            if self.useReader: super().read(r, tag); return
-            with Reader(self.readData(self.source.getReader(), self.file)) as r2:
-                self.pakBinary.read(self, r2, tag)
+        def opening(self) -> None: self.r = Reader(self.source.readData(file)); self.pool = StaticPool[Reader](self.r); super().opening()
+        def closing(self) -> None: self.r.__exit__(); super().closing()
+        def getReader(path: str, pooled: bool) -> IGenericPool[Reader]: return self.pool
+
+        # def read(self, r: Reader, tag: object = None):
+        #     if self.useReader: super().read(r, tag); return
+        #     with Reader(self.readData(self.source.getReader(), self.file)) as r2:
+        #         self.pakBinary.read(self, r2, tag)
 # end::PakBinary[]

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 from gamex import BinaryPakFile
 from gamex.Arkane.formats.danae.binary import Binary_Ftl, Binary_Fts, Binary_Tea
@@ -6,13 +7,6 @@ from gamex.Valve.formats.pakbinary import PakBinary_Vpk
 from gamex.GameX_Valve import ValvePakFile
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
-
-# typedefs
-class FamilyGame: pass
-class PakBinary: pass
-class PakState: pass
-class FileSource: pass
-class FileOption: pass
 
 #region ArkanePakFile
 

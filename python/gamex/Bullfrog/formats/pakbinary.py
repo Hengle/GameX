@@ -1,16 +1,9 @@
+from __future__ import annotations
 import os
 from io import BytesIO
-from gamex.pak import FileOption, PakBinaryT
-from gamex.meta import FileSource
+from gamex import FileOption, PakBinaryT, FileSource
 from gamex.util import _pathExtension
 from gamex.Bullfrog.formats.binary import Binary_Fli
-
-# typedefs
-class Reader: pass
-class BinaryPakFile: pass
-class FamilyGame: pass
-class IFileSystem: pass
-class FileOption: pass
 
 #region PakBinary_Bullfrog
 

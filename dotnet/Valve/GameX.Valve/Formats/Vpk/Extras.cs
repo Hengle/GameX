@@ -135,7 +135,7 @@ namespace GameX.Valve.Formats.Vpk
             var name = Encoding.UTF8.GetString(r.ReadBytes(r.ReadInt32()));
             r.ReadByte(); // null term?
 
-            b_.AppendLine($"Name: {name} - Offset: {r.BaseStream.Position}");
+            b_.AppendLine($"Name: {name} - Offsets: {r.BaseStream.Position}");
 
             var a = r.ReadInt32();
             var b = r.ReadInt32();
@@ -158,7 +158,7 @@ namespace GameX.Valve.Formats.Vpk
                 r.Seek(prevPos + 128);
 
                 var type = r.ReadUInt32();
-                b_.AppendLine($"Name: {name} - Type: {type} - Offset: {r.BaseStream.Position}");
+                b_.AppendLine($"Name: {name} - Type: {type} - Offsets: {r.BaseStream.Position}");
 
                 if (type == 1)
                 {
@@ -202,7 +202,7 @@ namespace GameX.Valve.Formats.Vpk
                 var desc = r.ReadVUString();
                 r.BaseStream.Position = prevPos + 84;
                 var subcount = r.ReadUInt32();
-                b_.AppendLine($"Name: {name} - Desc: {desc} - Count: {subcount} - Offset: {r.BaseStream.Position}");
+                b_.AppendLine($"Name: {name} - Desc: {desc} - Count: {subcount} - Offsets: {r.BaseStream.Position}");
                 for (var j = 0; j < subcount; j++) b_.AppendLine($"     {r.ReadVUString()}");
             }
 
@@ -226,7 +226,7 @@ namespace GameX.Valve.Formats.Vpk
 
             // Chunk 1
             var count = r.ReadUInt32();
-            b_.AppendLine($"[CHUNK 1] Count: {count} - Offset: {r.BaseStream.Position}");
+            b_.AppendLine($"[CHUNK 1] Count: {count} - Offsets: {r.BaseStream.Position}");
 
             for (var i = 0; i < count; i++)
             {
@@ -245,7 +245,7 @@ namespace GameX.Valve.Formats.Vpk
 
             // Chunk 2 - Similar structure to chunk 4, same chunk size
             count = r.ReadUInt32();
-            b_.AppendLine($"[CHUNK 2] Count: {count} - Offset: {r.BaseStream.Position}");
+            b_.AppendLine($"[CHUNK 2] Count: {count} - Offsets: {r.BaseStream.Position}");
 
             for (var i = 0; i < count; i++)
             {
@@ -268,7 +268,7 @@ namespace GameX.Valve.Formats.Vpk
 
             // 3
             count = r.ReadUInt32();
-            b_.AppendLine($"[CHUNK 3] Count: {count} - Offset: {r.BaseStream.Position}");
+            b_.AppendLine($"[CHUNK 3] Count: {count} - Offsets: {r.BaseStream.Position}");
 
             for (var i = 0; i < count; i++)
             {
@@ -287,7 +287,7 @@ namespace GameX.Valve.Formats.Vpk
 
             // 4 - Similar structure to chunk 2, same chunk size
             count = r.ReadUInt32();
-            b_.AppendLine($"[CHUNK 4] Count: {count} - Offset: {r.BaseStream.Position}");
+            b_.AppendLine($"[CHUNK 4] Count: {count} - Offsets: {r.BaseStream.Position}");
 
             for (var i = 0; i < count; i++)
             {
@@ -308,7 +308,7 @@ namespace GameX.Valve.Formats.Vpk
 
             // 5 - Globals?
             count = r.ReadUInt32();
-            b_.AppendLine($"[CHUNK 5] Count: {count} - Offset: {r.BaseStream.Position}");
+            b_.AppendLine($"[CHUNK 5] Count: {count} - Offsets: {r.BaseStream.Position}");
 
             for (var i = 0; i < count; i++)
             {
@@ -358,7 +358,7 @@ namespace GameX.Valve.Formats.Vpk
 
             // 6
             count = r.ReadUInt32();
-            b_.AppendLine($"[CHUNK 6] Count: {count} - Offset: {r.BaseStream.Position}");
+            b_.AppendLine($"[CHUNK 6] Count: {count} - Offsets: {r.BaseStream.Position}");
 
             for (var i = 0; i < count; i++)
             {
@@ -376,7 +376,7 @@ namespace GameX.Valve.Formats.Vpk
 
             // 7 - Input buffer layout
             count = r.ReadUInt32();
-            b_.AppendLine($"[CHUNK 7] Count: {count} - Offset: {r.BaseStream.Position}");
+            b_.AppendLine($"[CHUNK 7] Count: {count} - Offsets: {r.BaseStream.Position}");
 
             for (var i = 0; i < count; i++)
             {
@@ -387,7 +387,7 @@ namespace GameX.Valve.Formats.Vpk
                 var a = r.ReadUInt32();
                 var b = r.ReadUInt32();
                 var subCount = r.ReadUInt32();
-                b_.AppendLine($"[SUB CHUNK] Name: {name} - unk1: {a} - unk2: {b} - Count: {subCount} - Offset: {r.BaseStream.Position}");
+                b_.AppendLine($"[SUB CHUNK] Name: {name} - unk1: {a} - unk2: {b} - Count: {subCount} - Offsets: {r.BaseStream.Position}");
 
                 for (var j = 0; j < subCount; j++)
                 {
@@ -405,7 +405,7 @@ namespace GameX.Valve.Formats.Vpk
                 r.ReadBytes(4);
             }
 
-            b_.AppendLine($"Offset: {r.BaseStream.Position}");
+            b_.AppendLine($"Offsets: {r.BaseStream.Position}");
 
             // Vertex shader has a string chunk which seems to be vertex buffer specifications
             if (ShaderType == "vertex")
@@ -429,7 +429,7 @@ namespace GameX.Valve.Formats.Vpk
             }
 
             var lzmaCount = r.ReadUInt32();
-            b_.AppendLine($"Offset: {r.BaseStream.Position}");
+            b_.AppendLine($"Offsets: {r.BaseStream.Position}");
 
             var unkLongs = new long[lzmaCount];
             for (var i = 0; i < lzmaCount; i++) unkLongs[i] = r.ReadInt64();

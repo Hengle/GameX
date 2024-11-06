@@ -1660,7 +1660,7 @@ namespace GameX.Valve.Formats.Vpk
                     w.WriteLine($"Attribute[{i}]"); w.Indent++;
                     w.WriteLine($"SemanticName = {vertexAttribute.SemanticName}");
                     w.WriteLine($"SemanticIndex = {vertexAttribute.SemanticIndex}");
-                    w.WriteLine($"Offset = {vertexAttribute.Offset}");
+                    w.WriteLine($"Offsets = {vertexAttribute.Offset}");
                     w.WriteLine($"Format = {vertexAttribute.Format}");
                     w.WriteLine($"Slot = {vertexAttribute.Slot}");
                     w.WriteLine($"SlotType = {vertexAttribute.SlotType}");

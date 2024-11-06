@@ -313,8 +313,7 @@ namespace GameX.Valve.Formats
             if (fileDataLength > 0) file.Data.CopyTo(data, 0);
             if (file.FileSize == 0) { }
             else if (file.Tag is long offset) { r.Seek(file.Offset + offset); r.Read(data, fileDataLength, (int)file.FileSize); }
-            else if (file.Tag is string pakPath)
-                source.GetReader(pakPath).Action(r2 => { r2.Seek(file.Offset); r2.Read(data, fileDataLength, (int)file.FileSize); });
+            else if (file.Tag is string pakPath) source.Reader(r2 => { r2.Seek(file.Offset); r2.Read(data, fileDataLength, (int)file.FileSize); }, pakPath);
             var actualChecksum = Crc32Digest.Compute(data);
             if (file.Hash != actualChecksum) throw new InvalidDataException($"CRC32 mismatch for read data (expected {file.Hash:X2}, got {actualChecksum:X2})");
             return Task.FromResult((Stream)new MemoryStream(data));

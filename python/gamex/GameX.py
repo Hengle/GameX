@@ -1,13 +1,8 @@
+from __future__ import annotations
 import os
 from gamex import Family, PakFile, FileSource, MetaManager, MetaInfo, MetaContent, IHaveMetaInfo
 from gamex.Base.formats.binary import Binary_Dds, Binary_Img, Binary_Snd, Binary_Tga, Binary_Txt
 from gamex.util import _pathExtension
-
-# typedefs
-class Reader: pass
-class FileOption: pass
-class FamilyGame: pass
-class PakState: pass
 
 # UnknownFamily
 class UnknownFamily(Family):

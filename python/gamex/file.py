@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os, io, re, pathlib, platform, psutil, winreg
 from zipfile import ZipFile
 from openstk.poly import Reader, findType
@@ -5,9 +6,6 @@ from . import store
 from .util import _list
 
 GAMESPATH = 'Games'
-
-# forwards
-class FileManager: pass
 
 # tag::FileManager[]
 class FileManager:

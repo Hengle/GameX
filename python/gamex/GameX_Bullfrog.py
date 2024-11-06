@@ -1,14 +1,9 @@
+from __future__ import annotations
 import os
 from gamex import Family, FamilyGame, BinaryPakFile
 from gamex.Bullfrog.formats.pakbinary import PakBinary_Bullfrog, PakBinary_Populus, PakBinary_Syndicate
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
-
-# typedefs
-class PakBinary: pass
-class PakState: pass
-class FileSource: pass
-class FileOption: pass
 
 # BullfrogGame
 class BullfrogGame(FamilyGame):

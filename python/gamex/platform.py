@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 from enum import Enum
 from gamex.pak import PakFile
@@ -5,12 +6,6 @@ from openstk.gfx.gfx import IObjectManager, IMaterialManager, IShaderManager, IT
 from openstk.gfx.gfx_render import IMaterial
 from openstk.gfx.gfx_texture import ITexture
 from openstk.sfx.sfx import IAudioManager
-
-# typedefs
-class Audio: pass
-class Texture: pass
-class Shader: pass
-class Material: pass
 
 # AudioBuilderBase
 class AudioBuilderBase:

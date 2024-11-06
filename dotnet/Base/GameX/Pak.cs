@@ -393,6 +393,7 @@ namespace GameX
     {
         public readonly PakBinary PakBinary = pakBinary;
         // options
+        public int RetainInPool = 10;
         public bool UseReader = true;
         public bool UseWriter = true;
         public bool UseFileId = false;
@@ -426,32 +427,53 @@ namespace GameX
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public GenericPool<BinaryReader> GetReader(string path = default, int retainInPool = 10)
-            => Readers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryReader>(() => FileSystem.OpenReader(path), retainInPool) : null);
+        public virtual IGenericPool<BinaryReader> GetReader(string path = default, bool pooled = true) => pooled
+            ? Readers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryReader>(() => FileSystem.OpenReader(path), RetainInPool) : null)
+            : new SinglePool<BinaryReader>(FileSystem.FileExists(path ??= PakPath) ? FileSystem.OpenReader(path) : null);
 
         /// <summary>
         /// Reader
         /// </summary>
         /// <param name="func">The func.</param>
         /// <param name="path">The path.</param>
+        /// <param name="pooled">The pooled.</param>
         /// <returns></returns>
-        public virtual Task Reader(Func<BinaryReader, Task> func, string path = default) => GetReader(path).ActionAsync(r => func(r));
+        public void Reader(Action<BinaryReader> func, string path = default, bool pooled = false) => GetReader(path, pooled).Action(func);
 
         /// <summary>
         /// Reader
         /// </summary>
         /// <param name="func">The func.</param>
         /// <param name="path">The path.</param>
+        /// <param name="pooled">The pooled.</param>
         /// <returns></returns>
-        public virtual Task<TResult> Reader<TResult>(Func<BinaryReader, Task<TResult>> func, string path = default) => GetReader(path).FuncAsync(r => func(r));
+        public TResult ReaderT<TResult>(Func<BinaryReader, TResult> func, string path = default, bool pooled = false) => GetReader(path, pooled).Func(func);
+
+        /// <summary>
+        /// Reader
+        /// </summary>
+        /// <param name="func">The func.</param>
+        /// <param name="path">The path.</param>
+        /// <param name="pooled">The ppooledath.</param>
+        /// <returns></returns>
+        public Task ReaderAsync(Func<BinaryReader, Task> func, string path = default, bool pooled = true) => GetReader(path, pooled).ActionAsync(func);
+
+        /// <summary>
+        /// Reader
+        /// </summary>
+        /// <param name="func">The func.</param>
+        /// <param name="path">The path.</param>
+        /// <param name="pooled">The pooled.</param>
+        /// <returns></returns>
+        public Task<TResult> ReaderTAsync<TResult>(Func<BinaryReader, Task<TResult>> func, string path = default, bool pooled = true) => GetReader(path, pooled).FuncAsync(func);
 
         /// <summary>
         /// Gets the binary reader.
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public GenericPool<BinaryWriter> GetWriter(string path = default, int retainInPool = 10)
-            => Writers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryWriter>(() => FileSystem.OpenWriter(path), retainInPool) : null);
+        public GenericPool<BinaryWriter> GetWriter(string path = default)
+            => Writers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryWriter>(() => FileSystem.OpenWriter(path), RetainInPool) : null);
 
         /// <summary>
         /// Writer
@@ -459,7 +481,7 @@ namespace GameX
         /// <param name="func">The func.</param>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public Task Writer(Func<BinaryWriter, Task> func, string path = default) => GetWriter(path).ActionAsync(w => func(w));
+        public Task WriterActionAsync(Func<BinaryWriter, Task> func, string path = default) => GetWriter(path).ActionAsync(w => func(w));
 
         /// <summary>
         /// Writer
@@ -467,7 +489,7 @@ namespace GameX
         /// <param name="func">The func.</param>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public Task<TResult> Writer<TResult>(Func<BinaryWriter, Task<TResult>> func, string path = default) => GetWriter(path).FuncAsync(w => func(w));
+        public Task<TResult> WriterFuncAsync<TResult>(Func<BinaryWriter, Task<TResult>> func, string path = default) => GetWriter(path).FuncAsync(w => func(w));
 
         #endregion
 
@@ -678,7 +700,7 @@ namespace GameX
         /// <param name="tag">The tag.</param>
         /// <returns></returns>
         public virtual Task Read(object tag = default) => UseReader
-            ? Reader(r => PakBinary.Read(this, r, tag))
+            ? ReaderT(r => PakBinary.Read(this, r, tag))
             : PakBinary.Read(this, null, tag);
 
         /// <summary>
@@ -688,7 +710,7 @@ namespace GameX
         /// <param name="option">The option.</param>
         /// <returns></returns>
         public virtual Task<Stream> ReadData(FileSource file, FileOption option = default) => UseReader
-            ? Reader(r => PakBinary.ReadData(this, r, file, option))
+            ? ReaderT(r => PakBinary.ReadData(this, r, file, option))
             : PakBinary.ReadData(this, null, file, option);
 
         /// <summary>
@@ -697,7 +719,9 @@ namespace GameX
         /// <param name="w">The w.</param>
         /// <param name="tag">The tag.</param>
         /// <returns></returns>
-        public virtual Task Write(object tag = default) => Writer(w => PakBinary.Write(this, w, tag));
+        public virtual Task Write(object tag = default) => UseWriter
+            ? WriterActionAsync(w => PakBinary.Write(this, w, tag))
+            : PakBinary.Write(this, null, tag);
 
         /// <summary>
         /// Writes the file data asynchronous.
@@ -706,7 +730,9 @@ namespace GameX
         /// <param name="data">The data.</param>
         /// <param name="option">The option.</param>
         /// <returns></returns>
-        public virtual Task WriteData(FileSource file, Stream data, FileOption option = default) => Writer(w => PakBinary.WriteData(this, w, file, data, option));
+        public virtual Task WriteData(FileSource file, Stream data, FileOption option = default) => UseWriter
+            ? WriterActionAsync(w => PakBinary.WriteData(this, w, file, data, option))
+            : PakBinary.WriteData(this, null, file, data, option);
 
         #endregion
 
@@ -1028,6 +1054,7 @@ namespace GameX
         {
             readonly FileSource File;
             readonly BinaryPakFile Source;
+            StaticPool<BinaryReader> Pool;
             BinaryReader R;
 
             public SubPakFile(BinaryPakFile source, FileSource file, string path, object tag = null, PakBinary instance = null) : base(new PakState(source.FileSystem, source.Game, source.Edition, path, tag), instance ?? Current)
@@ -1038,13 +1065,9 @@ namespace GameX
                 //Open();
             }
 
-            public async override void Opening() { R = new BinaryReader(await Source.ReadData(File)); base.Opening(); }
-
+            public async override void Opening() { R = new BinaryReader(await Source.ReadData(File)); Pool = new StaticPool<BinaryReader>(R); base.Opening(); }
             public override void Closing() { R?.Dispose(); base.Closing(); }
-
-            public override Task Reader(Func<BinaryReader, Task> func, string path = null) => func(R);
-
-            public override Task<TResult> Reader<TResult>(Func<BinaryReader, Task<TResult>> func, string path = null) => func(R);
+            public override IGenericPool<BinaryReader> GetReader(string path = null, bool pooled = true) => Pool;
         }
     }
 

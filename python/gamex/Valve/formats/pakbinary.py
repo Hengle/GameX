@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 from io import BytesIO
 from hashlib import md5
@@ -5,14 +6,10 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization
-from gamex import FileSource, FileOption, PakBinaryT
+from gamex import FileSource, FileOption, BinaryPakFile, PakBinaryT
 from gamex.compression import decompressBlast
 from gamex.util import _throw, _pathExtension
-from openstk.poly import unsafe
-
-# typedefs
-class Reader: pass
-class BinaryPakFile: pass
+from openstk.poly import Reader, unsafe
 
 #region PakBinary_Bsp30
 
@@ -125,9 +122,6 @@ class PakBinary_Bsp30(PakBinaryT):
 #endregion
 
 #region PakBinary_Vpk
-
-# typedefs
-class V_HeaderV2: pass
 
 # PakBinary_Vpk
 class PakBinary_Vpk(PakBinaryT):

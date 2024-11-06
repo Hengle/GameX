@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 from gamex import BinaryPakFile
 from gamex.Base.formats.pakbinary import PakBinary_Zip
@@ -8,13 +9,6 @@ from gamex.Capcom.pakbinary_kpka import PakBinary_Kpka
 from gamex.Capcom.pakbinary_plist import PakBinary_Plist
 from gamex.Unity.pakbinary_unity import PakBinary_Unity
 from gamex.util import _pathExtension
-
-# typedefs
-class FamilyGame: pass
-class PakBinary: pass
-class PakState: pass
-class FileSource: pass
-class FileOption: pass
 
 # CapcomPakFile
 class CapcomPakFile(BinaryPakFile):

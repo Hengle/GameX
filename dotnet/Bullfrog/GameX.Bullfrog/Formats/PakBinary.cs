@@ -277,12 +277,12 @@ namespace GameX.Bullfrog.Formats
             switch (source.Game.Id)
             {
                 case "P2":
-                    if (fileName.StartsWith("EMSCBLK")) await source.Reader(s => ParseSprite(s, files), tabPath);
-                    else if (fileName.StartsWith("EMSFACES") || fileName.StartsWith("MEMSFACE")) await source.Reader(s => ParseSprite(s, files), tabPath);
-                    else if (fileName.StartsWith("EMSICON") || fileName.StartsWith("MEMICON")) await source.Reader(s => ParseSprite(s, files), tabPath);
-                    else if (fileName.StartsWith("EMSSPR") || fileName.StartsWith("MEMSPR")) await source.Reader(s => ParseSprite(s, files), tabPath);
-                    else if (fileName.StartsWith("HPOINTER") || fileName.StartsWith("MPOINTER")) await source.Reader(s => ParseSprite(s, files), tabPath);
-                    else if (fileName.StartsWith("MBLOCK")) await source.Reader(s => ParseSprite(s, files), tabPath);
+                    if (fileName.StartsWith("EMSCBLK")) await source.ReaderT(s => ParseSprite(s, files), tabPath);
+                    else if (fileName.StartsWith("EMSFACES") || fileName.StartsWith("MEMSFACE")) await source.ReaderT(s => ParseSprite(s, files), tabPath);
+                    else if (fileName.StartsWith("EMSICON") || fileName.StartsWith("MEMICON")) await source.ReaderT(s => ParseSprite(s, files), tabPath);
+                    else if (fileName.StartsWith("EMSSPR") || fileName.StartsWith("MEMSPR")) await source.ReaderT(s => ParseSprite(s, files), tabPath);
+                    else if (fileName.StartsWith("HPOINTER") || fileName.StartsWith("MPOINTER")) await source.ReaderT(s => ParseSprite(s, files), tabPath);
+                    else if (fileName.StartsWith("MBLOCK")) await source.ReaderT(s => ParseSprite(s, files), tabPath);
                     else if (fileName.StartsWith("LAND")) ParseOther(files, 10);
                     return;
                 case "P3":

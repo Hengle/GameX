@@ -1,15 +1,7 @@
+from __future__ import annotations
 import sys, os, re, pathlib
 from io import BytesIO
 from gamex.util import _throw
-
-# typedefs
-class PakFile: pass
-class BinaryPakFile: pass
-
-# forwards
-class MetaInfo: pass
-class MetaItem: pass
-class MetaManager: pass
 
 # FileSource
 class FileSource:

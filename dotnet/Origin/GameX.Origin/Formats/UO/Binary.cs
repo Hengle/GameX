@@ -2234,8 +2234,7 @@ namespace GameX.Origin.Formats.UO
             public int Extra;
         }
 
-        public Stream ReadData(long offset, int fileSize)
-            => PakFile.GetReader().Func(r => new MemoryStream(r.Seek(offset).ReadBytes(fileSize)));
+        public Stream ReadData(long offset, int fileSize) => PakFile.ReaderT(r => new MemoryStream(r.Seek(offset).ReadBytes(fileSize)));
 
         public BinaryPakFile PakFile;
         public IDictionary<int, Patch[]> Patches = new Dictionary<int, Patch[]>();

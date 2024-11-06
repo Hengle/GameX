@@ -319,7 +319,7 @@ class PakBinary_Bsa(PakBinaryT):
                     packedSize = size)
 
             # read filename offsets
-            filenameOffsets = r.readPArray('I', header.fileCount) # relative offset in filenames section
+            filenameOffsets = r.readPArray(None, 'I', header.fileCount) # relative offset in filenames section
 
             # read filenames
             filenamesPosition = r.tell()

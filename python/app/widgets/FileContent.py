@@ -6,14 +6,11 @@ from PyQt6.QtMultimedia import QMediaPlayer
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6 import QtCore, QtMultimedia
 from gamex.pak import PakFile
-from gamex.meta import MetaContent
+from gamex.meta import MetaContent, MetaInfo
 from .ViewHex import ViewHex
 from .ViewTestTri import ViewTestTri
 from .ViewTexture import ViewTexture
 from .ViewVideoTexture import ViewVideoTexture
-
-# typedefs
-class MetaInfo: pass
 
 # ViewText
 class ViewText(QWidget):

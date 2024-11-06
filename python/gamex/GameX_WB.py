@@ -1,21 +1,15 @@
+from __future__ import annotations
 import os
 from gamex import FamilyGame, BinaryPakFile
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
 
-# typedefs
-class Family: pass
-class PakBinary: pass
-class IFileSystem: pass
-class FileSource: pass
-class FileOption: pass
-
-# WbBGame
+# WBGame
 class WbBGame(FamilyGame):
     def __init__(self, family: Family, id: str, elem: dict[str, object], dgame: FamilyGame):
         super().__init__(family, id, elem, dgame)
 
-# WbBPakFile
+# WBPakFile
 class WbBPakFile(BinaryPakFile):
     def __init__(self, state: PakState):
         super().__init__(state, self.getPakBinary(state.game, _pathExtension(state.path).lower()))

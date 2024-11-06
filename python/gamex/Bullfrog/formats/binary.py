@@ -1,23 +1,16 @@
+from __future__ import annotations
 import os, ctypes
 from enum import Enum
 from io import BytesIO
 from openstk.gfx.gfx_render import Rasterize
 from openstk.gfx.gfx_texture import ITextureFrames, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
-from gamex.pak import PakBinary
-from gamex.meta import FileSource, MetaInfo, MetaContent, IHaveMetaInfo
+from gamex import PakBinary, FileSource, MetaInfo, MetaContent, IHaveMetaInfo
 from gamex.platform import Platform
-
-# typedefs
-class Reader: pass
-class TextureFlags: pass
-class BinaryPakFile: pass
-class PakFile: pass
-class MetaManager: pass
 
 #region Binary_Fli
 
 # Binary_Fli
-class Binary_Fli(IHaveMetaInfo, ITextureFrames): #IDisposable
+class Binary_Fli(IHaveMetaInfo, ITextureFrames):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Fli(r, f)
 

@@ -1,7 +1,5 @@
+from __future__ import annotations
 from io import BytesIO
-
-# typedefs
-class Reader: pass
 
 def decompressUnknown(r: Reader, length: int, newLength: int) -> bytes: raise NotImplementedError()
 def decompressZlib(r: Reader, length: int, newLength: int, noHeader: bool = False, full: bool = True) -> bytes: 

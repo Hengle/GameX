@@ -198,13 +198,13 @@ namespace GameX.Arkane.Formats
         {
             if (file.FileSize == 0 || _badPositions.Contains(file.Offset)) return Task.FromResult(System.IO.Stream.Null);
             var (path, tag1, tag2) = ((string, string, string))file.Tag;
-            return Task.FromResult((Stream)new MemoryStream(source.GetReader(path).Func(r2 =>
+            return Task.FromResult((Stream)source.ReaderT(r2 =>
             {
                 r2.Seek(file.Offset);
-                return file.Compressed != 0
+                return new MemoryStream(file.Compressed != 0
                     ? r2.DecompressZlib((int)file.PackedSize, (int)file.FileSize)
-                    : r2.ReadBytes((int)file.PackedSize);
-            })));
+                    : r2.ReadBytes((int)file.PackedSize));
+            }, path));
         }
 
         // Bad Positions - Dishonored2

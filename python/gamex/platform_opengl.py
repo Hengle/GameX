@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os, io, numpy as np
 from OpenGL.GL import *
 from OpenGL.GL.EXT import texture_compression_s3tc
@@ -5,16 +6,8 @@ from openstk.gfx.gfx import IFixedMaterial, IParamMaterial
 from openstk.gfx.gl import IOpenGLGfx, QuadIndexBuffer, GLMeshBufferCache, ShaderDebugLoader
 from openstk.gfx.gl_render import GLRenderMaterial
 from openstk.gfx.gfx_texture import TextureGLFormat, TextureFlags
-from openstk.poly import IDisposable
 from gamex.platform_system import SystemSfx
 from gamex.platform import ObjectBuilderBase, ObjectManager, MaterialBuilderBase, MaterialManager, ShaderBuilderBase, ShaderManager, TextureManager, TextureBuilderBase, Platform
-
-# typedefs
-class PakFile: pass
-class Shader: pass
-class ShaderLoader: pass
-class IMaterialManager: pass
-class ITexture: pass
 
 # OpenGLObjectBuilder
 class OpenGLObjectBuilder(ObjectBuilderBase):

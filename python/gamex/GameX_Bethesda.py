@@ -1,15 +1,10 @@
+from __future__ import annotations
 import os
 from gamex import Family, FamilyGame, BinaryPakFile
 from gamex.Base.formats.binary import Binary_Dds
 from gamex.Bethesda.formats.pakbinary import PakBinary_Ba2, PakBinary_Bsa, PakBinary_Esm
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
-
-# typedefs
-class PakBinary: pass
-class PakState: pass
-class FileSource: pass
-class FileOption: pass
 
 #region BethesdaFamily
 

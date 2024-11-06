@@ -1,20 +1,14 @@
+from __future__ import annotations
 import os
 import numpy as np
 from io import BytesIO
 from enum import Enum, Flag
 from openstk.gfx.gfx_render import Rasterize
-from openstk.gfx.gfx_texture import ITexture, ITextureFrames, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
-from openstk.poly import unsafe
-from gamex import PakBinary, FileSource, MetaInfo, MetaContent, IHaveMetaInfo
+from openstk.gfx.gfx_texture import TextureFlags, ITexture, ITextureFrames, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
+from openstk.poly import Reader, unsafe
+from gamex import PakFile, BinaryPakFile, PakBinary, FileSource, MetaInfo, MetaManager, MetaContent, IHaveMetaInfo
 from gamex.platform import Platform
 from gamex.util import _pathExtension
-
-# typedefs
-class Reader: pass
-class TextureFlags: pass
-class BinaryPakFile: pass
-class PakFile: pass
-class MetaManager: pass
 
 #region Binary_Src
 
@@ -161,8 +155,7 @@ class Binary_Mdl(IHaveMetaInfo):
     M_MAGIC = 0x54534449 #: IDST
     M_MAGIC2 = 0x51534449 #: IDSQ
     CoordinateAxes = 6
-    SequenceBlendCount = 2
-    ControllerCount = 4
+    # SequenceBlendCount = 2
 
     # header flags
     class HeaderFlags(Flag):
@@ -234,7 +227,7 @@ class Binary_Mdl(IHaveMetaInfo):
 
     # sequence header
     class M_SeqHeader:
-        struct = ('<2I64sI', 4)
+        struct = ('<2i64si', 76)
         def __init__(self, tuple):
             self.magic, \
             self.version, \
@@ -243,18 +236,45 @@ class Binary_Mdl(IHaveMetaInfo):
 
     # bones
     class M_Bone:
-        struct = ('<?', 4)
+        struct = ('<32s8i12f', 112)
         def __init__(self, tuple):
+            boneController = self.boneController = np.array([0,0,0,0,0,0])
+            value = self.value = np.array([0,0,0,0,0,0])
+            scale = self.scale = np.array([0,0,0,0,0,0])
             self.name, \
             self.parent, \
             self.flags, \
-            self.boneController, \
-            self.value, \
-            self.scale = tuple
+            boneController[0], boneController[1], boneController[2], boneController[3], boneController[4], boneController[5], \
+            value[0], value[1], value[2], value[3], value[4], value[5], \
+            scale[0], scale[1], scale[2], scale[3], scale[4], scale[5] = tuple
+
+    class BoneAxis:
+        def __init__(self, controller: BoneController, value: float, scale: float):
+            self.controller = controller
+            self.value = value
+            self.scale = scale
+
+    class Bone:
+        def __init__(self, s: M_Bone, id: int, controllers: list[BoneController]):
+            self.name = unsafe.fixedAString(s.name, 32)
+            self.parent = None
+            self.parentId = s.parent
+            self.flags = s.flags
+            self.axes = [
+                Binary_Mdl.BoneAxis(controllers[s.boneController[0]] if s.boneController[0] != -1 else None, s.value[0], s.scale[0]),
+                Binary_Mdl.BoneAxis(controllers[s.boneController[1]] if s.boneController[1] != -1 else None, s.value[1], s.scale[1]),
+                Binary_Mdl.BoneAxis(controllers[s.boneController[2]] if s.boneController[2] != -1 else None, s.value[2], s.scale[2]),
+                Binary_Mdl.BoneAxis(controllers[s.boneController[3]] if s.boneController[3] != -1 else None, s.value[3], s.scale[3]),
+                Binary_Mdl.BoneAxis(controllers[s.boneController[4]] if s.boneController[4] != -1 else None, s.value[4], s.scale[4]),
+                Binary_Mdl.BoneAxis(controllers[s.boneController[5]] if s.boneController[5] != -1 else None, s.value[5], s.scale[5])]
+            self.id = id
+        def remap(bones: list[Bone]) -> None:
+            for bone in bones:
+                if bone.parentId != -1: bone.parent = bones[bone.parentId]
 
     # bone controllers
     class M_BoneController:
-        struct = ('<?', 4)
+        struct = ('<2i2f2i', 24)
         def __init__(self, tuple):
             self.bone, \
             self.type, \
@@ -262,46 +282,74 @@ class Binary_Mdl(IHaveMetaInfo):
             self.rest, \
             self.index = tuple
 
+    class BoneController:
+        def __init__(self, s: M_BoneController, id: int):
+            self.type = s.type
+            self.start = s.start; self.end = s.end
+            self.rest = s.rest
+            self.index = s.index
+            self.id = id
+
     # intersection boxes
     class M_BBox:
-        struct = ('<?', 4)
+        struct = ('<2i6f', 32)
         def __init__(self, tuple):
+            bbMin = self.bbMin = np.array([0,0,0]); bbMax = self.bbMax = np.array([0,0,0])
             self.bone, \
             self.group, \
-            self.bbMin, self.bbMax = tuple
+            bbMin[0], bbMin[1], bbMin[2], bbMax[0], bbMax[1], bbMax[2] = tuple
+
+    class BBox:
+        def __init__(self, s: M_BBox, bones: list[Bone]):
+            self.bone = bones[s.bone]
+            self.group = s.group
+            self.bbMin = s.bbMin; self.bbMax = s.bbMax
 
     # sequence groups
     class M_SeqGroup:
-        struct = ('<?', 4)
+        struct = ('<32s64s2i', 104)
         def __init__(self, tuple):
             self.label, \
             self.name, \
             self.unused1, \
             self.unused2 = tuple
 
+    class SeqGroup:
+        def __init__(self, s: M_SeqGroup):
+            self.label = unsafe.fixedAString(s.label, 32)
+            self.name = unsafe.fixedAString(s.name, 64)
+            self.offset = s.unused2
+
     # sequence descriptions
-    class M_SeqDesc:
-        struct = ('<?', 4)
+    class M_Seq:
+        struct = ('<32sf10i3f2i6f4i4f6i', 176)
         def __init__(self, tuple):
+            linearMovement = self.linearMovement = np.array([0,0,0])
+            bbMin = self.bbMin = np.array([0,0,0]); bbMax = self.bbMax = np.array([0,0,0])
+            events = self.events = Binary_Mdl.M_Lump()
+            pivots = self.pivots = Binary_Mdl.M_Lump()
+            blendType = self.blendType = np.array([0,0])
+            blendStart = self.blendStart = np.array([0,0])
+            blendEnd = self.blendEnd = np.array([0,0])
             self.label, \
             self.fps, \
             self.flags, \
             self.activity, \
             self.actWeight, \
-            self.events, \
+            events.num, events.offset, \
             self.numFrames, \
-            self.pivots, \
+            pivots.num, pivots.offset, \
             self.motionType, \
             self.motionBone, \
-            self.linearMovement, \
+            linearMovement[0], linearMovement[1], linearMovement[2], \
             self.automovePosIndex, \
             self.automoveAngleIndex, \
-            self.bbMin, self.bbMax, \
+            bbMin[0], bbMin[1], bbMin[2], bbMax[0], bbMax[1], bbMax[2], \
             self.numBlends, \
             self.animIndex, \
-            self.blendType, \
-            self.blendStart, \
-            self.blendEnd, \
+            blendType[0], blendType[1], \
+            blendStart[0], blendStart[1], \
+            blendEnd[0], blendEnd[1], \
             self.blendParent, \
             self.seqGroup, \
             self.entryNode, \
@@ -309,9 +357,71 @@ class Binary_Mdl(IHaveMetaInfo):
             self.nodeFlags, \
             self.nextSeq = tuple
 
+    class SeqBlend:
+        def __init__(self, type: int, start: float, end: float):
+            self.type = type
+            self.start = start
+            self.end = end
+
+    class SeqPivot:
+        def __init__(self, origin: np.ndarray, start: int, end: int):
+            self.origin = origin
+            self.start = start
+            self.end = end
+    
+    class SeqAnimation:
+        def __init__(self, axis: list[list[self.M_AnimValue]]):
+            self.axis = axis
+
+    class Seq:
+        def __init__(self, r: Reader, s: M_Seq, sequences: list[M_SeqHeader], zeroGroupOffset: int, isXashModel: bool, bones: list[Bone]):
+            if s.seqGroup < 0 or (s.seqGroup != 0 and (s.seqGroup - 1) >= len(sequences)): raise Exception('Invalid seqgroup value')
+            self.label = unsafe.fixedAString(s.label, 32)
+            self.fps = s.fps
+            self.flags = s.flags
+            self.activity = s.activity
+            self.actWeight = s.actWeight
+            r.seek(s.events.offset); self.events = r.readSArray(Binary_Mdl.M_Event, s.events.num)
+            self.sortedEvents = self.events
+            self.numFrames = s.numFrames
+            if isXashModel: self.pivots = []
+            else: r.seek(s.pivots.offset); self.pivots = r.readSArray(Binary_Mdl.M_Pivot, s.pivots.num)
+            self.motionType = s.motionType
+            self.motionBone = s.motionBone
+            self.bbMin = s.bbMin; self.bbMax = s.bbMax
+            self.animationBlends = Binary_Mdl.Seq.getAnimationBlends(r, s, sequences, zeroGroupOffset, len(bones))
+            self.blend = [Binary_Mdl.SeqBlend(s.blendType[0], s.blendStart[0], s.blendEnd[0]), Binary_Mdl.SeqBlend(s.blendType[1], s.blendStart[1], s.blendEnd[1])]
+            self.entryNode = s.entryNode
+            self.exitNode = s.exitNode
+            self.nodeFlags = s.nodeFlags
+            self.nextSequence = s.nextSeq
+        @staticmethod
+        def getAnimationBlends(r: Reader, s: M_Seq, sequences: list[M_SeqHeader], zeroGroupOffset: int, numBones: int) -> list[SeqAnimation]:
+            (sr, so) = (r, zeroGroupOffset + s.animIndex) if s.seqGroup == 0 else (sequences[s.seqGroup - 1][0], s.animIndex)
+            sr.seek(so)
+            anim = sr.readS(Binary_Mdl.M_Anim)
+            blends = [list[Binary_Mdl.SeqAnimation]] * s.numBlends
+            for i in range(s.numBlends):
+                animations = [Binary_Mdl.SeqAnimation] * numBones
+                for b in range(numBones):
+                    animation = Binary_Mdl.SeqAnimation([Binary_Mdl.M_AnimValue] * Binary_Mdl.CoordinateAxes)
+                    for j in range(Binary_Mdl.CoordinateAxes):
+                        if anim.offsets[j] != 0:
+                            sr.seek(so + anim.offsets[j])
+                            values = [sr.readS(Binary_Mdl.M_AnimValue)]
+                            if s.numFrames > 0:
+                                for f in range(s.numFrames):
+                                    v = values[-1]
+                                    f += v.total
+                                    values.extend(sr.readSArray(Binary_Mdl.M_AnimValue, 1 + v.valid))
+                            animation.axis[j] = values
+                    animations[b] = animation
+                blends[i] = animations
+            return blends
+
     # events
     class M_Event:
-        struct = ('<?', 4)
+        struct = ('<3i64s', 76)
         def __init__(self, tuple):
             self.frame, \
             self.event, \
@@ -320,64 +430,130 @@ class Binary_Mdl(IHaveMetaInfo):
 
     # pivots
     class M_Pivot:
-        struct = ('<?', 4)
+        struct = ('<3f2i', 4)
         def __init__(self, tuple):
             self.org, \
             self.start, self.end = tuple
 
     # attachments
     class M_Attachment:
-        struct = ('<?', 4)
+        struct = ('<32s2i12f', 88)
         def __init__(self, tuple):
+            vector0 = self.vector0 = np.array([0,0,0])
+            vector1 = self.vector1 = np.array([0,0,0])
+            vector2 = self.vector2 = np.array([0,0,0])
+            org = self.org = np.array([0,0,0])
             self.name, \
             self.type, \
             self.bone, \
-            self.org, \
-            self.vectors = tuple
+            org[0], org[1], org[2], \
+            vector0[0], vector0[1], vector0[2], \
+            vector1[0], vector1[1], vector1[2], \
+            vector2[0], vector2[1], vector2[2] = tuple
+
+    class Attachment:
+        def __init__(self, s: M_Attachment, bones: list[Bone]):
+            self.name = unsafe.fixedAString(s.name, 32)
+            self.type = s.type
+            self.bone = bones[s.bone]
+            self.org = s.org
+            self.vectors = [s.vector0, s.vector1, s.vector2]
 
     # animations
     class M_Anim:
-        struct = ('<?', 4)
+        struct = ('<6H', 12)
         def __init__(self, tuple):
-            self.offset = tuple
+            offsets = self.offsets = np.array([0,0,0,0,0,0])
+            offsets[0], offsets[1], offsets[2], offsets[3], offsets[4], offsets[5] = tuple
+
+    class M_AnimValue:
+        struct = ('<2B', 2)
+        def __init__(self, tuple):
+            self.valid, \
+            self.total = tuple
 
     # body part index
     class M_Bodypart:
-        struct = ('<?', 4)
+        struct = ('<64s3i', 76)
         def __init__(self, tuple):
+            models = self.models = Binary_Mdl.M_Lump2()
             self.name, \
-            self.numModels, \
-            self.base, \
-            self.modelIndex = tuple
+            models.num, models.offset, models.offset2 = tuple
+
+    class Bodypart:
+        def __init__(self, r: Reader, s: M_Bodypart, bones: list[Bone]):
+            self.name = unsafe.fixedAString(s.name, 32)
+            self.base = s.models.offset
+            r.seek(s.models.offset2); self.models = [Binary_Mdl.Model(r, x, bones) for x in r.readSArray(Binary_Mdl.M_Model, s.models.num)]
 
     # skin info
     class M_Texture:
-        struct = ('<?', 4)
+        struct = ('<64s4i', 80)
         def __init__(self, tuple):
             self.name, \
             self.flags, \
             self.width, self.height, \
             self.index = tuple
 
+    class Texture:
+        def __init__(self, r: Reader, s: M_Texture):
+            self.name = unsafe.fixedAString(s.name, 64)
+            self.flags = s.flags
+            self.width = s.width; self.height = s.height
+            self.pixels = r.readBytes(self.width * self.height)
+            self.palette = r.readBytes(3 * 255)
+
     # studio models
     class M_Model:
-        struct = ('<?', 4)
+        struct = ('<64sif10i', 112)
         def __init__(self, tuple):
+            meshs = self.meshs = Binary_Mdl.M_Lump()
+            verts = self.verts = Binary_Mdl.M_Lump2()
+            norms = self.norms = Binary_Mdl.M_Lump2()
+            groups = self.groups = Binary_Mdl.M_Lump()
             self.name, \
             self.type, \
             self.boundingRadius, \
-            self.meshs, \
-            self.verts, \
-            self.norms, \
-            self.groups = tuple
+            meshs.num, meshs.offset, \
+            verts.num, verts.offset, verts.offset2, \
+            norms.num, norms.offset, norms.offset2, \
+            groups.num, groups.offset = tuple
+
+    class ModelVertex:
+        def __init__(self, bone: Bone, vertex: np.ndarray):
+            self.bone = bone
+            self.vertex = vertex
+        @staticmethod
+        def create(r: Reader, s: M_Lump2, bones: list[Bone]) -> list[ModelVertex]:
+            r.seek(s.offset); boneIds = r.readPArray(None, 'B', s.num)
+            r.seek(s.offset2); verts = r.readPArray(np.array, '3f', s.num)
+            return [Binary_Mdl.ModelVertex(bones[boneIds[i]], verts[i]) for i in range(s.num)]
+
+    class Model:
+        def __init__(self, r: Reader, s: M_Model, bones: list[Bone]):
+            self.name = unsafe.fixedAString(s.name, 64)
+            self.type = s.type
+            self.boundingRadius = s.boundingRadius
+            r.seek(s.meshs.offset); self.meshs = [Binary_Mdl.Mesh(r, x) for x in r.readSArray(Binary_Mdl.M_Mesh, s.meshs.num)]
+            self.vertices = Binary_Mdl.ModelVertex.create(r, s.verts, bones)
+            self.normals = Binary_Mdl.ModelVertex.create(r, s.norms, bones)
 
     # meshes
     class M_Mesh:
-        struct = ('<?', 4)
+        struct = ('<5i', 20)
         def __init__(self, tuple):
-            self.tris, \
+            tris = self.tris = Binary_Mdl.M_Lump()
+            norms = self.norms = Binary_Mdl.M_Lump()
+            tris.num, tris.offset, \
             self.skinRef, \
-            self.norms = tuple
+            norms.num, norms.offset = tuple
+
+    class Mesh:
+        def __init__(self, r: Reader, s: M_Mesh):
+            r.seek(s.tris.offset); self.triangles = r.readPArray(None, 'H', s.tris.num) #TODO
+            self.numTriangles = s.tris.num
+            self.numNorms = s.norms.num
+            self.skinRef = s.skinRef
 
     # header
     class M_Header:
@@ -392,8 +568,8 @@ class Binary_Mdl(IHaveMetaInfo):
             seqs = self.seqs = Binary_Mdl.M_Lump()
             seqGroups = self.seqGroups = Binary_Mdl.M_Lump()
             textures = self.textures = Binary_Mdl.M_Lump2()
-            skins = self.skins = Binary_Mdl.M_Lump()
-            bodyParts = self.bodyParts = Binary_Mdl.M_Lump()
+            skinFamilies = self.skinFamilies = Binary_Mdl.M_Lump()
+            bodyparts = self.bodyparts = Binary_Mdl.M_Lump()
             attachments = self.attachments = Binary_Mdl.M_Lump()
             sounds = self.sounds = Binary_Mdl.M_Lump()
             soundGroups = self.soundGroups = Binary_Mdl.M_Lump()
@@ -413,8 +589,8 @@ class Binary_Mdl(IHaveMetaInfo):
             seqGroups.num, seqGroups.offset, \
             textures.num, textures.offset, textures.offset2, \
             self.numSkinRef, \
-            skins.num, skins.offset, \
-            bodyParts.num, bodyParts.offset, \
+            skinFamilies.num, skinFamilies.offset, \
+            bodyparts.num, bodyparts.offset, \
             attachments.num, attachments.offset, \
             sounds.num, sounds.offset, \
             soundGroups.num, soundGroups.offset, \
@@ -423,53 +599,98 @@ class Binary_Mdl(IHaveMetaInfo):
 
     #endregion
 
-    header: M_Header
-    texture: M_Header
-    sequences: list[M_SeqHeader]
-    headerName: str
+    name: str
     isDol: bool
+    isXashModel: bool
+    eyePosition: np.ndarray
+    boundingMin: np.ndarray
+    boundingMax: np.ndarray
+    clippingMin: np.ndarray
+    clippingMax: np.ndarray
+    flags: HeaderFlags
+    boneControllers: list[BoneController]
+    bones: list[Bone]
+    hitboxes: list[BBox]
+    sequenceGroups: list[SeqGroup]
+    sequences: list[Seq]
+    attachments: list[Attachment]
+    bodyparts: list[Bodypart]
+    textures: list[Texture]
+    skinFamilies: list[list[int]]
+    transitions: list[bytearray]
 
     def __init__(self, r: Reader, f: FileSource, s: BinaryPakFile):
         # read file
-        header = self.header = r.readS(self.M_Header)
+        header = r.readS(self.M_Header)
         if header.magic != self.M_MAGIC: raise Exception('BAD MAGIC')
         elif header.version != 10: raise Exception('BAD VERSION')
-        self.headerName = unsafe.fixedAString(header.name, 64)
-        if not self.headerName: raise Exception(f'The file "{self.headerName}" is not a model main header file')
-        pathExt = _pathExtension(f.path); pathName = f.path[:-len(pathExt)]
+        self.name = unsafe.fixedAString(header.name, 64)
+        if not self.name: raise Exception(f'The file "{self.name}" is not a model main header file')
+        path = f.path; pathExt = _pathExtension(path); pathName = path[:-len(pathExt)]
         self.isDol = pathExt == '.dol'
+        if self.isDol: raise Exception('Not Implemented')
+        # Xash models store the offset to the second header in this variable.
+        self.isXashModel = header.sounds.num != 0 # If it's not zero this is a Xash model.
+        self.hasTextureFile = header.textures.offset == 0
 
         # load texture
-        if header.textures.offset == 0:
-            path = f'{pathName}T{pathExt}'
-            print(path)
-            # self.texture = s.reader(r2 =>
-            # {
-            #     if (r2 == null) throw new Exception($"External texture file '{path}' does not exist");
-            #     var header = r2.ReadS<M_Header>();
-            #     if (header.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
-            #     else if (header.Version != 10) throw new FormatException("BAD VERSION");
-            #     return Task.FromResult(header);
-            # }, path)
+        def _texture(r2: Reader):
+            if not r2: raise Exception(f'External texture file "{path}" does not exist')
+            header = r2.readS(self.M_Header)
+            if header.magic != self.M_MAGIC: raise Exception('BAD MAGIC')
+            elif header.version != 10: raise Exception('BAD VERSION')
+            return (r2, header)
+        (tr, theader) = s.readerT(_texture, path := f'{pathName}T{pathExt}', True) if self.hasTextureFile else (r, header)
 
         # load animations
+        sequences: list[(Reader, M_SeqHeader)] = None
         if header.seqGroups.num > 1:
-            self.sequences = [M_SeqHeader] * header.seqGroups.num - 1
+            sequences = [(Reader, self.M_SeqHeader)] * (header.seqGroups.num - 1)
             for i in range(len(sequences)):
-                path = f'{pathName}{i + 1:00}{pathExt}'
-                # self.sequences[i] = s.reader(r2 =>
-                # {
-                #     if (r2 == null) throw new Exception($"Sequence group file '{path}' does not exist");
-                #     var header = r2.ReadS<M_SeqHeader>();
-                #     if (header.Magic != M_MAGIC2) throw new FormatException("BAD MAGIC");
-                #     else if (header.Version != 10) throw new FormatException("BAD VERSION");
-                #     return Task.FromResult(header);
-                # }, path).Result;
+                def _sequences(r2: Reader):
+                    if not r2: raise Exception(f'Sequence group file "{path}" does not exist')
+                    header = r2.readS(self.M_SeqHeader)
+                    if header.magic != self.M_MAGIC2: raise Exception('BAD MAGIC')
+                    elif header.version != 10: raise Exception('BAD VERSION')
+                    return (r2, header)
+                sequences[i] = s.readerT(_sequences, path := f'{pathName}{i + 1:02}{pathExt}', True)
+
+        # validate
+        if header.bones.num < 0 \
+            or header.boneControllers.num < 0 \
+            or header.hitboxs.num < 0 \
+            or header.seqs.num < 0 \
+            or header.seqGroups.num < 0 \
+            or header.bodyparts.num < 0 \
+            or header.attachments.num < 0 \
+            or header.transitions.num < 0 \
+            or theader.textures.num < 0 \
+            or theader.skinFamilies.num < 0 \
+            or theader.numSkinRef < 0: raise Exception('Negative data chunk count value')
+
+        # build
+        self.eyePosition = header.eyePosition
+        self.boundingMin = header.min
+        self.boundingMax = header.max
+        self.clippingMin = header.bbMin
+        self.clippingMax = header.bbMax
+        self.flags = header.flags
+        r.seek(header.boneControllers.offset); self.boneControllers = [self.BoneController(x, i) for i,x in enumerate(r.readSArray(self.M_BoneController, header.boneControllers.num))]
+        r.seek(header.bones.offset); self.bones = [self.Bone(x, i, self.boneControllers) for i,x in enumerate(r.readSArray(self.M_Bone, header.bones.num))]; self.Bone.remap(self.bones)
+        r.seek(header.hitboxs.offset); self.hitboxes = [self.BBox(x, self.bones) for x in r.readSArray(self.M_BBox, header.hitboxs.num)]
+        r.seek(header.seqGroups.offset); self.sequenceGroups = [self.SeqGroup(x) for x in r.readSArray(self.M_SeqGroup, header.seqGroups.num)]
+        zeroGroupOffset = self.sequenceGroups[0].offset if self.sequenceGroups else 0
+        r.seek(header.seqs.offset); self.sequences = [self.Seq(r, x, sequences, zeroGroupOffset, self.isXashModel, self.bones) for x in r.readSArray(self.M_Seq, header.seqs.num)]
+        r.seek(header.attachments.offset); self.attachments = [self.Attachment(x, self.bones) for x in r.readSArray(self.M_Attachment, header.attachments.num)]
+        r.seek(header.bodyparts.offset); self.bodyparts = [self.Bodypart(r, x, self.bones) for x in r.readSArray(self.M_Bodypart, header.bodyparts.num)]
+        r.seek(header.transitions.offset); self.transitions = tr.readFArray(lambda x: x.readBytes(10), header.transitions.num)
+        tr.seek(theader.textures.offset); self.textures = [self.Texture(r, x) for x in tr.readSArray(self.M_Texture, theader.textures.num)]
+        tr.seek(theader.skinFamilies.offset); self.skinFamilies = tr.readFArray(lambda x: x.readPArray(None, 'H', theader.numSkinRef), theader.skinFamilies.num)
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
-        MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = self)),
+        MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = 'self')),
         MetaInfo('Model', items = [
-            MetaInfo(f'Name: {self.headerName}')
+            MetaInfo(f'Name: {self.name}')
             ])
         ]
 

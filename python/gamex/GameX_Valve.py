@@ -1,18 +1,10 @@
+from __future__ import annotations
 import os
 from gamex import BinaryPakFile
 from gamex.Valve.formats.pakbinary import PakBinary_Bsp30, PakBinary_Vpk, PakBinary_Wad3
 from gamex.Valve.formats.binary import Binary_Src, Binary_Spr, Binary_Mdl, Binary_Wad3
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
-
-# typedefs
-class Reader: pass
-class FamilyGame: pass
-class PakBinary: pass
-class PakState: pass
-class PakFile: pass
-class FileSource: pass
-class FileOption: pass
 
 #region ValvePakFile
 

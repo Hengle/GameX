@@ -1,15 +1,9 @@
+from __future__ import annotations
 import os
 from gamex import BinaryPakFile
 from gamex.Cig.formats.pakbinary import PakBinary_P4k
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
-
-# typedefs
-class FamilyGame: pass
-class PakBinary: pass
-class PakState: pass
-class FileSource: pass
-class FileOption: pass
 
 # CigPakFile
 class CigPakFile(BinaryPakFile):
