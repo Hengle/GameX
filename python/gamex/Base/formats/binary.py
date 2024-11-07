@@ -118,7 +118,7 @@ class Binary_Img(IHaveMetaInfo, ITexture):
         self.image = Image.open(r.f)
         self.width, self.height = self.image.size
         bytes = self.image.tobytes(); palette = self.image.getpalette()
-        # print(f'mode: {self.image.mode}')
+        print(f'mode: {self.image.mode}')
         match self.image.mode:
             case '1': # 1-bit pixels, black and white
                 self.format = (self.image.format,

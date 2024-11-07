@@ -19,4 +19,4 @@ def decompressBlast(r: Reader, length: int, newLength: int) -> bytes:
     decoder.decompress(fs, os)
     return os
 def decompressLz4(r: Reader, length: int, newLength: int) -> bytes: raise NotImplementedError()
-def decompressZlib2(r: Reader, length: int, newLength: int) -> bytes: raise NotImplementedError()
+# def decompressZlib2(r: Reader, length: int, newLength: int) -> bytes: raise NotImplementedError()

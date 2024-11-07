@@ -213,11 +213,11 @@ class BinaryPakFile(PakFile):
 
     #region PakBinary
     def read(self, tag: object = None) -> None: return \
-        self.reader(lambda r: self.pakBinary.read(self, r, tag)) if self.useReader else \
+        self.readerT(lambda r: self.pakBinary.read(self, r, tag)) if self.useReader else \
         self.pakBinary.read(self, None, tag)
 
     def readData(self, file: FileSource, option: FileOption = None) -> bytes: return \
-        self.reader(lambda r: self.pakBinary.readData(self, r, file, option)) if self.useReader else \
+        self.readerT(lambda r: self.pakBinary.readData(self, r, file, option)) if self.useReader else \
         self.pakBinary.readData(self, None, file, option)
     #endregion
 

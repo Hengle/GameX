@@ -2,7 +2,7 @@ import os
 from io import BytesIO
 from enum import Enum
 from gamex import FileSource, FileOption, PakBinaryT
-from gamex.compression import decompressLz4, decompressZlib2
+from gamex.compression import decompressLz4, decompressZlib
 from gamex.Bethesda.formats.records import FormType, Header
 
 # typedefs
@@ -159,7 +159,7 @@ class PakBinary_Ba2(PakBinaryT):
         # General BA2 Format
         if file.fileInfo == None:
             return BytesIO(
-                decompressZlib2(r, file.packedSize, file.fileSize) if file.compressed != 0 else \
+                decompressZlib(r, file.packedSize, file.fileSize) if file.compressed != 0 else \
                 r.readBytes(file.fileSize)
                 )
 
@@ -299,7 +299,7 @@ class PakBinary_Bsa(PakBinaryT):
                     fileX += 1
 
             # read-all names
-            for file in files: file.path = f'{file.path}/{r.readCString()}'
+            for file in files: file.path = f'{file.path}/{r.readVUString()}'
 
         # Morrowind
         elif magic == self.MW_BSAHEADER_FILEID:
@@ -346,7 +346,7 @@ class PakBinary_Bsa(PakBinaryT):
         newFileSize = r.readUInt32(); fileSize -= 4
         return BytesIO(
             decompressLz4(r, fileSize, newFileSize) if source.version == self.SSE_BSAHEADER_VERSION else \
-            decompressZlib2(r, fileSize, newFileSize))
+            decompressZlib(r, fileSize, newFileSize))
 
 #endregion
 

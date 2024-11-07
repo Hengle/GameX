@@ -1,5 +1,5 @@
 ﻿//#define Arkane
-//#define Bethesda
+#define Bethesda
 //#define Bioware
 //#define Black
 //#define Blizzard
@@ -22,7 +22,7 @@
 //#define Ubisoft
 //#define Unity
 //#define Unknown
-#define Valve
+//#define Valve
 //#define Volition
 //#define WB
 
@@ -49,7 +49,7 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            ForcePath = "sample:4",
+            ForcePath = "sample:0",
             Family = "Arkane",
             Game = "AF", // Arx Fatalis
             //Game = "DOM", // Dark Messiah of Might and Magic
@@ -68,7 +68,7 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            //ForcePath = "sample:0",
+            ForcePath = "sample:0",
             Family = "Bethesda",
             Game = "Morrowind", // The Elder Scrolls III: Morrowind
             //Game = "Oblivion", // The Elder Scrolls IV: Oblivion

@@ -12,12 +12,10 @@ using System.Threading.Tasks;
 namespace GameX.Bethesda.Formats
 {
     #region PakBinary_Ba2
-
     // http://en.uesp.net/wiki/Bethesda5Mod:Archive_File_Format
 
     public unsafe class PakBinary_Ba2 : PakBinary<PakBinary_Ba2>
     {
-        // Header : TES5
         #region Headers : TES5
 
         // Default header data
@@ -350,13 +348,11 @@ namespace GameX.Bethesda.Formats
     #endregion
 
     #region PakBinary_Bsa
-
     // http://en.uesp.net/wiki/Bethesda4Mod:BSA_File_Format
     // http://en.uesp.net/wiki/Bethesda3Mod:BSA_File_Format
 
     public unsafe class PakBinary_Bsa : PakBinary<PakBinary_Bsa>
     {
-        // Header : TES4
         #region Headers : TES4
 
         // Default header data
@@ -434,7 +430,6 @@ namespace GameX.Bethesda.Formats
 
         #endregion
 
-        // Header : TES3
         #region Headers : TES3
 
         // Default header data
@@ -570,7 +565,7 @@ namespace GameX.Bethesda.Formats
             var newFileSize = (int)r.ReadUInt32(); fileSize -= 4;
             return Task.FromResult<Stream>(source.Version == SSE_BSAHEADER_VERSION
                 ? new MemoryStream(r.DecompressLz4(fileSize, newFileSize))
-                : new MemoryStream(r.DecompressZlib2(fileSize, newFileSize)));
+                : new MemoryStream(r.DecompressZlib(fileSize, newFileSize))); //was:Zlib2
         }
     }
 

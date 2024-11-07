@@ -1,10 +1,10 @@
 __title__ = "gamex"
 __version__ = "0.0.1"
-# __current__ = "Unknown"
+__current__ = "Unknown"
 # __current__ = "Arkane"
 # __current__ = "Bethesda"
 # __current__ = "Bullfrog"
-__current__ = "Valve"
+# __current__ = "Valve"
 
 class GlobalOption:
     def __init__(self, Family:str=None, Game:str=None, Edition:str=None, ForcePath:str=None, ForceOpen:bool=False):
@@ -38,9 +38,9 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:1",
+            ForcePath = "sample:2",
             Family = "Bethesda",
-            Game = "Morrowind", # The Elder Scrolls III: Morrowind
+            # Game = "Morrowind", # The Elder Scrolls III: Morrowind
             # Game = "Oblivion", # The Elder Scrolls IV: Oblivion
             # Game = "Fallout3", # Fallout 3
             # Game = "FalloutNV", # Fallout New Vegas
@@ -472,7 +472,7 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:10",
+            ForcePath = "sample:0",
             Family = "Valve",
             Game = "HL", # Half-Life
             # Game = "TF", # Team Fortress Classic
