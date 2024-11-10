@@ -38,7 +38,7 @@ class ArkanePakFile(BinaryPakFile):
     @staticmethod
     def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
-            case x if x == '.asl': return (0, Binary_Txt.factory)
+            case '.asl': return (0, Binary_Txt.factory)
             # Danae (AF)
             case '.ftl': return (0, Binary_Ftl.factory)
             case '.fts': return (0, Binary_Fts.factory)

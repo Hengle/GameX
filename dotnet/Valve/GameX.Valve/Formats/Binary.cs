@@ -283,17 +283,9 @@ namespace GameX.Valve.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Spr(r, f));
 
-        (object gl, object vulken, object unity, object unreal) Format;
-        public int Width => width;
-        public int Height => height;
-        public int Depth => 0;
-        public int MipMaps => 1;
-        public TextureFlags TexFlags => 0;
-        public int Fps { get; } = 60;
-
         #region Headers
 
-        const uint SPR_MAGIC = 0x50534449; //: IDSP
+        const uint S_MAGIC = 0x50534449; //: IDSP
 
         /// <summary>
         /// Type of sprite.
@@ -328,9 +320,9 @@ namespace GameX.Valve.Formats
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        struct SPR_Header
+        struct S_Header
         {
-            public static (string, int) Struct = ("<I3if3ifi", sizeof(SPR_Header));
+            public static (string, int) Struct = ("<I3if3ifi", sizeof(S_Header));
             public uint Magic;
             public int Version;
             public SprType Type;
@@ -344,9 +336,9 @@ namespace GameX.Valve.Formats
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        struct SPR_Frame
+        struct S_Frame
         {
-            public static (string, int) Struct = ("<5i", sizeof(SPR_Frame));
+            public static (string, int) Struct = ("<5i", sizeof(S_Frame));
             public int Group;
             public int OriginX;
             public int OriginY;
@@ -358,7 +350,7 @@ namespace GameX.Valve.Formats
 
         int width;
         int height;
-        SPR_Frame[] frames;
+        S_Frame[] frames;
         byte[][] pixels;
         byte[] palette;
         int frame;
@@ -373,25 +365,35 @@ namespace GameX.Valve.Formats
                 TextureUnityFormat.RGBA32);
 
             // read file
-            var header = r.ReadS<SPR_Header>();
-            if (header.Magic != SPR_MAGIC) throw new FormatException("BAD MAGIC");
+            var header = r.ReadS<S_Header>();
+            if (header.Magic != S_MAGIC) throw new FormatException("BAD MAGIC");
 
             // load palette
             palette = r.ReadBytes(r.ReadUInt16() * 3);
 
             // load frames
-            frames = new SPR_Frame[header.NumFrames];
+            frames = new S_Frame[header.NumFrames];
             pixels = new byte[header.NumFrames][];
             for (var i = 0; i < header.NumFrames; i++)
             {
-                frames[i] = r.ReadS<SPR_Frame>();
-                ref SPR_Frame frame = ref frames[i];
+                frames[i] = r.ReadS<S_Frame>();
+                ref S_Frame frame = ref frames[i];
                 pixels[i] = r.ReadBytes(frame.Width * frame.Height);
             }
             width = frames[0].Width;
             height = frames[0].Height;
             bytes = new byte[width * height << 2];
         }
+
+        #region ITexture
+
+        (object gl, object vulken, object unity, object unreal) Format;
+        public int Width => width;
+        public int Height => height;
+        public int Depth => 0;
+        public int MipMaps => 1;
+        public TextureFlags TexFlags => 0;
+        public int Fps { get; } = 60;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
@@ -416,6 +418,8 @@ namespace GameX.Valve.Formats
             frame++;
             return true;
         }
+
+        #endregion
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "VideoTexture", Name = Path.GetFileName(file.Path), Value = this }),
@@ -1064,12 +1068,14 @@ namespace GameX.Valve.Formats
             Format = ((TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24);
         }
 
+        #region ITexture
+
         (object gl, object vulken, object unity, object unreal) Format;
         public int Width { get; set; }
         public int Height { get; set; }
         public int Depth => 0;
         public int MipMaps => 1;
-        TextureFlags ITexture.TexFlags => 0;
+        public TextureFlags TexFlags => 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
@@ -1088,6 +1094,8 @@ namespace GameX.Valve.Formats
             }, null);
         }
         public void End() { }
+
+        #endregion
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
@@ -1410,8 +1418,9 @@ namespace GameX.Valve.Formats
         byte[][] pixels;
         byte[] palette;
 
-        (Formats type, object gl, object vulken, object unity, object unreal) Format;
+        #region ITexture
 
+        (Formats type, object gl, object vulken, object unity, object unreal) Format;
         public int Width => width;
         public int Height => height;
         public int Depth => 0;
@@ -1442,6 +1451,8 @@ namespace GameX.Valve.Formats
             }, spans);
         }
         public void End() { }
+
+        #endregion
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),

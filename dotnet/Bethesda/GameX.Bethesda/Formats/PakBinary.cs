@@ -602,10 +602,10 @@ namespace GameX.Bethesda.Formats
                 // tes
                 "Morrowind" => FormType.TES3,
                 "Oblivion" => FormType.TES4,
-                var x when x == "Skyrim" || x == "SkyrimSE" || x == "SkyrimVR" => FormType.TES5,
+                "Skyrim" or "SkyrimSE" or "SkyrimVR" => FormType.TES5,
                 // fallout
-                var x when x == "Fallout3" || x == "FalloutNV" => FormType.TES4,
-                var x when x == "Fallout4" || x == "Fallout4VR" => FormType.TES5,
+                "Fallout3" or "FalloutNV" => FormType.TES4,
+                "Fallout4" or "Fallout4VR" => FormType.TES5,
                 "Starfield" => FormType.TES6,
                 _ => throw new ArgumentOutOfRangeException(nameof(game), game),
             };
@@ -637,7 +637,7 @@ namespace GameX.Bethesda.Formats
                 group.Load();
                 Groups = group.Records.GroupBy(x => x.Header.Type).ToDictionary(x => x.Key, x =>
                 {
-                    var s = new RecordGroup(null, filePath, Format, recordLevel) { Records = [..x] };
+                    var s = new RecordGroup(null, filePath, Format, recordLevel) { Records = [.. x] };
                     s.AddHeader(new Header { Label = x.Key }, load: false);
                     return s;
                 });

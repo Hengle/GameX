@@ -2,6 +2,7 @@
 using GameX.Formats.Unknown;
 using GameX.Frontier.Formats;
 using GameX.Frontier.Transforms;
+using GameX.Unknown;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -30,8 +31,7 @@ namespace GameX.Frontier
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
-                _ => (0, null),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

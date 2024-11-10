@@ -30,7 +30,7 @@ class ValvePakFile(BinaryPakFile):
         match game.engine:
             case 'GoldSrc':
                 match _pathExtension(source.path).lower():
-                    case x if x == '.pic' or x == '.tex' or x == '.tex2' or x == '.fnt': return (0, Binary_Wad3.factory)
+                    case '.pic' | '.tex' | '.tex2' | '.fnt': return (0, Binary_Wad3.factory)
                     case '.spr': return (0, Binary_Spr.factory)
                     case '.mdl': return (0, Binary_Mdl10.factory)
                     case _: return UnknownPakFile.objectFactory(source, game)

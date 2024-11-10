@@ -2,6 +2,7 @@
 using GameX.Capcom.Transforms;
 using GameX.Formats;
 using GameX.Formats.Unknown;
+using GameX.Unknown;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -55,9 +56,7 @@ namespace GameX.Capcom
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                ".png" => (0, Binary_Img.Factory),
-                var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
-                _ => (0, null),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

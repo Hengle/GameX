@@ -1,9 +1,6 @@
-﻿using GameX.Formats;
-using GameX.ID.Formats.Q;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using static System.IO.Polyfill;
@@ -124,28 +121,6 @@ namespace GameX.ID.Formats
 
     public unsafe class PakBinary_Pak : PakBinary<PakBinary_Pak>
     {
-        #region Factories
-
-        public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
-            => source.Path.ToLowerInvariant() switch
-            {
-                _ => Path.GetExtension(source.Path).ToLowerInvariant() switch
-                {
-                    ".wav" => (0, Binary_Snd.Factory),
-                    var x when x == ".jpg" => (0, Binary_Img.Factory),
-                    ".tga" => (0, Binary_Tga.Factory),
-                    var x when x == ".tex" || x == ".lmp" => (0, Binary_Lump.Factory),
-                    ".dds" => (0, Binary_Dds.Factory),
-                    ".pcx" => (0, Binary_Pcx.Factory),
-                    ".bsp" => (0, Binary_Level.Factory),
-                    ".mdl" => (0, Binary_Model.Factory),
-                    ".spr" => (0, Binary_Sprite.Factory),
-                    _ => (0, null),
-                }
-            };
-
-        #endregion
-
         #region Headers
 
         const uint P_MAGIC = 0x4b434150; // PACK

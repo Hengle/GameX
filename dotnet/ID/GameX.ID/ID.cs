@@ -1,7 +1,9 @@
 ﻿using GameX.Formats;
 using GameX.Formats.Unknown;
 using GameX.ID.Formats;
+using GameX.ID.Formats.Q;
 using GameX.ID.Transforms;
+using GameX.Unknown;
 using System;
 using System.IO;
 using System.Text.Json;
@@ -56,24 +58,26 @@ namespace GameX.ID
              => Path.GetExtension(filePath).ToLowerInvariant() switch
              {
                  "" => null,
-                 var x when x == ".pk3" || x == ".pk4" || x == ".zip" => PakBinary_Zip.GetPakBinary(game),
+                 ".pk3" or ".pk4" or ".zip" => PakBinary_Zip.GetPakBinary(game),
+                 ".bsp" => PakBinary_Bsp.Current,
                  ".pak" => PakBinary_Pak.Current,
                  ".wad" => PakBinary_Wad.Current,
                  _ => throw new ArgumentOutOfRangeException(),
              };
 
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
-            => game.Id switch
+            => game.Engine switch
             {
-                //var x when x == "Q" || x == "Q2" || x == "Q3" || x == "D3" || x == "Q:L" => PakBinary_Pak.ObjectFactory(source, game),
-                _ => PakBinary_Pak.ObjectFactory(source, game) // throw new ArgumentOutOfRangeException(),
+                "GoldSrc" => Path.GetExtension(source.Path).ToLowerInvariant() switch
+                {
+                    ".tex" or ".lmp" => (0, Binary_Lump.Factory),
+                    ".bsp" => (0, Binary_Level.Factory),
+                    ".mdl" => (0, Binary_Model.Factory),
+                    ".spr" => (0, Binary_Sprite.Factory),
+                    _ => UnknownPakFile.ObjectFactory(source, game),
+                },
+                _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine),
             };
-        //=> Path.GetExtension(source.Path).ToLowerInvariant() switch
-        //{
-        //    ".wav" => (0, Binary_Snd.Factory),
-        //    ".dds" => (0, Binary_Dds.Factory),
-        //    _ => (0, null),
-        //};
 
         #endregion
 

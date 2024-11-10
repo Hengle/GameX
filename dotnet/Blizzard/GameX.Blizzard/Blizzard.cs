@@ -2,6 +2,7 @@
 using GameX.Blizzard.Transforms;
 using GameX.Formats;
 using GameX.Formats.Unknown;
+using GameX.Unknown;
 using Microsoft.Extensions.FileSystemGlobbing;
 using System;
 using System.Collections.Generic;
@@ -74,9 +75,7 @@ namespace GameX.Blizzard
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                ".dds" => (0, Binary_Dds.Factory),
-                var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
-                _ => (0, null),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

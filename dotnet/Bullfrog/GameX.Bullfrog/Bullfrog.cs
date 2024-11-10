@@ -52,20 +52,20 @@ namespace GameX.Bullfrog
         static PakBinary GetPakBinary(FamilyGame game, string filePath)
             => game.Id switch
             {
-                var x when x == "DK" || x == "DK2" => PakBinary_Bullfrog.Current,           // Keeper
-                var x when x == "P" || x == "P2" || x == "P3" => PakBinary_Populus.Current, // Populus
-                var x when x == "S" || x == "S2" => PakBinary_Syndicate.Current,             // Syndicate
-                var x when x == "MC" || x == "MC2" => PakBinary_Bullfrog.Current,           // Carpet
-                var x when x == "TP" || x == "TH" => PakBinary_Bullfrog.Current,            // Theme
+                "DK" or "DK2" => PakBinary_Bullfrog.Current,           // Keeper
+                "P" or "P2" or "P3" => PakBinary_Populus.Current, // Populus
+                "S" or "S2" => PakBinary_Syndicate.Current,             // Syndicate
+                "MC" or "MC2" => PakBinary_Bullfrog.Current,           // Carpet
+                "TP" or "TH" => PakBinary_Bullfrog.Current,            // Theme
                 _ => throw new ArgumentOutOfRangeException(),
             };
 
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => game.Id switch
             {
-                var x when x == "DK" || x == "DK2" => PakBinary_Bullfrog.ObjectFactory(source, game),
-                var x when x == "P" || x == "P2" || x == "P3" => PakBinary_Populus.ObjectFactory(source, game),
-                var x when x == "S" || x == "S2" => PakBinary_Syndicate.ObjectFactory(source, game),
+                "DK" or "DK2" => PakBinary_Bullfrog.ObjectFactory(source, game),
+                "P" or "P2" or "P3" => PakBinary_Populus.ObjectFactory(source, game),
+                "S" or "S2" => PakBinary_Syndicate.ObjectFactory(source, game),
                 _ => throw new ArgumentOutOfRangeException(),
             };
 

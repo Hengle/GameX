@@ -7,17 +7,12 @@
     "IDFamily.Sample.json"
   ],
   "engines": {
-    "idTech0": { "name": "id Tech 0" },
-    "idTech1": { "name": "id Tech 1" },
-    "idTech2": { "name": "id Tech 2" },
-    "idTech2.5": { "name": "id Tech 2.5" },
-    "idTech3": { "name": "id Tech 3" },
-    "idTech3.5": { "name": "id Tech 3.5" },
-    "idTech4": { "name": "id Tech 4" },
-    "idTech4.5": { "name": "id Tech 4.5" },
-    "idTech5": { "name": "id Tech 5" },
-    "idTech6": { "name": "id Tech 6" },
-    "idTech7": { "name": "id Tech 7" }
+    "idTech": {
+      "name": "id Tech"
+    },
+    "T": {
+      "name": "id Tech"
+    }
   },
   "games": {
     "*": {
@@ -97,7 +92,7 @@
     "W3D": {
       "n/a": true,
       "name": "Wolfenstein 3D",
-      "engine": "idTech0",
+      "engine": "idTech:0",
       "url": "https://en.wikipedia.org/wiki/Wolfenstein_3D",
       "date": "1992-05-05",
       "tag": "DOS"
@@ -112,7 +107,7 @@
     "D1": {
       "n/a": true,
       "name": "Doom",
-      "engine": "idTech1",
+      "engine": "idTech:1",
       "url": "https://en.wikipedia.org/wiki/Doom_(1993_video_game)",
       "date": "1993-12-10",
       "tag": "DOS"
@@ -127,15 +122,26 @@
     },
     "Q": {
       "name": "Quake",
-      "engine": "idTech2",
-      "url": [ "https://store.steampowered.com/app/2310", "https://en.wikipedia.org/wiki/Quake_(video_game)" ],
+      "engine": "idTech:2",
+      "url": [
+        "https://store.steampowered.com/app/2310",
+        "https://en.wikipedia.org/wiki/Quake_(video_game)"
+      ],
       "date": "1996-06-22",
       "editions": {
-        "": { "name": "original" },
-        "r": { "name": "rerelease", "path": "rerelease" }
+        "": {
+          "name": "original"
+        },
+        "r": {
+          "name": "rerelease",
+          "path": "rerelease"
+        }
       },
       "searchBy": "Pak",
-      "pakExt": [".pak", ".wad"],
+      "pakExt": [
+        ".pak",
+        ".wad"
+      ],
       "path": "id1",
       "dlcs": {
         "hipnotic": {
@@ -166,15 +172,26 @@
     },
     "Q2": {
       "name": "Quake II",
-      "engine": "idTech2.5",
-      "url": [ "https://store.steampowered.com/app/2320", "https://en.wikipedia.org/wiki/Quake_II" ],
+      "engine": "idTech:25",
+      "url": [
+        "https://store.steampowered.com/app/2320",
+        "https://en.wikipedia.org/wiki/Quake_II"
+      ],
       "date": "1997-12-09",
       "searchBy": "Pak",
-      "pakExt": [".pak", ".wad"],
+      "pakExt": [
+        ".pak",
+        ".wad"
+      ],
       "path": "baseq2",
       "editions": {
-        "": { "name": "original" },
-        "r": { "name": "rerelease", "path": "rerelease" }
+        "": {
+          "name": "original"
+        },
+        "r": {
+          "name": "rerelease",
+          "path": "rerelease"
+        }
       },
       "dlcs": {
         "xatrix": {
@@ -197,11 +214,17 @@
     },
     "Q3": {
       "name": "Quake III Arena",
-      "engine": "idTech3",
-      "url": [ "https://store.steampowered.com/app/0", "https://en.wikipedia.org/wiki/Quake_III_Arena" ],
+      "engine": "idTech:3",
+      "url": [
+        "https://store.steampowered.com/app/0",
+        "https://en.wikipedia.org/wiki/Quake_III_Arena"
+      ],
       "date": "1999-12-05",
       "searchBy": "Pak",
-      "pakExt": [".pk3", ".wad"],
+      "pakExt": [
+        ".pk3",
+        ".wad"
+      ],
       "path": "baseq3",
       "dlcs": {
         "missionpack": {
@@ -214,11 +237,17 @@
     },
     "D3": {
       "name": "Doom 3",
-      "engine": "idTech4",
-      "url": [ "https://store.steampowered.com/app/9050", "https://en.wikipedia.org/wiki/Doom_3" ],
+      "engine": "idTech:4",
+      "url": [
+        "https://store.steampowered.com/app/9050",
+        "https://en.wikipedia.org/wiki/Doom_3"
+      ],
       "date": "2004-08-09",
       "searchBy": "Pak",
-      "pakExt": [".pk4", ".wad"],
+      "pakExt": [
+        ".pk4",
+        ".wad"
+      ],
       "path": "base"
     },
     "D:RPG": {
@@ -258,11 +287,17 @@
     },
     "Q:L": {
       "name": "Quake Live",
-      "engine": "idTech3",
-      "url": [ "https://store.steampowered.com/app/282440", "https://en.wikipedia.org/wiki/Quake_Live" ],
+      "engine": "idTech:3",
+      "url": [
+        "https://store.steampowered.com/app/282440",
+        "https://en.wikipedia.org/wiki/Quake_Live"
+      ],
       "date": "2010-08-06",
       "searchBy": "Pak",
-      "pakExt": [".pk3", ".wad"],
+      "pakExt": [
+        ".pk3",
+        ".wad"
+      ],
       "path": "baseq3"
     },
     "R:MBT": {
@@ -274,38 +309,60 @@
     },
     "R": {
       "name": "Rage",
-      "engine": "idTech5",
-      "url": [ "https://store.steampowered.com/app/9200", "https://en.wikipedia.org/wiki/Rage_(video_game)" ],
+      "engine": "idTech:5",
+      "url": [
+        "https://store.steampowered.com/app/9200",
+        "https://en.wikipedia.org/wiki/Rage_(video_game)"
+      ],
       "date": "2011-10-04",
       "searchBy_": "Pak",
-      "pakExt": [".pk3", ".wad"],
+      "pakExt": [
+        ".pk3",
+        ".wad"
+      ],
       "path": "baseq3"
     },
     "D": {
       "name": "Doom (2016)",
-      "engine": "T6",
-      "url": [ "https://store.steampowered.com/app/0", "https://en.wikipedia.org/wiki/Doom_(2016_video_game)" ],
+      "engine": "T:6",
+      "url": [
+        "https://store.steampowered.com/app/0",
+        "https://en.wikipedia.org/wiki/Doom_(2016_video_game)"
+      ],
       "date": "2016-05-13"
     },
     "D:VFR": {
       "name": "Doom VFR",
-      "url": [ "https://store.steampowered.com/app/650000", "https://en.wikipedia.org/wiki/Doom_VFR" ],
+      "url": [
+        "https://store.steampowered.com/app/650000",
+        "https://en.wikipedia.org/wiki/Doom_VFR"
+      ],
       "date": "2017-12-01"
     },
     "R2": {
       "name": "Rage 2",
-      "url": [ "https://store.steampowered.com/app/548570", "https://en.wikipedia.org/wiki/Rage_2" ],
+      "url": [
+        "https://store.steampowered.com/app/548570",
+        "https://en.wikipedia.org/wiki/Rage_2"
+      ],
       "date": "2019-05-14"
     },
     "D:E": {
       "name": "Doom Eternal",
-      "engine": "T7",
-      "url": [ "https://store.steampowered.com/app/0", "https://en.wikipedia.org/wiki/Doom_Eternal" ],
+      "engine": "T:7",
+      "url": [
+        "https://store.steampowered.com/app/0",
+        "https://en.wikipedia.org/wiki/Doom_Eternal"
+      ],
       "date": "2020-05-20"
     },
     "Q:C": {
       "name": "Quake Champions",
-      "url": [ "https://store.steampowered.com/app/611500", "https://en.wikipedia.org/wiki/Quake_Champions" ],
+      "engine": "T:7",
+      "url": [
+        "https://store.steampowered.com/app/611500",
+        "https://en.wikipedia.org/wiki/Quake_Champions"
+      ],
       "date": "2022-08-18"
     }
   },
@@ -322,8 +379,14 @@
         "dir": "Quake 2"
       },
       "Q3": {
-        "key": [ "Steam:2200", "Gog:1441704920" ],
-        "reg": [ "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2200", "GOG.com/Games/1441704920" ],
+        "key": [
+          "Steam:2200",
+          "Gog:1441704920"
+        ],
+        "reg": [
+          "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2200",
+          "GOG.com/Games/1441704920"
+        ],
         "dir": "Quake III"
       },
       "D3": {

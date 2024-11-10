@@ -63,6 +63,8 @@ namespace GameX.Formats
         readonly byte[] Bytes;
         readonly Range[] Spans;
 
+        #region ITexture
+
         readonly (object type, int blockSize, object gl, object vulken, object unity, object unreal) Format;
         public int Width { get; }
         public int Height { get; }
@@ -81,6 +83,8 @@ namespace GameX.Formats
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
             }, Spans);
         public void End() { }
+
+        #endregion
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
@@ -569,13 +573,6 @@ namespace GameX.Formats
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Img(r, f));
 
-        (string type, object gl, object vulken, object unity, object unreal) Format;
-        public int Width { get; }
-        public int Height { get; }
-        public int Depth { get; } = 0;
-        public int MipMaps { get; } = 1;
-        public TextureFlags TexFlags { get; } = 0;
-
         #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -664,6 +661,15 @@ namespace GameX.Formats
             }
         }
 
+        #region ITexture
+
+        (string type, object gl, object vulken, object unity, object unreal) Format;
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth { get; } = 0;
+        public int MipMaps { get; } = 1;
+        public TextureFlags TexFlags { get; } = 0;
+
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
             => (Bytes, (Platform.Type)platform switch
             {
@@ -674,6 +680,8 @@ namespace GameX.Formats
                 _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
             }, null);
         public void End() { }
+
+        #endregion
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
@@ -754,19 +762,19 @@ namespace GameX.Formats
     #endregion
 
     #region Binary_Pcx
-
     // https://en.wikipedia.org/wiki/PCX
     // https://github.com/warpdesign/pcx-js/blob/master/js/pcx.js
+
     public unsafe class Binary_Pcx : IHaveMetaInfo, ITexture
     {
-        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pcx(r, f));
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Pcx(r));
 
         #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_Header
         {
-            public static (string, int) Struct = ("<4B6H48c2B4H54c", sizeof(X_Header));
+            public static (string, int) Struct = ("<4B6H48s2B4H54s", sizeof(X_Header));
             public byte Manufacturer;       // Fixed header field valued at a hexadecimal
             public byte Version;            // Version number referring to the Paintbrush software release
             public byte Encoding;           // Method used for encoding the image data
@@ -789,13 +797,8 @@ namespace GameX.Formats
 
         #endregion
 
-        public Binary_Pcx(BinaryReader r, FileSource f)
+        public Binary_Pcx(BinaryReader r)
         {
-            Format = (
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGBA32,
-                TextureUnrealFormat.Unknown);
             Header = r.ReadS<X_Header>();
             if (Header.Manufacturer != 0x0a) throw new FormatException("BAD MAGIC");
             else if (Header.Encoding == 0) throw new FormatException("NO COMPRESSION");
@@ -803,13 +806,16 @@ namespace GameX.Formats
             Planes = Header.NumPlanes;
             Width = Header.XMax - Header.XMin + 1;
             Height = Header.YMax - Header.YMin + 1;
+            Format = ((TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnrealFormat.Unknown);
         }
 
         readonly X_Header Header;
         readonly int Planes;
         readonly byte[] Body;
-        readonly (object gl, object vulken, object unity, object unreal) Format;
 
+        #region ITexture
+
+        readonly (object gl, object vulken, object unity, object unreal) Format;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
@@ -835,6 +841,7 @@ namespace GameX.Formats
         /// <param name="pixels"></param>
         /// <param name="pos"></param>
         /// <param name="index"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static void SetPixel(Span<byte> palette, byte[] pixels, int pos, int index)
         {
             var start = index * 3;
@@ -862,7 +869,7 @@ namespace GameX.Formats
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {
-            // Decodes 4bpp pixel data
+            // decodes 4bpp pixel data
             byte[] Decode4bpp()
             {
                 var palette = GetPalette();
@@ -901,7 +908,7 @@ namespace GameX.Formats
                 return pixels;
             }
 
-            // Decodes 8bpp (depth = 8/24bit) data
+            // decodes 8bpp (depth = 8/24bit) data
             byte[] Decode8bpp()
             {
                 var palette = Planes == 1 ? GetPalette() : null;
@@ -938,12 +945,13 @@ namespace GameX.Formats
                 return pixels;
             }
 
-            return (Header.Bpp switch
+            var bytes = Header.Bpp switch
             {
                 8 => Decode8bpp(),
                 1 => Decode4bpp(),
                 _ => throw new FormatException($"Unsupported bpp: {Header.Bpp}"),
-            }, (Platform.Type)platform switch
+            };
+            return (bytes, (Platform.Type)platform switch
             {
                 Platform.Type.OpenGL => Format.gl,
                 Platform.Type.Vulken => Format.vulken,
@@ -954,12 +962,14 @@ namespace GameX.Formats
         }
         public void End() { }
 
+        #endregion
+
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new($"{nameof(Binary_Pcx)}", items: new List<MetaInfo> {
+            new($"{nameof(Binary_Pcx)}", items: [
                 new($"Width: {Width}"),
                 new($"Height: {Height}"),
-            })
+            ])
         ];
     }
 
@@ -1001,8 +1011,10 @@ namespace GameX.Formats
         public byte[] Body;
         readonly byte[][] PaletteData;
         public string Palette;
-        readonly (object gl, object vulken, object unity, object unreal) Format;
 
+        #region ITexure
+
+        readonly (object gl, object vulken, object unity, object unreal) Format;
         public int Width { get; set; }
         public int Height { get; set; }
         public int Depth { get; } = 0;
@@ -1040,6 +1052,8 @@ namespace GameX.Formats
             }, null);
         }
         public void End() { }
+
+        #endregion
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
@@ -1110,21 +1124,14 @@ namespace GameX.Formats
     #endregion
 
     #region Binary_Tga
-
     // https://en.wikipedia.org/wiki/Truevision_TGA
     // https://github.com/cadenji/tgafunc/blob/main/tgafunc.c
     // https://www.dca.fee.unicamp.br/~martino/disciplinas/ea978/tgaffs.pdf
     // https://www.conholdate.app/viewer/view/rVqTeZPLAL/tga-file-format-specifications.pdf?default=view&preview=
+
     public unsafe class Binary_Tga : IHaveMetaInfo, ITexture
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Tga(r, f));
-
-        (object gl, object vulken, object unity, object unreal) Format;
-        public int Width { get; }
-        public int Height { get; }
-        public int Depth { get; } = 0;
-        public int MipMaps { get; } = 1;
-        public TextureFlags TexFlags { get; } = 0;
 
         #region Headers
 
@@ -1309,6 +1316,15 @@ namespace GameX.Formats
             };
         }
 
+        #region ITexture
+
+        (object gl, object vulken, object unity, object unreal) Format;
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth { get; } = 0;
+        public int MipMaps { get; } = 1;
+        public TextureFlags TexFlags { get; } = 0;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static ushort PixelToMapIndex(byte[] pixelPtr, int offset) => pixelPtr[offset];
 
@@ -1451,6 +1467,8 @@ namespace GameX.Formats
                 }
         }
 
+        #endregion
+
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
             new($"{nameof(Binary_Tga)}", items: [
@@ -1486,12 +1504,14 @@ namespace GameX.Formats
 
         readonly int Type;
         readonly byte[] Body = r.ReadToEnd();
+
+        #region ITexture
+
         readonly (object gl, object vulken, object unity, object unreal) Format = (
             (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
             (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
             TextureUnityFormat.RGBA32,
             TextureUnrealFormat.Unknown);
-
         public int Width { get; } = 64;
         public int Height { get; } = 64;
         public int Depth { get; } = 0;
@@ -1515,6 +1535,8 @@ namespace GameX.Formats
             }, null);
         }
         public void End() { }
+
+        #endregion
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),

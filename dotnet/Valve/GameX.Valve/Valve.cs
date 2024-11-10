@@ -48,7 +48,7 @@ namespace GameX.Valve
             {
                 "GoldSrc" => Path.GetExtension(source.Path).ToLowerInvariant() switch
                 {
-                    var x when x == ".pic" || x == ".tex" || x == ".tex2" || x == ".fnt" => (0, Binary_Wad3.Factory),
+                    ".pic" or ".tex" or ".tex2" or ".fnt" => (0, Binary_Wad3.Factory),
                     ".spr" => (0, Binary_Spr.Factory),
                     ".mdl" => (0, Binary_Mdl10.Factory),
                     _ => UnknownPakFile.ObjectFactory(source, game),

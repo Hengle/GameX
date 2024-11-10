@@ -1,5 +1,6 @@
 ﻿using GameX.Formats;
 using GameX.Formats.Unknown;
+using GameX.Unknown;
 using GameX.Volition.Formats;
 using GameX.Volition.Formats.Descent;
 using GameX.Volition.Transforms;
@@ -70,13 +71,9 @@ namespace GameX.Volition
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
                 ".256" => (0, Binary_Pal.Factory_3),
-                ".bmp" => (0, Binary_Bmp.Factory),
-                ".wav" => (0, Binary_Snd.Factory),
-                ".pcx" => (0, Binary_Pcx.Factory),
                 ".mvl" => (0, Binary_Mvl.Factory),
-                _ => (0, null),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

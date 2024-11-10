@@ -4,7 +4,7 @@
     "files": [
       {
         "path": "PAK0.PAK:gfx.wad:BACKTILE.tex",
-        "type": "Wad"
+        "type": "Texture"
       },
       {
         "path": "PAK0.PAK:gfx/palette.lmp",

@@ -55,7 +55,7 @@ namespace GameX.Arkane
         internal static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".asl" => (0, Binary_Txt.Factory),
+                ".asl" => (0, Binary_Txt.Factory),
                 // Danae (AF)
                 ".ftl" => (0, Binary_Ftl.Factory),
                 ".fts" => (0, Binary_Fts.Factory),

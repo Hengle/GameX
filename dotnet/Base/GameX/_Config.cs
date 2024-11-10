@@ -13,7 +13,7 @@
 //#define Epic
 //#define Frictional
 //#define Frontier
-//#define ID
+#define ID
 //#define IW
 //#define Lucas
 //#define Monolith
@@ -22,7 +22,7 @@
 //#define Ubisoft
 //#define Unity
 //#define Unknown
-#define Valve
+//#define Valve
 //#define Volition
 //#define WB
 
@@ -322,7 +322,7 @@ namespace GameX
             ForceOpen = true,
             ForcePath = "sample:0",
             Family = "ID",
-            //Game = "Q", // Quake
+            Game = "Q", // Quake
             //Game = "Q2", // Quake II
             //Game = "Q3", // Quake III Arena
             //Game = "D3", // Doom 3
@@ -332,7 +332,7 @@ namespace GameX
             //Game = "D:VFR", // Doom VFR
             //Game = "R2", // Rage 2 (buy)
             //Game = "D:E", // Doom Eternal (buy)
-            Game = "Q:C", // Quake Champions
+            //Game = "Q:C", // Quake Champions
         };
 #elif IW
         static readonly string[] FamilyKeys = ["IW", "Unknown"];

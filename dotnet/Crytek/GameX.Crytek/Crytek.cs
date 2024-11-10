@@ -2,6 +2,7 @@
 using GameX.Crytek.Transforms;
 using GameX.Formats;
 using GameX.Formats.Unknown;
+using GameX.Unknown;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -47,9 +48,8 @@ namespace GameX.Crytek
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 ".xml" => (0, CryXmlFile.Factory),
-                ".dds" => (0, Binary_Dds.Factory),
-                var x when x == ".cgf" || x == ".cga" || x == ".chr" || x == ".skin" || x == ".anim" => (0, CryFile.Factory),
-                _ => (0, null),
+                ".cgf" or ".cga" or ".chr" or ".skin" or ".anim" => (0, CryFile.Factory),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

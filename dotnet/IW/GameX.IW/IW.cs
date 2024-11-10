@@ -2,6 +2,7 @@
 using GameX.Formats.Unknown;
 using GameX.IW.Formats;
 using GameX.IW.Transforms;
+using GameX.Unknown;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -31,12 +32,11 @@ namespace GameX.IW
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
                 //".roq" => (0, VIDEO.Factory),
                 //".wav" => (0, BinaryWav.Factory),
                 //".d3dbsp" => (0, BinaryD3dbsp.Factory),
                 ".iwi" => (0, Binary_Iwi.Factory),
-                _ => (0, null),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

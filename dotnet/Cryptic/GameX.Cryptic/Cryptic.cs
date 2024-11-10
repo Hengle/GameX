@@ -2,6 +2,7 @@
 using GameX.Cryptic.Transforms;
 using GameX.Formats;
 using GameX.Formats.Unknown;
+using GameX.Unknown;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -34,13 +35,12 @@ namespace GameX.Cryptic
         internal static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".png" => (0, Binary_Img.Factory),
                 ".bin" => (0, Binary_Bin.Factory),
-                var x when x == ".htex" || x == ".wtex" => (0, Binary_Tex.Factory), // Textures
+                ".htex" or ".wtex" => (0, Binary_Tex.Factory), // Textures
                 ".mset" => (0, Binary_MSet.Factory), // 3D Models
                 ".fsb" => (0, Binary_Fsb.Factory), // FMod Soundbanks
                 ".bik" => (0, Binary_Bik.Factory), // Bink Video
-                _ => (0, null),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

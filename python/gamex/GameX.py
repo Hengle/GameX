@@ -1,7 +1,7 @@
 from __future__ import annotations
 import os
 from gamex import Family, PakFile, FileSource, MetaManager, MetaInfo, MetaContent, IHaveMetaInfo
-from gamex.Base.formats.binary import Binary_Dds, Binary_Img, Binary_Snd, Binary_Tga, Binary_Txt
+from gamex.Base.formats.binary import Binary_Dds, Binary_Img, Binary_Pcx, Binary_Snd, Binary_Tga, Binary_Txt
 from gamex.util import _pathExtension
 
 # UnknownFamily
@@ -21,9 +21,10 @@ class UnknownPakFile(PakFile):
     @staticmethod
     def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match _pathExtension(source.path).lower():
-            case x if x == '.txt' or x == '.ini' or x == '.cfg' or x == '.xml': return (0, Binary_Txt.factory)
+            case '.txt' | '.ini' | '.cfg' | '.csv' | '.xml': return (0, Binary_Txt.factory)
             case '.wav': return (0, Binary_Snd.factory)
-            case x if x == '.bmp' or x == '.jpg': return (0, Binary_Img.factory)
+            case '.bmp' | '.jpg' | '.png' | '.gif' | '.tiff': return (0, Binary_Img.factory)
+            case '.pcx': return (0, Binary_Pcx.factory)
             case '.tga': return (0, Binary_Tga.factory)
             case '.dds': return (0, Binary_Dds.factory)
             case _:

@@ -25,7 +25,7 @@ namespace GameX.Bullfrog.Formats
         //    {
         //        ".pal" => (0, Binary_Pal.Factory_3),
         //        ".wav" => (0, Binary_Snd.Factory),
-        //        var x when x == ".tex" || x == ".raw" => (0, Binary_Raw.FactoryMethod(Binary_RawFunc, (id, value) => id switch
+        //        ".tex" or ".raw" => (0, Binary_Raw.FactoryMethod(Binary_RawFunc, (id, value) => id switch
         //        {
         //            "DK" => Games.DK.Database.GetPalette(value, "DATA/MAIN"),
         //            "DK2" => Games.DK2.Database.GetPalette(value, "DATA/MAIN"),
@@ -379,17 +379,17 @@ namespace GameX.Bullfrog.Formats
              var x when x.StartsWith("MAP") && x.EndsWith(".DAT") => (0, Binary_Syndicate.Factory_MapData),
              "HBLK01.DAT" => (0, Binary_Syndicate.Factory_MapTile),
              var x when x.StartsWith("MISS") && x.EndsWith(".DAT") => (0, Binary_Syndicate.Factory_Mission),
-             var x when x == "INTRO.XMI" || x == "SYNGAME.XMI" => (0, Binary_Iif.Factory),
+             "INTRO.XMI" or "SYNGAME.XMI" => (0, Binary_Iif.Factory),
              var x when x.StartsWith("HPAL") && x.EndsWith(".DAT") || x == "HPALETTE.DAT" || x == "MSELECT.PAL" => (0, Binary_Syndicate.Factory_Palette),
-             var x when x == "MLOGOS.DAT" || x == "MMAPBLK.DAT" || x == "MMINLOGO.PAL" => (0, Binary_Syndicate.Factory_Raw),
+             "MLOGOS.DAT" or "MMAPBLK.DAT" or "MMINLOGO.PAL" => (0, Binary_Syndicate.Factory_Raw),
              "HREQ.DAT" => (0, Binary_Syndicate.Factory_Req),
              var x when x.StartsWith("ISNDS-") && x.EndsWith(".DAT") || x.StartsWith("SOUND-") && x.EndsWith(".DAT") => (0, Binary_Syndicate.Factory_SoundData),
              var x when x.StartsWith("ISNDS-") && x.EndsWith(".TAB") || x.StartsWith("SOUND-") && x.EndsWith(".TAB") => (0, Binary_Syndicate.Factory_SoundTab),
              "HSTA-0.ANI" => (0, Binary_Syndicate.Factory_SpriteAnim),
              "HFRA-0.ANI" => (0, Binary_Syndicate.Factory_SpriteFrame),
              "HELE-0.ANI" => (0, Binary_Syndicate.Factory_SpriteElement),
-             var x when x == "HPOINTER.TAB" || x == "HSPR-0.TAB" || x == "MFNT-0.TAB" || x == "MSPR-0.TAB" => (0, Binary_Syndicate.Factory_SpriteTab),
-             var x when x == "HPOINTER.DAT" || x == "HSPR-0.DAT" || x == "MFNT-0.DAT" || x == "MSPR-0.DAT" => (0, Binary_Syndicate.Factory_SpriteData),
+             "HPOINTER.TAB" or "HSPR-0.TAB" or "MFNT-0.TAB" or "MSPR-0.TAB" => (0, Binary_Syndicate.Factory_SpriteTab),
+             "HPOINTER.DAT" or "HSPR-0.DAT" or "MFNT-0.DAT" or "MSPR-0.DAT" => (0, Binary_Syndicate.Factory_SpriteData),
              _ => throw new ArgumentOutOfRangeException(),
          };
 

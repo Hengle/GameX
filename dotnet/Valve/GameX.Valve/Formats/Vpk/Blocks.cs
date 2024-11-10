@@ -161,7 +161,7 @@ namespace GameX.Valve.Formats.Vpk
         //was:Resource.ConstructResourceType()
         internal static DATA Factory(Binary_Src source) => source.DataType switch
         {
-            var x when x == ResourceType.Panorama || x == ResourceType.PanoramaScript || x == ResourceType.PanoramaTypescript || x == ResourceType.PanoramaDynamicImages || x == ResourceType.PanoramaVectorGraphic => new D_Panorama(),
+            ResourceType.Panorama or ResourceType.PanoramaScript or ResourceType.PanoramaTypescript or ResourceType.PanoramaDynamicImages or ResourceType.PanoramaVectorGraphic => new D_Panorama(),
             ResourceType.PanoramaStyle => new D_PanoramaStyle(),
             ResourceType.PanoramaLayout => new D_PanoramaLayout(),
             ResourceType.Sound => new D_Sound(),
@@ -176,7 +176,7 @@ namespace GameX.Valve.Formats.Vpk
             ResourceType.ParticleSystem => new D_ParticleSystem(),
             ResourceType.PostProcessing => new D_PostProcessing(),
             ResourceType.ResourceManifest => new D_ResourceManifest(),
-            var x when x == ResourceType.SboxManagedResource || x == ResourceType.ArtifactItem => new D_Plaintext(),
+            ResourceType.SboxManagedResource or ResourceType.ArtifactItem => new D_Plaintext(),
             ResourceType.PhysicsCollisionMesh => new D_PhysAggregateData(),
             ResourceType.Mesh => new D_Mesh(source),
             //ResourceType.Mesh => source.Version != 0 ? new DATABinaryKV3() : source.ContainsBlockType<NTRO>() ? new DATABinaryNTRO() : new DATA(),
@@ -222,7 +222,7 @@ namespace GameX.Valve.Formats.Vpk
                 "VectorGraphic" => ResourceType.PanoramaVectorGraphic,
                 "VData" => ResourceType.VData,
                 "DotaItem" => ResourceType.ArtifactItem,
-                var x when x == "SBData" || x == "ManagedResourceCompiler" => ResourceType.SboxManagedResource, // This is without the "Compile" prefix
+                "SBData" or "ManagedResourceCompiler" => ResourceType.SboxManagedResource, // This is without the "Compile" prefix
                 _ => Enum.TryParse(identifier, false, out ResourceType resourceType) ? resourceType : ResourceType.Unknown,
             };
         }
@@ -1877,7 +1877,7 @@ namespace GameX.Valve.Formats.Vpk
                         EntityFieldType.Integer => r.ReadInt32(),
                         EntityFieldType.UInt => r.ReadUInt32(),
                         EntityFieldType.Integer64 => r.ReadUInt64(),
-                        var x when x == EntityFieldType.Vector || x == EntityFieldType.QAngle => new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle()),
+                        EntityFieldType.Vector or EntityFieldType.QAngle => new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle()),
                         EntityFieldType.CString => r.ReadVUString(), // null term variable
                         _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unknown type {type}"),
                     }

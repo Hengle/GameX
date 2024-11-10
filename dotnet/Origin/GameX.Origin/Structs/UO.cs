@@ -885,7 +885,7 @@ namespace GameX.Origin.Structs.UO
         public static SpellbookTypes GetSpellBookTypeFromItemID(int itemID)
             => itemID switch
             {
-                var x when x == 0x0E3B || x == 0x0EFA => SpellbookTypes.Magic,
+                0x0E3B or 0x0EFA => SpellbookTypes.Magic,
                 0x2252 => SpellbookTypes.Chivalry,  // paladin spellbook
                 0x2253 => SpellbookTypes.Necromancer,  // necromancer book
                 0x238C => SpellbookTypes.Bushido,  // book of bushido

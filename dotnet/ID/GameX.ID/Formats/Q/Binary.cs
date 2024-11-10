@@ -78,13 +78,13 @@ namespace GameX.ID.Formats.Q
 
         // IHaveMetaInfo
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-            => new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-                new MetaInfo("Texture", items: new List<MetaInfo> {
-                    new MetaInfo($"Width: {Width}"),
-                    new MetaInfo($"Height: {Height}"),
-                })
-            };
+            => [
+                new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+                new("Texture", items: [
+                    new($"Width: {Width}"),
+                    new($"Height: {Height}"),
+                ])
+            ];
     }
 
     #endregion
@@ -95,7 +95,7 @@ namespace GameX.ID.Formats.Q
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Level(r));
 
-        #region Records
+        #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct D_Entry

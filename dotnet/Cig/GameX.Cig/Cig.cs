@@ -3,6 +3,7 @@ using GameX.Cig.Transforms;
 using GameX.Crytek.Formats;
 using GameX.Formats;
 using GameX.Formats.Unknown;
+using GameX.Unknown;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -32,13 +33,11 @@ namespace GameX.Cig
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
                 //".cfg" => (0, BinaryDcb.Factory),
-                var x when x == ".cfg" || x == ".txt" => (0, Binary_Txt.Factory),
-                var x when x == ".mtl" || x == ".xml" => (FileOption.Stream, CryXmlFile.Factory),
-                ".dds" => (0, Binary_Dds.Factory),
+                ".mtl" or ".xml" => (FileOption.Stream, CryXmlFile.Factory),
                 ".a" => (0, Binary_DdsA.Factory),
                 ".dcb" => (0, Binary_Dcb.Factory),
-                var x when x == ".soc" || x == ".cgf" || x == ".cga" || x == ".chr" || x == ".skin" || x == ".anim" => (FileOption.Model, CryFile.Factory),
-                _ => (0, null),
+                ".soc" or ".cgf" or ".cga" or ".chr" or ".skin" or ".anim" => (FileOption.Model, CryFile.Factory),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

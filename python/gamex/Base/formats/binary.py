@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os, numpy as np
 from io import BytesIO
 from PIL import Image
@@ -7,13 +8,6 @@ from openstk.gfx.gfx_texture import DDS_HEADER, ITexture, TextureGLFormat, Textu
 from gamex import PakBinary, FileSource, MetaManager, MetaInfo, MetaContent, IHaveMetaInfo
 from gamex.platform import Platform
 from gamex.util import _pathExtension
-
-# typedefs
-class PakFile: pass
-class Reader: pass
-class TextureFlags: pass
-class MetaManager: pass
-class MetaManager: pass
 
 #region Binary_Bik
 
@@ -38,12 +32,6 @@ class Binary_Dds(IHaveMetaInfo, ITexture):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Dds(r)
 
-    width: int = 0
-    height: int = 0
-    depth: int = 0
-    mipMaps: int = 1
-    texFlags: TextureFlags = 0
-
     def __init__(self, r: Reader, readMagic: bool = True):
         self.header, self.headerDXT10, self.format, self.bytes = DDS_HEADER.read(r, readMagic)
         width = self.header.dwWidth; height = self.header.dwHeight; mipMaps = max(1, self.header.dwMipMapCount)
@@ -61,6 +49,14 @@ class Binary_Dds(IHaveMetaInfo, ITexture):
         self.height = height
         self.mipMaps = mipMaps
 
+    #region ITexture
+
+    width: int = 0
+    height: int = 0
+    depth: int = 0
+    mipMaps: int = 1
+    texFlags: TextureFlags = 0
+
     def begin(self, platform: int) -> (bytes, object, list[object]):
         match platform:
             case Platform.Type.OpenGL: format = self.format[2]
@@ -70,6 +66,8 @@ class Binary_Dds(IHaveMetaInfo, ITexture):
             case _: raise Exception('Unknown {platform}')
         return self.bytes, format, self.spans
     def end(self): pass
+
+    #endregion
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Texture', name = os.path.basename(file.path), value = self)),
@@ -105,12 +103,6 @@ class Binary_Fsb(IHaveMetaInfo):
 class Binary_Img(IHaveMetaInfo, ITexture):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Img(r, f)
-
-    width: int = 0
-    height: int = 0
-    depth: int = 0
-    mipMaps: int = 1
-    texFlags: TextureFlags = 0
 
     def __init__(self, r: Reader, f: FileSource):
         self.image = Image.open(r.f)
@@ -151,6 +143,14 @@ class Binary_Img(IHaveMetaInfo, ITexture):
             self.bytes = bytearray(self.width * self.height * 3)
             Rasterize.copyPixelsByPalette(self.bytes, 3, bytes, palette, 3)
 
+    #region ITexture
+
+    width: int = 0
+    height: int = 0
+    depth: int = 0
+    mipMaps: int = 1
+    texFlags: TextureFlags = 0
+
     def begin(self, platform: int) -> (bytes, object, list[object]):
         match platform:
             case Platform.Type.OpenGL: format = self.format[1]
@@ -160,6 +160,8 @@ class Binary_Img(IHaveMetaInfo, ITexture):
             case _: raise Exception(f'Unknown {platform}')
         return self.bytes, format, None
     def end(self): pass
+
+    #endregion
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Texture', name = os.path.basename(file.path), value = self)),
@@ -189,6 +191,93 @@ class Binary_Msg(IHaveMetaInfo):
 
 #endregion
 
+#region Binary_Pcx
+
+# Binary_Pcx
+class Binary_Pcx(IHaveMetaInfo, ITexture):
+    @staticmethod
+    def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Pcx(r, f.fileSize)
+
+    #region Headers
+
+    class X_Header:
+        struct = ('<4B6H48s2B4H54s', 18)
+        def __init__(self, tuple):
+            self.manufacturer, \
+            self.version, \
+            self.encoding, \
+            self.bpp, \
+            self.xmin, \
+            self.ymin, \
+            self.xmax, \
+            self.ymax, \
+            self.hdpi, \
+            self.vdpi, \
+            self.palette, \
+            self.reserved1, \
+            self.numPlanes, \
+            self.bpl, \
+            self.mode, \
+            self.vres, \
+            self.vres, \
+            self.reserved2 = tuple
+
+    #endregion
+
+    def __init__(self, r: Reader, fileSize: int):
+        self.header = r.readS(self.X_Header)
+        if self.header.manufacturer != 0x0a: raise Exception('BAD MAGIC')
+        elif self.header.encoding == 0: raise Exception('NO COMPRESSION')
+        self.body = r.readToEnd()
+        self.planes = self.header.numPlanes
+        self.Width = self.header.xmax - self.header.xmin + 1
+        self.height = self.header.ymax - self.header.ymin + 1
+        self.format = ((TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnrealFormat.Unknown)
+
+    #region ITexture
+
+    width: int = 0
+    height: int = 0
+    depth: int = 0
+    mipMaps: int = 1
+    texFlags: TextureFlags = 0
+
+    @staticmethod
+    def rle(body: bytearray, offset: int) -> bool: return (body[offset] >> 6) == 3
+
+    @staticmethod
+    def rleLength(body: bytearray, offset: int) -> int: return body[offset] & 63
+
+    def begin(self, platform: int) -> (bytes, object, list[object]):
+        # decodes 4bpp pixel data
+        def decode4bbp():
+            pass
+
+        # decodes 8bpp (depth = 8/24bit) data
+        def decode8bbp():
+            pass
+
+        match header.bpp:
+            case 8: bytes = decode8bpp()
+            case 1: bytes = decode4bpp()
+            case _: raise Exception(f'Unknown bpp: {header.bpp}')
+        match platform:
+            case Platform.Type.OpenGL: format = self.format[1]
+            case Platform.Type.Vulken: format = self.format[2]
+            case Platform.Type.Unity: format = self.format[3]
+            case Platform.Type.Unreal: format = self.format[4]
+            case _: raise Exception(f'Unknown {platform}')
+        return bytes, format, None
+    def end(self): pass
+
+    #endregion
+
+    def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
+        MetaInfo(None, MetaContent(type = 'AudioPlayer', name = os.path.basename(file.path), value = self.data, tag = _pathExtension(file.path)))
+        ]
+
+#endregion
+
 #region Binary_Snd
     
 # Binary_Snd
@@ -207,21 +296,11 @@ class Binary_Snd(IHaveMetaInfo):
 
 #region Binary_Tga
 
-# typedefs
-class ColorMap: pass
-class PIXEL: pass
-
 # Binary_Tga
 class Binary_Tga(IHaveMetaInfo, ITexture):
 
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Tga(r, f)
-
-    width: int = 0
-    height: int = 0
-    depth: int = 0
-    mipMaps: int = 1
-    texFlags: TextureFlags = 0
 
     #region Headers
 
@@ -341,7 +420,7 @@ class Binary_Tga(IHaveMetaInfo, ITexture):
             if self.IS_COLOR_MAPPED:
                 if self.pixelDepth == 8:
                     match self.mapEntrySize:
-                        case x if x == 15 or x == 16: return Binary_Tga.PIXEL.RGB555
+                        case 15 | 16: return Binary_Tga.PIXEL.RGB555
                         case 24: return Binary_Tga.PIXEL.RGB24
                         case 32: return Binary_Tga.PIXEL.ARGB32
             elif self.IS_TRUE_COLOR:
@@ -386,6 +465,14 @@ class Binary_Tga(IHaveMetaInfo, ITexture):
                     TextureUnityFormat.RGBA32, \
                     TextureUnrealFormat.Unknown
             case _: raise Exception(f'Unknown {self.pixelFormat}')
+
+    #region ITexture
+
+    width: int = 0
+    height: int = 0
+    depth: int = 0
+    mipMaps: int = 1
+    texFlags: TextureFlags = 0
 
     @staticmethod
     def pixelToMapIndex(pixelPtr: bytearray, offfset: int) -> int: return pixelPtr[offset]
@@ -503,6 +590,8 @@ class Binary_Tga(IHaveMetaInfo, ITexture):
         #         # Buffer.BlockCopy(data, p2, data, p1, pixelSize)
         #         # Buffer.BlockCopy(temp, 0, data, p2, pixelSize)
         pass
+
+    #endregion
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Texture', name = os.path.basename(file.path), value = self)),

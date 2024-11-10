@@ -5,6 +5,7 @@ using GameX.Formats.Unknown;
 using System.IO;
 using System;
 using System.Threading.Tasks;
+using GameX.Unknown;
 
 namespace GameX.Epic
 {
@@ -31,9 +32,7 @@ namespace GameX.Epic
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".cfg" || x == ".txt" => (0, Binary_Txt.Factory),
-                ".dds" => (0, Binary_Dds.Factory),
-                _ => (0, null),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion

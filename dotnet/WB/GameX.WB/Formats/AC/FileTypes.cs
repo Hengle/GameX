@@ -2275,19 +2275,11 @@ namespace GameX.WB.Formats.AC.FileTypes
             }
             Format = PixFormat switch
             {
-                PFID_DXT1 => (PFID_DXT1, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureUnityFormat.DXT1, TextureUnityFormat.DXT1),
-                PFID_DXT3 => (PFID_DXT3, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureUnityFormat.Unknown, TextureUnityFormat.Unknown),
-                PFID_DXT5 => (PFID_DXT5, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureUnityFormat.DXT5, TextureUnityFormat.DXT5),
-                var x when x == PFID_CUSTOM_RAW_JPEG ||
-                x == PFID_R8G8B8 ||
-                x == PFID_CUSTOM_LSCAPE_R8G8B8 ||
-                x == PFID_A8 ||
-                x == PFID_CUSTOM_LSCAPE_ALPHA ||
-                x == PFID_R5G6B5 => (x, (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24),
-                var x when x == PFID_INDEX16 ||
-                x == PFID_P8 ||
-                x == PFID_A8R8G8B8 ||
-                x == PFID_A4R4G4B4 => (x, (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnityFormat.RGBA32),
+                PFID_DXT1 => (PixFormat, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureUnityFormat.DXT1, TextureUnityFormat.DXT1),
+                PFID_DXT3 => (PixFormat, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureUnityFormat.Unknown, TextureUnityFormat.Unknown),
+                PFID_DXT5 => (PixFormat, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureUnityFormat.DXT5, TextureUnityFormat.DXT5),
+                PFID_CUSTOM_RAW_JPEG or PFID_R8G8B8 or PFID_CUSTOM_LSCAPE_R8G8B8 or PFID_A8 or PFID_CUSTOM_LSCAPE_ALPHA or PFID_R5G6B5 => (PixFormat, (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24),
+                PFID_INDEX16 or PFID_P8 or PFID_A8R8G8B8 or PFID_A4R4G4B4 => (PixFormat, (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnityFormat.RGBA32),
                 _ => throw new ArgumentOutOfRangeException(nameof(Format), $"{Format}"),
             };
         }

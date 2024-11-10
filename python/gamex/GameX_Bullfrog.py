@@ -28,19 +28,19 @@ class BullfrogPakFile(BinaryPakFile):
     @staticmethod
     def getPakBinary(game: FamilyGame, filePath: str) -> PakBinary:
         match game.id:
-            case x if x == 'DK' or x == 'DK2': return PakBinary_Bullfrog()            # Keeper
-            case x if x == 'P' or x == 'P2' or x == 'P3': return PakBinary_Populus()  # Populs
-            case x if x == 'S' or x == 'S2': return PakBinary_Syndicate()             # Syndicate
-            case x if x == 'MC' or x == 'MC2': return PakBinary_Bullfrog()            # Carpet
-            case x if x == 'TP' or x == 'TH': return PakBinary_Bullfrog()             # Theme
+            case 'DK' | 'DK2': return PakBinary_Bullfrog()            # Keeper
+            case 'P' | 'P2' | 'P3': return PakBinary_Populus()        # Populs
+            case 'S' | 'S2': return PakBinary_Syndicate()             # Syndicate
+            case 'MC' | 'MC2': return PakBinary_Bullfrog()            # Carpet
+            case 'TP' | 'TH': return PakBinary_Bullfrog()             # Theme
             case _: raise Exception(f'Unknown: {game.id}')
 
     @staticmethod
     def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
         match game.id:
-            case x if x == 'DK' or x == 'DK2': return PakBinary_Bullfrog.objectFactory(source, game)
-            case x if x == 'P' or x == 'P2' or x == 'P3': return PakBinary_Populus.objectFactory(source, game)
-            case x if x == 'S' or x == 'S2': return PakBinary_Syndicate.objectFactory(source, game)
+            case 'DK' | 'DK2': return PakBinary_Bullfrog.objectFactory(source, game)
+            case 'P' | 'P2' | 'P3': return PakBinary_Populus.objectFactory(source, game)
+            case 'S' | 'S2': return PakBinary_Syndicate.objectFactory(source, game)
             case _: raise Exception(f'Unknown: {game.id}')
 
     #endregion

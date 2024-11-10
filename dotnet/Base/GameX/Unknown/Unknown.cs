@@ -54,9 +54,10 @@ namespace GameX.Unknown
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".txt" || x == ".ini" || x == ".cfg" || x == ".xml" => (0, Binary_Txt.Factory),
+                ".txt" or ".ini" or ".cfg" or ".csv" or ".xml" => (0, Binary_Txt.Factory),
                 ".wav" => (0, Binary_Snd.Factory),
-                var x when x == ".bmp" || x == ".jpg" => (0, Binary_Img.Factory),
+                ".bmp" or ".jpg" or ".png" or ".gif" or ".tiff" => (0, Binary_Img.Factory), // Exif
+                ".pcx" => (0, Binary_Pcx.Factory),
                 ".tga" => (0, Binary_Tga.Factory),
                 ".dds" => (0, Binary_Dds.Factory),
                 _ => source.Path switch

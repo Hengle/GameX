@@ -48,7 +48,7 @@ namespace GameX.Bioware
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".dlg" || x == ".qdb" || x == ".qst" => (0, Binary_Gff.Factory),
+                ".dlg" or ".qdb" or ".qst" => (0, Binary_Gff.Factory),
                 _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
