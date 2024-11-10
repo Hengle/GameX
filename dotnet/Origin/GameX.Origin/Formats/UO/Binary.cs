@@ -835,7 +835,7 @@ namespace GameX.Origin.Formats.UO
         public int Height { get; private set; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
             => (Pixels, (Platform.Type)platform switch
@@ -1051,7 +1051,7 @@ namespace GameX.Origin.Formats.UO
         public int Height { get; } = 44;
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
             => (Pixels, (Platform.Type)platform switch
@@ -1129,7 +1129,7 @@ namespace GameX.Origin.Formats.UO
         public int Height { get; private set; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
             => (Pixels, (Platform.Type)platform switch
@@ -1322,7 +1322,7 @@ namespace GameX.Origin.Formats.UO
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
             => (Pixels, (Platform.Type)platform switch
@@ -1785,7 +1785,7 @@ namespace GameX.Origin.Formats.UO
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
             => (Pixels, (Platform.Type)platform switch

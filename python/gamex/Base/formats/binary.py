@@ -38,12 +38,11 @@ class Binary_Dds(IHaveMetaInfo, ITexture):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Dds(r)
 
-    data: dict[str, object] = None
     width: int = 0
     height: int = 0
     depth: int = 0
     mipMaps: int = 1
-    flags: TextureFlags = 0
+    texFlags: TextureFlags = 0
 
     def __init__(self, r: Reader, readMagic: bool = True):
         self.header, self.headerDXT10, self.format, self.bytes = DDS_HEADER.read(r, readMagic)
@@ -107,12 +106,11 @@ class Binary_Img(IHaveMetaInfo, ITexture):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Img(r, f)
 
-    data: dict[str, object] = None
     width: int = 0
     height: int = 0
     depth: int = 0
     mipMaps: int = 1
-    flags: TextureFlags = 0
+    texFlags: TextureFlags = 0
 
     def __init__(self, r: Reader, f: FileSource):
         self.image = Image.open(r.f)
@@ -219,12 +217,11 @@ class Binary_Tga(IHaveMetaInfo, ITexture):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Tga(r, f)
 
-    data: dict[str, object] = None
     width: int = 0
     height: int = 0
     depth: int = 0
     mipMaps: int = 1
-    flags: TextureFlags = 0
+    texFlags: TextureFlags = 0
 
     #region Headers
 

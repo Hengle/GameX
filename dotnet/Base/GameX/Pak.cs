@@ -428,7 +428,7 @@ namespace GameX
         /// <param name="path">The path.</param>
         /// <returns></returns>
         public virtual IGenericPool<BinaryReader> GetReader(string path = default, bool pooled = true) => pooled
-            ? Readers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryReader>(() => FileSystem.OpenReader(path), RetainInPool) : null)
+            ? Readers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryReader>(() => FileSystem.OpenReader(path), r => r.Seek(0), RetainInPool) : null)
             : new SinglePool<BinaryReader>(FileSystem.FileExists(path ??= PakPath) ? FileSystem.OpenReader(path) : null);
 
         /// <summary>
@@ -473,7 +473,7 @@ namespace GameX
         /// <param name="path">The path.</param>
         /// <returns></returns>
         public GenericPool<BinaryWriter> GetWriter(string path = default)
-            => Writers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryWriter>(() => FileSystem.OpenWriter(path), RetainInPool) : null);
+            => Writers.GetOrAdd(path ?? PakPath, path => FileSystem.FileExists(path) ? new GenericPool<BinaryWriter>(() => FileSystem.OpenWriter(path), r => r.Seek(0), RetainInPool) : null);
 
         /// <summary>
         /// Writer

@@ -144,8 +144,8 @@ namespace GameX.Platforms
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             }
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)(source.Flags.HasFlag(TextureFlags.SUGGEST_CLAMPS) ? TextureWrapMode.Clamp : TextureWrapMode.Repeat));
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)(source.Flags.HasFlag(TextureFlags.SUGGEST_CLAMPT) ? TextureWrapMode.Clamp : TextureWrapMode.Repeat));
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)(source.TexFlags.HasFlag(TextureFlags.SUGGEST_CLAMPS) ? TextureWrapMode.Clamp : TextureWrapMode.Repeat));
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)(source.TexFlags.HasFlag(TextureFlags.SUGGEST_CLAMPT) ? TextureWrapMode.Clamp : TextureWrapMode.Repeat));
             GL.BindTexture(TextureTarget.Texture2D, 0); // release texture
             return id;
         }

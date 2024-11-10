@@ -19,8 +19,8 @@ class Binary_Fli(IHaveMetaInfo, ITextureFrames):
     height: int = 0
     depth: int = 0
     mipMaps: int = 1
-    flags: TextureFlags = 0
-    Fps: int = 1
+    texFlags: TextureFlags = 0
+    fps: int = 1
 
     #region Headers
 

@@ -60,15 +60,15 @@ namespace GameX.Formats
 
         readonly DDS_HEADER Header;
         readonly DDS_HEADER_DXT10? HeaderDXT10;
-        readonly (object type, int blockSize, object gl, object vulken, object unity, object unreal) Format;
         readonly byte[] Bytes;
         readonly Range[] Spans;
 
+        readonly (object type, int blockSize, object gl, object vulken, object unity, object unreal) Format;
         public int Width { get; }
         public int Height { get; }
         public int Depth => 0;
         public int MipMaps { get; }
-        public TextureFlags Flags => 0;
+        public TextureFlags TexFlags => 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
             => (Bytes, (Platform.Type)platform switch
@@ -574,7 +574,7 @@ namespace GameX.Formats
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         #region Headers
 
@@ -814,7 +814,7 @@ namespace GameX.Formats
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         /// <summary>
         /// Gets the palette either from the header (< 8 bit) or at the bottom of the file (8bit)
@@ -1007,7 +1007,7 @@ namespace GameX.Formats
         public int Height { get; set; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         /// <summary>
         /// Set a color using palette index
@@ -1124,7 +1124,7 @@ namespace GameX.Formats
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         #region Headers
 
@@ -1496,7 +1496,7 @@ namespace GameX.Formats
         public int Height { get; } = 64;
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {

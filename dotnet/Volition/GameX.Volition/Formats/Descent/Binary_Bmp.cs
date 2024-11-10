@@ -53,7 +53,7 @@ namespace GameX.Volition.Formats.Descent
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         /// <summary>
         /// Set a color using palette index

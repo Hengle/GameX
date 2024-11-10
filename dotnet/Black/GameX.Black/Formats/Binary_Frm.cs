@@ -100,7 +100,7 @@ namespace GameX.Black.Formats
         public int Height { get; internal set; }
         public int Depth => 0;
         public int MipMaps => 1;
-        public TextureFlags Flags => 0;
+        public TextureFlags TexFlags => 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
             => (Bytes, (Platform.Type)platform switch

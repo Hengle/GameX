@@ -9662,7 +9662,7 @@ namespace GameX.Valve.Formats.Vpk
         int ITexture.Height => Height;
         int ITexture.Depth => Depth;
         int ITexture.MipMaps => NumMipMaps;
-        TextureFlags ITexture.Flags => (TextureFlags)Flags;
+        TextureFlags ITexture.TexFlags => (TextureFlags)Flags;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {

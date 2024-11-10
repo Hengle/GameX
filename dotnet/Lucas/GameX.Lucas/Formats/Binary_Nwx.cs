@@ -154,7 +154,7 @@ namespace GameX.Lucas.Formats
         public int Height { get; set; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         public void Select(int id) => (Width, Height, Flip, CellData) = Cells[id % Cells.Count];
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)

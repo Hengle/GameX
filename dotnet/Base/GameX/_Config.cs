@@ -21,8 +21,8 @@
 //#define Red
 //#define Ubisoft
 //#define Unity
-#define Unknown
-//#define Valve
+//#define Unknown
+#define Valve
 //#define Volition
 //#define WB
 
@@ -526,9 +526,9 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            ForcePath = "sample:10",
+            ForcePath = "sample:0",
             Family = "Valve",
-            Game = "HL", // Half-Life
+            //Game = "HL", // Half-Life
             //Game = "TF", // Team Fortress Classic
             //Game = "HL:OF", // Half-Life: Opposing Force
             //Game = "Ricochet", // Ricochet
@@ -538,7 +538,7 @@ namespace GameX
             //Game = "DOD", // Day of Defeat
             //Game = "CS:CZ", // Counter-Strike: Condition Zero
             //# Source
-            //Game = "HL:Src", // Half-Life: Source []
+            Game = "HL:Src", // Half-Life: Source
             //Game = "CS:Src", // Counter-Strike: Source
             //Game = "HL2", // Half-Life 2
             //Game = "HL2:DM", // Half-Life 2: Deathmatch

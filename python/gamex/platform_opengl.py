@@ -109,8 +109,8 @@ class OpenGLTextureBuilder(TextureBuilderBase):
         else:
             glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
             glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP if (source.flags & TextureFlags.SUGGEST_CLAMPS.value) != 0 else GL_REPEAT)
-        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP if (source.flags & TextureFlags.SUGGEST_CLAMPT.value) != 0 else GL_REPEAT)
+        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP if (source.texFlags & TextureFlags.SUGGEST_CLAMPS.value) != 0 else GL_REPEAT)
+        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP if (source.texFlags & TextureFlags.SUGGEST_CLAMPT.value) != 0 else GL_REPEAT)
         glBindTexture(GL_TEXTURE_2D, 0) # unbind texture
         return id
 

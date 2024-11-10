@@ -464,12 +464,11 @@ class Binary_Gump(IHaveMetaInfo, ITexture):
                     cur2 = cur << 1
                     while cur < next: bd[cur2:cur2+1] = color.tobytes(); cur += 1
 
-    data: dict[str, object] = None
     width: int = 0
     height: int = 0
     depth: int = 0
     mipMaps: int = 1
-    flags: TextureFlags = 0
+    texFlags: TextureFlags = 0
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
         match platform:

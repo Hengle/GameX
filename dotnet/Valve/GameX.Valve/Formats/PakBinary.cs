@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using static System.IO.Polyfill;
 
 namespace GameX.Valve.Formats
 {
@@ -19,28 +20,26 @@ namespace GameX.Valve.Formats
     {
         #region Headers
 
-        struct B_Lump { public int Offset; public int Length; }
-
         [StructLayout(LayoutKind.Sequential)]
         struct B_Header
         {
             public static (string, int) Struct = ("<31i", sizeof(B_Header));
             public int Version;
-            public B_Lump Entities;
-            public B_Lump Planes;
-            public B_Lump Textures;
-            public B_Lump Vertices;
-            public B_Lump Visibility;
-            public B_Lump Nodes;
-            public B_Lump TexInfo;
-            public B_Lump Faces;
-            public B_Lump Lighting;
-            public B_Lump ClipNodes;
-            public B_Lump Leaves;
-            public B_Lump MarkSurfaces;
-            public B_Lump Edges;
-            public B_Lump SurfEdges;
-            public B_Lump Models;
+            public X_LumpON Entities;
+            public X_LumpON Planes;
+            public X_LumpON Textures;
+            public X_LumpON Vertices;
+            public X_LumpON Visibility;
+            public X_LumpON Nodes;
+            public X_LumpON TexInfo;
+            public X_LumpON Faces;
+            public X_LumpON Lighting;
+            public X_LumpON ClipNodes;
+            public X_LumpON Leaves;
+            public X_LumpON MarkSurfaces;
+            public X_LumpON Edges;
+            public X_LumpON SurfEdges;
+            public X_LumpON Models;
 
             public void ForGameId(string id)
             {
@@ -58,7 +57,7 @@ namespace GameX.Valve.Formats
             public fixed uint Offsets[4];
         }
 
-        const int MAX_MAP_HULLS = 4;
+        //const int MAX_MAP_HULLS = 4;
         //const int MAX_MAP_MODELS = 400;
         //const int MAX_MAP_BRUSHES = 4096;
         //const int MAX_MAP_ENTITIES = 1024;
@@ -90,8 +89,8 @@ namespace GameX.Valve.Formats
             var header = r.ReadS<B_Header>();
             if (header.Version != 30) throw new FormatException("BAD VERSION");
             header.ForGameId(source.Game.Id);
-            files.Add(new FileSource { Path = "entities.txt", Offset = header.Entities.Offset, FileSize = header.Entities.Length });
-            files.Add(new FileSource { Path = "planes.dat", Offset = header.Planes.Offset, FileSize = header.Planes.Length });
+            files.Add(new FileSource { Path = "entities.txt", Offset = header.Entities.Offset, FileSize = header.Entities.Num });
+            files.Add(new FileSource { Path = "planes.dat", Offset = header.Planes.Offset, FileSize = header.Planes.Num });
             r.Seek(start = header.Textures.Offset);
             foreach (var o in r.ReadL32PArray<uint>("I"))
             {
@@ -99,18 +98,18 @@ namespace GameX.Valve.Formats
                 var tex = r.ReadS<B_Texture>();
                 files.Add(new FileSource { Path = $"textures/{UnsafeX.FixedAString(tex.Name, 16)}.tex", Tag = tex });
             }
-            files.Add(new FileSource { Path = "vertices.dat", Offset = header.Vertices.Offset, FileSize = header.Vertices.Length });
-            files.Add(new FileSource { Path = "visibility.dat", Offset = header.Visibility.Offset, FileSize = header.Visibility.Length });
-            files.Add(new FileSource { Path = "nodes.dat", Offset = header.Nodes.Offset, FileSize = header.Nodes.Length });
-            files.Add(new FileSource { Path = "texInfo.dat", Offset = header.TexInfo.Offset, FileSize = header.TexInfo.Length });
-            files.Add(new FileSource { Path = "faces.dat", Offset = header.Faces.Offset, FileSize = header.Faces.Length });
-            files.Add(new FileSource { Path = "lighting.dat", Offset = header.Lighting.Offset, FileSize = header.Lighting.Length });
-            files.Add(new FileSource { Path = "clipNodes.dat", Offset = header.ClipNodes.Offset, FileSize = header.ClipNodes.Length });
-            files.Add(new FileSource { Path = "leaves.dat", Offset = header.Leaves.Offset, FileSize = header.Leaves.Length });
-            files.Add(new FileSource { Path = "markSurfaces.dat", Offset = header.MarkSurfaces.Offset, FileSize = header.MarkSurfaces.Length });
-            files.Add(new FileSource { Path = "edges.dat", Offset = header.Edges.Offset, FileSize = header.Edges.Length });
-            files.Add(new FileSource { Path = "surfEdges.dat", Offset = header.SurfEdges.Offset, FileSize = header.SurfEdges.Length });
-            start = header.Models.Offset; stop = start + header.Models.Length; stride = 33 + (MAX_MAP_HULLS << 2);
+            files.Add(new FileSource { Path = "vertices.dat", Offset = header.Vertices.Offset, FileSize = header.Vertices.Num });
+            files.Add(new FileSource { Path = "visibility.dat", Offset = header.Visibility.Offset, FileSize = header.Visibility.Num });
+            files.Add(new FileSource { Path = "nodes.dat", Offset = header.Nodes.Offset, FileSize = header.Nodes.Num });
+            files.Add(new FileSource { Path = "texInfo.dat", Offset = header.TexInfo.Offset, FileSize = header.TexInfo.Num });
+            files.Add(new FileSource { Path = "faces.dat", Offset = header.Faces.Offset, FileSize = header.Faces.Num });
+            files.Add(new FileSource { Path = "lighting.dat", Offset = header.Lighting.Offset, FileSize = header.Lighting.Num });
+            files.Add(new FileSource { Path = "clipNodes.dat", Offset = header.ClipNodes.Offset, FileSize = header.ClipNodes.Num });
+            files.Add(new FileSource { Path = "leaves.dat", Offset = header.Leaves.Offset, FileSize = header.Leaves.Num });
+            files.Add(new FileSource { Path = "markSurfaces.dat", Offset = header.MarkSurfaces.Offset, FileSize = header.MarkSurfaces.Num });
+            files.Add(new FileSource { Path = "edges.dat", Offset = header.Edges.Offset, FileSize = header.Edges.Num });
+            files.Add(new FileSource { Path = "surfEdges.dat", Offset = header.SurfEdges.Offset, FileSize = header.SurfEdges.Num });
+            start = header.Models.Offset; stop = start + header.Models.Num; stride = 33 + (4 << 2);
             for (var o = start; o < stop; o += stride) files.Add(new FileSource { Path = $"models/model{o}.dat", Offset = o, FileSize = stride });
             return Task.CompletedTask;
         }
@@ -331,7 +330,7 @@ namespace GameX.Valve.Formats
 
         const uint W_MAGIC = 0x33444157; //: WAD3
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1), DebuggerDisplay("Header:{LumpCount}")]
+        [StructLayout(LayoutKind.Sequential)]
         struct W_Header
         {
             public static (string, int) Struct = ("<3I", sizeof(W_Header));
@@ -340,7 +339,7 @@ namespace GameX.Valve.Formats
             public uint LumpOffset;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1), DebuggerDisplay("Lump:{Name}")]
+        [StructLayout(LayoutKind.Sequential)]
         struct W_Lump
         {
             public static (string, int) Struct = ("<3I2bH16s", 32);
@@ -353,7 +352,7 @@ namespace GameX.Valve.Formats
             public fixed byte Name[16];
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1), DebuggerDisplay("LumpInfo:{Width}x{Height}")]
+        [StructLayout(LayoutKind.Sequential)]
         struct W_LumpInfo
         {
             public static (string, int) Struct = ("<3I", 32);

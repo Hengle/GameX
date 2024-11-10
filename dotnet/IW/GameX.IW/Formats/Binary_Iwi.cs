@@ -251,7 +251,7 @@ namespace GameX.IW.Formats
         public int Height => Header.Height;
         public int Depth => 0;
         public int MipMaps => Mips.Length;
-        public TextureFlags Flags => (Header.Flags & FLAGS.CUBEMAP) != 0 ? TextureFlags.CUBE_TEXTURE : 0;
+        public TextureFlags TexFlags => (Header.Flags & FLAGS.CUBEMAP) != 0 ? TextureFlags.CUBE_TEXTURE : 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
             => (Bytes, (Platform.Type)platform switch

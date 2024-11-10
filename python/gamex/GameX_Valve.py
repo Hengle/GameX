@@ -2,7 +2,7 @@ from __future__ import annotations
 import os
 from gamex import BinaryPakFile
 from gamex.Valve.formats.pakbinary import PakBinary_Bsp30, PakBinary_Vpk, PakBinary_Wad3
-from gamex.Valve.formats.binary import Binary_Src, Binary_Spr, Binary_Mdl, Binary_Wad3
+from gamex.Valve.formats.binary import Binary_Src, Binary_Spr, Binary_Mdl10, Binary_Mdl40, Binary_Wad3
 from gamex.GameX import UnknownPakFile
 from gamex.util import _pathExtension
 
@@ -22,7 +22,7 @@ class ValvePakFile(BinaryPakFile):
         match game.engine:
             # case 'Unity': return PakBinary_Unity()
             case 'GoldSrc': return PakBinary_Wad3()
-            case 'Source': return PakBinary_Vpk()
+            case 'Source' | 'Source2': return PakBinary_Vpk()
             case _: raise Exception(f'Unknown: {game.engine}')
 
     @staticmethod
@@ -32,9 +32,13 @@ class ValvePakFile(BinaryPakFile):
                 match _pathExtension(source.path).lower():
                     case x if x == '.pic' or x == '.tex' or x == '.tex2' or x == '.fnt': return (0, Binary_Wad3.factory)
                     case '.spr': return (0, Binary_Spr.factory)
-                    case '.mdl': return (0, Binary_Mdl.factory)
+                    case '.mdl': return (0, Binary_Mdl10.factory)
                     case _: return UnknownPakFile.objectFactory(source, game)
-            case 'Source': return (0, Binary_Src.factory)
+            case 'Source':
+                match _pathExtension(source.path).lower():
+                    case '.mdl': return (0, Binary_Mdl40.factory)
+                    case _: return UnknownPakFile.objectFactory(source, game)
+            case 'Source2': return (0, Binary_Src.factory)
             case _: raise Exception(f'Unknown: {game.engine}')
 
     #endregion

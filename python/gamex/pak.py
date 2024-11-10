@@ -118,7 +118,7 @@ class BinaryPakFile(PakFile):
     
     def getReader(self, path: str = None, pooled: bool = True) -> Reader:
         path = path or self.pakPath
-        return self.readers.get(path) or self.readers.setdefault(path, GenericPool[Reader](lambda: self.fileSystem.openReader(path)) if self.fileSystem.fileExists(path) else None) if pooled else \
+        return self.readers.get(path) or self.readers.setdefault(path, GenericPool[Reader](lambda: self.fileSystem.openReader(path), lambda r: r.seek(0)) if self.fileSystem.fileExists(path) else None) if pooled else \
             SinglePool[Reader](self.fileSystem.openReader(path) if self.fileSystem.fileExists(path) else None) 
     
     def reader(self, func: callable, path: str = None, pooled: bool = False): self.getReader(path, pooled).action(func)

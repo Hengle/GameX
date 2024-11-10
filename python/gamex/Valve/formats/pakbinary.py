@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives import serialization
 from gamex import FileSource, FileOption, BinaryPakFile, PakBinaryT
 from gamex.compression import decompressBlast
 from gamex.util import _throw, _pathExtension
-from openstk.poly import Reader, unsafe
+from openstk.poly import Reader, unsafe, X_LumpON
 
 #region PakBinary_Bsp30
 
@@ -18,28 +18,24 @@ class PakBinary_Bsp30(PakBinaryT):
 
     #region Headers
 
-    class B_Lump:
-        offset: int
-        length: int
-
     class B_Header:
         struct = ('<31i', 124)
         def __init__(self, tuple):
-            entities = self.entities = PakBinary_Bsp30.B_Lump()
-            planes = self.planes = PakBinary_Bsp30.B_Lump()
-            textures = self.textures = PakBinary_Bsp30.B_Lump()
-            vertices = self.vertices = PakBinary_Bsp30.B_Lump()
-            visibility = self.visibility = PakBinary_Bsp30.B_Lump()
-            nodes = self.nodes = PakBinary_Bsp30.B_Lump()
-            texInfo = self.texInfo = PakBinary_Bsp30.B_Lump()
-            faces = self.faces = PakBinary_Bsp30.B_Lump()
-            lighting = self.lighting = PakBinary_Bsp30.B_Lump()
-            clipNodes = self.clipNodes = PakBinary_Bsp30.B_Lump()
-            leaves = self.leaves = PakBinary_Bsp30.B_Lump()
-            markSurfaces = self.markSurfaces = PakBinary_Bsp30.B_Lump()
-            edges = self.edges = PakBinary_Bsp30.B_Lump()
-            surfEdges = self.surfEdges = PakBinary_Bsp30.B_Lump()
-            models = self.models = PakBinary_Bsp30.B_Lump()
+            entities = self.entities = X_LumpON()
+            planes = self.planes = X_LumpON()
+            textures = self.textures = X_LumpON()
+            vertices = self.vertices = X_LumpON()
+            visibility = self.visibility = X_LumpON()
+            nodes = self.nodes = X_LumpON()
+            texInfo = self.texInfo = X_LumpON()
+            faces = self.faces = X_LumpON()
+            lighting = self.lighting = X_LumpON()
+            clipNodes = self.clipNodes = X_LumpON()
+            leaves = self.leaves = X_LumpON()
+            markSurfaces = self.markSurfaces = X_LumpON()
+            edges = self.edges = X_LumpON()
+            surfEdges = self.surfEdges = X_LumpON()
+            models = self.models = X_LumpON()
             self.version, \
             entities.offset, entities.length, \
             planes.offset, planes.length, \
@@ -67,7 +63,7 @@ class PakBinary_Bsp30(PakBinaryT):
             self.height, \
             self.offsets = tuple
 
-    MAX_MAP_HULLS = 4
+    # MAX_MAP_HULLS = 4
     # MAX_MAP_MODELS = 400
     # MAX_MAP_BRUSHES = 4096
     # MAX_MAP_ENTITIES = 1024
@@ -98,21 +94,21 @@ class PakBinary_Bsp30(PakBinaryT):
         header = r.readS(self.B_Header)
         if header.version != 30: raise Exception('BAD VERSION')
         header.forGameId(source.game.id)
-        files.append(FileSource(path = 'entities.txt', offset = header.entities.offset, fileSize = header.entities.length))
-        files.append(FileSource(path = 'planes.dat', offset = header.planes.offset, fileSize = header.planes.length))
+        files.append(FileSource(path = 'entities.txt', offset = header.entities.offset, fileSize = header.entities.num))
+        files.append(FileSource(path = 'planes.dat', offset = header.planes.offset, fileSize = header.planes.num))
         
-        files.append(FileSource(path = 'vertices.dat', offset = header.vertices.offset, fileSize = header.vertices.length))
-        files.append(FileSource(path = 'visibility.dat', offset = header.visibility.offset, fileSize = header.visibility.length))
-        files.append(FileSource(path = 'nodes.dat', offset = header.nodes.offset, fileSize = header.nodes.length))
-        files.append(FileSource(path = 'texInfo.dat', offset = header.texInfo.offset, fileSize = header.texInfo.length))
-        files.append(FileSource(path = 'faces.dat', offset = header.faces.offset, fileSize = header.faces.length))
-        files.append(FileSource(path = 'lighting.dat', offset = header.lighting.offset, fileSize = header.lighting.length))
-        files.append(FileSource(path = 'clipNodes.dat', offset = header.clipNodes.offset, fileSize = header.clipNodes.length))
-        files.append(FileSource(path = 'leaves.dat', offset = header.leaves.offset, fileSize = header.leaves.length))
-        files.append(FileSource(path = 'markSurfaces.dat', offset = header.markSurfaces.offset, fileSize = header.markSurfaces.length))
-        files.append(FileSource(path = 'edges.dat', offset = header.edges.offset, fileSize = header.edges.length))
-        files.append(FileSource(path = 'surfEdges.dat', offset = header.surfEdges.offset, fileSize = header.surfEdges.length))
-        files.append(FileSource(path = 'markSurfaces.dat', offset = header.markSurfaces.offset, fileSize = header.markSurfaces.length))
+        files.append(FileSource(path = 'vertices.dat', offset = header.vertices.offset, fileSize = header.vertices.num))
+        files.append(FileSource(path = 'visibility.dat', offset = header.visibility.offset, fileSize = header.visibility.num))
+        files.append(FileSource(path = 'nodes.dat', offset = header.nodes.offset, fileSize = header.nodes.num))
+        files.append(FileSource(path = 'texInfo.dat', offset = header.texInfo.offset, fileSize = header.texInfo.num))
+        files.append(FileSource(path = 'faces.dat', offset = header.faces.offset, fileSize = header.faces.num))
+        files.append(FileSource(path = 'lighting.dat', offset = header.lighting.offset, fileSize = header.lighting.num))
+        files.append(FileSource(path = 'clipNodes.dat', offset = header.clipNodes.offset, fileSize = header.clipNodes.num))
+        files.append(FileSource(path = 'leaves.dat', offset = header.leaves.offset, fileSize = header.leaves.num))
+        files.append(FileSource(path = 'markSurfaces.dat', offset = header.markSurfaces.offset, fileSize = header.markSurfaces.num))
+        files.append(FileSource(path = 'edges.dat', offset = header.edges.offset, fileSize = header.edges.num))
+        files.append(FileSource(path = 'surfEdges.dat', offset = header.surfEdges.offset, fileSize = header.surfEdges.num))
+        files.append(FileSource(path = 'markSurfaces.dat', offset = header.markSurfaces.offset, fileSize = header.markSurfaces.num))
 
     # readData
     def readData(self, source: BinaryPakFile, r: Reader, file: FileSource, option: FileOption = None) -> BytesIO:
@@ -270,10 +266,10 @@ class PakBinary_Vpk(PakBinaryT):
         fileDataLength = len(file.data)
         data = bytearray(fileDataLength + file.fileSize); mv = memoryview(data)
         if fileDataLength > 0: data[0:] = file.data
+        def _str(r2: Reader): r2.seek(file.offset); r2.read(mv, fileDataLength, file.fileSize)
         if file.fileSize == 0: pass
         elif isinstance(file.tag, int): r.seek(file.offset + file.tag); r.read(mv, fileDataLength, file.fileSize)
-        elif isinstance(file.tag, str):
-            with source.getReader(file.tag) as r2: r2.seek(file.offset); r2.read(mv, fileDataLength, file.fileSize)
+        elif isinstance(file.tag, str): source.reader(_str, file.tag)
         return BytesIO(data)
 
 #endregion

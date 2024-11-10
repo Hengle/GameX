@@ -1,26 +1,18 @@
 using GameX.Platforms;
 using GameX.Valve.Formats.Vpk;
-using ICSharpCode.SharpZipLib.Tar;
 using OpenStack.Gfx;
-using OpenStack.Gfx.Animates;
 using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
-using SevenZip.Compression.LZMA;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Net.Mail;
 using System.Numerics;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static GameX.Formats.Unknown.IUnknownFileObject;
-using static GameX.Valve.Formats.Binary_Mdl;
 using static GameX.Valve.Formats.Vpk.D_Texture;
-using static OpenStack.Gfx.TextureSequences;
+using static System.IO.Polyfill;
 
 namespace GameX.Valve.Formats
 {
@@ -296,7 +288,7 @@ namespace GameX.Valve.Formats
         public int Height => height;
         public int Depth => 0;
         public int MipMaps => 1;
-        public TextureFlags Flags => 0;
+        public TextureFlags TexFlags => 0;
         public int Fps { get; } = 60;
 
         #region Headers
@@ -438,11 +430,11 @@ namespace GameX.Valve.Formats
 
     #endregion
 
-    #region Binary_Mdl
+    #region Binary_Mdl10
 
-    public unsafe class Binary_Mdl : IHaveMetaInfo
+    public unsafe class Binary_Mdl10 : ITexture, IHaveMetaInfo
     {
-        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Mdl(r, f, (BinaryPakFile)s));
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Mdl10(r, f, (BinaryPakFile)s));
 
         #region Headers
 
@@ -534,10 +526,6 @@ namespace GameX.Valve.Formats
             BBOX = 0x0004,
             CHROME = 0x0008 // if any of the textures have chrome on them
         }
-
-        // lumps
-        public struct M_Lump { public int Num; public int Offset; }
-        public struct M_Lump2 { public int Num; public int Offset; public int Offset2; }
 
         // sequence header
         public struct M_SeqHeader
@@ -647,30 +635,30 @@ namespace GameX.Valve.Formats
         {
             public static (string, int) Struct = ("<32sf10i3f2i6f4i4f6i", sizeof(M_Seq));
             public fixed byte Label[32]; // sequence label
-            public float Fps;      // frames per second	
-            public int Flags;      // looping/non-looping flags
+            public float Fps;           // frames per second
+            public int Flags;           // looping/non-looping flags
             public int Activity;
             public int ActWeight;
-            public M_Lump Events;
-            public int NumFrames;  // number of frames per sequence
-            public M_Lump Pivots;  // number of foot pivots
+            public X_LumpNO Events;
+            public int NumFrames;       // number of frames per sequence
+            public X_LumpNO Pivots;     // number of foot pivots
             public int MotionType;
             public int MotionBone;
             public Vector3 LinearMovement;
             public int AutomovePosIndex;
             public int AutomoveAngleIndex;
-            public Vector3 BBMin, BBMax;        // per sequence bounding box
+            public Vector3 BBMin, BBMax; // per sequence bounding box
             public int NumBlends;
-            public int AnimIndex;      // mstudioanim_t pointer relative to start of sequence group data: [blend][bone][X, Y, Z, XR, YR, ZR]
+            public int AnimIndex;       // mstudioanim_t pointer relative to start of sequence group data: [blend][bone][X, Y, Z, XR, YR, ZR]
             public fixed int BlendType[SequenceBlends];  // X, Y, Z, XR, YR, ZR
             public fixed float BlendStart[SequenceBlends]; // starting value
             public fixed float BlendEnd[SequenceBlends]; // ending value
             public int BlendParent;
-            public int SeqGroup;       // sequence group for demand loading
-            public int EntryNode;      // transition node at entry
-            public int ExitNode;       // transition node at exit
-            public int NodeFlags;      // transition rules
-            public int NextSeq;        // auto advancing sequences
+            public int SeqGroup;        // sequence group for demand loading
+            public int EntryNode;       // transition node at entry
+            public int ExitNode;        // transition node at exit
+            public int NodeFlags;       // transition rules
+            public int NextSeq;         // auto advancing sequences
         }
 
         public class SeqBlend(int type, float start, float end)
@@ -689,11 +677,6 @@ namespace GameX.Valve.Formats
 
         public class SeqAnimation(M_AnimValue[][] axis)
         {
-            //public struct Value(byte total, byte valid)
-            //{
-            //    public byte Total = total;
-            //    public byte Valid = valid;
-            //}
             public M_AnimValue[][] Axis = axis;
         }
 
@@ -793,7 +776,7 @@ namespace GameX.Valve.Formats
         public struct M_Pivot
         {
             public static (string, int) Struct = ("<3f2i", sizeof(M_Pivot));
-            public Vector3 Org; // pivot point
+            public Vector3 Org;         // pivot point
             public int Start, End;
         }
 
@@ -802,9 +785,9 @@ namespace GameX.Valve.Formats
         {
             public static (string, int) Struct = ("<32s2i12f", sizeof(M_Attachment));
             public fixed byte Name[32]; // Name of this attachment. Unused in GoldSource.
-            public int Type; // Type of this attachment. Unused in GoldSource;
-            public int Bone; // Index of the bone this is attached to.
-            public Vector3 Org; // Offset from bone origin.
+            public int Type;            // Type of this attachment. Unused in GoldSource;
+            public int Bone;            // Index of the bone this is attached to.
+            public Vector3 Org;         // Offset from bone origin.
             public Vector3 Vector0, Vector1, Vector2; // Directional vectors? Unused in GoldSource.
         }
 
@@ -836,7 +819,7 @@ namespace GameX.Valve.Formats
         {
             public static (string, int) Struct = ("<64s3i", sizeof(M_Bodypart));
             public fixed byte Name[64];
-            public M_Lump2 Models;
+            public X_LumpNO2 Models;
         }
 
         public class Bodypart
@@ -876,8 +859,8 @@ namespace GameX.Valve.Formats
                 Name = UnsafeX.FixedAString(s.Name, 64);
                 Flags = s.Flags;
                 Width = s.Width; Height = s.Height;
-                Pixels = r.ReadBytes(Width * Height);
-                Palette = r.ReadBytes(3 * 255);
+                r.Seek(s.Index); Pixels = r.ReadBytes(Width * Height);
+                Palette = r.ReadBytes(3 * 256);
             }
         }
 
@@ -888,17 +871,17 @@ namespace GameX.Valve.Formats
             public fixed byte Name[64];
             public int Type;
             public float BoundingRadius;
-            public M_Lump Meshs;
-            public M_Lump2 Verts;       // number of unique vertices, vertex bone info, vertex glm::vec3
-            public M_Lump2 Norms;       // number of unique surface normals, normal bone info, normal glm::vec3
-            public M_Lump Groups;      // deformation groups
+            public X_LumpNO Meshs;
+            public X_LumpNO2 Verts;     // number of unique vertices, vertex bone info, vertex glm::vec3
+            public X_LumpNO2 Norms;     // number of unique surface normals, normal bone info, normal glm::vec3
+            public X_LumpNO Groups;     // deformation groups
         }
 
         public class ModelVertex(Bone bone, Vector3 vertex)
         {
             public Bone Bone = bone;
             public Vector3 Vertex = vertex;
-            public static ModelVertex[] Create(BinaryReader r, M_Lump2 s, Bone[] bones)
+            public static ModelVertex[] Create(BinaryReader r, X_LumpNO2 s, Bone[] bones)
             {
                 r.Seek(s.Offset); var boneIds = r.ReadPArray<byte>("B", s.Num);
                 r.Seek(s.Offset2); var verts = r.ReadPArray<Vector3>("3f", s.Num);
@@ -930,9 +913,9 @@ namespace GameX.Valve.Formats
         public struct M_Mesh
         {
             public static (string, int) Struct = ("<5i", sizeof(M_Mesh));
-            public M_Lump Tris;
+            public X_LumpNO Tris;
             public int SkinRef;
-            public M_Lump Norms; // per mesh normals, normal vec3
+            public X_LumpNO Norms; // per mesh normals, normal vec3
         }
 
         public class Mesh
@@ -964,19 +947,19 @@ namespace GameX.Valve.Formats
             public Vector3 Min, Max;        // ideal movement hull size
             public Vector3 BBMin, BBMax;    // clipping bounding box
             public HeaderFlags Flags;
-            public M_Lump Bones;            // bones
-            public M_Lump BoneControllers; 	// bone controllers
-            public M_Lump Hitboxs; 		    // complex bounding boxes
-            public M_Lump Seqs; 		    // animation sequences
-            public M_Lump SeqGroups; 		// lazy sequences
-            public M_Lump2 Textures;        // raw textures
+            public X_LumpNO Bones;            // bones
+            public X_LumpNO BoneControllers; 	// bone controllers
+            public X_LumpNO Hitboxs; 		    // complex bounding boxes
+            public X_LumpNO Seqs; 		    // animation sequences
+            public X_LumpNO SeqGroups; 		// lazy sequences
+            public X_LumpNO2 Textures;        // raw textures
             public int NumSkinRef;          // replaceable textures
-            public M_Lump SkinFamilies;
-            public M_Lump Bodyparts;
-            public M_Lump Attachments;      // attachable points
-            public M_Lump Sounds;           // This seems to be obsolete. Probably replaced by events that reference external sounds?
-            public M_Lump SoundGroups;      // This seems to be obsolete. Probably replaced by events that reference external sounds?
-            public M_Lump Transitions;      // animation node to animation node transition graph
+            public X_LumpNO SkinFamilies;
+            public X_LumpNO Bodyparts;
+            public X_LumpNO Attachments;      // attachable points
+            public X_LumpNO Sounds;           // This seems to be obsolete. Probably replaced by events that reference external sounds?
+            public X_LumpNO SoundGroups;      // This seems to be obsolete. Probably replaced by events that reference external sounds?
+            public X_LumpNO Transitions;      // animation node to animation node transition graph
         }
 
         #endregion
@@ -1000,7 +983,7 @@ namespace GameX.Valve.Formats
         public Texture[] Textures;
         public short[][] SkinFamilies;
 
-        public Binary_Mdl(BinaryReader r, FileSource f, BinaryPakFile s)
+        public Binary_Mdl10(BinaryReader r, FileSource f, BinaryPakFile s)
         {
             // read file
             var header = r.ReadS<M_Header>();
@@ -1074,8 +1057,253 @@ namespace GameX.Valve.Formats
             r.Seek(header.Attachments.Offset); Attachments = r.ReadSArray<M_Attachment>(header.Attachments.Num).Select(x => new Attachment(x, Bones)).ToArray();
             r.Seek(header.Bodyparts.Offset); Bodyparts = r.ReadSArray<M_Bodypart>(header.Bodyparts.Num).Select(x => new Bodypart(r, x, Bones)).ToArray();
             r.Seek(header.Transitions.Offset); Transitions = r.ReadFArray(x => x.ReadBytes(1), header.Transitions.Num);
-            tr.Seek(theader.Textures.Offset); Textures = tr.ReadSArray<M_Texture>(theader.Textures.Num).Select(x => new Texture(r, x)).ToArray();
+            tr.Seek(theader.Textures.Offset); Textures = tr.ReadSArray<M_Texture>(theader.Textures.Num).Select(x => new Texture(tr, x)).ToArray();
             tr.Seek(theader.SkinFamilies.Offset); SkinFamilies = tr.ReadFArray(x => x.ReadPArray<short>("H", theader.NumSkinRef), theader.SkinFamilies.Num);
+
+            // Texture
+            Format = ((TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24);
+        }
+
+        (object gl, object vulken, object unity, object unreal) Format;
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int Depth => 0;
+        public int MipMaps => 1;
+        TextureFlags ITexture.TexFlags => 0;
+
+        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        {
+            var tex = Textures[0];
+            Width = tex.Width; Height = tex.Height;
+            var buf = new byte[Width * Height * 3];
+            Rasterize.CopyPixelsByPalette(buf, 3, tex.Pixels, tex.Palette, 3);
+            return (buf, (Platform.Type)platform switch
+            {
+                Platform.Type.OpenGL => Format.gl,
+                Platform.Type.Unity => Format.unity,
+                Platform.Type.Unreal => Format.unreal,
+                Platform.Type.Vulken => Format.vulken,
+                Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
+                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
+            }, null);
+        }
+        public void End() { }
+
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Model", items: [
+                new($"Name: {Name}"),
+            ]),
+        ];
+    }
+
+    #endregion
+
+    #region Binary_Mdl40
+    //https://developer.valvesoftware.com/wiki/MDL
+
+    public unsafe class Binary_Mdl40 : IHaveMetaInfo
+    {
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Mdl40(r, f, (BinaryPakFile)s));
+
+        #region Headers
+
+        const uint M_MAGIC = 0x54534449; //: IDST
+        //const uint M_MAGIC2 = 0x51534449; //: IDSQ
+
+        /// <summary>
+        /// header flags
+        /// </summary>
+        [Flags]
+        public enum HeaderFlags : int
+        {
+            AUTOGENERATED_HITBOX = 0x00000001,          // This flag is set if no hitbox information was specified
+            USES_ENV_CUBEMAP = 0x00000002,              // This flag is set at loadtime, not mdl build time so that we don't have to rebuild models when we change materials.
+            FORCE_OPAQUE = 0x00000004,                  // Use this when there are translucent parts to the model but we're not going to sort it
+            TRANSLUCENT_TWOPASS = 0x00000008,           // Use this when we want to render the opaque parts during the opaque pass and the translucent parts during the translucent pass
+            STATIC_PROP = 0x00000010,                   // This is set any time the .qc files has $staticprop in it
+            USES_FB_TEXTURE = 0x00000020,               // This flag is set at loadtime, not mdl build time so that we don't have to rebuild models when we change materials.
+            HASSHADOWLOD = 0x00000040,                  // This flag is set by studiomdl.exe if a separate "$shadowlod" entry was present for the .mdl (the shadow lod is the last entry in the lod list if present)
+            USES_BUMPMAPPING = 0x00000080,              // This flag is set at loadtime, not mdl build time so that we don't have to rebuild models when we change materials.	S
+            USE_SHADOWLOD_MATERIALS = 0x00000100,       // This flag is set when we should use the actual materials on the shadow LOD instead of overriding them with the default one (necessary for translucent shadows)
+            OBSOLETE = 0x00000200,                      // This flag is set when we should use the actual materials on the shadow LOD instead of overriding them with the default one (necessary for translucent shadows)
+            UNUSED = 0x00000400,	                    // N/A
+            NO_FORCED_FADE = 0x00000800,	            // This flag is set at mdl build time
+            FORCE_PHONEME_CROSSFADE = 0x00001000,	    // The npc will lengthen the viseme check to always include two phonemes
+            CONSTANT_DIRECTIONAL_LIGHT_DOT = 0x00002000, // This flag is set when the .qc has $constantdirectionallight in it
+            FLEXES_CONVERTED = 0x00004000,	            // Flag to mark delta flexes as already converted from disk format to memory format
+            BUILT_IN_PREVIEW_MODE = 0x00008000,	        // Indicates the studiomdl was built in preview mode
+            AMBIENT_BOOST = 0x00010000,	                // Ambient boost (runtime flag)
+            DO_NOT_CAST_SHADOWS = 0x00010000,	        // Forces the model to be lit by skybox lighting
+            CAST_TEXTURE_SHADOWS = 0x00010000,	        // Don't cast shadows from this model (useful on first-person models)
+            NA_1 = 0x00080000,	                        // N/A (undefined)
+            NA_2 = 0x00100000,	                        // N/A (undefined)
+            VERT_ANIM_FIXED_POINT_SCALE = 0x00200000,   // flagged on load to indicate no animation events on this model
+        }
+
+        public struct M_Texture
+        {
+            public static (string, int) Struct = ("<6i10s", sizeof(M_Texture));
+            public int NameOffset;
+            public int Flags;
+            public int Used;
+            public int Unused;
+            public int Material;        // (Placeholder)
+            public int ClientMaterial;  // (Placeholder)
+            public fixed byte Unused2[10];
+        }
+
+        // header
+        [StructLayout(LayoutKind.Sequential)]
+        public struct M_Header
+        {
+            public static (string, int) Struct = ("<3i64si18f44if11i4B3if3i", sizeof(M_Header));
+            public int Magic;
+            public int Version;
+            public int Checksum;
+            public fixed byte Name[64];
+            public int Length;
+            public Vector3 EyePosition;     // ideal eye position
+            public Vector3 IllumPosition;   // ideal illum position
+            public Vector3 Min, Max;        // ideal movement hull size
+            public Vector3 BBMin, BBMax;    // clipping bounding box
+            public HeaderFlags Flags;
+            public X_LumpNO Bones;            // bones
+            public X_LumpNO BoneControllers; 	// bone controllers
+            public X_LumpNO Hitboxs; 		    // bounding boxes
+            public X_LumpNO LocalAnims; 		// local animations
+            public X_LumpNO LocalSeqs; 		// local sequences
+            public X_LumpNO Events;           // events
+            public X_LumpNO Textures;         // textures
+            public X_LumpNO TexturesDirs;     // textures directories
+            public X_LumpNO2 SkinFamilies;    // skin-families
+            public X_LumpNO Bodyparts;        // bodyparts
+            public X_LumpNO Attachments;      // attachable points
+            public X_LumpNO2 LocalNodes;      // local nodes
+            public X_LumpNO Flexs;            // flexs
+            public X_LumpNO FlexControllers;  // flex controllers
+            public X_LumpNO FlexRules;        // flex rules
+            public X_LumpNO IKChains;         // ik chains
+            public X_LumpNO Mouths;           // Mouths
+            public X_LumpNO LocalPoseParams;  // local pose params
+            public int SurfacePropIndex;    // surface properties
+            public X_LumpNO KeyValues;        // key values
+            public X_LumpNO IKLocks;          // ik locks
+            public float Mass;              // mass
+            public int Contents;            // contents
+            public X_LumpNO IncludeModel;     // include model
+            public int VirtualModel;        // virtual model (Placeholder)
+            public int AnimBlockNameIndex;  // anim block name
+            public X_LumpNO AnimBlocks;       // anim blocks
+            public int AnimBlockModel;      // anim block model (Placeholder)
+            public int BoneNameIndex;       // bone name index
+            public int VertexBase;          // (Placeholder)
+            public int OffsetBase;          // (Placeholder)
+            public byte DirectionalDotProduct;
+            public byte RootLod;            // preferred rather than clamped
+            public byte NumAllowedRootLods; // 0 means any allowed, N means Lod 0 -> (N-1)
+            public byte Unused0;
+            public int Unused1;
+            public X_LumpNO FlexControllerUI; // flex controller ui
+            public float VertAnimFixedPointScale;
+            public int Unused2;
+            public int Header2Index;
+            public int Unused3;
+        }
+
+        // header
+        [StructLayout(LayoutKind.Sequential)]
+        public struct M_Header2
+        {
+            public static (string, int) Struct = ("<3ifi64s", sizeof(M_Header2));
+            public X_LumpNO SrcBoneTransform;
+            public int IllumPositionAttachmentIndex;
+            public float MaxEyeDeflection;    // if set to 0, then equivalent to cos(30)
+            public int LinearBoneIndex;
+            public fixed byte Unknown[64];
+        }
+
+        #endregion
+
+        public string Name;
+        public Vector3 EyePosition;
+        public Vector3 IllumPosition;
+        public Vector3 BoundingMin, BoundingMax;
+        public Vector3 ClippingMin, ClippingMax;
+        public HeaderFlags Flags;
+
+        public Binary_Mdl40(BinaryReader r, FileSource f, BinaryPakFile s)
+        {
+            // read file
+            var header = r.ReadS<M_Header>();
+            if (header.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
+            else if (header.Version < 40) throw new FormatException("BAD VERSION");
+            Name = UnsafeX.FixedAString(header.Name, 64);
+            if (string.IsNullOrEmpty(Name)) throw new FormatException($"The file '{Name}' is not a model main header file");
+            string path = f.Path, pathExt = Path.GetExtension(path), pathName = path[..^pathExt.Length];
+
+            //// load texture
+            //BinaryReader tr; M_Header theader;
+            //(tr, theader) = HasTextureFile
+            //    ? s.ReaderT(r2 =>
+            //    {
+            //        if (r2 == null) throw new Exception($"External texture file '{path}' does not exist");
+            //        var header = r2.ReadS<M_Header>();
+            //        if (header.Magic != M_MAGIC) throw new FormatException("BAD MAGIC");
+            //        else if (header.Version != 10) throw new FormatException("BAD VERSION");
+            //        return Task.FromResult((r2, header));
+            //    }, path = $"{pathName}T{pathExt}", true).Result
+            //    : (r, header);
+
+            //// load animations
+            //(BinaryReader r, M_SeqHeader h)[] sequences;
+            //if (header.SeqGroups.Num > 1)
+            //{
+            //    sequences = new (BinaryReader, M_SeqHeader)[header.SeqGroups.Num - 1];
+            //    for (var i = 0; i < sequences.Length; i++)
+            //        sequences[i] = s.ReaderT(r2 =>
+            //        {
+            //            if (r2 == null) throw new Exception($"Sequence group file '{path}' does not exist");
+            //            var header = r2.ReadS<M_SeqHeader>();
+            //            if (header.Magic != M_MAGIC2) throw new FormatException("BAD MAGIC");
+            //            else if (header.Version != 10) throw new FormatException("BAD VERSION");
+            //            return Task.FromResult((r2, header));
+            //        }, path = $"{pathName}{i + 1:00}{pathExt}", true).Result;
+            //}
+            //else sequences = [];
+
+            //// validate
+            //if (header.Bones.Num < 0
+            //    || header.BoneControllers.Num < 0
+            //    || header.Hitboxs.Num < 0
+            //    || header.Seqs.Num < 0
+            //    || header.SeqGroups.Num < 0
+            //    || header.Bodyparts.Num < 0
+            //    || header.Attachments.Num < 0
+            //    || header.Transitions.Num < 0
+            //    || theader.Textures.Num < 0
+            //    || theader.SkinFamilies.Num < 0
+            //    || theader.NumSkinRef < 0) throw new Exception("Negative data chunk count value");
+
+            // build
+            EyePosition = header.EyePosition;
+            IllumPosition = header.IllumPosition;
+            BoundingMin = header.Min;
+            BoundingMax = header.Max;
+            ClippingMin = header.BBMin;
+            ClippingMax = header.BBMax;
+            Flags = header.Flags;
+            //r.Seek(header.BoneControllers.Offset); BoneControllers = r.ReadSArray<M_BoneController>(header.BoneControllers.Num).Select((x, i) => new BoneController(ref x, i)).ToArray();
+            //r.Seek(header.Bones.Offset); Bones = r.ReadSArray<M_Bone>(header.Bones.Num).Select((x, i) => new Bone(x, i, BoneControllers)).ToArray(); Bone.Remap(Bones);
+            //r.Seek(header.Hitboxs.Offset); Hitboxes = r.ReadSArray<M_BBox>(header.Hitboxs.Num).Select(x => new BBox(ref x, Bones)).ToArray();
+            //r.Seek(header.SeqGroups.Offset); SequenceGroups = r.ReadSArray<M_SeqGroup>(header.SeqGroups.Num).Select(x => new SeqGroup(x)).ToArray();
+            //var zeroGroupOffset = SequenceGroups.Length > 0 ? SequenceGroups[0].Offset : 0;
+            //r.Seek(header.Seqs.Offset); Sequences = r.ReadSArray<M_Seq>(header.Seqs.Num).Select(x => new Seq(r, x, sequences, zeroGroupOffset, IsXashModel, Bones)).ToArray();
+            //r.Seek(header.Attachments.Offset); Attachments = r.ReadSArray<M_Attachment>(header.Attachments.Num).Select(x => new Attachment(x, Bones)).ToArray();
+            //r.Seek(header.Bodyparts.Offset); Bodyparts = r.ReadSArray<M_Bodypart>(header.Bodyparts.Num).Select(x => new Bodypart(r, x, Bones)).ToArray();
+            //r.Seek(header.Transitions.Offset); Transitions = r.ReadFArray(x => x.ReadBytes(1), header.Transitions.Num);
+            //tr.Seek(theader.Textures.Offset); Textures = tr.ReadSArray<M_Texture>(theader.Textures.Num).Select(x => new Texture(tr, x)).ToArray();
+            //tr.Seek(theader.SkinFamilies.Offset); SkinFamilies = tr.ReadFArray(x => x.ReadPArray<short>("H", theader.NumSkinRef), theader.SkinFamilies.Num);
         }
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
@@ -1188,7 +1416,7 @@ namespace GameX.Valve.Formats
         public int Height => height;
         public int Depth => 0;
         public int MipMaps => pixels.Length;
-        public TextureFlags Flags => 0;
+        public TextureFlags TexFlags => 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
         {

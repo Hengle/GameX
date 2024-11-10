@@ -17,7 +17,10 @@
       "pakFileType": "GameX.Valve.ValvePakFile, GameX.Valve",
       "engine": "GoldSrc",
       "searchBy": "AllDir",
-      "pakExt": [".wad", ".bsp"]
+      "pakExt": [
+        ".wad",
+        ".bsp"
+      ]
     },
     "HL": {
       "name": "Half-Life",

@@ -5,7 +5,7 @@ from io import BytesIO
 from enum import Enum, Flag
 from openstk.gfx.gfx_render import Rasterize
 from openstk.gfx.gfx_texture import TextureFlags, ITexture, ITextureFrames, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
-from openstk.poly import Reader, unsafe
+from openstk.poly import Reader, unsafe, X_LumpNO, X_LumpNO2, X_Lump2NO
 from gamex import PakFile, BinaryPakFile, PakBinary, FileSource, MetaInfo, MetaManager, MetaContent, IHaveMetaInfo
 from gamex.platform import Platform
 from gamex.util import _pathExtension
@@ -34,12 +34,11 @@ class Binary_Spr(IHaveMetaInfo, ITextureFrames):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Spr(r)
 
-    data: dict[str, object] = None
     width: int = 0
     height: int = 0
     depth: int = 0
     mipMaps: int = 1
-    flags: TextureFlags = 0
+    texFlags: TextureFlags = 0
     fps: int = 60
 
     #region Headers
@@ -143,12 +142,12 @@ class Binary_Spr(IHaveMetaInfo, ITextureFrames):
 
 #endregion
 
-#region Binary_Mdl
+#region Binary_Mdl10
 
-# Binary_Mdl
-class Binary_Mdl(IHaveMetaInfo):
+# Binary_Mdl10
+class Binary_Mdl10(IHaveMetaInfo, ITexture):
     @staticmethod
-    def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Mdl(r, f, s)
+    def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Mdl10(r, f, s)
 
     #region Headers
 
@@ -216,15 +215,6 @@ class Binary_Mdl(IHaveMetaInfo):
         BBOX = 0x0004
         CHROME = 0x0008 # if any of the textures have chrome on them
 
-    # lumps
-    class M_Lump:
-        num: int
-        offset: int
-    class M_Lump2:
-        num: int
-        offset: int
-        offset2: int
-
     # sequence header
     class M_SeqHeader:
         struct = ('<2i64si', 76)
@@ -261,12 +251,12 @@ class Binary_Mdl(IHaveMetaInfo):
             self.parentId = s.parent
             self.flags = s.flags
             self.axes = [
-                Binary_Mdl.BoneAxis(controllers[s.boneController[0]] if s.boneController[0] != -1 else None, s.value[0], s.scale[0]),
-                Binary_Mdl.BoneAxis(controllers[s.boneController[1]] if s.boneController[1] != -1 else None, s.value[1], s.scale[1]),
-                Binary_Mdl.BoneAxis(controllers[s.boneController[2]] if s.boneController[2] != -1 else None, s.value[2], s.scale[2]),
-                Binary_Mdl.BoneAxis(controllers[s.boneController[3]] if s.boneController[3] != -1 else None, s.value[3], s.scale[3]),
-                Binary_Mdl.BoneAxis(controllers[s.boneController[4]] if s.boneController[4] != -1 else None, s.value[4], s.scale[4]),
-                Binary_Mdl.BoneAxis(controllers[s.boneController[5]] if s.boneController[5] != -1 else None, s.value[5], s.scale[5])]
+                Binary_Mdl10.BoneAxis(controllers[s.boneController[0]] if s.boneController[0] != -1 else None, s.value[0], s.scale[0]),
+                Binary_Mdl10.BoneAxis(controllers[s.boneController[1]] if s.boneController[1] != -1 else None, s.value[1], s.scale[1]),
+                Binary_Mdl10.BoneAxis(controllers[s.boneController[2]] if s.boneController[2] != -1 else None, s.value[2], s.scale[2]),
+                Binary_Mdl10.BoneAxis(controllers[s.boneController[3]] if s.boneController[3] != -1 else None, s.value[3], s.scale[3]),
+                Binary_Mdl10.BoneAxis(controllers[s.boneController[4]] if s.boneController[4] != -1 else None, s.value[4], s.scale[4]),
+                Binary_Mdl10.BoneAxis(controllers[s.boneController[5]] if s.boneController[5] != -1 else None, s.value[5], s.scale[5])]
             self.id = id
         def remap(bones: list[Bone]) -> None:
             for bone in bones:
@@ -326,8 +316,8 @@ class Binary_Mdl(IHaveMetaInfo):
         def __init__(self, tuple):
             linearMovement = self.linearMovement = np.array([0,0,0])
             bbMin = self.bbMin = np.array([0,0,0]); bbMax = self.bbMax = np.array([0,0,0])
-            events = self.events = Binary_Mdl.M_Lump()
-            pivots = self.pivots = Binary_Mdl.M_Lump()
+            events = self.events = X_LumpNO()
+            pivots = self.pivots = X_LumpNO()
             blendType = self.blendType = np.array([0,0])
             blendStart = self.blendStart = np.array([0,0])
             blendEnd = self.blendEnd = np.array([0,0])
@@ -381,16 +371,16 @@ class Binary_Mdl(IHaveMetaInfo):
             self.flags = s.flags
             self.activity = s.activity
             self.actWeight = s.actWeight
-            r.seek(s.events.offset); self.events = r.readSArray(Binary_Mdl.M_Event, s.events.num)
+            r.seek(s.events.offset); self.events = r.readSArray(Binary_Mdl10.M_Event, s.events.num)
             self.sortedEvents = self.events
             self.numFrames = s.numFrames
             if isXashModel: self.pivots = []
-            else: r.seek(s.pivots.offset); self.pivots = r.readSArray(Binary_Mdl.M_Pivot, s.pivots.num)
+            else: r.seek(s.pivots.offset); self.pivots = r.readSArray(Binary_Mdl10.M_Pivot, s.pivots.num)
             self.motionType = s.motionType
             self.motionBone = s.motionBone
             self.bbMin = s.bbMin; self.bbMax = s.bbMax
-            self.animationBlends = Binary_Mdl.Seq.getAnimationBlends(r, s, sequences, zeroGroupOffset, len(bones))
-            self.blend = [Binary_Mdl.SeqBlend(s.blendType[0], s.blendStart[0], s.blendEnd[0]), Binary_Mdl.SeqBlend(s.blendType[1], s.blendStart[1], s.blendEnd[1])]
+            self.animationBlends = Binary_Mdl10.Seq.getAnimationBlends(r, s, sequences, zeroGroupOffset, len(bones))
+            self.blend = [Binary_Mdl10.SeqBlend(s.blendType[0], s.blendStart[0], s.blendEnd[0]), Binary_Mdl10.SeqBlend(s.blendType[1], s.blendStart[1], s.blendEnd[1])]
             self.entryNode = s.entryNode
             self.exitNode = s.exitNode
             self.nodeFlags = s.nodeFlags
@@ -399,21 +389,21 @@ class Binary_Mdl(IHaveMetaInfo):
         def getAnimationBlends(r: Reader, s: M_Seq, sequences: list[M_SeqHeader], zeroGroupOffset: int, numBones: int) -> list[SeqAnimation]:
             (sr, so) = (r, zeroGroupOffset + s.animIndex) if s.seqGroup == 0 else (sequences[s.seqGroup - 1][0], s.animIndex)
             sr.seek(so)
-            anim = sr.readS(Binary_Mdl.M_Anim)
-            blends = [list[Binary_Mdl.SeqAnimation]] * s.numBlends
+            anim = sr.readS(Binary_Mdl10.M_Anim)
+            blends = [list[Binary_Mdl10.SeqAnimation]] * s.numBlends
             for i in range(s.numBlends):
-                animations = [Binary_Mdl.SeqAnimation] * numBones
+                animations = [Binary_Mdl10.SeqAnimation] * numBones
                 for b in range(numBones):
-                    animation = Binary_Mdl.SeqAnimation([Binary_Mdl.M_AnimValue] * Binary_Mdl.CoordinateAxes)
-                    for j in range(Binary_Mdl.CoordinateAxes):
+                    animation = Binary_Mdl10.SeqAnimation([Binary_Mdl10.M_AnimValue] * Binary_Mdl10.CoordinateAxes)
+                    for j in range(Binary_Mdl10.CoordinateAxes):
                         if anim.offsets[j] != 0:
                             sr.seek(so + anim.offsets[j])
-                            values = [sr.readS(Binary_Mdl.M_AnimValue)]
+                            values = [sr.readS(Binary_Mdl10.M_AnimValue)]
                             if s.numFrames > 0:
                                 for f in range(s.numFrames):
                                     v = values[-1]
                                     f += v.total
-                                    values.extend(sr.readSArray(Binary_Mdl.M_AnimValue, 1 + v.valid))
+                                    values.extend(sr.readSArray(Binary_Mdl10.M_AnimValue, 1 + v.valid))
                             animation.axis[j] = values
                     animations[b] = animation
                 blends[i] = animations
@@ -476,7 +466,7 @@ class Binary_Mdl(IHaveMetaInfo):
     class M_Bodypart:
         struct = ('<64s3i', 76)
         def __init__(self, tuple):
-            models = self.models = Binary_Mdl.M_Lump2()
+            models = self.models = X_LumpNO2()
             self.name, \
             models.num, models.offset, models.offset2 = tuple
 
@@ -484,7 +474,7 @@ class Binary_Mdl(IHaveMetaInfo):
         def __init__(self, r: Reader, s: M_Bodypart, bones: list[Bone]):
             self.name = unsafe.fixedAString(s.name, 32)
             self.base = s.models.offset
-            r.seek(s.models.offset2); self.models = [Binary_Mdl.Model(r, x, bones) for x in r.readSArray(Binary_Mdl.M_Model, s.models.num)]
+            r.seek(s.models.offset2); self.models = [Binary_Mdl10.Model(r, x, bones) for x in r.readSArray(Binary_Mdl10.M_Model, s.models.num)]
 
     # skin info
     class M_Texture:
@@ -500,17 +490,17 @@ class Binary_Mdl(IHaveMetaInfo):
             self.name = unsafe.fixedAString(s.name, 64)
             self.flags = s.flags
             self.width = s.width; self.height = s.height
-            self.pixels = r.readBytes(self.width * self.height)
-            self.palette = r.readBytes(3 * 255)
+            r.seek(s.index); self.pixels = r.readBytes(self.width * self.height)
+            self.palette = r.readBytes(3 * 256)
 
     # studio models
     class M_Model:
         struct = ('<64sif10i', 112)
         def __init__(self, tuple):
-            meshs = self.meshs = Binary_Mdl.M_Lump()
-            verts = self.verts = Binary_Mdl.M_Lump2()
-            norms = self.norms = Binary_Mdl.M_Lump2()
-            groups = self.groups = Binary_Mdl.M_Lump()
+            meshs = self.meshs = X_LumpNO()
+            verts = self.verts = X_LumpNO2()
+            norms = self.norms = X_LumpNO2()
+            groups = self.groups = X_LumpNO()
             self.name, \
             self.type, \
             self.boundingRadius, \
@@ -527,23 +517,23 @@ class Binary_Mdl(IHaveMetaInfo):
         def create(r: Reader, s: M_Lump2, bones: list[Bone]) -> list[ModelVertex]:
             r.seek(s.offset); boneIds = r.readPArray(None, 'B', s.num)
             r.seek(s.offset2); verts = r.readPArray(np.array, '3f', s.num)
-            return [Binary_Mdl.ModelVertex(bones[boneIds[i]], verts[i]) for i in range(s.num)]
+            return [Binary_Mdl10.ModelVertex(bones[boneIds[i]], verts[i]) for i in range(s.num)]
 
     class Model:
         def __init__(self, r: Reader, s: M_Model, bones: list[Bone]):
             self.name = unsafe.fixedAString(s.name, 64)
             self.type = s.type
             self.boundingRadius = s.boundingRadius
-            r.seek(s.meshs.offset); self.meshs = [Binary_Mdl.Mesh(r, x) for x in r.readSArray(Binary_Mdl.M_Mesh, s.meshs.num)]
-            self.vertices = Binary_Mdl.ModelVertex.create(r, s.verts, bones)
-            self.normals = Binary_Mdl.ModelVertex.create(r, s.norms, bones)
+            r.seek(s.meshs.offset); self.meshs = [Binary_Mdl10.Mesh(r, x) for x in r.readSArray(Binary_Mdl10.M_Mesh, s.meshs.num)]
+            self.vertices = Binary_Mdl10.ModelVertex.create(r, s.verts, bones)
+            self.normals = Binary_Mdl10.ModelVertex.create(r, s.norms, bones)
 
     # meshes
     class M_Mesh:
         struct = ('<5i', 20)
         def __init__(self, tuple):
-            tris = self.tris = Binary_Mdl.M_Lump()
-            norms = self.norms = Binary_Mdl.M_Lump()
+            tris = self.tris = X_LumpNO()
+            norms = self.norms = X_LumpNO()
             tris.num, tris.offset, \
             self.skinRef, \
             norms.num, norms.offset = tuple
@@ -562,18 +552,18 @@ class Binary_Mdl(IHaveMetaInfo):
             eyePosition = self.eyePosition = np.array([0,0,0])
             min = self.min = np.array([0,0,0]); max = self.max = np.array([0,0,0])
             bbMin = self.bbMin = np.array([0,0,0]); bbMax = self.bbMax = np.array([0,0,0])
-            bones = self.bones = Binary_Mdl.M_Lump()
-            boneControllers = self.boneControllers = Binary_Mdl.M_Lump()
-            hitboxs = self.hitboxs = Binary_Mdl.M_Lump()
-            seqs = self.seqs = Binary_Mdl.M_Lump()
-            seqGroups = self.seqGroups = Binary_Mdl.M_Lump()
-            textures = self.textures = Binary_Mdl.M_Lump2()
-            skinFamilies = self.skinFamilies = Binary_Mdl.M_Lump()
-            bodyparts = self.bodyparts = Binary_Mdl.M_Lump()
-            attachments = self.attachments = Binary_Mdl.M_Lump()
-            sounds = self.sounds = Binary_Mdl.M_Lump()
-            soundGroups = self.soundGroups = Binary_Mdl.M_Lump()
-            transitions = self.transitions = Binary_Mdl.M_Lump()
+            bones = self.bones = X_LumpNO()
+            boneControllers = self.boneControllers = X_LumpNO()
+            hitboxs = self.hitboxs = X_LumpNO()
+            seqs = self.seqs = X_LumpNO()
+            seqGroups = self.seqGroups = X_LumpNO()
+            textures = self.textures = X_LumpNO2()
+            skinFamilies = self.skinFamilies = X_LumpNO()
+            bodyparts = self.bodyparts = X_LumpNO()
+            attachments = self.attachments = X_LumpNO()
+            sounds = self.sounds = X_LumpNO()
+            soundGroups = self.soundGroups = X_LumpNO()
+            transitions = self.transitions = X_LumpNO()
             self.magic, \
             self.version, \
             self.name, \
@@ -595,7 +585,7 @@ class Binary_Mdl(IHaveMetaInfo):
             sounds.num, sounds.offset, \
             soundGroups.num, soundGroups.offset, \
             transitions.num, transitions.offset = tuple
-            self.flags = Binary_Mdl.HeaderFlags(self.flags)
+            self.flags = Binary_Mdl10.HeaderFlags(self.flags)
 
     #endregion
 
@@ -683,9 +673,256 @@ class Binary_Mdl(IHaveMetaInfo):
         r.seek(header.seqs.offset); self.sequences = [self.Seq(r, x, sequences, zeroGroupOffset, self.isXashModel, self.bones) for x in r.readSArray(self.M_Seq, header.seqs.num)]
         r.seek(header.attachments.offset); self.attachments = [self.Attachment(x, self.bones) for x in r.readSArray(self.M_Attachment, header.attachments.num)]
         r.seek(header.bodyparts.offset); self.bodyparts = [self.Bodypart(r, x, self.bones) for x in r.readSArray(self.M_Bodypart, header.bodyparts.num)]
-        r.seek(header.transitions.offset); self.transitions = tr.readFArray(lambda x: x.readBytes(10), header.transitions.num)
-        tr.seek(theader.textures.offset); self.textures = [self.Texture(r, x) for x in tr.readSArray(self.M_Texture, theader.textures.num)]
+        r.seek(header.transitions.offset); self.transitions = tr.readFArray(lambda x: x.readBytes(1), header.transitions.num)
+        tr.seek(theader.textures.offset); self.textures = [self.Texture(tr, x) for x in tr.readSArray(self.M_Texture, theader.textures.num)]
         tr.seek(theader.skinFamilies.offset); self.skinFamilies = tr.readFArray(lambda x: x.readPArray(None, 'H', theader.numSkinRef), theader.skinFamilies.num)
+
+        # texture
+        self.format = ((TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24)
+
+    width: int = 0
+    height: int = 0
+    depth: int = 0
+    mipMaps: int = 1
+    texFlags: TextureFlags = 0
+
+    def begin(self, platform: int) -> (bytes, object, list[object]):
+        tex = self.textures[0]
+        self.width = tex.width; self.height = tex.height
+        buf = bytearray(self.width * self.height * 3); mv = memoryview(buf)
+        Rasterize.copyPixelsByPalette(mv, 3, tex.pixels, tex.palette, 3)
+        match platform:
+            case Platform.Type.OpenGL: format = self.format[1]
+            case Platform.Type.Vulken: format = self.format[2]
+            case Platform.Type.Unity: format = self.format[3]
+            case Platform.Type.Unreal: format = self.format[4]
+            case _: raise Exception(f'Unknown {platform}')
+        return buf, format, None
+    def end(self): pass
+
+    def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
+        MetaInfo(None, MetaContent(type = 'Texture', name = os.path.basename(file.path), value = self)),
+        MetaInfo('Model', items = [
+            MetaInfo(f'Name: {self.name}')
+            ])
+        ]
+
+#endregion
+
+#region Binary_Mdl40
+
+# Binary_Mdl40
+class Binary_Mdl40(IHaveMetaInfo):
+    @staticmethod
+    def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Mdl40(r, f, s)
+
+    #region Headers
+
+    M_MAGIC = 0x54534449 #: IDST
+
+    # header flags
+    class HeaderFlags(Flag):
+        AUTOGENERATED_HITBOX = 0x00000001           # This flag is set if no hitbox information was specified
+        USES_ENV_CUBEMAP = 0x00000002               # This flag is set at loadtime, not mdl build time so that we don't have to rebuild models when we change materials.
+        FORCE_OPAQUE = 0x00000004                   # Use this when there are translucent parts to the model but we're not going to sort it
+        TRANSLUCENT_TWOPASS = 0x00000008            # Use this when we want to render the opaque parts during the opaque pass and the translucent parts during the translucent pass
+        STATIC_PROP = 0x00000010                    # This is set any time the .qc files has $staticprop in it
+        USES_FB_TEXTURE = 0x00000020                # This flag is set at loadtime, not mdl build time so that we don't have to rebuild models when we change materials.
+        HASSHADOWLOD = 0x00000040                   # This flag is set by studiomdl.exe if a separate "$shadowlod" entry was present for the .mdl (the shadow lod is the last entry in the lod list if present)
+        USES_BUMPMAPPING = 0x00000080               # This flag is set at loadtime, not mdl build time so that we don't have to rebuild models when we change materials.	S
+        USE_SHADOWLOD_MATERIALS = 0x00000100        # This flag is set when we should use the actual materials on the shadow LOD instead of overriding them with the default one (necessary for translucent shadows)
+        OBSOLETE = 0x00000200                       # This flag is set when we should use the actual materials on the shadow LOD instead of overriding them with the default one (necessary for translucent shadows)
+        UNUSED = 0x00000400 	                    # N/A
+        NO_FORCED_FADE = 0x00000800 	            # This flag is set at mdl build time
+        FORCE_PHONEME_CROSSFADE = 0x00001000	    # The npc will lengthen the viseme check to always include two phonemes
+        CONSTANT_DIRECTIONAL_LIGHT_DOT = 0x00002000 # This flag is set when the .qc has $constantdirectionallight in it
+        FLEXES_CONVERTED = 0x00004000	            # Flag to mark delta flexes as already converted from disk format to memory format
+        BUILT_IN_PREVIEW_MODE = 0x00008000	        # Indicates the studiomdl was built in preview mode
+        AMBIENT_BOOST = 0x00010000	                # Ambient boost (runtime flag)
+        DO_NOT_CAST_SHADOWS = 0x00010000	        # Forces the model to be lit by skybox lighting
+        CAST_TEXTURE_SHADOWS = 0x00010000 	        # Don't cast shadows from this model (useful on first-person models)
+        NA_1 = 0x00080000 	                        # N/A (undefined)
+        NA_2 = 0x00100000 	                        # N/A (undefined)
+        VERT_ANIM_FIXED_POINT_SCALE = 0x00200000    # flagged on load to indicate no animation events on this model
+
+    class M_Texture:
+        struct = ('<6i10s', 80)
+        def __init__(self, tuple):
+            self.nameOffset, \
+            self.flags, \
+            self.used, \
+            self.unused, \
+            self.material, \
+            self.clientMaterial, \
+            self.unused2 = tuple
+
+    class M_Header:
+        struct = ('<3i64si18f44if11i4B3if3i', 408)
+        def __init__(self, tuple):
+            eyePosition = self.eyePosition = np.array([0,0,0])
+            illumPosition = self.illumPosition = np.array([0,0,0])
+            min = self.min = np.array([0,0,0]); max = self.max = np.array([0,0,0])
+            bbMin = self.bbMin = np.array([0,0,0]); bbMax = self.bbMax = np.array([0,0,0])
+            bones = self.bones = X_LumpNO()
+            boneControllers = self.boneControllers = X_LumpNO()
+            hitboxs = self.hitboxs = X_LumpNO()
+            localAnims = self.localAnims = X_LumpNO()
+            localSeqs = self.localSeqs = X_LumpNO()
+            events = self.events = X_LumpNO()
+            textures = self.textures = X_LumpNO()
+            texturesDirs = self.texturesDirs = X_LumpNO()
+            skinFamilies = self.skinFamilies = X_LumpNO2()
+            bodyparts = self.bodyparts = X_LumpNO()
+            attachments = self.attachments = X_LumpNO()
+            localNodes = self.localNodes = X_LumpNO2()
+            flexs = self.flexs = X_LumpNO()
+            flexControllers = self.flexControllers = X_LumpNO()
+            flexRules = self.flexRules = X_LumpNO()
+            ikChains = self.ikChains = X_LumpNO()
+            mouths = self.mouths = X_LumpNO()
+            localPoseParams = self.localPoseParams = X_LumpNO()
+            keyValues = self.keyValues = X_LumpNO()
+            ikLocks = self.ikLocks = X_LumpNO()
+            includeModel = self.includeModel = X_LumpNO()
+            animBlocks = self.animBlocks = X_LumpNO()
+            flexControllerUI = self.flexControllerUI = X_LumpNO()
+            self.magic, \
+            self.version, \
+            self.checksum, \
+            self.name, \
+            self.length, \
+            eyePosition[0], eyePosition[1], eyePosition[2], \
+            illumPosition[0], illumPosition[1], illumPosition[2], \
+            min[0], min[1], min[2], max[0], max[1], max[2], \
+            bbMin[0], bbMin[1], bbMin[2], bbMax[0], bbMax[1], bbMax[2], \
+            self.flags, \
+            bones.num, bones.offset, \
+            boneControllers.num, boneControllers.offset, \
+            hitboxs.num, hitboxs.offset, \
+            localAnims.num, localAnims.offset, \
+            localSeqs.num, localSeqs.offset, \
+            events.num, events.offset, \
+            textures.num, textures.offset, \
+            texturesDirs.num, texturesDirs.offset, \
+            skinFamilies.num, skinFamilies.offset, skinFamilies.offset2, \
+            bodyparts.num, bodyparts.offset, \
+            attachments.num, attachments.offset, \
+            localNodes.num, localNodes.offset, localNodes.offset2, \
+            flexs.num, flexs.offset, \
+            flexControllers.num, flexControllers.offset, \
+            flexRules.num, flexRules.offset, \
+            ikChains.num, ikChains.offset, \
+            mouths.num, mouths.offset, \
+            localPoseParams.num, localPoseParams.offset, \
+            self.surfacePropIndex, \
+            keyValues.num, keyValues.offset, \
+            ikLocks.num, ikLocks.offset, \
+            self.mass, \
+            self.contents, \
+            includeModel.num, includeModel.offset, \
+            self.virtualModel, \
+            self.animBlockNameIndex, \
+            animBlocks.num, animBlocks.offset, \
+            self.animBlockModel, \
+            self.boneNameIndex, \
+            self.vertexBase, \
+            self.offsetBase, \
+            self.directionalDotProduct, \
+            self.rootLod, \
+            self.numAllowedRootLods, \
+            self.unused0, \
+            self.unused1, \
+            flexControllerUI.num, flexControllerUI.offset, \
+            self.vertAnimFixedPointScale, \
+            self.unused2, \
+            self.header2Index, \
+            self.unused3 = tuple
+            self.flags = Binary_Mdl40.HeaderFlags(self.flags)
+
+    class M_Header2:
+        struct = ('<3ifi64s', 244)
+        def __init__(self, tuple):
+            srcBoneTransform = self.srcBoneTransform = X_LumpNO()
+            srcBoneTransform.num, srcBoneTransform.offset, \
+            self.illumPositionAttachmentIndex, \
+            self.maxEyeDeflection, \
+            self.linearBoneIndex, \
+            self.unknown = tuple
+
+    #endregion
+
+    name: str
+    eyePosition: np.ndarray
+    illumPosition: np.ndarray
+    boundingMin: np.ndarray
+    boundingMax: np.ndarray
+    clippingMin: np.ndarray
+    clippingMax: np.ndarray
+    flags: HeaderFlags
+
+    def __init__(self, r: Reader, f: FileSource, s: BinaryPakFile):
+        # read file
+        header = r.readS(self.M_Header)
+        if header.magic != self.M_MAGIC: raise Exception('BAD MAGIC')
+        elif header.version < 40: raise Exception('BAD VERSION')
+        self.name = unsafe.fixedAString(header.name, 64)
+        if not self.name: raise Exception(f'The file "{self.name}" is not a model main header file')
+        path = f.path; pathExt = _pathExtension(path); pathName = path[:-len(pathExt)]
+
+        # # load texture
+        # def _texture(r2: Reader):
+        #     if not r2: raise Exception(f'External texture file "{path}" does not exist')
+        #     header = r2.readS(self.M_Header)
+        #     if header.magic != self.M_MAGIC: raise Exception('BAD MAGIC')
+        #     elif header.version != 10: raise Exception('BAD VERSION')
+        #     return (r2, header)
+        # (tr, theader) = s.readerT(_texture, path := f'{pathName}T{pathExt}', True) if self.hasTextureFile else (r, header)
+
+        # # load animations
+        # sequences: list[(Reader, M_SeqHeader)] = None
+        # if header.seqGroups.num > 1:
+        #     sequences = [(Reader, self.M_SeqHeader)] * (header.seqGroups.num - 1)
+        #     for i in range(len(sequences)):
+        #         def _sequences(r2: Reader):
+        #             if not r2: raise Exception(f'Sequence group file "{path}" does not exist')
+        #             header = r2.readS(self.M_SeqHeader)
+        #             if header.magic != self.M_MAGIC2: raise Exception('BAD MAGIC')
+        #             elif header.version != 10: raise Exception('BAD VERSION')
+        #             return (r2, header)
+        #         sequences[i] = s.readerT(_sequences, path := f'{pathName}{i + 1:02}{pathExt}', True)
+
+        # # validate
+        # if header.bones.num < 0 \
+        #     or header.boneControllers.num < 0 \
+        #     or header.hitboxs.num < 0 \
+        #     or header.seqs.num < 0 \
+        #     or header.seqGroups.num < 0 \
+        #     or header.bodyparts.num < 0 \
+        #     or header.attachments.num < 0 \
+        #     or header.transitions.num < 0 \
+        #     or theader.textures.num < 0 \
+        #     or theader.skinFamilies.num < 0 \
+        #     or theader.numSkinRef < 0: raise Exception('Negative data chunk count value')
+
+        # build
+        self.eyePosition = header.eyePosition
+        self.illumPosition = header.illumPosition
+        self.boundingMin = header.min
+        self.boundingMax = header.max
+        self.clippingMin = header.bbMin
+        self.clippingMax = header.bbMax
+        self.flags = header.flags
+        # r.seek(header.boneControllers.offset); self.boneControllers = [self.BoneController(x, i) for i,x in enumerate(r.readSArray(self.M_BoneController, header.boneControllers.num))]
+        # r.seek(header.bones.offset); self.bones = [self.Bone(x, i, self.boneControllers) for i,x in enumerate(r.readSArray(self.M_Bone, header.bones.num))]; self.Bone.remap(self.bones)
+        # r.seek(header.hitboxs.offset); self.hitboxes = [self.BBox(x, self.bones) for x in r.readSArray(self.M_BBox, header.hitboxs.num)]
+        # r.seek(header.seqGroups.offset); self.sequenceGroups = [self.SeqGroup(x) for x in r.readSArray(self.M_SeqGroup, header.seqGroups.num)]
+        # zeroGroupOffset = self.sequenceGroups[0].offset if self.sequenceGroups else 0
+        # r.seek(header.seqs.offset); self.sequences = [self.Seq(r, x, sequences, zeroGroupOffset, self.isXashModel, self.bones) for x in r.readSArray(self.M_Seq, header.seqs.num)]
+        # r.seek(header.attachments.offset); self.attachments = [self.Attachment(x, self.bones) for x in r.readSArray(self.M_Attachment, header.attachments.num)]
+        # r.seek(header.bodyparts.offset); self.bodyparts = [self.Bodypart(r, x, self.bones) for x in r.readSArray(self.M_Bodypart, header.bodyparts.num)]
+        # r.seek(header.transitions.offset); self.transitions = tr.readFArray(lambda x: x.readBytes(1), header.transitions.num)
+        # tr.seek(theader.textures.offset); self.textures = [self.Texture(tr, x) for x in tr.readSArray(self.M_Texture, theader.textures.num)]
+        # tr.seek(theader.skinFamilies.offset); self.skinFamilies = tr.readFArray(lambda x: x.readPArray(None, 'H', theader.numSkinRef), theader.skinFamilies.num)
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Text', name = os.path.basename(file.path), value = 'self')),
@@ -702,13 +939,6 @@ class Binary_Mdl(IHaveMetaInfo):
 class Binary_Wad3(IHaveMetaInfo, ITexture):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Wad3(r, f)
-
-    data: dict[str, object] = None
-    width: int = 0
-    height: int = 0
-    depth: int = 0
-    mipMaps: int = 1
-    flags: TextureFlags = 0
 
     #region Headers
 
@@ -770,6 +1000,12 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
                 p[j + 1] = i
                 p[j + 2] = i
                 j += 3
+
+    width: int = 0
+    height: int = 0
+    depth: int = 0
+    mipMaps: int = 1
+    texFlags: TextureFlags = 0
 
     def begin(self, platform: int) -> (bytes, object, list[object]):
         bbp = 4 if self.transparent else 3

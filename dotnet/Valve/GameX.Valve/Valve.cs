@@ -38,7 +38,7 @@ namespace GameX.Valve
                 {
                     "Unity" => Unity.Formats.PakBinary_Unity.Current,
                     "GoldSrc" => PakBinary_Wad3.Current,
-                    "Source" => PakBinary_Vpk.Current,
+                    "Source" or "Source2" => PakBinary_Vpk.Current,
                     _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine),
                 })
                 : PakBinary_Bsp30.Current;
@@ -50,10 +50,15 @@ namespace GameX.Valve
                 {
                     var x when x == ".pic" || x == ".tex" || x == ".tex2" || x == ".fnt" => (0, Binary_Wad3.Factory),
                     ".spr" => (0, Binary_Spr.Factory),
-                    ".mdl" => (0, Binary_Mdl.Factory),
+                    ".mdl" => (0, Binary_Mdl10.Factory),
                     _ => UnknownPakFile.ObjectFactory(source, game),
                 },
-                "Source" => (0, Binary_Src.Factory),
+                "Source" => Path.GetExtension(source.Path).ToLowerInvariant() switch
+                {
+                    ".mdl" => (0, Binary_Mdl40.Factory),
+                    _ => UnknownPakFile.ObjectFactory(source, game),
+                },
+                "Source2" => (0, Binary_Src.Factory),
                 _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine),
             };
 

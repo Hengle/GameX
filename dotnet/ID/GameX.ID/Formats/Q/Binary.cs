@@ -63,7 +63,7 @@ namespace GameX.ID.Formats.Q
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
-        public TextureFlags Flags { get; } = 0;
+        public TextureFlags TexFlags { get; } = 0;
 
         public (byte[] bytes, object format, Range[] spans) Begin(int platform)
             => (Pixels, (Platform.Type)platform switch

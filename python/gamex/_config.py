@@ -1,10 +1,11 @@
 __title__ = "gamex"
 __version__ = "0.0.1"
-__current__ = "Unknown"
+# __current__ = "Unknown"
 # __current__ = "Arkane"
 # __current__ = "Bethesda"
 # __current__ = "Bullfrog"
-# __current__ = "Valve"
+# __current__ = "ID"
+__current__ = "Valve"
 
 class GlobalOption:
     def __init__(self, Family:str=None, Game:str=None, Edition:str=None, ForcePath:str=None, ForceOpen:bool=False):
@@ -276,7 +277,7 @@ match __current__:
 
         option = GlobalOption(
             ForceOpen = True,
-            ForcePath = "sample:*",
+            ForcePath = "sample:0",
             Family = "ID",
             Game = "Q", # Quake
             # Game = "Q2", # Quake II
@@ -474,7 +475,7 @@ match __current__:
             ForceOpen = True,
             ForcePath = "sample:0",
             Family = "Valve",
-            Game = "HL", # Half-Life
+            # Game = "HL", # Half-Life
             # Game = "TF", # Team Fortress Classic
             # Game = "HL:OF", # Half-Life: Opposing Force
             # Game = "Ricochet", # Ricochet
@@ -484,7 +485,7 @@ match __current__:
             # Game = "DOD", # Day of Defeat
             # Game = "CS:CZ", # Counter-Strike: Condition Zero
             # Source
-            # Game = "HL:Src", # Half-Life: Source
+            Game = "HL:Src", # Half-Life: Source
             # Game = "CS:Src", # Counter-Strike: Source
             # Game = "HL2", # Half-Life 2
             # Game = "HL2:DM", # Half-Life 2: Deathmatch
