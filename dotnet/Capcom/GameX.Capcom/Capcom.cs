@@ -24,7 +24,7 @@ namespace GameX.Capcom
         /// <param name="state">The state.</param>
         public CapcomPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFunc = state.Game.Engine switch
+            ObjectFactoryFunc = state.Game.Engine.n switch
             {
                 "Unity" => Unity.UnityPakFile.ObjectFactory,
                 _ => ObjectFactory,
@@ -38,7 +38,7 @@ namespace GameX.Capcom
         static PakBinary GetPakBinary(FamilyGame game, string extension) => PakBinarys.GetOrAdd(game.Id, _ => PakBinaryFactory(game, extension));
 
         static PakBinary PakBinaryFactory(FamilyGame game, string extension)
-            => game.Engine switch
+            => game.Engine.n switch
             {
                 "Zip" => PakBinary_Zip.GetPakBinary(game),
                 "Unity" => Unity.Formats.PakBinary_Unity.Current,

@@ -7,6 +7,10 @@
         "type": "Texture"
       },
       {
+        "path": "PAK0.PAK:maps/b_batt0.bsp",
+        "type": "Bsp"
+      },
+      {
         "path": "PAK0.PAK:gfx/palette.lmp",
         "type": "Lump:Palette"
       },
@@ -19,10 +23,6 @@
         "type": "Lump"
       },
       {
-        "path": "maps/b_batt0.bsp",
-        "type": "Bsp"
-      },
-      {
         "path": "gfx.wad:xxx",
         "type": "Palette"
       }
@@ -30,14 +30,23 @@
   },
   "Q2": {
     "name": "Quake II",
-    "files": []
+    "files": [
+      {
+        "path": "pak0.pak:env/space1bk.pcx",
+        "type": "Texture"
+      },
+      {
+        "path": "pak0.pak:maps/base1.bsp",
+        "type": "Bsp"
+      }
+    ]
   },
   "Q3": {
     "name": "Quake III Arena",
     "files": [
       {
         "path": "pak0.pk3:textures/skin/nibbles.tga",
-        "type": "Tga"
+        "type": "Texture"
       }
     ]
   },

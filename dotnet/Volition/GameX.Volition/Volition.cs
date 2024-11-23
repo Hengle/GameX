@@ -59,13 +59,13 @@ namespace GameX.Volition
         static readonly ConcurrentDictionary<string, PakBinary> PakBinarys = new ConcurrentDictionary<string, PakBinary>();
 
         static PakBinary GetPakBinary(FamilyGame game, string extension)
-            => PakBinarys.GetOrAdd(game.Id, _ => game.Engine switch
+            => PakBinarys.GetOrAdd(game.Id, _ => game.Engine.n switch
             {
                 "Descent" => PakBinary_Descent.Current,
                 "CTG" => PakBinary_Ctg.Current,
                 "Geo-Mod" => PakBinary_GeoMod.Current,
                 "Geo-Mod2" => PakBinary_GeoMod.Current,
-                _ => throw new ArgumentOutOfRangeException(nameof(game.Engine)),
+                _ => throw new ArgumentOutOfRangeException(nameof(game.Engine.n)),
             });
 
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)

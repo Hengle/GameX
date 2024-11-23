@@ -86,12 +86,12 @@ namespace GameX
         #region Factory
 
         /// <summary>
-        /// Create Key.
+        /// Parse Key.
         /// </summary>
         /// <param name="elem"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        internal static object CreateKey(JsonElement elem)
+        internal static object ParseKey(JsonElement elem)
         {
             var str = elem.ToString();
             if (string.IsNullOrEmpty(str)) { return null; }
@@ -105,6 +105,19 @@ namespace GameX
             }
             else if (str.StartsWith("txt:", StringComparison.OrdinalIgnoreCase)) return str[4..];
             else throw new ArgumentOutOfRangeException(nameof(str), str);
+        }
+
+        /// Parse Engine.
+        /// </summary>
+        /// <param name="elem"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        internal static (string n, string v) ParseEngine(JsonElement elem)
+        {
+            var str = elem.ToString();
+            if (string.IsNullOrEmpty(str)) { return default; }
+            var p = str.Split([':'], 2);
+            return (p[0], p.Length < 2 ? null : p[1]);
         }
 
         /// <summary>
@@ -300,7 +313,7 @@ namespace GameX
            {
                "name" => Name = x.Value.GetString(),
                "type" => x.Value.GetString(),
-               "key" => _method(elem, "key", CreateKey),
+               "key" => _method(elem, "key", ParseKey),
                "hashs" => Hashs = _related(elem, "hashs", k => k.GetProperty("hash").GetString(), v => ParseHash(game, v)),
                _ => _valueV(x.Value)
            });
@@ -712,7 +725,7 @@ namespace GameX
                "name" => Name = x.Value.GetString(),
                "explorerAppType" => ExplorerType = Type.GetType(x.Value.GetString(), false),
                "explorerApp2Type" => Explorer2Type = Type.GetType(x.Value.GetString(), false),
-               "key" => _method(elem, "key", CreateKey),
+               "key" => _method(elem, "key", ParseKey),
                _ => _valueV(x.Value)
            });
 
@@ -785,7 +798,7 @@ namespace GameX
            => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
            {
                "name" => Name = x.Value.GetString(),
-               "key" => _method(elem, "key", CreateKey),
+               "key" => _method(elem, "key", ParseKey),
                _ => _valueV(x.Value)
            });
 
@@ -933,7 +946,7 @@ namespace GameX
                    "name" => Name = x.Value.GetString(),
                    "path" => Path = x.Value.GetString(),
                    "ignore" => Ignores = _list(elem, "ignore"),
-                   "key" => _method(elem, "key", CreateKey),
+                   "key" => _method(elem, "key", ParseKey),
                    _ => _valueV(x.Value)
                });
         }
@@ -982,7 +995,7 @@ namespace GameX
                {
                    "name" => Name = x.Value.GetString(),
                    "path" => Path = x.Value.GetString(),
-                   "key" => _method(elem, "key", CreateKey),
+                   "key" => _method(elem, "key", ParseKey),
                    _ => _valueV(x.Value)
                });
         }
@@ -1026,7 +1039,7 @@ namespace GameX
                => elem.EnumerateObject().ToDictionary(x => x.Name, x => x.Name switch
                {
                    "name" => Name = x.Value.GetString(),
-                   "key" => _method(elem, "key", CreateKey),
+                   "key" => _method(elem, "key", ParseKey),
                    _ => _valueV(x.Value)
                });
         }
@@ -1053,7 +1066,7 @@ namespace GameX
         /// <summary>
         /// Gets or sets the game engine.
         /// </summary>
-        public string Engine { get; set; }
+        public (string n, string v) Engine { get; set; }
         /// <summary>
         /// Gets or sets the game resource.
         /// </summary>
@@ -1150,14 +1163,14 @@ namespace GameX
             Id = id;
             Ignore = _valueBool(elem, "n/a", dgame.Ignore);
             Name = _value(elem, "name"); //System.Diagnostics.Debugger.Log(0, null, $"Game: {Name}\n");
-            Engine = _value(elem, "engine", dgame.Engine);
+            Engine = _method(elem, "engine", ParseEngine, dgame.Engine);
             Resource = _value(elem, "resource", dgame.Resource);
             Urls = _list(elem, "url", x => new Uri(x));
             Date = _value(elem, "date", z => DateTime.Parse(z.GetString()));
             //Option = _value(elem, "option", z => Enum.TryParse<GameOption>(z.GetString(), true, out var zT) ? zT : throw new ArgumentOutOfRangeException("option", $"Unknown option: {z}"), dgame.Option);
             Paks = _list(elem, "pak", x => new Uri(x), dgame.Paks);
             Paths = _list(elem, "path", dgame.Paths);
-            Key = _method(elem, "key", CreateKey, dgame.Key);
+            Key = _method(elem, "key", ParseKey, dgame.Key);
             //Status = _value(elem, "status");
             Tags = _value(elem, "tags", string.Empty).Split(' ');
             // interface

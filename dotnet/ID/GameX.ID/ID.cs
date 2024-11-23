@@ -1,7 +1,6 @@
 ﻿using GameX.Formats;
 using GameX.Formats.Unknown;
 using GameX.ID.Formats;
-using GameX.ID.Formats.Q;
 using GameX.ID.Transforms;
 using GameX.Unknown;
 using System;
@@ -59,24 +58,24 @@ namespace GameX.ID
              {
                  "" => null,
                  ".pk3" or ".pk4" or ".zip" => PakBinary_Zip.GetPakBinary(game),
-                 ".bsp" => PakBinary_Bsp.Current,
+                 //".bsp" => PakBinary_Bsp.Current,
                  ".pak" => PakBinary_Pak.Current,
                  ".wad" => PakBinary_Wad.Current,
                  _ => throw new ArgumentOutOfRangeException(),
              };
 
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
-            => game.Engine switch
+            => game.Engine.n switch
             {
-                "GoldSrc" => Path.GetExtension(source.Path).ToLowerInvariant() switch
+                "idTech" => Path.GetExtension(source.Path).ToLowerInvariant() switch
                 {
-                    ".tex" or ".lmp" => (0, Binary_Lump.Factory),
-                    ".bsp" => (0, Binary_Level.Factory),
-                    ".mdl" => (0, Binary_Model.Factory),
-                    ".spr" => (0, Binary_Sprite.Factory),
+                    ".lmp" or ".tex" => (0, Binary_Lmp.Factory),
+                    ".bsp" => (0, Binary_Bsp.Factory),
+                    ".mdl" => (0, Binary_Mdl.Factory),
+                    ".spr" => (0, Binary_Spr.Factory),
                     _ => UnknownPakFile.ObjectFactory(source, game),
                 },
-                _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine),
+                _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine.n),
             };
 
         #endregion

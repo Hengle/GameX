@@ -37,7 +37,7 @@ namespace GameX.Bioware
                 : PakBinary_Zip.GetPakBinary(game);
 
         static PakBinary PakBinaryFactory(FamilyGame game)
-            => game.Engine switch
+            => game.Engine.n switch
             {
                 //"Infinity" => PakBinary_Infinity.Instance,
                 "Aurora" => PakBinary_Aurora.Current,

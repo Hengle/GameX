@@ -21,9 +21,9 @@ namespace GameX.Valve.Formats
         #region Headers
 
         [StructLayout(LayoutKind.Sequential)]
-        struct B_Header
+        struct X_Header
         {
-            public static (string, int) Struct = ("<31i", sizeof(B_Header));
+            public static (string, int) Struct = ("<31i", sizeof(X_Header));
             public int Version;
             public X_LumpON Entities;
             public X_LumpON Planes;
@@ -48,9 +48,9 @@ namespace GameX.Valve.Formats
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        struct B_Texture
+        struct X_Texture
         {
-            public static (string, int) Struct = ("<16s6I", sizeof(B_Texture));
+            public static (string, int) Struct = ("<16s6I", sizeof(X_Texture));
             public fixed byte Name[16];
             public uint Width;
             public uint Height;
@@ -86,7 +86,7 @@ namespace GameX.Valve.Formats
 
             // read file
             int start, stop, stride;
-            var header = r.ReadS<B_Header>();
+            var header = r.ReadS<X_Header>();
             if (header.Version != 30) throw new FormatException("BAD VERSION");
             header.ForGameId(source.Game.Id);
             files.Add(new FileSource { Path = "entities.txt", Offset = header.Entities.Offset, FileSize = header.Entities.Num });
@@ -95,7 +95,7 @@ namespace GameX.Valve.Formats
             foreach (var o in r.ReadL32PArray<uint>("I"))
             {
                 r.Seek(start + o);
-                var tex = r.ReadS<B_Texture>();
+                var tex = r.ReadS<X_Texture>();
                 files.Add(new FileSource { Path = $"textures/{UnsafeX.FixedAString(tex.Name, 16)}.tex", Tag = tex });
             }
             files.Add(new FileSource { Path = "vertices.dat", Offset = header.Vertices.Offset, FileSize = header.Vertices.Num });

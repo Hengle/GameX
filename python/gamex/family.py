@@ -10,16 +10,25 @@ from gamex.file import FileManager, HostFileSystem, StandardFileSystem, VirtualF
 from gamex.platform import Platform
 from .util import _throw, _value, _list, _method, _related, _dictTrim
 
-# tag::createKey[]
+# tag::parseKey[]
 # parse key
 @staticmethod
-def createKey(value: str) -> object:
+def parseKey(value: str) -> object:
     if not value: return None
     elif value.startswith('b64:'): return base64.b64decode(value[4:].encode('ascii')) 
     elif value.startswith('hex:'): return bytes.fromhex(value[4:].replace('/x', ''))
     elif value.startswith('txt:'): return value[4:]
     else: raise Exception(f'Unknown value: {value}')
-# end::createKey[]
+# end::parseKey[]
+
+# tag::parseEngine[]
+# parse engine
+@staticmethod
+def parseEngine(value: str) -> (str, str):
+    if not value: return (None, None)
+    p = value.split(':', 2)
+    return (p[0], None if len(p) < 2 else p[1])
+# end::parseEngine[]
 
 # create Detector
 @staticmethod
@@ -104,7 +113,7 @@ class Detector:
         def switch(k,v):
             match k:
                 case 'type': return v
-                case 'key': return _method(elem, 'key', createKey)
+                case 'key': return _method(elem, 'key', parseKey)
                 # case 'hashs': Hashs = _related(elem, 'hashs', k => k.GetProperty("hash").GetString(), v => parseHash(game, v)); return v
                 case _: return v
         return { k:switch(k,v) for k,v in elem.items() }
@@ -229,7 +238,7 @@ class FamilyApp:
                 case 'name': self.name = v; return v
                 case 'explorerAppType': self.explorerType = v; return v
                 case 'explorer2AppType': self.explorer2Type = v; return v
-                case 'key': return _method(elem, 'key', createKey)
+                case 'key': return _method(elem, 'key', parseKey)
                 case _: return v
         return { k:switch(k,v) for k,v in elem.items() }
     def __repr__(self): return f'\n  {self.id}: {self.name}'
@@ -245,7 +254,7 @@ class FamilyEngine:
         def switch(k,v):
             match k:
                 case 'name': self.name = v; return v
-                case 'key': return _method(elem, 'key', createKey)
+                case 'key': return _method(elem, 'key', parseKey)
                 case _: return v
         return { k:switch(k,v) for k,v in elem.items() }
     def __repr__(self): return f'\n  {self.id}: {self.name}'
@@ -285,7 +294,7 @@ class FamilyGame:
                     case 'name': self.name = v; return v
                     case 'path': self.path = v; return v
                     case 'ignore': self.ignores = _list(elem, 'ignore'); return v
-                    case 'key': return _method(elem, 'key', createKey)
+                    case 'key': return _method(elem, 'key', parseKey)
                     case _: return v
             return { k:switch(k,v) for k,v in elem.items() }
         def __repr__(self): return f'{self.id}: {self.name}'
@@ -300,7 +309,7 @@ class FamilyGame:
                 match k:
                     case 'name': self.name = v; return v
                     case 'path': self.path = v; return v
-                    case 'key': return _method(elem, 'key', createKey)
+                    case 'key': return _method(elem, 'key', parseKey)
                     case _: return v
             return { k:switch(k,v) for k,v in elem.items() }
         def __repr__(self): return f'{self.id}: {self.name}'
@@ -313,7 +322,7 @@ class FamilyGame:
             def switch(k,v):
                 match k:
                     case 'name': self.name = v; return v
-                    case 'key': return _method(elem, 'key', createKey)
+                    case 'key': return _method(elem, 'key', parseKey)
                     case _: return v
             return { k:switch(k,v) for k,v in elem.items() }
         def __repr__(self): return f'{self.id}: {self.name}'
@@ -329,14 +338,14 @@ class FamilyGame:
             return
         self.ignore = _value(elem, 'n/a', dgame.ignore)
         self.name = _value(elem, 'name')
-        self.engine = _value(elem, 'engine', dgame.engine)
+        self.engine = _method(elem, 'engine', parseEngine, dgame.engine)
         self.resource = _value(elem, 'resource', dgame.resource)
         self.urls = _list(elem, 'url')
         self.date = _value(elem, 'date')
         #self.option = _list(elem, 'option', dgame.option)
         self.paks = _list(elem, 'pak', dgame.paks)
         self.paths = _list(elem, 'path', dgame.paths)
-        self.key = _method(elem, 'key', createKey, dgame.key)
+        self.key = _method(elem, 'key', parseKey, dgame.key)
         # self.status = _value(elem, 'status')
         self.tags = _value(elem, 'tags', '').split(' ')
         # interface

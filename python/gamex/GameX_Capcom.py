@@ -20,7 +20,7 @@ class CapcomPakFile(BinaryPakFile):
     def getPakBinary(game: FamilyGame, extension: str) -> PakBinary:
         if not extension: return None
         elif extension == '.pie': return PakBinary_Zip()
-        match game.engine:
+        match game.engine[0]:
             case 'Unity': return PakBinary_Unity()
         match extension:
             case '.pak': return PakBinary_Kpka()

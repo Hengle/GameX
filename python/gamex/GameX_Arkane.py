@@ -14,7 +14,7 @@ from gamex.util import _pathExtension
 class ArkanePakFile(BinaryPakFile):
     def __init__(self, state: PakState):
         super().__init__(state, self.getPakBinary(state.game, _pathExtension(state.path).lower()))
-        match state.game.engine:
+        match state.game.engine[0]:
             # case 'CryEngine': self.objectFactoryFunc = Crytek.CrytekPakFile.ObjectFactory
             # case 'Unreal': self.objectFactoryFunc = Epic.EpicPakFile.ObjectFactory
             case 'Valve': self.objectFactoryFunc = ValvePakFile.ObjectFactory
@@ -26,14 +26,14 @@ class ArkanePakFile(BinaryPakFile):
         
     @staticmethod
     def getPakBinary(game: FamilyGame, extension: str) -> PakBinary:
-        match game.engine:
+        match game.engine[0]:
             case 'Danae': return PakBinary_Danae()
             case 'Void': return PakBinary_Void()
             # case 'CryEngine': return PakBinary_Void()
             # case 'Unreal': return PakBinary_Void()
             case 'Valve': return PakBinary_Vpk()
             # case 'idTech7': return PakBinary_Void()
-            case _: raise Exception(f'Unknown: {game.engine}')
+            case _: raise Exception(f'Unknown: {game.engine[0]}')
 
     @staticmethod
     def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):

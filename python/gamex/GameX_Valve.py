@@ -19,15 +19,15 @@ class ValvePakFile(BinaryPakFile):
     @staticmethod
     def getPakBinary(game: FamilyGame, extension: str) -> object:
         if extension == '.bsp': return PakBinary_Bsp30()
-        match game.engine:
+        match game.engine[0]:
             # case 'Unity': return PakBinary_Unity()
             case 'GoldSrc': return PakBinary_Wad3()
             case 'Source' | 'Source2': return PakBinary_Vpk()
-            case _: raise Exception(f'Unknown: {game.engine}')
+            case _: raise Exception(f'Unknown: {game.engine[0]}')
 
     @staticmethod
     def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):
-        match game.engine:
+        match game.engine[0]:
             case 'GoldSrc':
                 match _pathExtension(source.path).lower():
                     case '.pic' | '.tex' | '.tex2' | '.fnt': return (0, Binary_Wad3.factory)
@@ -39,7 +39,7 @@ class ValvePakFile(BinaryPakFile):
                     case '.mdl': return (0, Binary_Mdl40.factory)
                     case _: return UnknownPakFile.objectFactory(source, game)
             case 'Source2': return (0, Binary_Src.factory)
-            case _: raise Exception(f'Unknown: {game.engine}')
+            case _: raise Exception(f'Unknown: {game.engine[0]}')
 
     #endregion
 

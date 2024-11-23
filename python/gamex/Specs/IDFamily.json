@@ -115,7 +115,7 @@
     "D2": {
       "n/a": true,
       "name": "Doom II",
-      "engine": "idTech1",
+      "engine": "idTech:1",
       "url": "https://en.wikipedia.org/wiki/Doom_II",
       "date": "1994-10-10",
       "tag": "DOS"

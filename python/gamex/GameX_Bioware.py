@@ -15,10 +15,10 @@ class BiowarePakFile(BinaryPakFile):
     @staticmethod
     def getPakBinary(game: FamilyGame, extension: str) -> PakBinary:
         if extension == '.zip': return PakBinary_Zip()
-        match game.engine:
+        match game.engine[0]:
             case 'Aurora': return PakBinary_Aurora()
             case 'HeroEngine': return PakBinary_Myp()
-            case _: raise Exception(f'Unknown: {game.engine}')
+            case _: raise Exception(f'Unknown: {game.engine[0]}')
 
     @staticmethod
     def objectFactory(source: FileSource, game: FamilyGame) -> (FileOption, callable):

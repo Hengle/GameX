@@ -25,7 +25,7 @@ namespace GameX.Arkane
         /// <param name="state">The state.</param>
         public ArkanePakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
-            ObjectFactoryFunc = state.Game.Engine switch
+            ObjectFactoryFunc = state.Game.Engine.n switch
             {
                 "CryEngine" => Crytek.CrytekPakFile.ObjectFactory,
                 "Unreal" => Epic.EpicPakFile.ObjectFactory,
@@ -41,7 +41,7 @@ namespace GameX.Arkane
         static readonly ConcurrentDictionary<string, PakBinary> PakBinarys = new();
 
         static PakBinary GetPakBinary(FamilyGame game, string extension)
-            => PakBinarys.GetOrAdd(game.Id, _ => game.Engine switch
+            => PakBinarys.GetOrAdd(game.Id, _ => game.Engine.n switch
             {
                 "Danae" => PakBinary_Danae.Current,
                 "Void" => PakBinary_Void.Current,

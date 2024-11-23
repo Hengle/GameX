@@ -29,7 +29,7 @@ namespace GameX.Lucas
         #region Factories
 
         static PakBinary GetPakBinary(FamilyGame game, string extension)
-            => game.Engine switch
+            => game.Engine.n switch
             {
                 "SPUTM" => PakBinary_Scumm.Current,
                 "Jedi" => PakBinary_Jedi.Current,

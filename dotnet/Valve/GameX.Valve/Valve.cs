@@ -34,17 +34,17 @@ namespace GameX.Valve
 
         static PakBinary GetPakBinary(FamilyGame game, string extension)
             => extension != ".bsp"
-                ? PakBinarys.GetOrAdd(game.Id, _ => game.Engine switch
+                ? PakBinarys.GetOrAdd(game.Id, _ => game.Engine.n switch
                 {
                     "Unity" => Unity.Formats.PakBinary_Unity.Current,
                     "GoldSrc" => PakBinary_Wad3.Current,
                     "Source" or "Source2" => PakBinary_Vpk.Current,
-                    _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine),
+                    _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine.n),
                 })
                 : PakBinary_Bsp30.Current;
 
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
-            => game.Engine switch
+            => game.Engine.n switch
             {
                 "GoldSrc" => Path.GetExtension(source.Path).ToLowerInvariant() switch
                 {
@@ -59,7 +59,7 @@ namespace GameX.Valve
                     _ => UnknownPakFile.ObjectFactory(source, game),
                 },
                 "Source2" => (0, Binary_Src.Factory),
-                _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine),
+                _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine.n),
             };
 
         #endregion

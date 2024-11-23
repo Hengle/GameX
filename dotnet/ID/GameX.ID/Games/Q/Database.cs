@@ -1,6 +1,5 @@
-using GameX.ID.Formats.Q;
+using GameX.ID.Formats;
 using System;
-using static OpenStack.Debug;
 
 namespace GameX.ID.Games.Q
 {
@@ -11,8 +10,8 @@ namespace GameX.ID.Games.Q
         internal static FamilyGame Ensure(FamilyGame game)
         {
             PakFile = game.Family.OpenPakFile(new Uri("game:/#Q"));
-            PakFile.LoadFileObject<Binary_Lump>("PAK0.PAK:gfx/palette.lmp");
-            PakFile.LoadFileObject<Binary_Lump>("PAK0.PAK:gfx/colormap.lmp");
+            PakFile.LoadFileObject<Binary_Lmp>("PAK0.PAK:gfx/palette.lmp");
+            PakFile.LoadFileObject<Binary_Lmp>("PAK0.PAK:gfx/colormap.lmp");
             return game;
         }
     }
