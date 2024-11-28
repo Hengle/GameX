@@ -185,7 +185,7 @@ namespace GameX.Platforms
             return material;
         }
 
-        static Material BuildMaterialTerrain() => new Material(Shader.Find("Nature/Terrain/Diffuse"));
+        static Material BuildMaterialTerrain() => new(Shader.Find("Nature/Terrain/Diffuse"));
 
         Material BuildMaterialBlended(Rendering.BlendMode srcBlendMode, Rendering.BlendMode dstBlendMode)
         {
@@ -207,11 +207,9 @@ namespace GameX.Platforms
     /// <summary>
     /// A material that uses the default shader created for TESUnity.
     /// </summary>
-    public class UnityMaterialBuilder_Default : MaterialBuilderBase<Material, Texture2D>
+    public class UnityMaterialBuilder_Default(TextureManager<Texture2D> textureManager) : MaterialBuilderBase<Material, Texture2D>(textureManager)
     {
         static readonly Material _defaultMaterial = BuildMaterial();
-
-        public UnityMaterialBuilder_Default(TextureManager<Texture2D> textureManager) : base(textureManager) { }
 
         public override Material DefaultMaterial => _defaultMaterial;
 
@@ -239,9 +237,9 @@ namespace GameX.Platforms
             }
         }
 
-        static Material BuildMaterial() => new Material(Shader.Find("TES Unity/Standard"));
+        static Material BuildMaterial() => new(Shader.Find("TES Unity/Standard"));
 
-        static Material BuildMaterialTerrain() => new Material(Shader.Find("Nature/Terrain/Diffuse"));
+        static Material BuildMaterialTerrain() => new(Shader.Find("Nature/Terrain/Diffuse"));
 
         static Material BuildMaterialBlended(Rendering.BlendMode sourceBlendMode, Rendering.BlendMode destinationBlendMode)
         {
@@ -262,11 +260,9 @@ namespace GameX.Platforms
     /// <summary>
     /// A material that uses the Unlit Shader.
     /// </summary>
-    public class UnityMaterial_Unlite : MaterialBuilderBase<Material, Texture2D>
+    public class UnityMaterial_Unlite(TextureManager<Texture2D> textureManager) : MaterialBuilderBase<Material, Texture2D>(textureManager)
     {
         static readonly Material _defaultMaterial = BuildMaterial();
-
-        public UnityMaterial_Unlite(TextureManager<Texture2D> textureManager) : base(textureManager) { }
 
         public override Material DefaultMaterial => _defaultMaterial;
 
@@ -287,9 +283,9 @@ namespace GameX.Platforms
             }
         }
 
-        static Material BuildMaterial() => new Material(Shader.Find("Unlit/Texture"));
+        static Material BuildMaterial() => new(Shader.Find("Unlit/Texture"));
 
-        static Material BuildMaterialTerrain() => new Material(Shader.Find("Nature/Terrain/Diffuse"));
+        static Material BuildMaterialTerrain() => new(Shader.Find("Nature/Terrain/Diffuse"));
 
         static Material BuildMaterialBlended(Rendering.BlendMode sourceBlendMode, Rendering.BlendMode destinationBlendMode)
         {
@@ -310,11 +306,9 @@ namespace GameX.Platforms
     /// <summary>
     /// A material that uses the legacy Bumped Diffuse Shader.
     /// </summary>
-    public class UnityMaterialBuilder_BumpedDiffuse : MaterialBuilderBase<Material, Texture2D>
+    public class UnityMaterialBuilder_BumpedDiffuse(ITextureManager<Texture2D> textureManager) : MaterialBuilderBase<Material, Texture2D>(textureManager)
     {
         static readonly Material _defaultMaterial = BuildMaterial();
-
-        public UnityMaterialBuilder_BumpedDiffuse(ITextureManager<Texture2D> textureManager) : base(textureManager) { }
 
         public override Material DefaultMaterial => _defaultMaterial;
 
@@ -340,9 +334,9 @@ namespace GameX.Platforms
             }
         }
 
-        static Material BuildMaterial() => new Material(Shader.Find("Legacy Shaders/Bumped Diffuse"));
+        static Material BuildMaterial() => new(Shader.Find("Legacy Shaders/Bumped Diffuse"));
 
-        static Material BuildMaterialTerrain() => new Material(Shader.Find("Nature/Terrain/Diffuse"));
+        static Material BuildMaterialTerrain() => new(Shader.Find("Nature/Terrain/Diffuse"));
 
         static Material BuildMaterialBlended(Rendering.BlendMode srcBlendMode, Rendering.BlendMode dstBlendMode)
         {
@@ -406,9 +400,8 @@ namespace GameX.Platforms
     }
 
     // UnitySfx
-    public class UnitySfx : SystemSfx
+    public class UnitySfx(PakFile source) : SystemSfx(source)
     {
-        public UnitySfx(PakFile source) : base(source) { }
     }
 
     // UnityPlatform
@@ -416,7 +409,7 @@ namespace GameX.Platforms
     {
         public static unsafe bool Startup()
         {
-            var task = Task.Run(() => Application.platform.ToString());
+            var task = Task.Run(Application.platform.ToString);
             try
             {
                 Platform.PlatformType = Platform.Type.Unity;
@@ -426,8 +419,8 @@ namespace GameX.Platforms
                 //Debug.Log(Platform);
                 UnsafeX.Memcpy = (dest, src, count) => UnsafeUtility.MemCpy(dest, src, count);
                 Debug.AssertFunc = x => UnityEngine.Debug.Assert(x);
-                Debug.LogFunc = a => UnityEngine.Debug.Log(a);
-                Debug.LogFormatFunc = (a, b) => UnityEngine.Debug.LogFormat(a, b);
+                Debug.LogFunc = UnityEngine.Debug.Log;
+                Debug.LogFormatFunc = UnityEngine.Debug.LogFormat;
                 return true;
             }
             catch { return false; }

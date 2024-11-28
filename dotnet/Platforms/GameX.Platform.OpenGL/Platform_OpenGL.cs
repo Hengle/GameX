@@ -259,7 +259,7 @@ namespace GameX.Platforms
 
         // cache
         QuadIndexBuffer _quadIndices;
-        public QuadIndexBuffer QuadIndices => _quadIndices ?? (_quadIndices = new QuadIndexBuffer(65532));
+        public QuadIndexBuffer QuadIndices => _quadIndices ??= new QuadIndexBuffer(65532);
         public GLMeshBufferCache MeshBufferCache { get; }
     }
 
