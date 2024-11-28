@@ -1,5 +1,4 @@
 using GameX.Platforms;
-using Google.Protobuf.WellKnownTypes;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
@@ -8,22 +7,378 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using static GameX.Formats.Unknown.IUnknownTexture;
 using static System.IO.Polyfill;
 
 // https://www.gamers.org/dEngine/quake/spec/quake-spec34/qkspec_3.htm
 namespace GameX.ID.Formats
 {
-    #region Binary_Bsp30
+    #region Binary_Bsp
+    public unsafe class Binary_Bsp : IHaveMetaInfo
+    {
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Bsp(r, s));
+
+        //[StructLayout(LayoutKind.Sequential)]
+        //internal struct X_DVertex
+        //{
+        //    public Vector3 Point;
+        //}
+        //[StructLayout(LayoutKind.Sequential)]
+        //internal struct X_DEdge
+        //{
+        //    public Vector2<ushort> V;
+        //}
+
+        #region Headers : Ent
+        public unsafe class Ent
+        {
+            const int MAX_MAP_ENTITIES = 2048;
+
+            public class epair
+            {
+                epair next;
+                object key;
+                object value;
+            }
+
+            public class Entity
+            {
+                Vector3 Origin;
+                int FirstBrush;
+                int NumBrushes;
+                epair[] epairs;
+                // only valid for func_areaportals
+                int AreaPortalNum;
+                int PortalAreas; //[2];
+                int ModelNum;   //for bsp 2 map conversion
+                bool WasDetail; //for SIN
+            }
+
+            //extern int num_entities;
+            //extern entity_t entities[MAX_MAP_ENTITIES];
+        }
+        #endregion
+
+        #region Headers
+
+        #region DHeader
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DHeader_H1
+        {
+            public static (string, int) Struct = ("<31i", sizeof(X_DHeader_H1));
+            public int Version;
+            public (int o, int l) ENTITIES;
+            public (int o, int l) PLANES;
+            public (int o, int l) TEXTURES;
+            public (int o, int l) VERTEXES;
+            public (int o, int l) VISIBILITY;
+            public (int o, int l) NODES;
+            public (int o, int l) TEXINFO;
+            public (int o, int l) FACES;
+            public (int o, int l) LIGHTING;
+            public (int o, int l) CLIPNODES;
+            public (int o, int l) LEAFS;
+            public (int o, int l) MARKSURFACES;
+            public (int o, int l) EDGES;
+            public (int o, int l) SURFEDGES;
+            public (int o, int l) MODELS;
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DHeader_S2
+        {
+            public static (string, int) Struct = ("<42i", sizeof(X_DHeader_S2));
+            public int Magic, Version;
+            public (int o, int l) ENTITIES;
+            public (int o, int l) PLANES;
+            public (int o, int l) VERTEXES;
+            public (int o, int l) TEXTURES;
+            public (int o, int l) VISIBILITY;
+            public (int o, int l) NODES;
+            public (int o, int l) TEXINFO;
+            public (int o, int l) FACES;
+            public (int o, int l) LIGHTING;
+            public (int o, int l) LEAFS;
+            public (int o, int l) LEAFFACES;
+            public (int o, int l) LEAFBRUSHES;
+            public (int o, int l) EDGES;
+            public (int o, int l) SURFEDGES;
+            public (int o, int l) MODELS;
+            public (int o, int l) BRUSHES;
+            public (int o, int l) BRUSHSIDES;
+            public (int o, int l) POP;
+            public (int o, int l) AREAS;
+            public (int o, int l) AREAPORTALS;
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DHeader_3
+        {
+            public static (string, int) Struct = ("<36i", sizeof(X_DHeader_3));
+            public int Magic, Version;
+            public (int o, int l) ENTITIES;
+            public (int o, int l) SHADERS;
+            public (int o, int l) PLANES;
+            public (int o, int l) NODES;
+            public (int o, int l) LEAFS;
+            public (int o, int l) LEAFSURFACES;
+            public (int o, int l) LEAFBRUSHES;
+            public (int o, int l) MODELS;
+            public (int o, int l) BRUSHES;
+            public (int o, int l) BRUSHSIDES;
+            public (int o, int l) DRAWVERTS;
+            public (int o, int l) DRAWINDEXES;
+            public (int o, int l) FOGS;
+            public (int o, int l) SURFACES;
+            public (int o, int l) LIGHTMAPS;
+            public (int o, int l) LIGHTGRID;
+            public (int o, int l) VISIBILITY;
+        }
+        #endregion
+
+        #region DModel
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DModel_H1
+        {
+            public static (string, int) Struct = ("<9f7i", sizeof(X_DModel_H1));
+            public Vector3 Mins, Maxs;
+            public Vector3 Origin;
+            public fixed int HeadNodes[4];
+            public int Visleafs; // not including the solid leaf 0
+            public int FirstFace, NumFaces;
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DModel_S2
+        {
+            public static (string, int) Struct = ("<9f3i", sizeof(X_DModel_S2));
+            public Vector3 Mins, Maxs;
+            public Vector3 Origin;
+            public int HeadNode;
+            public int FirstFace, NumFaces;
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DModel_3
+        {
+            public static (string, int) Struct = ("<6f4i", sizeof(X_DModel_3));
+            public Vector3 Mins, Maxs;
+            public int FirstSurface, NumSurfaces;
+            public int FirstBrush, NumBrushes;
+        }
+        #endregion
+
+        #region Shader
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_Shader_3
+        {
+            public static (string, int) Struct = ("<64s2i", sizeof(X_Shader_3));
+            public fixed byte Shader[64];
+            public int SurfaceFlags, ContentFlags;
+        }
+        #endregion
+
+        #region DMiptex
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DMiptexLump_H1
+        {
+            public static (string, int) Struct = ("<5i", sizeof(X_DMiptexLump_H1));
+            public int NumMiptex;
+            public fixed int Offsets[4]; // [nummiptex]
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_Miptex_H1
+        {
+            public static (string, int) Struct = ("<16s6I", sizeof(X_Miptex_H1));
+            public fixed byte Name[16];
+            public uint Width, Height;
+            public fixed uint Offsets[4]; // four mip maps stored
+        }
+        #endregion
+
+        #region DPlane
+        internal enum PLANE : int
+        {
+            // 0-2 are axial planes
+            X = 0,
+            Y = 1,
+            Z = 2,
+            // 3-5 are non-axial planes snapped to the nearest
+            ANYX = 3,
+            ANYY = 4,
+            ANYZ = 5,
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DPlane_H1S2
+        {
+            public static (string, int) Struct = ("<4fi", sizeof(X_DPlane_H1S2));
+            public Vector3 Normal;
+            public float Dist;
+            public int Type; // PLANE_X - PLANE_ANYZ
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DPlane_3
+        {
+            public static (string, int) Struct = ("<4f", sizeof(X_DPlane_3));
+            public Vector3 Normal;
+            public float Dist;
+        }
+        #endregion
+
+        #region DNode
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DNode_H1S2
+        {
+            public static (string, int) Struct = ("<i8h2H", sizeof(X_DNode_H1S2));
+            public int PlaneNum;
+            public (short l, short r) Children; // negative numbers are -(leafs+1), not nodes
+            public Vector3<short> Mins, Maxs; // for frustom culling
+            public ushort FirstFace, NumFaces; // counting both sides
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DNode_3
+        {
+            public static (string, int) Struct = ("<9i", sizeof(X_DNode_3));
+            public int PlaneNum;
+            public (int l, int r) Children; // negative numbers are -(leafs+1), not nodes
+            public Vector3<int> Mins, Maxs; // for frustom culling
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DClipNode_H1
+        {
+            public static (string, int) Struct = ("<I2h", sizeof(X_DClipNode_H1));
+            public int PlaneNum;
+            public (short l, short r) Children;// negative numbers are contents
+        }
+        #endregion
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_Texinfo_H1
+        {
+            public static (string, int) Struct = ("<8f2i", sizeof(X_Texinfo_H1));
+            public Vector4 Vec0, Vec1; // [s/t][xyz offset]
+            public int Miptex;
+            public int Flags;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DEdge_H1
+        {
+            public static (string, int) Struct = ("<2H", sizeof(X_DEdge_H1));
+            public Vector2<ushort> V; // vertex numbers
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DFace_H1
+        {
+            public static (string, int) Struct = ("<2hi2h4Bi", sizeof(X_DFace_H1));
+            public short PlaneNum, Side;
+            public int FirstEdge; public short NumEdges; // we must support > 64k edges
+            public short Texinfo;
+            public fixed byte Styles[4];
+            public int LightOfs; // start of [numstyles*surfsize] samples
+        }
+
+        #region DLeaf
+        internal enum AMBIENT_H1 : int
+        {
+            WATER = 0,
+            SKY = 1,
+            SLIME = 2,
+            LAVA = 3,
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct X_DLeaf_H1
+        {
+            public static (string, int) Struct = ("<2i6hH4B", sizeof(X_DLeaf_H1));
+            public int Contents, VisOfs; // -1 = no visibility info
+            public Vector3<short> Mins, Maxs; // for frustum culling
+            public ushort FirstMarkSurface, NumMarkSurface;
+            public fixed byte AmbientLevel[4]; // automatic ambient sounds
+        }
+        #endregion
+
+        #endregion
+
+        #region Headers : Q2
+        #endregion
+
+        #region Headers : Q3
+        #endregion
+
+        #region CONTENTS
+        internal enum CONTENTS_H1 : int
+        {
+            EMPTY = -1,
+            SOLID = -2,
+            WATER = -3,
+            SLIME = -4,
+            LAVA = -5,
+            SKY = -6,
+            // h1
+            ORIGIN = -7,		// removed at csg time
+            CLIP = -8,      // changed to contents_solid
+            CURRENT_0 = -9,
+            CURRENT_90 = -10,
+            CURRENT_180 = -11,
+            CURRENT_270 = -12,
+            CURRENT_UP = -13,
+            CURRENT_DOWN = -14,
+            TRANSLUCENT = -15,
+        }
+        [Flags]
+        internal enum CONTENTS_S2 : int
+        {
+            SOLID = 1, // an eye is never valid in a solid
+            WINDOW = 2,
+            AUX = 4,
+            LAVA = 8,
+            SLIME = 16,
+            WATER = 32,
+            MIST = 64, LAST_VISIBLE = 64,
+            // remaining contents are non-visible, and don't eat brushes
+            AREAPORTAL = 0x8000,
+            PLAYERCLIP = 0x10000,
+            MONSTERCLIP = 0x20000,
+            // currents can be added to any other contents, and may be mixed
+            CURRENT_0 = 0x40000,
+            CURRENT_90 = 0x80000,
+            CURRENT_180 = 0x100000,
+            CURRENT_270 = 0x200000,
+            CURRENT_UP = 0x400000,
+            CURRENT_DOWN = 0x800000,
+            ORIGIN = 0x1000000, // removed before bsping an entity
+            MONSTER = 0x2000000, // should never be on a brush, only in game
+            DEADMONSTER = 0x4000000,
+            DETAIL = 0x8000000, // brushes to be added after vis leafs
+            // renamed because it's in conflict with the Q3A translucent contents
+            Q2TRANSLUCENT = 0x10000000, // auto set if any surface has trans
+            LADDER = 0x20000000,
+        }
+        #endregion
+
+        public Binary_Bsp(BinaryReader r, PakFile s)
+        {
+        }
+
+        // IHaveMetaInfo
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
+            => [
+                new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = this }),
+                new("BSP", items: [
+                    //new($"Planes: {Planes.Length}"),
+                ])
+            ];
+    }
+
+    #endregion
+
+    #region Binary_Bsp2
     // https://developer.valvesoftware.com/wiki/BSP_(Quake)
     // https://www.flipcode.com/archives/Quake_2_BSP_File_Format.shtml
     // https://www.gamers.org/dEngine/quake/spec/quake-spec34/qkspec_4.htm
     // https://www.mralligator.com/q3/
     // https://github.com/demoth/jake2/blob/main/info/BSP.md
 
-    public unsafe class Binary_Bsp : IHaveMetaInfo
+    public unsafe class Binary_Bsp2 : IHaveMetaInfo
     {
-        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Bsp(r, s));
+        public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Bsp2(r, s));
 
         #region Headers
 
@@ -130,8 +485,8 @@ namespace GameX.ID.Formats
         }
         public class Texinfo
         {
-            internal static Texinfo Create(Binary_Bsp p, X_Texinfo1 s) => new Texinfo() { Vecs = [s.Vec0, s.Vec1], Flags = s.Flags, Mipadjust = ToMipadjust(ref s.Vec0, ref s.Vec1) }.Set(p, s.Miptex);
-            internal static Texinfo Create(Binary_Bsp p, X_Texinfo2 s) => new() { Vecs = [s.Vec0, s.Vec1], Flags = s.Flags, Value = s.Value, TextureName = UnsafeX.FixedAString(s.Texture, 32), NextTexinfo = s.NextTexinfo };
+            internal static Texinfo Create(Binary_Bsp2 p, X_Texinfo1 s) => new Texinfo() { Vecs = [s.Vec0, s.Vec1], Flags = s.Flags, Mipadjust = ToMipadjust(ref s.Vec0, ref s.Vec1) }.Set(p, s.Miptex);
+            internal static Texinfo Create(Binary_Bsp2 p, X_Texinfo2 s) => new() { Vecs = [s.Vec0, s.Vec1], Flags = s.Flags, Value = s.Value, TextureName = UnsafeX.FixedAString(s.Texture, 32), NextTexinfo = s.NextTexinfo };
             public Vector4[] Vecs;
             public int Flags;
             // q2
@@ -151,7 +506,7 @@ namespace GameX.ID.Formats
                 else if (len1 < 0.99) return 2;
                 else return 1;
             }
-            Texinfo Set(Binary_Bsp p, int miptex)
+            Texinfo Set(Binary_Bsp2 p, int miptex)
             {
                 var texs = p.Textures;
                 Texture = texs == null ? null : miptex < texs.Length ? texs[miptex] : throw new FormatException("miptex >= numtextures");
@@ -198,8 +553,8 @@ namespace GameX.ID.Formats
         }
         public class Surface
         {
-            internal static Surface Create(Binary_Bsp p, X_Surface12 s) => new Surface() { FirstEdge = s.FirstEdge, NumEdges = s.NumEdges, Plane = p.Planes[s.PlaneNum], Texinfo = p.Texinfos[s.Texinfo], Styles = [s.Styles[0], s.Styles[1], s.Styles[2], s.Styles[3]], Samples = s.LightOffset != -1 ? p.Lightmaps.AsMemory(s.LightOffset) : null }.Set(p, s.Side);
-            internal static Surface Get(Binary_Bsp p, short s) => s < p.Surfaces.Length ? p.Surfaces[s] : throw new FormatException("MarkSurfaces: bad surface number");
+            internal static Surface Create(Binary_Bsp2 p, X_Surface12 s) => new Surface() { FirstEdge = s.FirstEdge, NumEdges = s.NumEdges, Plane = p.Planes[s.PlaneNum], Texinfo = p.Texinfos[s.Texinfo], Styles = [s.Styles[0], s.Styles[1], s.Styles[2], s.Styles[3]], Samples = s.LightOffset != -1 ? p.Lightmaps.AsMemory(s.LightOffset) : null }.Set(p, s.Side);
+            internal static Surface Get(Binary_Bsp2 p, short s) => s < p.Surfaces.Length ? p.Surfaces[s] : throw new FormatException("MarkSurfaces: bad surface number");
             public int VisFrame; // should be drawn when node is crossed
             public int DlightFrame, DlightBits;
             public Plane Plane;
@@ -213,7 +568,7 @@ namespace GameX.ID.Formats
             // lighting info
             public int[] Styles;
             public Memory<byte> Samples; // [numstyles*surfsize]
-            Surface Set(Binary_Bsp p, ushort side)
+            Surface Set(Binary_Bsp2 p, ushort side)
             {
                 if (side != 0) Flags |= SurfaceFlags.PLANEBACK;
                 if (Texinfo.Texture.Name.StartsWith("sky")) Flags |= SurfaceFlags.DRAWSKY | SurfaceFlags.DRAWTILED; // sky
@@ -227,7 +582,7 @@ namespace GameX.ID.Formats
                 return this;
             }
 
-            void CalcSurfaceExtents(Binary_Bsp p)
+            void CalcSurfaceExtents(Binary_Bsp2 p)
             {
                 float val; var mins = stackalloc float[2]; var maxs = stackalloc float[2];
                 int i, j, e; var bmins = stackalloc int[2]; var bmaxs = stackalloc int[2];
@@ -282,12 +637,12 @@ namespace GameX.ID.Formats
             public int VisFrame; // node needs to be traversed if current
             public Vector3<int> Min, Max; // for bounding box culling
             public Node Parent;
-            internal static void Bind(Binary_Bsp p)
+            internal static void Bind(Binary_Bsp2 p)
             {
                 foreach (var s in p.Nodes) { s.Children = (ToNode(p, s.ChildrenId.l), ToNode(p, s.ChildrenId.r)); }
                 SetParent(p.Nodes[0], null);
             }
-            static Node ToNode(Binary_Bsp p, int id) => id >= 0 ? p.Nodes[id] : p.Leafs[-1 - id];
+            static Node ToNode(Binary_Bsp2 p, int id) => id >= 0 ? p.Nodes[id] : p.Leafs[-1 - id];
             static void SetParent(Node node, Node parent)
             {
                 return;
@@ -301,7 +656,7 @@ namespace GameX.ID.Formats
 
         public class NodeX : Node
         {
-            internal static NodeX Create(Binary_Bsp p, X_Node12 s) => new()
+            internal static NodeX Create(Binary_Bsp2 p, X_Node12 s) => new()
             {
                 Min = new Vector3<int>(s.Min.X, s.Min.Y, s.Min.Z),
                 Max = new Vector3<int>(s.Max.X, s.Max.Y, s.Max.Z),
@@ -310,7 +665,7 @@ namespace GameX.ID.Formats
                 NumSurfaces = s.NumSurfaces,
                 ChildrenId = (s.Children[0], s.Children[1])
             };
-            internal static NodeX Create(Binary_Bsp p, X_Node3 s) => new()
+            internal static NodeX Create(Binary_Bsp2 p, X_Node3 s) => new()
             {
                 Min = s.Min,
                 Max = s.Max,
@@ -347,7 +702,7 @@ namespace GameX.ID.Formats
         }
         public class Leaf : Node
         {
-            internal static Leaf Create(Binary_Bsp p, X_Leaf12 s) => new()
+            internal static Leaf Create(Binary_Bsp2 p, X_Leaf12 s) => new()
             {
                 Min = new Vector3<int>(s.Min.X, s.Min.Y, s.Min.Z),
                 Max = new Vector3<int>(s.Max.X, s.Max.Y, s.Max.Z),
@@ -632,7 +987,7 @@ namespace GameX.ID.Formats
         AreaPortal[] AreaPortals; // | -- | 18 | --
         Surface[] MarkSurfaces; // | 11 | -- | --
 
-        public Binary_Bsp(BinaryReader r, PakFile s)
+        public Binary_Bsp2(BinaryReader r, PakFile s)
         {
             var engineV = s.Game.Engine.v;
             // read file
