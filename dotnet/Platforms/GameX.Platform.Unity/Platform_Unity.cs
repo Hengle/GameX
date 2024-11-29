@@ -1,15 +1,16 @@
 ﻿using OpenStack.Gfx;
 using OpenStack.Gfx.Textures;
-using OpenStack.Sfx;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
+using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using Debug = OpenStack.Debug;
 using Rendering = UnityEngine.Rendering;
 using Shader = UnityEngine.Shader;
+using TextureFormat = UnityEngine.TextureFormat;
+using static OpenStack.Gfx.Textures.TextureFormat;
 
 namespace GameX.Platforms
 {
@@ -17,7 +18,7 @@ namespace GameX.Platforms
     public static class UnityExtensions
     {
         public static UnityEngine.Experimental.Rendering.GraphicsFormat ToUnity(this DXGI_FORMAT source) => (UnityEngine.Experimental.Rendering.GraphicsFormat)source;
-        public static UnityEngine.TextureFormat ToUnity(this TextureUnityFormat source) => (UnityEngine.TextureFormat)source;
+        //public static UnityEngine.TextureFormat ToUnity(this TextureUnityFormat source) => (UnityEngine.TextureFormat)source;
 
         // NifUtils
         public static UnityEngine.Vector3 ToUnity(this System.Numerics.Vector3 source) { MathX.Swap(ref source.Y, ref source.Z); return new UnityEngine.Vector3(source.X, source.Y, source.Z); }
@@ -73,32 +74,58 @@ namespace GameX.Platforms
             if (_defaultTexture != null) { UnityEngine.Object.Destroy(_defaultTexture); _defaultTexture = null; }
         }
 
-        Texture2D CreateDefaultTexture() => new Texture2D(4, 4);
+        Texture2D CreateDefaultTexture() => new(4, 4);
 
         public override Texture2D CreateTexture(Texture2D reuse, ITexture source, Range? range = null)
         {
-            var (bytes, format, _) = source.Begin((int)Platform.Type.Unity);
-            if (format is TextureUnityFormat unityFormat)
+            var (bytes, fmt, _) = source.Begin("UN");
+            try
             {
-                if (unityFormat == TextureUnityFormat.DXT3_POLYFILL)
+                if (bytes == null) return DefaultTexture;
+                else if (fmt is ValueTuple<OpenStack.Gfx.Textures.TextureFormat, TexturePixel> z)
                 {
-                    unityFormat = TextureUnityFormat.DXT5;
-                    DDS_HEADER.ConvertDxt3ToDtx5(bytes, source.Width, source.Height, source.MipMaps);
+                    var (format, pixel) = z;
+                    var s = (pixel & TexturePixel.Signed) != 0;
+                    var f = (pixel & TexturePixel.Float) != 0;
+                    var textureFormat = format switch
+                    {
+                        DXT1 => TextureFormat.DXT1,
+                        DXT3 => default,
+                        DXT5 => TextureFormat.DXT5,
+                        BC4 => TextureFormat.BC4,
+                        BC5 => TextureFormat.BC5,
+                        BC6H => TextureFormat.BC6H,
+                        BC7 => TextureFormat.BC7,
+                        ETC2 => TextureFormat.ETC2_RGB,
+                        ETC2_EAC => TextureFormat.ETC2_RGBA8,
+                        //
+                        I8 => default,
+                        L8 => default,
+                        R8 => TextureFormat.R8,
+                        R16 => f ? TextureFormat.RFloat : s ? TextureFormat.R16_SIGNED : TextureFormat.R16,
+                        RG16 => f ? TextureFormat.RGFloat : s ? TextureFormat.RG16_SIGNED : TextureFormat.RG16,
+                        RGB24 => f ? default : s ? TextureFormat.RGB24_SIGNED : TextureFormat.RGB24,
+                        RGB565 => TextureFormat.RGB565,
+                        RGBA32 => f ? TextureFormat.RGBAFloat : s ? TextureFormat.RGBA32_SIGNED : TextureFormat.RGBA32,
+                        ARGB32 => TextureFormat.ARGB32,
+                        BGRA32 => TextureFormat.BGRA32,
+                        BGRA1555 => default,
+                        _ => throw new ArgumentOutOfRangeException("TextureFormat", $"{format}")
+                    };
+                    if (format == DXT3)
+                    {
+                        textureFormat = TextureFormat.DXT5;
+                        TextureConvert.Dxt3ToDtx5(bytes, source.Width, source.Height, source.MipMaps);
+                    }
+                    var tex = new Texture2D(source.Width, source.Height, textureFormat, source.MipMaps, false);
+                    tex.LoadRawTextureData(bytes);
+                    tex.Apply();
+                    tex.Compress(true);
+                    return tex;
                 }
-                var textureFormat = (TextureFormat)unityFormat;
-                var tex = new Texture2D(source.Width, source.Height, textureFormat, source.MipMaps, false);
-                tex.LoadRawTextureData(bytes);
-                tex.Apply();
-                tex.Compress(true);
-                return tex;
+                else throw new ArgumentOutOfRangeException(nameof(fmt), $"{fmt}");
             }
-            //else if (format is ValueTuple<TextureUnityFormat> unityPixelFormat)
-            //{
-            //    var textureFormat = (TextureFormat)unityPixelFormat.Item1;
-            //    var tex = new Texture2D(source.Width, source.Height, textureFormat, source.MipMaps, false);
-            //    return tex;
-            //}
-            else throw new ArgumentOutOfRangeException(nameof(format), $"{format}");
+            finally { source.End(); }
         }
 
         public override Texture2D CreateSolidTexture(int width, int height, float[] rgba) => new Texture2D(width, height);
@@ -107,7 +134,7 @@ namespace GameX.Platforms
         {
             strength = Mathf.Clamp(strength, 0.0F, 1.0F);
             float xLeft, xRight, yUp, yDown, yDelta, xDelta;
-            var normalTexture = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, true);
+            var normalTexture = new Texture2D(texture.width, texture.height, UnityEngine.TextureFormat.ARGB32, true);
             for (var y = 0; y < normalTexture.height; y++)
                 for (var x = 0; x < normalTexture.width; x++)
                 {
@@ -412,7 +439,7 @@ namespace GameX.Platforms
             var task = Task.Run(Application.platform.ToString);
             try
             {
-                Platform.PlatformType = Platform.Type.Unity;
+                Platform.PlatformType = "UN";
                 Platform.PlatformTag = task.Result;
                 Platform.GfxFactory = source => new UnityGfx(source);
                 Platform.SfxFactory = source => new UnitySfx(source);

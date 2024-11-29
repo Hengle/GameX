@@ -3,7 +3,7 @@ import os, ctypes
 from enum import Enum
 from io import BytesIO
 from openstk.gfx.gfx_render import Rasterize
-from openstk.gfx.gfx_texture import ITextureFrames, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
+from openstk.gfx.gfx_texture import ITextureFrames, TextureFormat, TexturePixel
 from gamex import PakBinary, FileSource, MetaInfo, MetaContent, IHaveMetaInfo
 from gamex.platform import Platform
 
@@ -13,14 +13,6 @@ from gamex.platform import Platform
 class Binary_Fli(IHaveMetaInfo, ITextureFrames):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Fli(r, f)
-
-    format: tuple
-    width: int = 0
-    height: int = 0
-    depth: int = 0
-    mipMaps: int = 1
-    texFlags: TextureFlags = 0
-    fps: int = 1
 
     #region Headers
 
@@ -76,11 +68,6 @@ class Binary_Fli(IHaveMetaInfo, ITextureFrames):
         # read header
         header = r.readS(self.X_Header)
         if header.type != self.MAGIC: raise Exception('BAD MAGIC')
-        self.format = (
-            (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-            (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-            TextureUnityFormat.RGB24,
-            TextureUnrealFormat.Unknown)
         self.width = header.width
         self.height = header.height
         self.frames = self.numFrames = header.numFrames
@@ -94,14 +81,16 @@ class Binary_Fli(IHaveMetaInfo, ITextureFrames):
 
     def dispose(self) -> None: self.r.close()
 
-    def begin(self, platform: int) -> (bytes, object, list[object]):
-        match platform:
-            case Platform.Type.OpenGL: format = self.format[1]
-            case Platform.Type.Vulken: format = self.format[2]
-            case Platform.Type.Unity: format = self.format[3]
-            case Platform.Type.Unreal: format = self.format[4]
-            case _: raise Exception(f'Unknown {platform}')
-        return self.bytes, format, None
+    #region ITexture
+    format: tuple = (TextureFormat.RGB24, TexturePixel.Unknown)
+    width: int = 0
+    height: int = 0
+    depth: int = 0
+    mipMaps: int = 1
+    texFlags: TextureFlags = 0
+    fps: int = 1
+
+    def begin(self, platform: str) -> (bytes, object, list[object]): return self.bytes, self.format, None
     def end(self): pass
 
     def hasFrames(self) -> bool: return self.numFrames > 0

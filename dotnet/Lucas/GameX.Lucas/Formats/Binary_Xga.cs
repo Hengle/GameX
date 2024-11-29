@@ -1,4 +1,3 @@
-using GameX.Platforms;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
@@ -14,6 +13,8 @@ namespace GameX.Lucas.Formats
     public unsafe class Binary_Xga : IHaveMetaInfo, ITexture
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Xga(r, f));
+
+        #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct X_Header
@@ -39,13 +40,10 @@ namespace GameX.Lucas.Formats
             public fixed byte Reserved2[54]; // Second reserved field, intended for future extension
         }
 
+        #endregion
+
         public Binary_Xga(BinaryReader r, FileSource f)
         {
-            Format = (
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGBA32,
-                TextureUnrealFormat.Unknown);
             Header = r.ReadS<X_Header>();
             if (Header.Magic != 0x0a) throw new FormatException("BAD MAGIC");
             Body = r.ReadToEnd();
@@ -53,16 +51,20 @@ namespace GameX.Lucas.Formats
 
         X_Header Header;
         byte[] Body;
-        (object gl, object vulken, object unity, object unreal) Format;
 
-        public IDictionary<string, object> Data { get; } = null;
+        #region ITexture
+        static readonly object Format = (TextureFormat.RGBA32, TexturePixel.Unknown);
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //TextureUnityFormat.RGBA32,
+        //TextureUnrealFormat.Unknown);
         public int Width { get; } = 320;
         public int Height { get; } = 200;
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             //var bytes = Header.Bpp switch
             //{
@@ -70,24 +72,18 @@ namespace GameX.Lucas.Formats
             //    //1 => Decode4bpp(),
             //    _ => throw new FormatException($"Unsupported bpp: {Header.Bpp}"),
             //};
-            return (null, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null); // bytes;
+            return (null, Format, null); // bytes;
         }
         public void End() { }
+        #endregion
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Xga)}", items: new List<MetaInfo> {
-                new MetaInfo($"Width: {Width}"),
-                new MetaInfo($"Height: {Height}"),
-            })
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new($"{nameof(Binary_Xga)}", items: [
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
     #endregion
 }

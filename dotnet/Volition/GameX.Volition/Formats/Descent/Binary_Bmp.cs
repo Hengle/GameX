@@ -1,5 +1,3 @@
-using GameX.Platforms;
-using OpenStack.Gfx;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
@@ -16,12 +14,6 @@ namespace GameX.Volition.Formats.Descent
 
         public Binary_Bmp(BinaryReader r, FamilyGame game, object tag)
         {
-            Format = (
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGBA32,
-                TextureUnrealFormat.Unknown);
-
             // get body
             game.Ensure();
             Body = r.ReadToEnd();
@@ -47,8 +39,13 @@ namespace GameX.Volition.Formats.Descent
         PIG_Flags PigFlags;
         byte[] Body;
         byte[][] Palette;
-        (object gl, object vulken, object unity, object unreal) Format;
 
+        #region ITexture
+        static readonly object Format = (TextureFormat.RGBA32, TexturePixel.Unknown);
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //TextureUnityFormat.RGBA32,
+        //TextureUnrealFormat.Unknown);
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
@@ -72,7 +69,7 @@ namespace GameX.Volition.Formats.Descent
             pixel += 4;
         }
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             byte[] DecodeRLE()
             {
@@ -103,25 +100,20 @@ namespace GameX.Volition.Formats.Descent
 
             return ((PigFlags & (PIG_Flags.RLE | PIG_Flags.RLEBIG)) != 0
                 ? DecodeRLE()
-                : DecodeRaw(), (Platform.Type)platform switch
-                {
-                    Platform.Type.OpenGL => Format.gl,
-                    Platform.Type.Vulken => Format.vulken,
-                    Platform.Type.Unity => Format.unity,
-                    Platform.Type.Unreal => Format.unreal,
-                    _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-                }, null);
+                : DecodeRaw(), Format, null);
         }
         public void End() { }
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Bmp)}", items: new List<MetaInfo> {
-                new MetaInfo($"PigFlags: {PigFlags}"),
-                new MetaInfo($"Width: {Width}"),
-                new MetaInfo($"Height: {Height}"),
-            })
-        };
+        #endregion
+
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new($"{nameof(Binary_Bmp)}", items: [
+                new($"PigFlags: {PigFlags}"),
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 }
 

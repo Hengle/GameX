@@ -87,10 +87,8 @@ namespace GameX.Platforms
     /// <summary>
     /// StereoKitMaterialBuilder
     /// </summary>
-    public class StereoKitMaterialBuilder : MaterialBuilderBase<Material, Tex>
+    public class StereoKitMaterialBuilder(TextureManager<Tex> textureManager) : MaterialBuilderBase<Material, Tex>(textureManager)
     {
-        public StereoKitMaterialBuilder(TextureManager<Tex> textureManager) : base(textureManager) { }
-
         Material _defaultMaterial;
         public override Material DefaultMaterial => _defaultMaterial ??= BuildAutoMaterial(-1);
 
@@ -166,7 +164,7 @@ namespace GameX.Platforms
         {
             try
             {
-                Platform.PlatformType = Platform.Type.StereoKit;
+                Platform.PlatformType = "SK";
                 Platform.GfxFactory = source => new StereoKitGfx(source);
                 Platform.SfxFactory = source => new SystemSfx(source);
                 Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);

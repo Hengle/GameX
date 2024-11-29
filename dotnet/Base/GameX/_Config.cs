@@ -1,5 +1,5 @@
 ﻿//#define Arkane
-//#define Bethesda
+#define Bethesda
 //#define Bioware
 //#define Black
 //#define Blizzard
@@ -13,7 +13,7 @@
 //#define Epic
 //#define Frictional
 //#define Frontier
-#define ID
+//#define ID
 //#define IW
 //#define Lucas
 //#define Monolith
@@ -49,7 +49,7 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            ForcePath = "sample:0",
+            ForcePath = "sample:1",
             Family = "Arkane",
             Game = "AF", // Arx Fatalis
             //Game = "DOM", // Dark Messiah of Might and Magic

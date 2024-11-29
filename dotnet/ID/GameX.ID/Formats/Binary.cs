@@ -1,4 +1,3 @@
-using GameX.Platforms;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
@@ -1180,24 +1179,13 @@ namespace GameX.ID.Formats
     public unsafe class Binary_Lmp : IHaveMetaInfo, ITexture
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Lmp(r, f, s));
+
         public static Binary_Lmp Palette;
         public static Binary_Lmp Colormap;
-
-        #region Records
-
         public byte[][] PaletteRecords;
         public byte[][] ColormapRecords;
-
         public static byte[] ToLightPixel(int light, int pixel) => Palette.PaletteRecords[Colormap.ColormapRecords[(light >> 3) & 0x1F][pixel]];
-
         byte[] Pixels;
-        static (object gl, object vulken, object unity, object unreal) Format = (
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedInt8888),
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedInt8888),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown);
-
-        #endregion
 
         // file: PAK0.PAK:gfx/bigbox.lmp
         public Binary_Lmp(BinaryReader r, FileSource f, PakFile s)
@@ -1222,22 +1210,17 @@ namespace GameX.ID.Formats
             }
         }
 
+        #region ITexture
+        static readonly object Format = (TextureFormat.BGRA32, TexturePixel.Unknown);
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Pixels, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Pixels, Format, null);
         public void End() { }
+        #endregion
 
         // IHaveMetaInfo
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)

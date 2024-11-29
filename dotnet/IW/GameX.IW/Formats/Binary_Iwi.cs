@@ -192,12 +192,12 @@ namespace GameX.IW.Formats
                 if (Format > DXT5) throw new FormatException($"Unknown Format: {Format}");
             }
 
-            public static byte[] Read(BinaryReader r, out HEADER header, out Range[] ranges, out (FORMAT type, object gl, object vulken, object unity, object unreal) format)
+            public static byte[] Read(BinaryReader r, out HEADER header, out Range[] ranges, out (FORMAT type, object value) format)
             {
                 var magic = r.ReadUInt32();
                 var version = (VERSION)(magic >> 24);
                 magic <<= 8;
-                if (magic != HEADER.MAGIC) throw new FormatException($"Invalid IWI file magic: {magic}.");
+                if (magic != MAGIC) throw new FormatException($"Invalid IWI file magic: {magic}.");
                 if (version == VERSION.CODMW2) r.Seek(8);
                 header = r.ReadS<HEADER>();
                 header.Verify();
@@ -219,16 +219,16 @@ namespace GameX.IW.Formats
                 var size = (int)(r.BaseStream.Length - mipsBase);
                 ranges = mipsLength > 1
                     ? Enumerable.Range(0, mipsLength).Select(i => new Range(mips[i + 1] - mipsBase, mips[i] - mipsBase)).ToArray()
-                    : new[] { new Range(0, size) };
+                    : [new Range(0, size)];
                 r.Seek(mipsBase);
                 format = header.Format switch
                 {
-                    ARGB32 => (ARGB32, (TextureGLFormat.Rgba, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedInt8888Reversed), (TextureGLFormat.Rgba, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedInt8888Reversed), TextureUnityFormat.RGBA32, TextureUnityFormat.RGBA32),
-                    RGB24 => (RGB24, TextureGLFormat.Rgb, TextureGLFormat.Rgb, TextureUnityFormat.Unknown, TextureUnityFormat.Unknown),
-                    DXT1 => (DXT1, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureUnityFormat.DXT1, TextureUnityFormat.DXT1),
-                    DXT2 => (DXT2, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureUnityFormat.Unknown, TextureUnityFormat.Unknown),
-                    DXT3 => (DXT3, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureUnityFormat.Unknown, TextureUnityFormat.Unknown),
-                    DXT5 => (DXT5, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureUnityFormat.DXT5, TextureUnityFormat.DXT5),
+                    ARGB32 => (ARGB32, (TextureFormat.ARGB32, TexturePixel.Unknown)),
+                    RGB24 => (RGB24, (TextureFormat.RGB24, TexturePixel.Unknown)),
+                    DXT1 => (DXT1, (TextureFormat.DXT1, TexturePixel.Unknown)),
+                    DXT2 => (DXT2, (TextureFormat.DXT3, TexturePixel.Unknown)),
+                    DXT3 => (DXT3, (TextureFormat.DXT3, TexturePixel.Unknown)),
+                    DXT5 => (DXT5, (TextureFormat.DXT5, TexturePixel.Unknown)),
                     _ => throw new ArgumentOutOfRangeException(nameof(Header.Format), $"{header.Format}"),
                 };
                 return r.ReadBytes(size);
@@ -245,34 +245,27 @@ namespace GameX.IW.Formats
         HEADER Header;
         Range[] Mips;
         byte[] Bytes;
-        (FORMAT type, object gl, object vulken, object unity, object unreal) Format;
 
+        #region ITexture
+        readonly (FORMAT type, object value) Format;
         public int Width => Header.Width;
         public int Height => Header.Height;
         public int Depth => 0;
         public int MipMaps => Mips.Length;
         public TextureFlags TexFlags => (Header.Flags & FLAGS.CUBEMAP) != 0 ? TextureFlags.CUBE_TEXTURE : 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Bytes, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, Mips);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Bytes, Format.value, Mips);
         public void End() { }
+        #endregion
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo("Texture", items: new List<MetaInfo> {
-                new MetaInfo($"Format: {Format.type}"),
-                new MetaInfo($"Width: {Header.Width}"),
-                new MetaInfo($"Height: {Header.Height}"),
-                new MetaInfo($"Mipmaps: {Mips.Length}"),
-            }),
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Texture", items: [
+                new($"Format: {Format.type}"),
+                new($"Width: {Header.Width}"),
+                new($"Height: {Header.Height}"),
+                new($"Mipmaps: {Mips.Length}"),
+            ]),
+        ];
     }
 }

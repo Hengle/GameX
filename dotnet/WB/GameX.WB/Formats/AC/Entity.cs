@@ -1282,7 +1282,7 @@ namespace GameX.WB.Formats.AC.Entity
     //: Entity.Plane
     public class Plane
     {
-        public override string ToString() => $"Normal: {N} - Distance: {D}";
+        public override string ToString() => $"Unknown: {N} - Distance: {D}";
         public Vector3 N;
         public float D;
         public Plane() { }
@@ -1631,7 +1631,7 @@ namespace GameX.WB.Formats.AC.Entity
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new($"Skill: {SkillNum}"),
-            new($"Normal Cost: {NormalCost}"),
+            new($"Unknown Cost: {NormalCost}"),
             new($"Primary Cost: {PrimaryCost}"),
         ];
     }
@@ -2210,7 +2210,7 @@ namespace GameX.WB.Formats.AC.Entity
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             new($"Origin: {Origin}"),
-            new($"Normal: {Normal}"),
+            new($"Unknown: {Normal}"),
             new($"UVs", items: UVs.SelectMany(x => (x as IHaveMetaInfo).GetInfoNodes(resource, file))),
         ];
     }
@@ -2271,7 +2271,7 @@ namespace GameX.WB.Formats.AC.Entity
             new($"Quickness: {Quickness}"),
             new($"Focus: {Focus}"),
             new($"Self: {Self}"),
-            NormalSkillsList.Length > 0 ? new("Normal Skills", items: NormalSkillsList.Select(x => new MetaInfo($"{x}"))) : null,
+            NormalSkillsList.Length > 0 ? new("Unknown Skills", items: NormalSkillsList.Select(x => new MetaInfo($"{x}"))) : null,
             PrimarySkillsList.Length > 0 ? new("Primary Skills", items: PrimarySkillsList.Select(x => new MetaInfo($"{x}"))) : null,
         ];
     }

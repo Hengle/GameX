@@ -1,7 +1,6 @@
 using GameX.Formats;
 using GameX.Origin.Games.U9;
 using GameX.Platforms;
-using OpenStack.Gfx;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
@@ -177,19 +176,13 @@ namespace GameX.Origin.Formats.U9
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Bitmap(r, s));
 
-        #region Records
+        #region Headers
 
-        class Record
+        class Record(int width, int height, byte[] pixels)
         {
-            public int Width;
-            public int Height;
-            public byte[] Pixels;
-            public Record(int width, int height, byte[] pixels)
-            {
-                Width = width;
-                Height = height;
-                Pixels = pixels;
-            }
+            public int Width = width;
+            public int Height = height;
+            public byte[] Pixels = pixels;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -228,18 +221,6 @@ namespace GameX.Origin.Formats.U9
         Record Current => Records[Index];
         Record[] Records;
         int BytesPerPixel = 1;
-        (object gl, object vulken, object unity, object unreal) Format => Formats[BytesPerPixel == 1 ? 0 : 1];
-        static (object gl, object vulken, object unity, object unreal)[] Formats = new (object gl, object vulken, object unity, object unreal)[] {
-            // format-0
-            ((TextureGLFormat.Rgba, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedInt8888Reversed),
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedInt8888Reversed),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown),
-            // format-1
-            ((TextureGLFormat.Rgb, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedShort565),
-            (TextureGLFormat.Rgb, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedShort565),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown)};
 
         #endregion
 
@@ -281,34 +262,40 @@ namespace GameX.Origin.Formats.U9
             }).ToArray();
         }
 
+        #region ITexture
+        static readonly object[] Format = [
+            (TextureFormat.RGBA32, TexturePixel.Int | TexturePixel.Reversed),
+            (TextureFormat.RGB565, TexturePixel.Unknown) ];
+        //// format-0
+        //((TextureGLFormat.Rgba, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedInt8888Reversed),
+        //(TextureGLFormat.Rgba, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedInt8888Reversed),
+        //TextureUnityFormat.Unknown,
+        //TextureUnrealFormat.Unknown),
+        //// format-1
+        //((TextureGLFormat.Rgb, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedShort565),
+        //(TextureGLFormat.Rgb, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedShort565),
+        //TextureUnityFormat.Unknown,
+        //TextureUnrealFormat.Unknown)};
         public int Width => Current.Width;
         public int Height => Current.Height;
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Current?.Pixels, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Current?.Pixels, Format[BytesPerPixel == 1 ? 0 : 1], null);
         public void End() { }
+        #endregion
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-            => new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-                new MetaInfo("Bitmap", items: new List<MetaInfo> {
-                    new MetaInfo($"BytesPerPixel: {BytesPerPixel}"),
-                    new MetaInfo($"Index: {Index}"),
-                    new MetaInfo($"Width: {Current.Width}"),
-                    new MetaInfo($"Height: {Current.Height}"),
-                })
-            };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Bitmap", items: [
+                new($"BytesPerPixel: {BytesPerPixel}"),
+                new($"Index: {Index}"),
+                new($"Width: {Current.Width}"),
+                new($"Height: {Current.Height}"),
+            ])
+        ];
     }
 
     #endregion
@@ -412,18 +399,7 @@ namespace GameX.Origin.Formats.U9
 
         int BytesPerPixel = 1;
         byte[] Pixels;
-        (object gl, object vulken, object unity, object unreal) Format => Formats[BytesPerPixel == 1 ? 0 : 1];
-        static (object gl, object vulken, object unity, object unreal)[] Formats = new (object gl, object vulken, object unity, object unreal)[] {
-            // format-0
-            ((TextureGLFormat.Rgba, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedInt8888Reversed),
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedInt8888Reversed),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown),
-            // format-1
-            ((TextureGLFormat.Rgb, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedShort565),
-            (TextureGLFormat.Rgb, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedShort565),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown)};
+
 
         #endregion
 
@@ -455,33 +431,39 @@ namespace GameX.Origin.Formats.U9
             Pixels = BytesPerPixel == 1 ? data.SelectMany(x => palette[x]).ToArray() : data;
         }
 
+        #region ITexture
+        static object[] Formats = [
+            (TextureFormat.RGBA32, TexturePixel.Int | TexturePixel.Reversed),
+            (TextureFormat.RGB565, TexturePixel.Unknown) ];
+        //// format-0
+        //((TextureGLFormat.Rgba, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedInt8888Reversed),
+        //(TextureGLFormat.Rgba, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedInt8888Reversed),
+        //TextureUnityFormat.Unknown,
+        //TextureUnrealFormat.Unknown),
+        //// format-1
+        //((TextureGLFormat.Rgb, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedShort565),
+        //(TextureGLFormat.Rgb, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedShort565),
+        //TextureUnityFormat.Unknown,
+        //TextureUnrealFormat.Unknown)};
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Pixels, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Pixels, Formats[BytesPerPixel == 1 ? 0 : 1], null);
         public void End() { }
+        #endregion
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-            => new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-                new MetaInfo("Texture", items: new List<MetaInfo> {
-                    new MetaInfo($"BytesPerPixel: {BytesPerPixel}"),
-                    new MetaInfo($"Width: {Width}"),
-                    new MetaInfo($"Height: {Height}"),
-                })
-            };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Texture", items: [
+                new($"BytesPerPixel: {BytesPerPixel}"),
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 
     #endregion

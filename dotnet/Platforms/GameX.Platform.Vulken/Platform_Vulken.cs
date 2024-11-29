@@ -85,7 +85,7 @@ namespace GameX.Platforms
             GL.BindTexture(TextureTarget.Texture2D, id);
             if (levelStart > 0) GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, levelStart);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, levelEnd - levelStart);
-            var (bytes, fmt, spans) = source.Begin((int)Platform.Type.OpenGL);
+            var (bytes, fmt, spans) = source.Begin("VK");
             if (bytes == null) return DefaultTexture;
 
             bool CompressedTexImage2D(ITexture source, int i, InternalFormat internalFormat)
@@ -110,26 +110,26 @@ namespace GameX.Platforms
                 return true;
             }
 
-            if (fmt is TextureGLFormat glFormat)
-            {
-                //if (glFormat == TextureGLFormat.CompressedRgbaS3tcDxt3Ext)
-                //{
-                //    glFormat = TextureGLFormat.CompressedRgbaS3tcDxt5Ext;
-                //    DxtUtil2.ConvertDxt3ToDtx5(bytes, source.Width, source.Height, source.MipMaps);
-                //}
-                var internalFormat = (InternalFormat)glFormat;
-                if (internalFormat == 0) { Console.Error.WriteLine("Unsupported texture, using default"); return DefaultTexture; }
-                for (var i = levelStart; i <= levelEnd; i++) { if (!CompressedTexImage2D(source, i, internalFormat)) return DefaultTexture; }
-            }
-            else if (fmt is ValueTuple<TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType> glPixelFormat)
-            {
-                var internalFormat = (PixelInternalFormat)glPixelFormat.Item1;
-                if (internalFormat == 0) { Console.Error.WriteLine("Unsupported texture, using default"); return DefaultTexture; }
-                var format = (PixelFormat)glPixelFormat.Item2;
-                var type = (PixelType)glPixelFormat.Item3;
-                for (var i = levelStart; i < numMipMaps; i++) { if (!TexImage2D(source, i, internalFormat, format, type)) return DefaultTexture; }
-            }
-            else throw new NotImplementedException();
+            //if (fmt is TextureGLFormat glFormat)
+            //{
+            //    //if (glFormat == TextureGLFormat.CompressedRgbaS3tcDxt3Ext)
+            //    //{
+            //    //    glFormat = TextureGLFormat.CompressedRgbaS3tcDxt5Ext;
+            //    //    DxtUtil2.ConvertDxt3ToDtx5(bytes, source.Width, source.Height, source.MipMaps);
+            //    //}
+            //    var internalFormat = (InternalFormat)glFormat;
+            //    if (internalFormat == 0) { Console.Error.WriteLine("Unsupported texture, using default"); return DefaultTexture; }
+            //    for (var i = levelStart; i <= levelEnd; i++) { if (!CompressedTexImage2D(source, i, internalFormat)) return DefaultTexture; }
+            //}
+            //else if (fmt is ValueTuple<TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType> glPixelFormat)
+            //{
+            //    var internalFormat = (PixelInternalFormat)glPixelFormat.Item1;
+            //    if (internalFormat == 0) { Console.Error.WriteLine("Unsupported texture, using default"); return DefaultTexture; }
+            //    var format = (PixelFormat)glPixelFormat.Item2;
+            //    var type = (PixelType)glPixelFormat.Item3;
+            //    for (var i = levelStart; i < numMipMaps; i++) { if (!TexImage2D(source, i, internalFormat, format, type)) return DefaultTexture; }
+            //}
+            //else throw new NotImplementedException();
 
             source.End();
 
@@ -274,7 +274,7 @@ namespace GameX.Platforms
         {
             try
             {
-                Platform.PlatformType = Platform.Type.Vulken;
+                Platform.PlatformType = "VK";
                 Platform.GfxFactory = source => new VulkenGfx(source);
                 Platform.SfxFactory = source => new SystemSfx(source);
                 Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);

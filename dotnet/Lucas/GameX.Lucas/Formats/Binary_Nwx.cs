@@ -1,6 +1,4 @@
 using GameX.Formats;
-using GameX.Platforms;
-using OpenStack.Gfx;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Concurrent;
@@ -85,12 +83,6 @@ namespace GameX.Lucas.Formats
                 _ => throw new ArgumentOutOfRangeException(),
             }, PaletteBuilder, s);
 
-            Format = (
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGBA32,
-                TextureUnrealFormat.Unknown);
-
             // read header
             var header = r.ReadS<X_Header>();
             if (header.Magic != WAXF_MAGIC) throw new FormatException("BAD MAGIC");
@@ -103,7 +95,7 @@ namespace GameX.Lucas.Formats
             if (cellHeader.Magic != CELT_MAGIC) throw new FormatException("BAD MAGIC");
 
             // read each cell
-            Cells = new List<(int width, int height, bool flip, byte[] data)>();
+            Cells = [];
             for (var i = 0; i < cellHeader.Count; i++)
             {
                 var cell = r.ReadS<X_Cell>();
@@ -146,10 +138,15 @@ namespace GameX.Lucas.Formats
 
         readonly (byte r, byte g, byte b)[] Palette;
         readonly List<(int width, int height, bool flip, byte[] data)> Cells;
-        readonly (object gl, object vulken, object unity, object unreal) Format;
         bool Flip;
         byte[] CellData;
 
+        #region ITexture
+        static readonly object Format = (TextureFormat.RGBA32, TexturePixel.Unknown);
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //TextureUnityFormat.RGBA32,
+        //TextureUnrealFormat.Unknown);
         public int Width { get; set; }
         public int Height { get; set; }
         public int Depth { get; } = 0;
@@ -157,7 +154,7 @@ namespace GameX.Lucas.Formats
         public TextureFlags TexFlags { get; } = 0;
 
         public void Select(int id) => (Width, Height, Flip, CellData) = Cells[id % Cells.Count];
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             int width = Width, height = Height;
             var data = CellData;
@@ -190,24 +187,18 @@ namespace GameX.Lucas.Formats
                     }
             }
 
-            return (bytes, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+            return (bytes, Format, null);
         }
         public void End() { }
+        #endregion
 
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Nwx)}", items: new List<MetaInfo> {
-                new MetaInfo($"Cells: {Cells.Count}"),
-                //new MetaInfo($"Width: {Width}"),
-                //new MetaInfo($"Height: {Height}"),
-            })
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new($"{nameof(Binary_Nwx)}", items: [
+                new($"Cells: {Cells.Count}"),
+                //new($"Width: {Width}"),
+                //new($"Height: {Height}"),
+            ])
+        ];
     }
 }

@@ -1,6 +1,6 @@
 import os, re, struct, numpy as np
 from io import BytesIO
-from openstk.gfx_texture import ITexture, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
+from openstk.gfx_texture import ITexture, TextureFormat, TexturePixel
 from gamex.pak import PakBinary
 from gamex.meta import FileSource, MetaInfo, MetaContent, IHaveMetaInfo
 
@@ -15,6 +15,9 @@ class TextureFlags: pass
 class Binary_Anim(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Anim(r)
+
+    #region Headers
+    #endregion
 
     def __init__(self, r: Reader):
         pass
@@ -31,7 +34,7 @@ class Binary_Animdata(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Animdata(r)
 
-    #region Records
+    #region Headers
 
     class AnimRecord:
         struct = ('<64s4B', 68)
@@ -78,7 +81,7 @@ class Binary_AsciiFont(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_AsciiFont(r)
 
-    #region Records
+    #region Headers
 
     class AsciiFont:
         characters: list[list[int]] = [None]*224
@@ -122,7 +125,7 @@ class Binary_BodyConverter(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_BodyConverter(r)
 
-    #region Records
+    #region Headers
 
     table1: list[int]
     table2: list[int]
@@ -241,7 +244,7 @@ class Binary_BodyTable(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_BodyTable(r)
 
-    #region Records
+    #region Headers
 
     class Record:
         def __init__(self, oldId: int, newId: int, newHue: int):
@@ -288,7 +291,7 @@ class Binary_CalibrationInfo(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_CalibrationInfo(r)
 
-    #region Records
+    #region Headers
 
     class Record:
         def __init__(self, mask: bytes, vals: bytes, detX: bytes, detY: bytes, detZ: bytes, detF: bytes):
@@ -428,17 +431,6 @@ class Binary_Gump(IHaveMetaInfo, ITexture):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Gump(r, f.fileSize, f.compressed)
 
-    #region Records
-    
-    format: list[object] = [
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown
-            ]
-
-    #endregion
-
     def __init__(self, r: Reader, length: int, extra: int):
         width = self.width = (extra >> 16) & 0xFFFF
         height = self.height = extra & 0xFFFF
@@ -464,21 +456,17 @@ class Binary_Gump(IHaveMetaInfo, ITexture):
                     cur2 = cur << 1
                     while cur < next: bd[cur2:cur2+1] = color.tobytes(); cur += 1
 
+    #region ITexture
+    format: tuple = (TextureFormat.BGRA1555, TexturePixel.Unknown)
     width: int = 0
     height: int = 0
     depth: int = 0
     mipMaps: int = 1
     texFlags: TextureFlags = 0
 
-    def begin(self, platform: int) -> (bytes, object, list[object]):
-        match platform:
-            case Platform.Type.OpenGL: format = Binary_Gump.format[1]
-            case Platform.Type.Vulken: format = Binary_Gump.format[2]
-            case Platform.Type.Unity: format = Binary_Gump.format[3]
-            case Platform.Type.Unreal: format = Binary_Gump.format[4]
-            case _: raise Exception('Unknown {platform}')
-        return self.pixels, format, None
+    def begin(self, platform: str) -> (bytes, object, list[object]): return self.pixels, self.format, None
     def end(self): pass
+    #endregion
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
         MetaInfo(None, MetaContent(type = 'Texture', name = os.path.basename(file.path), value = self)),
@@ -493,7 +481,7 @@ class Binary_GumpDef(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_GumpDef(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -512,7 +500,7 @@ class Binary_Hues(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Hues(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -531,7 +519,7 @@ class Binary_Land(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_XX(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -550,7 +538,7 @@ class Binary_Light(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Light(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -569,7 +557,7 @@ class Binary_MobType(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_MobType(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -588,7 +576,7 @@ class Binary_MultiMap(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_MultiMap(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -607,7 +595,7 @@ class Binary_MusicDef(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_MusicDef(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -626,7 +614,7 @@ class Binary_Multi(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Multi(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -645,7 +633,7 @@ class Binary_RadarColor(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_RadarColor(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -664,7 +652,7 @@ class Binary_SkillGroups(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_SkillGroups(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -683,7 +671,7 @@ class Binary_Skills(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Skills(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -702,7 +690,7 @@ class Binary_Sound(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Sound(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -721,7 +709,7 @@ class Binary_SpeechList(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_SpeechList(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -740,7 +728,7 @@ class Binary_Static(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Static(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -759,7 +747,7 @@ class Binary_StringTable(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_StringTable(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -778,7 +766,7 @@ class Binary_TileData(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_TileData(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -797,7 +785,7 @@ class Binary_UnicodeFont(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_UnicodeFont(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 
@@ -816,7 +804,7 @@ class Binary_Verdata(IHaveMetaInfo):
     @staticmethod
     def factory(r: Reader, f: FileSource, s: PakFile): return Binary_Verdata(r)
 
-    #region Records
+    #region Headers
 
     #endregion
 

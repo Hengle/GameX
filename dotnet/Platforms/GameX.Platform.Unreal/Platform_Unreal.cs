@@ -1,24 +1,22 @@
 ﻿using OpenStack.Gfx;
-using OpenStack.Sfx;
+using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnrealEngine.Framework;
+using static OpenStack.Gfx.Textures.TextureFormat;
+using Debug = OpenStack.Debug;
 using Framework_Debug = UnrealEngine.Framework.Debug;
 using Framework_LogLevel = UnrealEngine.Framework.LogLevel;
-using Debug = OpenStack.Debug;
-using OpenStack.Gfx.Textures;
 
 namespace GameX.Platforms
 {
     // UnrealExtensions
     public static class UnrealExtensions { }
 
-    // UnrealObjectBuilder
-    // MISSING
+    // UnrealObjectBuilder : MISSING
 
-    // UnrealShaderBuilder
-    // MISSING
+    // UnrealShaderBuilder : MISSING
 
     // UnrealTextureBuilder
     public class UnrealTextureBuilder : TextureBuilderBase<Texture2D>
@@ -57,19 +55,51 @@ namespace GameX.Platforms
         public override Texture2D CreateTexture(Texture2D reuse, ITexture source, Range? level = null)
         {
             Framework_Debug.Log(Framework_LogLevel.Display, "BuildTexture");
-            var (bytes, format, _) = source.Begin((int)Platform.Type.Unreal);
-            if (format is TextureUnrealFormat unrealFormat)
+            var (bytes, fmt, _) = source.Begin("UR");
+            try
             {
-                var pixelFormat = (PixelFormat)unrealFormat;
-                Framework_Debug.Log(Framework_LogLevel.Display, $"bytes: {bytes.Length}");
-                Framework_Debug.Log(Framework_LogLevel.Display, $"Width: {source.Width}");
-                Framework_Debug.Log(Framework_LogLevel.Display, $"Height: {source.Height}");
-                Framework_Debug.Log(Framework_LogLevel.Display, $"PixelFormat: {pixelFormat}");
-                //var tex = new Texture2D(source.Width, source.Height, pixelFormat, "Texture");
-                //return tex;
-                return null;
+                if (bytes == null) return DefaultTexture;
+                else if (fmt is ValueTuple<TextureFormat, TexturePixel> z)
+                {
+                    var (format, pixel) = z;
+                    var s = (pixel & TexturePixel.Signed) != 0;
+                    var f = (pixel & TexturePixel.Float) != 0;
+                    var pixelFormat = format switch
+                    {
+                        DXT1 => PixelFormat.DXT1,
+                        DXT3 => PixelFormat.DXT3,
+                        DXT5 => PixelFormat.DXT5,
+                        BC4 => PixelFormat.BC4,
+                        BC5 => PixelFormat.BC5,
+                        BC6H => PixelFormat.BC6H,
+                        BC7 => PixelFormat.BC7,
+                        ETC2 => PixelFormat.ETC2RGB,
+                        ETC2_EAC => PixelFormat.ETC2RGBA,
+                        //
+                        I8 => default,
+                        L8 => default,
+                        R8 => PixelFormat.R8,
+                        R16 => f ? PixelFormat.R16F : s ? PixelFormat.R16SInt : PixelFormat.R16UInt,
+                        RG16 => f ? PixelFormat.R8G8 : PixelFormat.R16G16UInt,
+                        RGB24 => f ? PixelFormat.FloatRGB : default,
+                        RGB565 => PixelFormat.R5G6B5UNorm,
+                        RGBA32 => f ? PixelFormat.FloatRGBA : PixelFormat.R8G8B8A8,
+                        ARGB32 => PixelFormat.A8R8G8B8,
+                        BGRA32 => PixelFormat.B8G8R8A8,
+                        BGRA1555 => PixelFormat.B5G5R5A1UNorm,
+                        _ => throw new ArgumentOutOfRangeException("TextureFormat", $"{format}")
+                    };
+                    Framework_Debug.Log(Framework_LogLevel.Display, $"bytes: {bytes.Length}");
+                    Framework_Debug.Log(Framework_LogLevel.Display, $"Width: {source.Width}");
+                    Framework_Debug.Log(Framework_LogLevel.Display, $"Height: {source.Height}");
+                    Framework_Debug.Log(Framework_LogLevel.Display, $"PixelFormat: {pixelFormat}");
+                    //var tex = new Texture2D(source.Width, source.Height, pixelFormat, "Texture");
+                    //return tex;
+                    return null;
+                }
+                else throw new ArgumentOutOfRangeException(nameof(fmt), $"{fmt}");
             }
-            else throw new ArgumentOutOfRangeException(nameof(format), $"{format}");
+            finally { source.End(); }
         }
 
         public override Texture2D CreateSolidTexture(int width, int height, float[] pixels)
@@ -85,8 +115,7 @@ namespace GameX.Platforms
         public override void DeleteTexture(Texture2D texture) { }
     }
 
-    // UnityMaterialBuilder
-    // MISSING
+    // UnrealMaterialBuilder : MISSING
 
     // IUnrealGfx
     public interface IUnrealGfx : IOpenGfxAny<object, object, Texture2D, object> { }
@@ -118,9 +147,8 @@ namespace GameX.Platforms
     }
 
     // UnrealSfx
-    public class UnrealSfx : SystemSfx
+    public class UnrealSfx(PakFile source) : SystemSfx(source)
     {
-        public UnrealSfx(PakFile source) : base(source) { }
     }
 
     // UnrealPlatform
@@ -131,7 +159,7 @@ namespace GameX.Platforms
             Framework_Debug.Log(Framework_LogLevel.Display, "Startup");
             try
             {
-                Platform.PlatformType = Platform.Type.Unreal;
+                Platform.PlatformType = "UR";
                 Platform.GfxFactory = source => new UnrealGfx(source);
                 Platform.SfxFactory = source => new UnrealSfx(source);
                 Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);

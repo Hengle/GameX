@@ -1,4 +1,3 @@
-using GameX.Platforms;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
@@ -75,7 +74,6 @@ namespace GameX.Black.Formats
             }
             Header = header;
             Frames = [.. frames];
-            Format = ((TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnrealFormat.R8G8B8A8);
 
             // select a frame
             FrameSelect(0);
@@ -95,23 +93,15 @@ namespace GameX.Black.Formats
         }
 
         // ITexture
-        (object gl, object vulken, object unity, object unreal) Format;
+        static readonly object Format = (TextureFormat.RGBA32, TexturePixel.Unknown);
+        //((TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnrealFormat.R8G8B8A8);
         public int Width { get; internal set; }
         public int Height { get; internal set; }
         public int Depth => 0;
         public int MipMaps => 1;
         public TextureFlags TexFlags => 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Bytes, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Bytes, Format, null);
         public void End() { }
 
         // ITextureFrames

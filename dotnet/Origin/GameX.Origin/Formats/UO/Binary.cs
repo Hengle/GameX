@@ -1,5 +1,4 @@
 using GameX.Origin.Structs.UO;
-using GameX.Platforms;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
@@ -42,7 +41,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Animdata(r));
 
-        #region Records
+        #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct AnimRecord
@@ -111,7 +110,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_AsciiFont(r));
 
-        #region Records
+        #region Headers
 
         public class AsciiFont
         {
@@ -188,7 +187,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_BodyConverter(r.ToStream()));
 
-        #region Records
+        #region Headers
 
         readonly int[] Table1;
         readonly int[] Table2;
@@ -438,7 +437,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_BodyTable(r.ToStream()));
 
-        #region Records
+        #region Headers
 
         public class Record
         {
@@ -517,7 +516,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_CalibrationInfo(r.ToStream()));
 
-        #region Records
+        #region Headers
 
         public class Record
         {
@@ -694,17 +693,12 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Gump(r, (int)f.FileSize, f.Compressed));
 
-        #region Records
+        #region Headers
 
         static byte[] _pixels;
         static byte[] _colors;
 
         byte[] Pixels;
-        static (object gl, object vulken, object unity, object unreal) Format = (
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown);
 
         #endregion
 
@@ -831,35 +825,26 @@ namespace GameX.Origin.Formats.UO
             }
         }
 
+        #region ITexture
+        static readonly object Format = (TextureFormat.BGRA1555, TexturePixel.Unknown);
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Pixels, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Pixels, Format, null);
         public void End() { }
+        #endregion
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-        {
-            var nodes = new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-                new MetaInfo("Gump", items: new List<MetaInfo> {
-                    new MetaInfo($"Width: {Width}"),
-                    new MetaInfo($"Height: {Height}"),
-                })
-            };
-            return nodes;
-        }
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Gump", items: [
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 
     #endregion
@@ -870,7 +855,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_GumpDef(r.ToStream()));
 
-        #region Records
+        #region Headers
 
         public bool ItemHasGumpTranslation(int gumpIndex, out int gumpIndexTranslated, out int defaultHue)
         {
@@ -927,7 +912,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Hues(r));
 
-        #region Records
+        #region Headers
 
         public class Record
         {
@@ -1006,16 +991,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Land(r, (int)f.FileSize));
 
-        #region Records
-
         byte[] Pixels;
-        static (object gl, object vulken, object unity, object unreal) Format = (
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown);
-
-        #endregion
 
         // file: artLegacyMUL.uop:land/file00000.land
         public Binary_Land(BinaryReader r, int length)
@@ -1047,35 +1023,26 @@ namespace GameX.Origin.Formats.UO
             }
         }
 
+        #region ITexture
+        static readonly object Format = (TextureFormat.BGRA1555, TexturePixel.Unknown);
         public int Width { get; } = 44;
         public int Height { get; } = 44;
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Pixels, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Pixels, Format, null);
         public void End() { }
+        #endregion
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-        {
-            var nodes = new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-                new MetaInfo("Land", items: new List<MetaInfo> {
-                    new MetaInfo($"Width: {Width}"),
-                    new MetaInfo($"Height: {Height}"),
-                })
-            };
-            return nodes;
-        }
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Land", items: [
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 
     #endregion
@@ -1086,16 +1053,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Light(r, (int)f.FileSize, f.Compressed));
 
-        #region Records
-
         byte[] Pixels;
-        static (object gl, object vulken, object unity, object unreal) Format = (
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown);
-
-        #endregion
 
         // file: lightidx.mul:file00000.light
         public Binary_Light(BinaryReader r, int length, int extra)
@@ -1125,35 +1083,26 @@ namespace GameX.Origin.Formats.UO
             }
         }
 
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        #region ITexture
+        static readonly object Format = (TextureFormat.BGRA1555, TexturePixel.Unknown);
+        public int Width { get; }
+        public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Pixels, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Pixels, Format, null);
         public void End() { }
+        #endregion
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-        {
-            var nodes = new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-                new MetaInfo("Light", items: new List<MetaInfo> {
-                    new MetaInfo($"Width: {Width}"),
-                    new MetaInfo($"Height: {Height}"),
-                })
-            };
-            return nodes;
-        }
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Light", items: [
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 
     #endregion
@@ -1164,7 +1113,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_MobType(r.ToStream()));
 
-        #region Records
+        #region Headers
 
         public enum MobType
         {
@@ -1235,16 +1184,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_MultiMap(r, f));
 
-        #region Records
-
         byte[] Pixels;
-        static (object gl, object vulken, object unity, object unreal) Format = (
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown);
-
-        #endregion
 
         // file: Multimap.rle
         public Binary_MultiMap(BinaryReader r, FileSource f)
@@ -1318,35 +1258,26 @@ namespace GameX.Origin.Formats.UO
             }
         }
 
+        #region ITexture
+        static readonly object Format = (TextureFormat.BGRA1555, TexturePixel.Unknown);
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Pixels, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Pixels, Format, null);
         public void End() { }
+        #endregion
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-        {
-            var nodes = new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-                new MetaInfo("MultiMap", items: new List<MetaInfo> {
-                    new MetaInfo($"Width: {Width}"),
-                    new MetaInfo($"Height: {Height}"),
-                })
-            };
-            return nodes;
-        }
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("MultiMap", items: [
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 
     #endregion
@@ -1357,7 +1288,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_MusicDef(r.ToStream()));
 
-        #region Records
+        #region Headers
 
         public static bool TryGetMusicData(int index, out string name, out bool doesLoop)
         {
@@ -1412,7 +1343,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Multi(r, (int)f.FileSize, Art_IsUOAHS));
 
-        #region Records
+        #region Headers
 
         public class Record
         {
@@ -1567,7 +1498,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_RadarColor(r));
 
-        #region Records
+        #region Headers
 
         public uint[] Colors = new uint[0x20000];
 
@@ -1612,7 +1543,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_SkillGroups(r));
 
-        #region Records
+        #region Headers
 
 
         #endregion
@@ -1651,7 +1582,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_SpeechList(r));
 
-        #region Records
+        #region Headers
 
         public class Record
         {
@@ -1726,16 +1657,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Static(r, (int)f.FileSize));
 
-        #region Records
-
         byte[] Pixels;
-        static (object gl, object vulken, object unity, object unreal) Format = (
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            (TextureGLFormat.Rgba, TextureGLPixelFormat.Bgra, TextureGLPixelType.UnsignedShort1555Reversed),
-            TextureUnityFormat.Unknown,
-            TextureUnrealFormat.Unknown);
-
-        #endregion
 
         // file: artLegacyMUL.mul:static/file04000.art
         public Binary_Static(BinaryReader r, int length)
@@ -1781,35 +1703,26 @@ namespace GameX.Origin.Formats.UO
             }
         }
 
+        #region ITexture
+        static readonly object Format = (TextureFormat.BGRA1555, TexturePixel.Unknown);
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Pixels, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Pixels, Format, null);
         public void End() { }
+        #endregion
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-        {
-            var nodes = new List<MetaInfo> {
-                new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-                new MetaInfo("Static", items: new List<MetaInfo> {
-                    new MetaInfo($"Width: {Width}"),
-                    new MetaInfo($"Height: {Height}"),
-                })
-            };
-            return nodes;
-        }
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Static", items: [
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 
     #endregion
@@ -1821,7 +1734,7 @@ namespace GameX.Origin.Formats.UO
         public static Dictionary<string, Binary_StringTable> Instances = new Dictionary<string, Binary_StringTable>();
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_StringTable(r, f));
 
-        #region Records
+        #region Headers
 
         [Flags]
         public enum RecordFlag : byte
@@ -1885,7 +1798,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_TileData(r));
 
-        #region Records
+        #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public unsafe struct LandV1
@@ -2148,7 +2061,7 @@ namespace GameX.Origin.Formats.UO
     {
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_UnicodeFont(r));
 
-        #region Records
+        #region Headers
 
         public class UnicodeFont
         {
@@ -2221,7 +2134,7 @@ namespace GameX.Origin.Formats.UO
         public static Task<object> Factory(BinaryReader r, FileSource f, PakFile s) => Task.FromResult((object)new Binary_Verdata(r, (BinaryPakFile)s));
         public static Binary_Verdata Instance;
 
-        #region Records
+        #region Headers
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct Patch

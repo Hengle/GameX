@@ -1,9 +1,7 @@
-using GameX.Platforms;
 using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -65,23 +63,14 @@ namespace GameX.Formats
 
         #region ITexture
 
-        readonly (object type, int blockSize, object gl, object vulken, object unity, object unreal) Format;
+        readonly (object type, int blockSize, object value) Format;
         public int Width { get; }
         public int Height { get; }
         public int Depth => 0;
         public int MipMaps { get; }
         public TextureFlags TexFlags => 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Bytes, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, Spans);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Bytes, Format.value, Spans);
         public void End() { }
 
         #endregion
@@ -619,37 +608,14 @@ namespace GameX.Formats
             Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
             Image.UnlockBits(data);
             var palette = Image.Palette?.Entries;
-            switch (Image.PixelFormat)
+            Format = Image.PixelFormat switch
             {
-                case PixelFormat.Format16bppGrayScale:
-                    Format = (Image.RawFormat.ToString(),
-                        (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
-                        (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
-                        TextureUnityFormat.Unknown,
-                        TextureUnrealFormat.Unknown);
-                    break;
-                case PixelFormat.Format8bppIndexed:
-                    Format = (Image.RawFormat.ToString(),
-                        (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                        (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                        TextureUnityFormat.RGB24,
-                        TextureUnrealFormat.Unknown);
-                    break;
-                case PixelFormat.Format24bppRgb:
-                    Format = (Image.RawFormat.ToString(),
-                        (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                        (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                        TextureUnityFormat.RGB24,
-                        TextureUnrealFormat.Unknown);
-                    break;
-                case PixelFormat.Format32bppArgb:
-                    Format = (Image.RawFormat.ToString(),
-                        (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                        (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                        TextureUnityFormat.RGBA32,
-                        TextureUnrealFormat.Unknown);
-                    break;
-            }
+                PixelFormat.Format16bppGrayScale => ((string type, object value))(Image.RawFormat.ToString(), (TextureFormat.L8, TexturePixel.Unknown)),
+                PixelFormat.Format8bppIndexed => ((string type, object value))(Image.RawFormat.ToString(), (TextureFormat.RGB24, TexturePixel.Unknown)),
+                PixelFormat.Format24bppRgb => ((string type, object value))(Image.RawFormat.ToString(), (TextureFormat.RGB24, TexturePixel.Unknown)),
+                PixelFormat.Format32bppArgb => ((string type, object value))(Image.RawFormat.ToString(), (TextureFormat.RGBA32, TexturePixel.Unknown)),
+                _ => throw new ArgumentOutOfRangeException(),
+            };
 
             // decode
             if (palette == null || palette.Length == 0) Bytes = bytes;
@@ -663,22 +629,14 @@ namespace GameX.Formats
 
         #region ITexture
 
-        (string type, object gl, object vulken, object unity, object unreal) Format;
+        readonly (string type, object value) Format;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Bytes, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Bytes, Format.value, null);
         public void End() { }
 
         #endregion
@@ -806,7 +764,6 @@ namespace GameX.Formats
             Planes = Header.NumPlanes;
             Width = Header.XMax - Header.XMin + 1;
             Height = Header.YMax - Header.YMin + 1;
-            Format = ((TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnrealFormat.Unknown);
         }
 
         readonly X_Header Header;
@@ -815,7 +772,8 @@ namespace GameX.Formats
 
         #region ITexture
 
-        readonly (object gl, object vulken, object unity, object unreal) Format;
+        static readonly object Format = (TextureFormat.RGBA32, TexturePixel.Unknown);
+        //((TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnrealFormat.Unknown);
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
@@ -867,7 +825,7 @@ namespace GameX.Formats
         /// <returns></returns>
         static int RleLength(byte[] body, int offset) => body[offset] & 63;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             // decodes 4bpp pixel data
             byte[] Decode4bpp()
@@ -951,14 +909,7 @@ namespace GameX.Formats
                 1 => Decode4bpp(),
                 _ => throw new FormatException($"Unsupported bpp: {Header.Bpp}"),
             };
-            return (bytes, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+            return (bytes, Format, null);
         }
         public void End() { }
 
@@ -992,11 +943,6 @@ namespace GameX.Formats
         public Binary_Raw(BinaryReader r, FamilyGame game, FileSource source, Action<Binary_Raw, BinaryReader, FileSource> action, Func<string, string, Binary_Pal> palleteFunc)
         {
             game.Ensure();
-            Format = (
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGBA32,
-                TextureUnrealFormat.Unknown);
             action(this, r, source);
             Body ??= r.ReadToEnd();
             if (source.Tag is Tag c)
@@ -1014,7 +960,11 @@ namespace GameX.Formats
 
         #region ITexure
 
-        readonly (object gl, object vulken, object unity, object unreal) Format;
+        static readonly object Format = (TextureFormat.RGBA32, TexturePixel.Unknown);
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //TextureUnityFormat.RGBA32,
+        //TextureUnrealFormat.Unknown);
         public int Width { get; set; }
         public int Height { get; set; }
         public int Depth { get; } = 0;
@@ -1038,18 +988,10 @@ namespace GameX.Formats
         //    pixel += 4;
         //}
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             byte[] DecodeRaw() => Body.SelectMany(s => PaletteData[s]).ToArray();
-
-            return (DecodeRaw(), (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+            return (DecodeRaw(), Format, null);
         }
         public void End() { }
 
@@ -1297,28 +1239,28 @@ namespace GameX.Formats
             {
                 PIXEL.BW8 => throw new NotSupportedException(),
                 PIXEL.BW16 => throw new NotSupportedException(),
-                PIXEL.RGB555 => (
-                    (TextureGLFormat.Rgb5, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                    (TextureGLFormat.Rgb5, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                    TextureUnityFormat.RGB565,
-                    TextureUnrealFormat.Unknown),
-                PIXEL.RGB24 => (
-                    (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                    (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                    TextureUnityFormat.RGB24,
-                    TextureUnrealFormat.Unknown),
-                PIXEL.ARGB32 => (
-                    (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                    (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                    TextureUnityFormat.RGBA32,
-                    TextureUnrealFormat.Unknown),
+                PIXEL.RGB555 => (TextureFormat.RGB565, TexturePixel.Unknown),
+                //(TextureGLFormat.Rgb5, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                //(TextureGLFormat.Rgb5, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                //TextureUnityFormat.RGB565,
+                //TextureUnrealFormat.Unknown),
+                PIXEL.RGB24 => (TextureFormat.RGB24, TexturePixel.Unknown),
+                //(TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                //(TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+                //TextureUnityFormat.RGB24,
+                //TextureUnrealFormat.Unknown),
+                PIXEL.ARGB32 => (TextureFormat.RGBA32, TexturePixel.Unknown),
+                //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+                //TextureUnityFormat.RGBA32,
+                //TextureUnrealFormat.Unknown),
                 _ => throw new ArgumentOutOfRangeException(nameof(PixelFormat), $"{PixelFormat}")
             };
         }
 
         #region ITexture
 
-        (object gl, object vulken, object unity, object unreal) Format;
+        readonly object Format;
         public int Width { get; }
         public int Height { get; }
         public int Depth { get; } = 0;
@@ -1336,7 +1278,7 @@ namespace GameX.Formats
             Buffer.BlockCopy(map.Pixels, map.BytesPerEntry * index, dest, offset, map.BytesPerEntry);
         }
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             // decodeRle
             void decodeRle(byte[] data)
@@ -1410,14 +1352,7 @@ namespace GameX.Formats
             if (flipH) FlipH(bytes);
             if (flipV) FlipV(bytes);
 
-            return (bytes, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+            return (bytes, Format, null);
         }
         public void End() { }
 
@@ -1507,32 +1442,25 @@ namespace GameX.Formats
 
         #region ITexture
 
-        readonly (object gl, object vulken, object unity, object unreal) Format = (
-            (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-            (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-            TextureUnityFormat.RGBA32,
-            TextureUnrealFormat.Unknown);
+        readonly static object Format = (TextureFormat.RGBA32, TexturePixel.Unknown);
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //TextureUnityFormat.RGBA32,
+        //TextureUnrealFormat.Unknown);
         public int Width { get; } = 64;
         public int Height { get; } = 64;
         public int Depth { get; } = 0;
         public int MipMaps { get; } = 1;
         public TextureFlags TexFlags { get; } = 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             static byte[] Decode1() => null;
             return (Type switch
             {
                 1 => Decode1(),
                 _ => throw new FormatException($"Unsupported type: {Type}"),
-            }, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+            }, Format, null);
         }
         public void End() { }
 

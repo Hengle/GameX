@@ -358,12 +358,6 @@ namespace GameX.Valve.Formats
 
         public Binary_Spr(BinaryReader r, FileSource f)
         {
-            Format = (
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGBA32,
-                TextureUnityFormat.RGBA32);
-
             // read file
             var header = r.ReadS<S_Header>();
             if (header.Magic != S_MAGIC) throw new FormatException("BAD MAGIC");
@@ -387,7 +381,11 @@ namespace GameX.Valve.Formats
 
         #region ITexture
 
-        (object gl, object vulken, object unity, object unreal) Format;
+        static readonly object Format = (TextureFormat.RGBA32, TexturePixel.Unknown);
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //TextureUnityFormat.RGBA32,
+        //TextureUnityFormat.RGBA32);
         public int Width => width;
         public int Height => height;
         public int Depth => 0;
@@ -395,18 +393,7 @@ namespace GameX.Valve.Formats
         public TextureFlags TexFlags => 0;
         public int Fps { get; } = 60;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-        {
-            return (bytes, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
-        }
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (bytes, Format, null);
         public void End() { }
 
         public bool HasFrames => frame < frames.Length;
@@ -1063,35 +1050,28 @@ namespace GameX.Valve.Formats
             r.Seek(header.Transitions.Offset); Transitions = r.ReadFArray(x => x.ReadBytes(1), header.Transitions.Num);
             tr.Seek(theader.Textures.Offset); Textures = tr.ReadSArray<M_Texture>(theader.Textures.Num).Select(x => new Texture(tr, x)).ToArray();
             tr.Seek(theader.SkinFamilies.Offset); SkinFamilies = tr.ReadFArray(x => x.ReadPArray<short>("H", theader.NumSkinRef), theader.SkinFamilies.Num);
-
-            // Texture
-            Format = ((TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24);
         }
 
         #region ITexture
 
-        (object gl, object vulken, object unity, object unreal) Format;
+        static readonly object Format = (TextureFormat.RGB24, TexturePixel.Unknown);
+        //(TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+        //(TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+        //TextureUnityFormat.RGB24,
+        //TextureUnityFormat.RGB24);
         public int Width { get; set; }
         public int Height { get; set; }
         public int Depth => 0;
         public int MipMaps => 1;
         public TextureFlags TexFlags => 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             var tex = Textures[0];
             Width = tex.Width; Height = tex.Height;
             var buf = new byte[Width * Height * 3];
             Rasterize.CopyPixelsByPalette(buf, 3, tex.Pixels, tex.Palette, 3);
-            return (buf, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+            return (buf, Format, null);
         }
         public void End() { }
 
@@ -1366,8 +1346,10 @@ namespace GameX.Valve.Formats
             };
             transparent = Path.GetFileName(f.Path).StartsWith('{');
             Format = transparent
-                ? (type, (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnityFormat.RGBA32)
-                : (type, (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24);
+                ? (type, (TextureFormat.RGBA32, TexturePixel.Unknown))
+                : (type, (TextureFormat.RGB24, TexturePixel.Unknown));
+            //? (type, (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnityFormat.RGBA32)
+            //: (type, (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24);
             if (type == Formats.Tex2 || type == Formats.Tex) name = r.ReadFUString(16);
             width = (int)r.ReadUInt32();
             height = (int)r.ReadUInt32();
@@ -1420,14 +1402,14 @@ namespace GameX.Valve.Formats
 
         #region ITexture
 
-        (Formats type, object gl, object vulken, object unity, object unreal) Format;
+        (Formats type, object value) Format;
         public int Width => width;
         public int Height => height;
         public int Depth => 0;
         public int MipMaps => pixels.Length;
         public TextureFlags TexFlags => 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             var bbp = transparent ? 4 : 3;
             var buf = new byte[pixels.Sum(x => x.Length) * bbp];
@@ -1440,15 +1422,7 @@ namespace GameX.Valve.Formats
                 if (transparent) Rasterize.CopyPixelsByPaletteWithAlpha(buf.AsSpan(span), bbp, p, palette, 3, 0xFF);
                 else Rasterize.CopyPixelsByPalette(buf.AsSpan(span), bbp, p, palette, 3);
             }
-            return (buf, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, spans);
+            return (buf, Format.value, spans);
         }
         public void End() { }
 

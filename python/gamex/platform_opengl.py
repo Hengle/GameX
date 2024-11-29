@@ -64,7 +64,7 @@ class OpenGLTextureBuilder(TextureBuilderBase):
         glBindTexture(GL_TEXTURE_2D, id)
         if level.start > 0: glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level.start)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, level.stop - 1)
-        bytes, fmt, spans = source.begin(Platform.Type.OpenGL)
+        bytes, fmt, spans = source.begin('GL')
         pixels = []
 
         # decode
@@ -207,7 +207,7 @@ class OpenGLGfx(IOpenGLGfx):
 # OpenGLPlatform
 class OpenGLPlatform:
     def startup() -> bool:
-        Platform.platformType = Platform.Type.OpenGL
+        Platform.platformType = 'GL'
         Platform.gfxFactory = lambda source: OpenGLGfx(source)
         Platform.sfxFactory = lambda source: SystemSfx(source)
         Platform.logFunc = lambda a: print(a)

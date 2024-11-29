@@ -2,14 +2,13 @@
 using OpenStack.Gfx;
 using OpenStack.Gfx.Gl;
 using OpenStack.Gfx.Gl.Renders;
-using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Numerics;
 using System.Threading.Tasks;
+using static OpenStack.Gfx.Textures.TextureFormat;
 
 namespace GameX.Platforms
 {
@@ -82,10 +81,7 @@ namespace GameX.Platforms
             GL.BindTexture(TextureTarget.Texture2D, id);
             if (level.start > 0) GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, level.start);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, level.stop - 1);
-            var (bytes, fmt, spans) = source.Begin((int)Platform.Type.OpenGL);
-            if (bytes == null) return DefaultTexture;
-
-            // decode
+            var (bytes, fmt, spans) = source.Begin("GL");
             bool CompressedTexImage2D(ITexture source, (int start, int stop) level, InternalFormat internalFormat)
             {
                 int width = source.Width, height = source.Height;
@@ -114,40 +110,70 @@ namespace GameX.Platforms
                 else fixed (byte* data = bytes) GL.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, format, type, (IntPtr)data);
                 return true;
             }
-            if (fmt is TextureGLFormat glFormat)
+            try
             {
-                var internalFormat = glFormat;
-                //if (glFormat == TextureGLFormat.CompressedRgbaS3tcDxt3Ext)
-                //{
-                //    glFormat = TextureGLFormat.CompressedRgbaS3tcDxt5Ext;
-                //    DxtUtil2.ConvertDxt3ToDtx5(bytes, info.Width, info.Height, info.MipMaps);
-                //}
-                if (internalFormat == 0 || !CompressedTexImage2D(source, level, (InternalFormat)internalFormat)) return DefaultTexture;
+                if (bytes == null) return DefaultTexture;
+                else if (fmt is ValueTuple<TextureFormat, TexturePixel> z)
+                {
+                    var (format, pixel) = z;
+                    if ((format & Compressed) != 0)
+                    {
+                        var s = (pixel & TexturePixel.Signed) != 0;
+                        var internalFormat = format switch
+                        {
+                            DXT1 => s ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRgbaS3tcDxt1Ext,
+                            DXT3 => s ? InternalFormat.CompressedSrgbAlphaS3tcDxt1Ext : InternalFormat.CompressedRgbaS3tcDxt3Ext,
+                            DXT5 => s ? InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext : InternalFormat.CompressedRgbaS3tcDxt5Ext,
+                            BC4 => s ? InternalFormat.CompressedSignedRedRgtc1 : InternalFormat.CompressedRedRgtc1,
+                            BC5 => s ? InternalFormat.CompressedSignedRgRgtc2 : InternalFormat.CompressedRgRgtc2,
+                            BC6H => s ? InternalFormat.CompressedRgbBptcSignedFloat : InternalFormat.CompressedRgbBptcUnsignedFloat,
+                            BC7 => s ? InternalFormat.CompressedSrgbAlphaBptcUnorm : InternalFormat.CompressedRgbaBptcUnorm,
+                            ETC2 => s ? InternalFormat.CompressedSrgb8Etc2 : InternalFormat.CompressedRgb8Etc2,
+                            ETC2_EAC => s ? InternalFormat.CompressedSrgb8Alpha8Etc2Eac : InternalFormat.CompressedRgba8Etc2Eac,
+                            _ => throw new ArgumentOutOfRangeException("TextureFormat", $"{format}")
+                        };
+                        if (internalFormat == 0 || !CompressedTexImage2D(source, level, internalFormat)) return DefaultTexture;
+                    }
+                    else
+                    {
+                        var f = (pixel & TexturePixel.Float) != 0;
+                        var (internalFormat, format2, type) = format switch
+                        {
+                            I8 => (PixelInternalFormat.Intensity8, PixelFormat.Red, PixelType.UnsignedByte),
+                            L8 => (PixelInternalFormat.Luminance, PixelFormat.Luminance, PixelType.UnsignedByte),
+                            R8 => (PixelInternalFormat.R8, PixelFormat.Red, PixelType.UnsignedByte),
+                            R16 => f ? (PixelInternalFormat.R16f, PixelFormat.Red, PixelType.Float) : (PixelInternalFormat.R16, PixelFormat.Red, PixelType.UnsignedShort),
+                            RG16 => f ? (PixelInternalFormat.Rg16f, PixelFormat.Red, PixelType.Float) : (PixelInternalFormat.Rg16, PixelFormat.Red, PixelType.UnsignedShort),
+                            RGB24 => (PixelInternalFormat.Rgb8, PixelFormat.Rgb, PixelType.UnsignedByte),
+                            RGB565 => (PixelInternalFormat.Rgb5, PixelFormat.Rgb, PixelType.UnsignedByte),
+                            RGBA32 => (PixelInternalFormat.Rgba8, PixelFormat.Rgba, PixelType.UnsignedByte),
+                            ARGB32 => (PixelInternalFormat.Rgba, PixelFormat.Rgb, PixelType.UnsignedInt8888Reversed), //: odd Rgb
+                            BGRA32 => (PixelInternalFormat.Rgba, PixelFormat.Bgra, PixelType.UnsignedInt8888),
+                            BGRA1555 => (PixelInternalFormat.Rgba, PixelFormat.Bgra, PixelType.UnsignedShort1555Reversed),
+                            _ => throw new ArgumentOutOfRangeException("TextureFormat", $"{format}")
+                        };
+                        if (internalFormat == 0 || !TexImage2D(source, level, internalFormat, format2, type)) return DefaultTexture;
+                    }
+                }
+                else throw new ArgumentOutOfRangeException(nameof(fmt), $"{fmt}");
+                
+                if (MaxTextureMaxAnisotropy >= 4)
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, MaxTextureMaxAnisotropy);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                }
+                else
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+                }
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)(source.TexFlags.HasFlag(TextureFlags.SUGGEST_CLAMPS) ? TextureWrapMode.Clamp : TextureWrapMode.Repeat));
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)(source.TexFlags.HasFlag(TextureFlags.SUGGEST_CLAMPT) ? TextureWrapMode.Clamp : TextureWrapMode.Repeat));
+                GL.BindTexture(TextureTarget.Texture2D, 0); // release texture
+                return id;
             }
-            else if (fmt is ValueTuple<TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType> glPixelFormat)
-            {
-                var (internalFormat, format, type) = glPixelFormat;
-                if (internalFormat == 0 || !TexImage2D(source, level, (PixelInternalFormat)internalFormat, (PixelFormat)format, (PixelType)type)) return DefaultTexture;
-            }
-            else throw new NotImplementedException();
-            source.End();
-
-            // texture
-            if (MaxTextureMaxAnisotropy >= 4)
-            {
-                GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, MaxTextureMaxAnisotropy);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            }
-            else
-            {
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            }
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)(source.TexFlags.HasFlag(TextureFlags.SUGGEST_CLAMPS) ? TextureWrapMode.Clamp : TextureWrapMode.Repeat));
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)(source.TexFlags.HasFlag(TextureFlags.SUGGEST_CLAMPT) ? TextureWrapMode.Clamp : TextureWrapMode.Repeat));
-            GL.BindTexture(TextureTarget.Texture2D, 0); // release texture
-            return id;
+            finally { source.End(); }
         }
 
         public override int CreateSolidTexture(int width, int height, float[] pixels)
@@ -272,7 +298,7 @@ namespace GameX.Platforms
         {
             try
             {
-                Platform.PlatformType = Platform.Type.OpenGL;
+                Platform.PlatformType = "GL";
                 Platform.GfxFactory = source => new OpenGLGfx(source);
                 Platform.SfxFactory = source => new SystemSfx(source);
                 Debug.AssertFunc = x => System.Diagnostics.Debug.Assert(x);

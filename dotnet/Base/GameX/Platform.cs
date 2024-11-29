@@ -280,7 +280,7 @@ namespace GameX.Platforms
         /// <summary>
         /// The platform type.
         /// </summary>
-        public enum Type { Unknown, OpenGL, Unity, Unreal, Vulken, StereoKit, Test, Other }
+        //public enum Type { Unknown, OpenGL, Unity, Unreal, Vulken, StereoKit, Test, Other }
 
         /// <summary>
         /// The platform OS.
@@ -290,7 +290,7 @@ namespace GameX.Platforms
         /// <summary>
         /// Gets or sets the platform.
         /// </summary>
-        public static Type PlatformType;
+        public static string PlatformType;
 
         /// <summary>
         /// Gets or sets the platform tag.
@@ -349,7 +349,7 @@ namespace GameX.Platforms
         {
             if (InTestHost && Startups.Count == 0) Startups.Add(TestPlatform.Startup);
             foreach (var startup in Startups) if (startup()) return;
-            PlatformType = Type.Unknown;
+            PlatformType = "UK";
             GfxFactory = source => null; // throw new Exception("No GfxFactory");
             SfxFactory = source => null; // throw new Exception("No SfxFactory");
             AssertFunc = x => System.Diagnostics.Debug.Assert(x);
@@ -395,7 +395,7 @@ namespace GameX.Platforms
         {
             try
             {
-                Platform.PlatformType = Platform.Type.Test;
+                Platform.PlatformType = "TT";
                 Platform.GfxFactory = source => new TestGfx(source);
                 Platform.SfxFactory = source => new TestSfx(source);
                 AssertFunc = x => System.Diagnostics.Debug.Assert(x);

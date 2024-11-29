@@ -4,7 +4,7 @@ from io import BytesIO
 from PIL import Image
 from enum import Enum
 from openstk.gfx.gfx_render import Rasterize
-from openstk.gfx.gfx_texture import DDS_HEADER, ITexture, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
+from openstk.gfx.gfx_texture import DDS_HEADER, ITexture, TextureFormat, TexturePixel
 from gamex import PakBinary, FileSource, MetaManager, MetaInfo, MetaContent, IHaveMetaInfo
 from gamex.platform import Platform
 from gamex.util import _pathExtension
@@ -57,14 +57,7 @@ class Binary_Dds(IHaveMetaInfo, ITexture):
     mipMaps: int = 1
     texFlags: TextureFlags = 0
 
-    def begin(self, platform: int) -> (bytes, object, list[object]):
-        match platform:
-            case Platform.Type.OpenGL: format = self.format[2]
-            case Platform.Type.Vulken: format = self.format[3]
-            case Platform.Type.Unity: format = self.format[4]
-            case Platform.Type.Unreal: format = self.format[5]
-            case _: raise Exception('Unknown {platform}')
-        return self.bytes, format, self.spans
+    def begin(self, platform: str) -> (bytes, object, list[object]): return self.bytes, self.format[2], self.spans
     def end(self): pass
 
     #endregion
@@ -108,34 +101,19 @@ class Binary_Img(IHaveMetaInfo, ITexture):
         self.image = Image.open(r.f)
         self.width, self.height = self.image.size
         bytes = self.image.tobytes(); palette = self.image.getpalette()
-        print(f'mode: {self.image.mode}')
+        # print(f'mode: {self.image.mode}')
         match self.image.mode:
-            case '1': # 1-bit pixels, black and white
-                self.format = (self.image.format,
-                (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Luminance, TextureGLPixelFormat.Luminance, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGB24,
-                TextureUnrealFormat.Unknown)
-            case 'P' | 'L': # 8-bit pixels, mapped to any other mode using a color palette
-                self.format = (self.image.format,
-                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGB24,
-                TextureUnrealFormat.Unknown)
+            # 1-bit pixels, black and white
+            case '1':  self.format = (self.image.format, (TextureFormat.L8, TexturePixel.Unknown))
+            # 8-bit pixels, mapped to any other mode using a color palette
+            case 'P' | 'L':
+                self.format = (self.image.format, (TextureFormat.RGB24, TexturePixel.Unknown))
                 # 8-bit pixels, Grayscale
                 if self.image.mode == 'L': palette = [x for xs in [[x, x, x] for x in range(255)] for x in xs]
-            case 'RGB': # 3×8-bit pixels, true color
-                self.format = (self.image.format,
-                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGB24,
-                TextureUnrealFormat.Unknown)
-            case 'RGBA': # 4×8-bit pixels, true color with transparency mask
-                self.format = (self.image.format,
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGBA32,
-                TextureUnrealFormat.Unknown)
+            # 3×8-bit pixels, true color
+            case 'RGB': self.format = (self.image.format, (TextureFormat.RGB24, TexturePixel.Unknown))
+            # 4×8-bit pixels, true color with transparency mask
+            case 'RGBA': self.format = (self.image.format, (TextureFormat.RGBA32, TexturePixel.Unknown))
 
         # decode
         if not palette: self.bytes = bytes
@@ -151,14 +129,7 @@ class Binary_Img(IHaveMetaInfo, ITexture):
     mipMaps: int = 1
     texFlags: TextureFlags = 0
 
-    def begin(self, platform: int) -> (bytes, object, list[object]):
-        match platform:
-            case Platform.Type.OpenGL: format = self.format[1]
-            case Platform.Type.Vulken: format = self.format[2]
-            case Platform.Type.Unity: format = self.format[3]
-            case Platform.Type.Unreal: format = self.format[4]
-            case _: raise Exception(f'Unknown {platform}')
-        return self.bytes, format, None
+    def begin(self, platform: str) -> (bytes, object, list[object]): return self.bytes, self.format[1], None
     def end(self): pass
 
     #endregion
@@ -232,10 +203,10 @@ class Binary_Pcx(IHaveMetaInfo, ITexture):
         self.planes = self.header.numPlanes
         self.Width = self.header.xmax - self.header.xmin + 1
         self.height = self.header.ymax - self.header.ymin + 1
-        self.format = ((TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnrealFormat.Unknown)
 
     #region ITexture
 
+    format: tuple = (TextureFormat.RGBA32, TexturePixel.Unknown)
     width: int = 0
     height: int = 0
     depth: int = 0
@@ -248,32 +219,28 @@ class Binary_Pcx(IHaveMetaInfo, ITexture):
     @staticmethod
     def rleLength(body: bytearray, offset: int) -> int: return body[offset] & 63
 
-    def begin(self, platform: int) -> (bytes, object, list[object]):
+    def begin(self, platform: str) -> (bytes, object, list[object]):
         # decodes 4bpp pixel data
-        def decode4bbp():
-            pass
+        def decode4bbp(): pass
 
         # decodes 8bpp (depth = 8/24bit) data
-        def decode8bbp():
-            pass
+        def decode8bbp(): pass
 
         match header.bpp:
             case 8: bytes = decode8bpp()
             case 1: bytes = decode4bpp()
             case _: raise Exception(f'Unknown bpp: {header.bpp}')
-        match platform:
-            case Platform.Type.OpenGL: format = self.format[1]
-            case Platform.Type.Vulken: format = self.format[2]
-            case Platform.Type.Unity: format = self.format[3]
-            case Platform.Type.Unreal: format = self.format[4]
-            case _: raise Exception(f'Unknown {platform}')
-        return bytes, format, None
+        return bytes, self.format, None
     def end(self): pass
 
     #endregion
 
     def getInfoNodes(self, resource: MetaManager = None, file: FileSource = None, tag: object = None) -> list[MetaInfo]: return [
-        MetaInfo(None, MetaContent(type = 'AudioPlayer', name = os.path.basename(file.path), value = self.data, tag = _pathExtension(file.path)))
+        MetaInfo(None, MetaContent(type = 'Texture', name = os.path.basename(file.path), value = self.data)),
+        MetaInfo('Binary_Pcx', items = [
+            MetaInfo(f'Width: {self.width}'),
+            MetaInfo(f'Height: {self.height}')
+            ])
         ]
 
 #endregion
@@ -449,21 +416,9 @@ class Binary_Tga(IHaveMetaInfo, ITexture):
         match self.pixelFormat:
             case Binary_Tga.PIXEL.BW8: raise Exception('Not Supported')
             case Binary_Tga.PIXEL.BW16: raise Exception('Not Supported')
-            case Binary_Tga.PIXEL.RGB555:
-                self.format = (TextureGLFormat.Rgb5, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), \
-                    (TextureGLFormat.Rgb5, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), \
-                    TextureUnityFormat.RGB565, \
-                    TextureUnrealFormat.Unknown
-            case Binary_Tga.PIXEL.RGB24:
-                self.format = (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), \
-                    (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), \
-                    TextureUnityFormat.RGB24, \
-                    TextureUnrealFormat.Unknown
-            case Binary_Tga.PIXEL.ARGB32:
-                self.format = (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), \
-                    (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), \
-                    TextureUnityFormat.RGBA32, \
-                    TextureUnrealFormat.Unknown
+            case Binary_Tga.PIXEL.RGB555: self.format = (TextureFormat.RGB565, TexturePixel.Unknown)
+            case Binary_Tga.PIXEL.RGB24: self.format = (TextureFormat.RGB24, TexturePixel.Unknown),
+            case Binary_Tga.PIXEL.ARGB32: self.format = (TextureFormat.RGB24, TexturePixel.Unknown),
             case _: raise Exception(f'Unknown {self.pixelFormat}')
 
     #region ITexture
@@ -483,7 +438,7 @@ class Binary_Tga(IHaveMetaInfo, ITexture):
         if index < 0 and index >= map.entryCount: raise Exception('COLOR_MAP_INDEX_FAILED')
         # Buffer.BlockCopy(map.pixels, map.bytesPerEntry * index, dest, offset, map.bytesPerEntry)
 
-    def begin(self, platform: int) -> (bytes, object, list[object]):
+    def begin(self, platform: str) -> (bytes, object, list[object]):
         # decodeRle
         def decodeRle(data: bytearray):
             isColorMapped = self.header.IS_COLOR_MAPPED
@@ -539,13 +494,7 @@ class Binary_Tga(IHaveMetaInfo, ITexture):
         if flipH: self.flipH(bytes)
         if flipV: self.flipV(bytes)
         
-        match platform:
-            case Platform.Type.OpenGL: format = self.format[1]
-            case Platform.Type.Vulken: format = self.format[2]
-            case Platform.Type.Unity: format = self.format[3]
-            case Platform.Type.Unreal: format = self.format[4]
-            case _: raise Exception(f'Unknown {platform}')
-        return bytes, format, None
+        return bytes, self.format, None
     def end(self): pass
 
     # returns the pixel at coordinates (x,y) for reading or writing.

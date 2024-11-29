@@ -51,7 +51,7 @@ namespace GameX.Origin.Formats.U8
         public int MipMaps => 1;
         public TextureFlags TexFlags => 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             //byte[] Expand()
             //{

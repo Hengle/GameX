@@ -1,5 +1,4 @@
-﻿using GameX.Platforms;
-using OpenStack.Gfx.Renders;
+﻿using OpenStack.Gfx.Renders;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
@@ -24,14 +23,6 @@ namespace GameX.Bullfrog.Formats
         //static void FO(string x) { F = File.CreateText("C:\\T_\\FROG\\Fli2.txt"); }
         //static void FW(string x) { F.Write(x); F.Flush(); }
         //FO("C:\\T_\\FROG\\Fli2.txt");
-
-        (object gl, object vulken, object unity, object unreal) Format;
-        public int Width { get; }
-        public int Height { get; }
-        public int Depth => 0;
-        public int MipMaps => 0;
-        public TextureFlags TexFlags => 0;
-        public int Fps { get; }
 
         #region Headers
 
@@ -103,11 +94,6 @@ namespace GameX.Bullfrog.Formats
             // read header
             var header = r.ReadS<X_Header>();
             if (header.Type != MAGIC) throw new FormatException("BAD MAGIC");
-            Format = (
-                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGB24,
-                TextureUnrealFormat.Unknown);
             Width = header.Width;
             Height = header.Height;
             Frames = NumFrames = header.Frames;
@@ -122,16 +108,21 @@ namespace GameX.Bullfrog.Formats
 
         public void Dispose() => R.Close();
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Bytes, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                Platform.Type.Vulken => Format.vulken,
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        #region ITexture
+        static readonly object Format = (TextureFormat.RGB24, TexturePixel.Unknown);
+        //(TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+        //(TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte),
+        //TextureUnityFormat.RGB24,
+        //TextureUnrealFormat.Unknown);
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth => 0;
+        public int MipMaps => 0;
+        public TextureFlags TexFlags => 0;
+        public int Fps { get; }
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Bytes, Format, null);
         public void End() { }
+        #endregion
 
         public bool HasFrames => NumFrames > 0;
 
@@ -269,17 +260,14 @@ namespace GameX.Bullfrog.Formats
         }
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-        {
-            return [
-                new(null, new MetaContent { Type = "VideoTexture", Name = Path.GetFileName(file.Path), Value = this }),
-                new("Video", items: [
-                    new($"Width: {Width}"),
-                    new($"Height: {Height}"),
-                    new($"Frames: {Frames}")
-                ])
-            ];
-        }
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "VideoTexture", Name = Path.GetFileName(file.Path), Value = this }),
+            new("Video", items: [
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+                new($"Frames: {Frames}")
+            ])
+        ];
     }
 
     #endregion

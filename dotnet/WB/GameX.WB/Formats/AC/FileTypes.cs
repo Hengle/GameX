@@ -2275,24 +2275,29 @@ namespace GameX.WB.Formats.AC.FileTypes
             }
             Format = PixFormat switch
             {
-                PFID_DXT1 => (PixFormat, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureUnityFormat.DXT1, TextureUnityFormat.DXT1),
-                PFID_DXT3 => (PixFormat, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureUnityFormat.Unknown, TextureUnityFormat.Unknown),
-                PFID_DXT5 => (PixFormat, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureUnityFormat.DXT5, TextureUnityFormat.DXT5),
-                PFID_CUSTOM_RAW_JPEG or PFID_R8G8B8 or PFID_CUSTOM_LSCAPE_R8G8B8 or PFID_A8 or PFID_CUSTOM_LSCAPE_ALPHA or PFID_R5G6B5 => (PixFormat, (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24),
-                PFID_INDEX16 or PFID_P8 or PFID_A8R8G8B8 or PFID_A4R4G4B4 => (PixFormat, (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnityFormat.RGBA32),
+                //PFID_DXT1 => (PixFormat, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureGLFormat.CompressedRgbaS3tcDxt1Ext, TextureUnityFormat.DXT1, TextureUnityFormat.DXT1),
+                //PFID_DXT3 => (PixFormat, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureGLFormat.CompressedRgbaS3tcDxt3Ext, TextureUnityFormat.Unknown, TextureUnityFormat.Unknown),
+                //PFID_DXT5 => (PixFormat, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureGLFormat.CompressedRgbaS3tcDxt5Ext, TextureUnityFormat.DXT5, TextureUnityFormat.DXT5),
+                //PFID_CUSTOM_RAW_JPEG or PFID_R8G8B8 or PFID_CUSTOM_LSCAPE_R8G8B8 or PFID_A8 or PFID_CUSTOM_LSCAPE_ALPHA or PFID_R5G6B5 => (PixFormat, (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24),
+                //PFID_INDEX16 or PFID_P8 or PFID_A8R8G8B8 or PFID_A4R4G4B4 => (PixFormat, (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnityFormat.RGBA32),
+                PFID_DXT1 => (PixFormat, (TextureFormat.DXT1, TexturePixel.Unknown)),
+                PFID_DXT3 => (PixFormat, (TextureFormat.DXT3, TexturePixel.Unknown)),
+                PFID_DXT5 => (PixFormat, (TextureFormat.DXT5, TexturePixel.Unknown)),
+                PFID_CUSTOM_RAW_JPEG or PFID_R8G8B8 or PFID_CUSTOM_LSCAPE_R8G8B8 or PFID_A8 or PFID_CUSTOM_LSCAPE_ALPHA or PFID_R5G6B5 => (PixFormat, (TextureFormat.RGB24, TexturePixel.Unknown)),
+                PFID_INDEX16 or PFID_P8 or PFID_A8R8G8B8 or PFID_A4R4G4B4 => (PixFormat, (TextureFormat.RGBA32, TexturePixel.Unknown)),
                 _ => throw new ArgumentOutOfRangeException(nameof(Format), $"{Format}"),
             };
         }
 
-        (SurfacePixelFormat type, object gl, object vulken, object unity, object unreal) Format;
-
+        #region ITexture
+        readonly (SurfacePixelFormat type, object value) Format;
         public int Width { get; }
         public int Height { get; }
         public int Depth => 0;
         public int MipMaps => 1;
         public TextureFlags TexFlags => 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform)
         {
             byte[] Expand()
             {
@@ -2397,18 +2402,10 @@ namespace GameX.WB.Formats.AC.FileTypes
                     default: Console.WriteLine($"Unhandled SurfacePixelFormat ({Format}) in RenderSurface {Id:X8}"); return null;
                 }
             }
-
-            return (Expand(), (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, new[] { Range.All });
+            return (Expand(), Format.value, new[] { Range.All });
         }
         public void End() { }
+        #endregion
 
         List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
             //new(null, new MetaContent { Type = "Text", Name = Path.GetFileName(file.Path), Value = "PICTURE" }),

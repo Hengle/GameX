@@ -4,7 +4,7 @@ import numpy as np
 from io import BytesIO
 from enum import Enum, Flag
 from openstk.gfx.gfx_render import Rasterize
-from openstk.gfx.gfx_texture import TextureFlags, ITexture, ITextureFrames, TextureGLFormat, TextureGLPixelFormat, TextureGLPixelType, TextureUnityFormat, TextureUnrealFormat
+from openstk.gfx.gfx_texture import ITexture, ITextureFrames, TextureFlags, TextureFormat, TexturePixel
 from openstk.poly import Reader, unsafe, X_LumpNO, X_LumpNO2, X_Lump2NO
 from gamex import PakFile, BinaryPakFile, PakBinary, FileSource, MetaInfo, MetaManager, MetaContent, IHaveMetaInfo
 from gamex.platform import Platform
@@ -81,11 +81,7 @@ class Binary_Spr(IHaveMetaInfo, ITextureFrames):
     #endregion
 
     def __init__(self, r: Reader):
-        self.format = (
-              (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-              (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-              TextureUnityFormat.RGBA32,
-              TextureUnityFormat.RGBA32)
+        self.
 
         # read file
         header = r.readS(self.S_Header)
@@ -107,6 +103,7 @@ class Binary_Spr(IHaveMetaInfo, ITextureFrames):
 
     #region ITexture
 
+    format: tuple = (TextureFormat.RGBA32, TexturePixel.Unknown)
     width: int = 0
     height: int = 0
     depth: int = 0
@@ -114,14 +111,7 @@ class Binary_Spr(IHaveMetaInfo, ITextureFrames):
     texFlags: TextureFlags = 0
     fps: int = 60
 
-    def begin(self, platform: int) -> (bytes, object, list[object]):
-        match platform:
-            case Platform.Type.OpenGL: format = self.format[1]
-            case Platform.Type.Vulken: format = self.format[2]
-            case Platform.Type.Unity: format = self.format[3]
-            case Platform.Type.Unreal: format = self.format[4]
-            case _: raise Exception(f'Unknown {platform}')
-        return self.bytes, format, None
+    def begin(self, platform: str) -> (bytes, object, list[object]): return self.bytes, format, None
     def end(self): pass
 
     def hasFrames(self) -> bool: return self.frame < len(self.frames)
@@ -682,28 +672,22 @@ class Binary_Mdl10(IHaveMetaInfo, ITexture):
         tr.seek(theader.skinFamilies.offset); self.skinFamilies = tr.readFArray(lambda x: x.readPArray(None, 'H', theader.numSkinRef), theader.skinFamilies.num)
 
         # texture
-        self.format = ((TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24)
 
     #region ITexture
 
+    format: tuple = (TextureFormat.RGB24, TexturePixel.Unknown)
     width: int = 0
     height: int = 0
     depth: int = 0
     mipMaps: int = 1
     texFlags: TextureFlags = 0
 
-    def begin(self, platform: int) -> (bytes, object, list[object]):
+    def begin(self, platform: str) -> (bytes, object, list[object]):
         tex = self.textures[0]
         self.width = tex.width; self.height = tex.height
         buf = bytearray(self.width * self.height * 3); mv = memoryview(buf)
         Rasterize.copyPixelsByPalette(mv, 3, tex.pixels, tex.palette, 3)
-        match platform:
-            case Platform.Type.OpenGL: format = self.format[1]
-            case Platform.Type.Vulken: format = self.format[2]
-            case Platform.Type.Unity: format = self.format[3]
-            case Platform.Type.Unreal: format = self.format[4]
-            case _: raise Exception(f'Unknown {platform}')
-        return buf, format, None
+        return buf, self.format, None
     def end(self): pass
 
     #endregion
@@ -973,8 +957,8 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
             case '.fnt': type = self.Formats.Fnt
             case _: type = self.Formats.Nonex
         self.transparent = os.path.basename(f.path).startswith('{')
-        self.format = (type, (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGBA32, TextureUnityFormat.RGBA32) if self.transparent \
-            else (type, (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), (TextureGLFormat.Rgb8, TextureGLPixelFormat.Rgb, TextureGLPixelType.UnsignedByte), TextureUnityFormat.RGB24, TextureUnityFormat.RGB24)
+        self.format = (type, (TextureFormat.RGBA32, TexturePixel.Unknown)) if self.transparent \
+            else (type, (TextureFormat.RGB24, TexturePixel.Unknown))
         self.name = r.readFUString(16) if type == self.Formats.Tex2 or type == self.Formats.Tex else None
         self.width = r.readUInt32()
         self.height = r.readUInt32()
@@ -1017,7 +1001,7 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
     mipMaps: int = 1
     texFlags: TextureFlags = 0
 
-    def begin(self, platform: int) -> (bytes, object, list[object]):
+    def begin(self, platform: str) -> (bytes, object, list[object]):
         bbp = 4 if self.transparent else 3
         buf = bytearray(sum([len(x) for x in self.pixels]) * bbp); mv = memoryview(buf)
         spans = [range(0, 0)] * len(self.pixels); offset = 0
@@ -1025,13 +1009,7 @@ class Binary_Wad3(IHaveMetaInfo, ITexture):
             size = len(p) * bbp; span = spans[i] = range(offset, offset + size); offset += size
             if self.transparent: Rasterize.copyPixelsByPaletteWithAlpha(mv[span.start:span.stop], bbp, p, self.palette, 3, 0xFF)
             else: Rasterize.copyPixelsByPalette(mv[span.start:span.stop], bbp, p, self.palette, 3)
-        match platform:
-            case Platform.Type.OpenGL: format = self.format[1]
-            case Platform.Type.Vulken: format = self.format[2]
-            case Platform.Type.Unity: format = self.format[3]
-            case Platform.Type.Unreal: format = self.format[4]
-            case _: raise Exception(f'Unknown {platform}')
-        return buf, format, spans
+        return buf, self.format[1], spans
     def end(self): pass
 
     #endregion

@@ -1,4 +1,3 @@
-using GameX.Platforms;
 using OpenStack.Gfx.Textures;
 using System;
 using System.Collections.Generic;
@@ -29,7 +28,6 @@ namespace GameX.Black.Formats
         #endregion
 
         byte[] Bytes;
-        (object gl, object vulken, object unity, object unreal) Format;
 
         public Binary_Rix(BinaryReader r, FileSource f)
         {
@@ -50,43 +48,33 @@ namespace GameX.Black.Formats
                 var _ = image_;
                 for (var j = 0; j < data.Length; j++, _ += 4) *(uint*)_ = rgba32[data[j]];
             }
-
             Bytes = image;
-            Format = (
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                (TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
-                TextureUnityFormat.RGBA32,
-                TextureUnrealFormat.R8G8B8A8);
             Width = header.Width;
             Height = header.Height;
         }
 
         // ITexture
+        static readonly object Format = (TextureFormat.RGBA32, TexturePixel.Unknown);
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //(TextureGLFormat.Rgba8, TextureGLPixelFormat.Rgba, TextureGLPixelType.UnsignedByte),
+        //TextureUnityFormat.RGBA32,
+        //TextureUnrealFormat.R8G8B8A8);
         public int Width { get; }
         public int Height { get; }
         public int Depth => 0;
         public int MipMaps => 1;
         public TextureFlags TexFlags => 0;
 
-        public (byte[] bytes, object format, Range[] spans) Begin(int platform)
-            => (Bytes, (Platform.Type)platform switch
-            {
-                Platform.Type.OpenGL => Format.gl,
-                Platform.Type.Unity => Format.unity,
-                Platform.Type.Unreal => Format.unreal,
-                Platform.Type.Vulken => Format.vulken,
-                Platform.Type.StereoKit => throw new NotImplementedException("StereoKit"),
-                _ => throw new ArgumentOutOfRangeException(nameof(platform), $"{platform}"),
-            }, null);
+        public (byte[] bytes, object format, Range[] spans) Begin(string platform) => (Bytes, Format, null);
         public void End() { }
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => new List<MetaInfo> {
-            new MetaInfo(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
-            new MetaInfo($"{nameof(Binary_Rix)}", items: new List<MetaInfo> {
-                new MetaInfo($"Width: {Width}"),
-                new MetaInfo($"Height: {Height}"),
-            })
-        };
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new(null, new MetaContent { Type = "Texture", Name = Path.GetFileName(file.Path), Value = this }),
+            new($"{nameof(Binary_Rix)}", items: [
+                new($"Width: {Width}"),
+                new($"Height: {Height}"),
+            ])
+        ];
     }
 }

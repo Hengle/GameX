@@ -245,7 +245,7 @@ class Platform:
         if Platform.inTestHost and len(Platform.startups) == 0: Platform.startups.append(TestPlatform.startup)
         for startup in Platform.startups:
             if startup(): return
-        Platform.platformType = Platform.Type.Unknown
+        Platform.platformType = 'UK'
         Platform.gfxFactory = lambda source: None
         Platform.sfxFactory = lambda source: None
         Platform.logFunc = lambda a: print(a)
@@ -264,7 +264,7 @@ class TestSfx:
 class TestPlatform:
     @staticmethod
     def startup() -> bool:
-        Platform.platformType = Platform.Type.Test
+        Platform.platformType = 'TT'
         Platform.gfxFactory = lambda source: TestGfx(source)
         Platform.sfxFactory = lambda source: TestSfx(source)
         Platform.logFunc = lambda a: print(a)
