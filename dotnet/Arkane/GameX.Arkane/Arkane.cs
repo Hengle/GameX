@@ -29,8 +29,8 @@ namespace GameX.Arkane
             {
                 "CryEngine" => Crytek.CrytekPakFile.ObjectFactory,
                 "Unreal" => Epic.EpicPakFile.ObjectFactory,
-                "Valve" => Valve.ValvePakFile.ObjectFactory,
-                "idTech7" => ID.IDPakFile.ObjectFactory,
+                "Source" => Valve.ValvePakFile.ObjectFactory,
+                "idTech:7" => ID.IDPakFile.ObjectFactory,
                 _ => ObjectFactory,
             };
             UseFileId = true;
@@ -47,8 +47,8 @@ namespace GameX.Arkane
                 "Void" => PakBinary_Void.Current,
                 "CryEngine" => Crytek.Formats.PakBinary_Cry3.Current,
                 "Unreal" => Epic.Formats.PakBinary_Pck.Current,
-                "Valve" => Valve.Formats.PakBinary_Vpk.Current,
-                //"idTech7" => Id.Formats.PakBinaryVpk.Current,
+                "Source" => Valve.Formats.PakBinary_Vpk.Current,
+                "idTech" => ID.Formats.PakBinary_Pak.Current,
                 _ => throw new ArgumentOutOfRangeException(nameof(game.Engine)),
             });
 

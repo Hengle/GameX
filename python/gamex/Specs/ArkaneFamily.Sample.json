@@ -36,6 +36,10 @@
     "name": "Dark Messiah of Might and Magic",
     "files": [
       {
+        "path": "depot_2102_dir.vpk:mm/maps/l00.bsp",
+        "type": "Bsp"
+      },
+      {
         "path": "depot_2101_dir.vpk:platform/config/server.vdf",
         "size": 13,
         "type": "Test"

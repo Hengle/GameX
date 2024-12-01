@@ -1,6 +1,5 @@
 ﻿using GameX.Algorithms;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -10,6 +9,7 @@ using static System.IO.Polyfill;
 
 namespace GameX.Valve.Formats
 {
+#if false
     #region PakBinary_Bsp30
     // https://hlbsp.sourceforge.net/index.php?content=bspdef
     // https://github.com/bernhardmgruber/hlbsp/tree/master/src
@@ -122,6 +122,7 @@ namespace GameX.Valve.Formats
     }
 
     #endregion
+#endif
 
     #region PakBinary_Vpk
 
@@ -228,6 +229,7 @@ namespace GameX.Valve.Formats
 
         public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
         {
+            var extended = source.Game.Engine.v?.Contains('x') == true;
             var files = source.Files = [];
 
             // file mask
@@ -298,7 +300,7 @@ namespace GameX.Valve.Formats
                 // skip over file data, if any
                 r.Skip(headerV2.FileDataSectionSize);
                 var v = new Verification(r, ref headerV2);
-                v.VerifyHashes(r, treeSize, ref headerV2, headerPosition);
+                if (!extended) v.VerifyHashes(r, treeSize, ref headerV2, headerPosition);
                 v.VerifySignature(r);
             }
 

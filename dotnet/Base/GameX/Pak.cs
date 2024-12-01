@@ -1062,10 +1062,10 @@ namespace GameX
                 File = file;
                 Source = source;
                 ObjectFactoryFunc = source.ObjectFactoryFunc;
-                //Open();
+                Open();
             }
 
-            public async override void Opening() { R = new BinaryReader(await Source.ReadData(File)); Pool = new StaticPool<BinaryReader>(R); base.Opening(); }
+            public async override void Opening() { if (File != null) { R = new BinaryReader(await Source.ReadData(File)); Pool = new StaticPool<BinaryReader>(R); } base.Opening(); }
             public override void Closing() { R?.Dispose(); base.Closing(); }
             public override IGenericPool<BinaryReader> GetReader(string path = null, bool pooled = true) => Pool;
         }

@@ -1,4 +1,5 @@
 ﻿using GameX.Formats.Unknown;
+using GameX.ID.Formats;
 using GameX.Unknown;
 using GameX.Valve.Formats;
 using GameX.Valve.Transforms;
@@ -33,15 +34,13 @@ namespace GameX.Valve
         static readonly ConcurrentDictionary<string, PakBinary> PakBinarys = new();
 
         static PakBinary GetPakBinary(FamilyGame game, string extension)
-            => extension != ".bsp"
-                ? PakBinarys.GetOrAdd(game.Id, _ => game.Engine.n switch
-                {
-                    "Unity" => Unity.Formats.PakBinary_Unity.Current,
-                    "GoldSrc" => PakBinary_Wad3.Current,
-                    "Source" or "Source2" => PakBinary_Vpk.Current,
-                    _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine.n),
-                })
-                : PakBinary_Bsp30.Current;
+            => PakBinarys.GetOrAdd(game.Id, _ => game.Engine.n switch
+            {
+                "Unity" => Unity.Formats.PakBinary_Unity.Current,
+                "GoldSrc" => PakBinary_Wad3.Current,
+                "Source" or "Source2" => PakBinary_Vpk.Current,
+                _ => throw new ArgumentOutOfRangeException(nameof(game.Engine), game.Engine.n),
+            });
 
         public static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => game.Engine.n switch
@@ -49,6 +48,7 @@ namespace GameX.Valve
                 "GoldSrc" => Path.GetExtension(source.Path).ToLowerInvariant() switch
                 {
                     ".pic" or ".tex" or ".tex2" or ".fnt" => (0, Binary_Wad3.Factory),
+                    ".bsp" => (0, Binary_Bsp.Factory),
                     ".spr" => (0, Binary_Spr.Factory),
                     ".mdl" => (0, Binary_Mdl10.Factory),
                     _ => UnknownPakFile.ObjectFactory(source, game),

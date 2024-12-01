@@ -1,11 +1,11 @@
 from __future__ import annotations
 import os, io, numpy as np
 from OpenGL.GL import *
-from OpenGL.GL.EXT import texture_compression_s3tc
+from OpenGL.GL.EXT import texture_compression_s3tc as s3tc
 from openstk.gfx.gfx import IFixedMaterial, IParamMaterial
 from openstk.gfx.gl import IOpenGLGfx, QuadIndexBuffer, GLMeshBufferCache, ShaderDebugLoader
 from openstk.gfx.gl_render import GLRenderMaterial
-from openstk.gfx.gfx_texture import TextureGLFormat, TextureFlags
+from openstk.gfx.gfx_texture import TextureFlags, TextureFormat, TexturePixel
 from gamex.platform_system import SystemSfx
 from gamex.platform import ObjectBuilderBase, ObjectManager, MaterialBuilderBase, MaterialManager, ShaderBuilderBase, ShaderManager, TextureManager, TextureBuilderBase, Platform
 
@@ -65,9 +65,9 @@ class OpenGLTextureBuilder(TextureBuilderBase):
         if level.start > 0: glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level.start)
         glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, level.stop - 1)
         bytes, fmt, spans = source.begin('GL')
-        pixels = []
 
         # decode
+        pixels = []
         def compressedTexImage2D(source: ITexture, level: range, internalFormat: int) -> bool:
             nonlocal pixels
             width = source.width; height = source.height
@@ -90,29 +90,57 @@ class OpenGLTextureBuilder(TextureBuilderBase):
                     glTexImage2D(GL_TEXTURE_2D, l, internalFormat, width >> l, height >> l, 0, format, type, pixels)
             else: glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, bytes)
             return True
-        match fmt:
-            case glFormat if isinstance(fmt, TextureGLFormat):
-                internalFormat = glFormat
-                if not internalFormat or not compressedTexImage2D(source, level, internalFormat.value): return self.defaultTexture
-            case glPixelFormat if isinstance(fmt, tuple):
-                internalFormat, format, type = glPixelFormat
-                if internalFormat == 0 or not texImage2D(source, level, internalFormat.value, format.value, type.value): return self.defaultTexture
-            case _: raise Exception(f'Unknown format: {fmt}')
 
-        source.end()
+        try:
+            if not bytes: return self.defaultTexture
+            elif isinstance(fmt, tuple):
+                formatx, pixel = fmt
+                s = pixel & TexturePixel.Signed
+                f = pixel & TexturePixel.Float
+                if formatx & TextureFormat.Compressed:
+                    match formatx:
+                        case TextureFormat.DXT1: internalFormat = s3tc.GL_COMPRESSED_SRGB_S3TC_DXT1_EXT if s else s3tc.GL_COMPRESSED_RGB_S3TC_DXT1_EXT
+                        case TextureFormat.DXT1A: internalFormat = s3tc.GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT if s else s3tc.GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
+                        case TextureFormat.DXT3: internalFormat = s3tc.GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT if s else s3tc.GL_COMPRESSED_RGBA_S3TC_DXT3_EXT
+                        case TextureFormat.DXT5: internalFormat = s3tc.GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT if s else s3tc.GL_COMPRESSED_RGBA_S3TC_DXT5_EXT
+                        case TextureFormat.BC4: internalFormat = GL_COMPRESSED_SIGNED_RED_RGTC1 if s else GL_COMPRESSED_RED_RGTC1
+                        case TextureFormat.BC5: internalFormat = GL_COMPRESSED_SIGNED_RG_RGTC2 if s else GL_COMPRESSED_RG_RGTC2
+                        case TextureFormat.BC6H: internalFormat = GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT if s else GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT
+                        case TextureFormat.BC7: internalFormat = GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM if s else GL_COMPRESSED_RGBA_BPTC_UNORM
+                        case TextureFormat.ETC2: internalFormat = GL_COMPRESSED_SRGB8_ETC2 if s else GL_COMPRESSED_RGB8_ETC2
+                        case TextureFormat.ETC2_EAC: internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC if s else GL_COMPRESSED_RGBA8_ETC2_EAC
+                        case _: raise Exception(f'Unknown format: {formatx}')
+                    if not internalFormat or not compressedTexImage2D(source, level, internalFormat): return self.defaultTexture 
+                else:
+                    match formatx:
+                        case TextureFormat.I8: internalFormat, format, type = GL_INTENSITY8, GL_RED, GL_UNSIGNED_BYTE
+                        case TextureFormat.L8: internalFormat, format, type = GL_LUMINANCE, GL_LUMINANCE, GL_UNSIGNED_BYTE
+                        case TextureFormat.R8: internalFormat, format, type = GL_R8, GL_RED, GL_UNSIGNED_BYTE
+                        case TextureFormat.R16: internalFormat, format, type = GL_R16F, GL_RED, GL_FLOAT if f else GL_R16, GL_RED, GL_UNSIGNED_SHORT
+                        case TextureFormat.RG16: internalFormat, format, type = GL_RG16F, GL_RED, GL_FLOAT if f else GL_RG16, GL_RED, GL_UNSIGNED_SHORT
+                        case TextureFormat.RGB24: internalFormat, format, type = GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE
+                        case TextureFormat.RGB565: internalFormat, format, type = GL_RGB5, GL_RGB, GL_UNSIGNED_BYTE #GL_UNSIGNED_SHORT_5_6_5
+                        case TextureFormat.RGBA32: internalFormat, format, type = GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE
+                        case TextureFormat.ARGB32: internalFormat, format, type = GL_RGBA, GL_RGB, GL_UNSIGNED_INT_8_8_8_8_REVERSED
+                        case TextureFormat.BGRA32: internalFormat, format, type = GL_RGBA, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8
+                        case TextureFormat.BGRA1555: internalFormat, format, type = GL_RGBA, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REVERSED
+                        case _: raise Exception(f'Unknown format: {formatx}')
+                    if not internalFormat or not texImage2D(source, level, internalFormat, format, type): return self.defaultTexture
+            else: raise Exception(f'Unknown format: {fmt}')
 
-        # texture
-        if self.maxTextureMaxAnisotropy >= 4:
-            glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, self.maxTextureMaxAnisotropy)
-            glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
-            glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        else:
-            glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-            glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP if (source.texFlags & TextureFlags.SUGGEST_CLAMPS.value) != 0 else GL_REPEAT)
-        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP if (source.texFlags & TextureFlags.SUGGEST_CLAMPT.value) != 0 else GL_REPEAT)
-        glBindTexture(GL_TEXTURE_2D, 0) # unbind texture
-        return id
+            # texture
+            if self.maxTextureMaxAnisotropy >= 4:
+                glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, self.maxTextureMaxAnisotropy)
+                glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+                glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            else:
+                glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+                glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP if (source.texFlags & TextureFlags.SUGGEST_CLAMPS.value) != 0 else GL_REPEAT)
+            glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP if (source.texFlags & TextureFlags.SUGGEST_CLAMPT.value) != 0 else GL_REPEAT)
+            glBindTexture(GL_TEXTURE_2D, 0) # unbind texture
+            return id
+        finally: source.end()
 
     def createSolidTexture(self, width: int, height: int, pixels: np.array) -> int:
         id = glGenTextures(1)

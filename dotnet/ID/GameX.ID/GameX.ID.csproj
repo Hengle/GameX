@@ -15,6 +15,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Formats\Binary.old.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Formats\Binary.old.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Base\GameX\GameX.csproj" />
   </ItemGroup>
 

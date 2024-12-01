@@ -90,6 +90,7 @@ namespace GameX.Platforms
                     var textureFormat = format switch
                     {
                         DXT1 => TextureFormat.DXT1,
+                        DXT1A => default,
                         DXT3 => default,
                         DXT5 => TextureFormat.DXT5,
                         BC4 => TextureFormat.BC4,

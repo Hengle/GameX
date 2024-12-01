@@ -9,7 +9,8 @@
   ],
   "engines": {
     "Danae": {},
-    "Void": {}
+    "Void": {},
+    "Source": {}
   },
   "games": {
     "*": {
@@ -26,7 +27,7 @@
     },
     "DOM": {
       "name": "Dark Messiah of Might and Magic",
-      "engine": "Valve",
+      "engine": "Source:07x",
       "url": "https://store.steampowered.com/app/2100",
       "date": "2006-10-25",
       "pakExt": "dir.vpk",
@@ -78,14 +79,14 @@
     },
     "W:YB": {
       "name": "Wolfenstein: Youngblood",
-      "engine": "idTech6",
+      "engine": "idTech:6",
       "url": "https://store.steampowered.com/app/1056960",
       "date": "2019-07-25",
       "pakExt": ".xyz"
     },
     "W:CP": {
       "name": "Wolfenstein: Cyberpilot",
-      "engine": "idTech6",
+      "engine": "idTech:6",
       "url": "https://store.steampowered.com/app/1056970",
       "date": "2019-07-25",
       "pakExt": ".xyz"

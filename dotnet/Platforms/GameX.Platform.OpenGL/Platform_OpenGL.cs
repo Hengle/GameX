@@ -82,6 +82,8 @@ namespace GameX.Platforms
             if (level.start > 0) GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, level.start);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, level.stop - 1);
             var (bytes, fmt, spans) = source.Begin("GL");
+
+            // decode
             bool CompressedTexImage2D(ITexture source, (int start, int stop) level, InternalFormat internalFormat)
             {
                 int width = source.Width, height = source.Height;
@@ -110,19 +112,22 @@ namespace GameX.Platforms
                 else fixed (byte* data = bytes) GL.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, format, type, (IntPtr)data);
                 return true;
             }
+
             try
             {
                 if (bytes == null) return DefaultTexture;
                 else if (fmt is ValueTuple<TextureFormat, TexturePixel> z)
                 {
-                    var (format, pixel) = z;
-                    if ((format & Compressed) != 0)
+                    var (formatx, pixel) = z;
+                    var s = (pixel & TexturePixel.Signed) != 0;
+                    var f = (pixel & TexturePixel.Float) != 0;
+                    if ((formatx & Compressed) != 0)
                     {
-                        var s = (pixel & TexturePixel.Signed) != 0;
-                        var internalFormat = format switch
+                        var internalFormat = formatx switch
                         {
-                            DXT1 => s ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRgbaS3tcDxt1Ext,
-                            DXT3 => s ? InternalFormat.CompressedSrgbAlphaS3tcDxt1Ext : InternalFormat.CompressedRgbaS3tcDxt3Ext,
+                            DXT1 => s ? InternalFormat.CompressedSrgbS3tcDxt1Ext : InternalFormat.CompressedRgbS3tcDxt1Ext,
+                            DXT1A => s ? InternalFormat.CompressedSrgbAlphaS3tcDxt1Ext : InternalFormat.CompressedRgbaS3tcDxt1Ext,
+                            DXT3 => s ? InternalFormat.CompressedSrgbAlphaS3tcDxt3Ext : InternalFormat.CompressedRgbaS3tcDxt3Ext,
                             DXT5 => s ? InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext : InternalFormat.CompressedRgbaS3tcDxt5Ext,
                             BC4 => s ? InternalFormat.CompressedSignedRedRgtc1 : InternalFormat.CompressedRedRgtc1,
                             BC5 => s ? InternalFormat.CompressedSignedRgRgtc2 : InternalFormat.CompressedRgRgtc2,
@@ -130,14 +135,13 @@ namespace GameX.Platforms
                             BC7 => s ? InternalFormat.CompressedSrgbAlphaBptcUnorm : InternalFormat.CompressedRgbaBptcUnorm,
                             ETC2 => s ? InternalFormat.CompressedSrgb8Etc2 : InternalFormat.CompressedRgb8Etc2,
                             ETC2_EAC => s ? InternalFormat.CompressedSrgb8Alpha8Etc2Eac : InternalFormat.CompressedRgba8Etc2Eac,
-                            _ => throw new ArgumentOutOfRangeException("TextureFormat", $"{format}")
+                            _ => throw new ArgumentOutOfRangeException("TextureFormat", $"{formatx}")
                         };
                         if (internalFormat == 0 || !CompressedTexImage2D(source, level, internalFormat)) return DefaultTexture;
                     }
                     else
                     {
-                        var f = (pixel & TexturePixel.Float) != 0;
-                        var (internalFormat, format2, type) = format switch
+                        var (internalFormat, format, type) = formatx switch
                         {
                             I8 => (PixelInternalFormat.Intensity8, PixelFormat.Red, PixelType.UnsignedByte),
                             L8 => (PixelInternalFormat.Luminance, PixelFormat.Luminance, PixelType.UnsignedByte),
@@ -145,18 +149,19 @@ namespace GameX.Platforms
                             R16 => f ? (PixelInternalFormat.R16f, PixelFormat.Red, PixelType.Float) : (PixelInternalFormat.R16, PixelFormat.Red, PixelType.UnsignedShort),
                             RG16 => f ? (PixelInternalFormat.Rg16f, PixelFormat.Red, PixelType.Float) : (PixelInternalFormat.Rg16, PixelFormat.Red, PixelType.UnsignedShort),
                             RGB24 => (PixelInternalFormat.Rgb8, PixelFormat.Rgb, PixelType.UnsignedByte),
-                            RGB565 => (PixelInternalFormat.Rgb5, PixelFormat.Rgb, PixelType.UnsignedByte),
+                            RGB565 => (PixelInternalFormat.Rgb5, PixelFormat.Rgb, PixelType.UnsignedByte), //UnsignedShort565
                             RGBA32 => (PixelInternalFormat.Rgba8, PixelFormat.Rgba, PixelType.UnsignedByte),
                             ARGB32 => (PixelInternalFormat.Rgba, PixelFormat.Rgb, PixelType.UnsignedInt8888Reversed), //: odd Rgb
                             BGRA32 => (PixelInternalFormat.Rgba, PixelFormat.Bgra, PixelType.UnsignedInt8888),
                             BGRA1555 => (PixelInternalFormat.Rgba, PixelFormat.Bgra, PixelType.UnsignedShort1555Reversed),
-                            _ => throw new ArgumentOutOfRangeException("TextureFormat", $"{format}")
+                            _ => throw new ArgumentOutOfRangeException("TextureFormat", $"{formatx}")
                         };
-                        if (internalFormat == 0 || !TexImage2D(source, level, internalFormat, format2, type)) return DefaultTexture;
+                        if (internalFormat == 0 || !TexImage2D(source, level, internalFormat, format, type)) return DefaultTexture;
                     }
                 }
                 else throw new ArgumentOutOfRangeException(nameof(fmt), $"{fmt}");
-                
+
+                // texture
                 if (MaxTextureMaxAnisotropy >= 4)
                 {
                     GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, MaxTextureMaxAnisotropy);

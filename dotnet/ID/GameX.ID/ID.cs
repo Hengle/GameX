@@ -58,7 +58,6 @@ namespace GameX.ID
              {
                  "" => null,
                  ".pk3" or ".pk4" or ".zip" => PakBinary_Zip.GetPakBinary(game),
-                 //".bsp" => PakBinary_Bsp.Current,
                  ".pak" => PakBinary_Pak.Current,
                  ".wad" => PakBinary_Wad.Current,
                  _ => throw new ArgumentOutOfRangeException(),

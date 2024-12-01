@@ -81,8 +81,6 @@ class Binary_Spr(IHaveMetaInfo, ITextureFrames):
     #endregion
 
     def __init__(self, r: Reader):
-        self.
-
         # read file
         header = r.readS(self.S_Header)
         if header.magic != self.S_MAGIC: raise Exception('BAD MAGIC')
