@@ -30,7 +30,7 @@ namespace GameX.Arkane
                 "CryEngine" => Crytek.CrytekPakFile.ObjectFactory,
                 "Unreal" => Epic.EpicPakFile.ObjectFactory,
                 "Source" => Valve.ValvePakFile.ObjectFactory,
-                "idTech:7" => ID.IDPakFile.ObjectFactory,
+                "idTech" => ID.IDPakFile.ObjectFactory,
                 _ => ObjectFactory,
             };
             UseFileId = true;

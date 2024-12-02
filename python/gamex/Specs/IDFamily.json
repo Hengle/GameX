@@ -9,9 +9,6 @@
   "engines": {
     "idTech": {
       "name": "id Tech"
-    },
-    "T": {
-      "name": "id Tech"
     }
   },
   "games": {
@@ -324,7 +321,7 @@
     },
     "D": {
       "name": "Doom (2016)",
-      "engine": "T:6",
+      "engine": "idTech:6",
       "url": [
         "https://store.steampowered.com/app/0",
         "https://en.wikipedia.org/wiki/Doom_(2016_video_game)"
@@ -333,6 +330,7 @@
     },
     "D:VFR": {
       "name": "Doom VFR",
+      "engine": "idTech:6",
       "url": [
         "https://store.steampowered.com/app/650000",
         "https://en.wikipedia.org/wiki/Doom_VFR"
@@ -341,6 +339,7 @@
     },
     "R2": {
       "name": "Rage 2",
+      "engine": "Apex",
       "url": [
         "https://store.steampowered.com/app/548570",
         "https://en.wikipedia.org/wiki/Rage_2"
@@ -349,7 +348,7 @@
     },
     "D:E": {
       "name": "Doom Eternal",
-      "engine": "T:7",
+      "engine": "idTech:7",
       "url": [
         "https://store.steampowered.com/app/0",
         "https://en.wikipedia.org/wiki/Doom_Eternal"
@@ -358,7 +357,7 @@
     },
     "Q:C": {
       "name": "Quake Champions",
-      "engine": "T:7",
+      "engine": "idTech:7",
       "url": [
         "https://store.steampowered.com/app/611500",
         "https://en.wikipedia.org/wiki/Quake_Champions"

@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using static System.IO.Polyfill;
 
+// https://wiki.eternalmods.com/books/8-reverse-engineering-file-formats
 namespace GameX.ID.Formats
 {
     #region PakBinary_Bsp30

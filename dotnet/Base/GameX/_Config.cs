@@ -1,4 +1,4 @@
-﻿#define Arkane
+﻿//#define Arkane
 //#define Bethesda
 //#define Bioware
 //#define Black
@@ -13,7 +13,7 @@
 //#define Epic
 //#define Frictional
 //#define Frontier
-//#define ID
+#define ID
 //#define IW
 //#define Lucas
 //#define Monolith
@@ -49,12 +49,12 @@ namespace GameX
         public static GlobalOption Option = new()
         {
             ForceOpen = true,
-            //ForcePath = "sample:0",
+            ForcePath = "sample:0",
             Family = "Arkane",
-            //Game = "AF", // Arx Fatalis
+            Game = "AF", // Arx Fatalis
             //Game = "DOM", // Dark Messiah of Might and Magic [source]
             //Game = "D", // Dishonored [unreal]
-            Game = "D2", // Dishonored 2
+            //Game = "D2", // Dishonored 2
             //Game = "P", // Prey [cryengine]
             //Game = "D:DOTO", // Dishonored: Death of the Outsider
             //Game = "W:YB", // Wolfenstein: Youngblood [idTech]
@@ -322,17 +322,17 @@ namespace GameX
             ForceOpen = true,
             ForcePath = "sample:1",
             Family = "ID",
-            Game = "Q", // Quake
-            //Game = "Q2", // Quake II
-            //Game = "Q3", // Quake III Arena
-            //Game = "D3", // Doom 3
-            //Game = "Q:L", // Quake Live
-            //Game = "R", // Rage (buy)
-            //Game = "D", // Doom (buy)
-            //Game = "D:VFR", // Doom VFR
-            //Game = "R2", // Rage 2 (buy)
-            //Game = "D:E", // Doom Eternal (buy)
-            //Game = "Q:C", // Quake Champions
+            Game = "Q", // Quake [2]
+            //Game = "Q2", // Quake II [25]
+            //Game = "Q3", // Quake III Arena [3]
+            //Game = "D3", // Doom 3 [4]
+            //Game = "Q:L", // Quake Live [3]
+            //Game = "R", // Rage [5]
+            //Game = "D", // Doom (2016) [6]
+            //Game = "D:VFR", // Doom VFR [6]
+            //Game = "R2", // Rage 2 [Apex]
+            //Game = "D:E", // Doom Eternal [7]
+            //Game = "Q:C", // Quake Champions [7]
         };
 #elif IW
         static readonly string[] FamilyKeys = ["IW", "Unknown"];
