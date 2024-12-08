@@ -3,6 +3,7 @@
 //#define Bioware
 //#define Black
 //#define Blizzard
+//#define Bohemia
 //#define Bullfrog
 //#define Capcom
 //#define Cig
@@ -141,6 +142,16 @@ namespace GameX
             //Game = "DI", // Diablo Immortal
             //Game = "OW2", // Overwatch 2
             //Game = "D4", // Diablo IV
+        };
+#elif Bohemia
+        static readonly string[] FamilyKeys = ["Bohemia", "Unknown"];
+
+        public static GlobalOption Option = new()
+        {
+            ForceOpen = true,
+            ForcePath = "sample:*",
+            Family = "Bohemia",
+            //Game = "XX", // XX
         };
 #elif Bullfrog
         static readonly string[] FamilyKeys = ["Bullfrog", "Unknown"];
@@ -599,7 +610,7 @@ namespace GameX
             Game = "AC", // Asheron's Call [open, read, texture:GL]
         };
 #else
-        static readonly string[] FamilyKeys = ["Arkane", "Bethesda", "Bioware", "Black", "Blizzard", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "ID", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WB"];
+        static readonly string[] FamilyKeys = ["Arkane", "Bethesda", "Bioware", "Black", "Blizzard",  "Bohemia", "Bullfrog", "Capcom", "Cig", "Cryptic", "Crytek", "Cyanide", "EA", "Epic", "Frictional", "Frontier", "ID", "IW", "Lucas", "Monolith", "Origin", "Red", "Ubisoft", "Unity", "Unknown", "Valve", "Volition", "WB"];
 
         public static GlobalOption Option = new()
         {

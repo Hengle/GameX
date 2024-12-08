@@ -25,6 +25,8 @@
     <ProjectReference Include="..\..\Black\GameX.Black\GameX.Black.csproj" />
     <ProjectReference Include="..\..\Blizzard\GameX.Blizzard.Platform\GameX.Blizzard.Platform.csproj" />
     <ProjectReference Include="..\..\Blizzard\GameX.Blizzard\GameX.Blizzard.csproj" />
+    <ProjectReference Include="..\..\Bohemia\GameX.Bohemia.Platform\GameX.Bohemia.Platform.csproj" />
+    <ProjectReference Include="..\..\Bohemia\GameX.Bohemia\GameX.Bohemia.csproj" />
     <ProjectReference Include="..\..\Bullfrog\GameX.Bullfrog.Platform\GameX.Bullfrog.Platform.csproj" />
     <ProjectReference Include="..\..\Bullfrog\GameX.Bullfrog\GameX.Bullfrog.csproj" />
     <ProjectReference Include="..\..\Capcom\GameX.Capcom.Platform\GameX.Capcom.Platform.csproj" />

@@ -5,9 +5,12 @@ using GameX.MODEL.Transforms;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using GameX.Unknown;
 
 namespace GameX.MODEL
 {
+    #region MODELPakFile
+
     /// <summary>
     /// MODELPakFile
     /// </summary>
@@ -18,18 +21,24 @@ namespace GameX.MODEL
         /// Initializes a new instance of the <see cref="MODELPakFile" /> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public MODELPakFile(PakState state) : base(state, PakBinary_Hpl.Instance)
+        public MODELPakFile(PakState state) : base(state, GetPakBinary(state.Game, Path.GetExtension(state.Path).ToLowerInvariant()))
         {
             ObjectFactoryFunc = ObjectFactory;
         }
 
         #region Factories
 
+        static PakBinary GetPakBinary(FamilyGame game, string extension)
+            => extension switch
+            {
+                ".xxx" => PakBinary_XXX.Current,
+                _ => throw new ArgumentOutOfRangeException(nameof(extension)),
+            };
+
         static (FileOption, Func<BinaryReader, FileSource, PakFile, Task<object>>) ObjectFactory(FileSource source, FamilyGame game)
             => Path.GetExtension(source.Path).ToLowerInvariant() switch
             {
-                var x when x == ".cfg" || x == ".csv" || x == ".txt" => (0, Binary_Txt.Factory),
-                _ => (0, null),
+                _ => UnknownPakFile.ObjectFactory(source, game),
             };
 
         #endregion
@@ -41,4 +50,6 @@ namespace GameX.MODEL
 
         #endregion
     }
+
+    #endregion
 }

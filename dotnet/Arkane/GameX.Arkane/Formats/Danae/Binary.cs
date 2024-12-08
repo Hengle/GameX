@@ -322,12 +322,11 @@ namespace GameX.Arkane.Formats.Danae
         }
 
         // IHaveMetaInfo
-        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag)
-            => [
-                new("BinaryFTL", items: [
-                    new($"Obj: {Obj}"),
-                ])
-            ];
+        List<MetaInfo> IHaveMetaInfo.GetInfoNodes(MetaManager resource, FileSource file, object tag) => [
+            new("BinaryFTL", items: [
+                new($"Obj: {Obj}"),
+            ])
+        ];
     }
 
     #endregion

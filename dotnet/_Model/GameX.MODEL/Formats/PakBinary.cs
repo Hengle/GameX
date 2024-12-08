@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace GameX.MODEL.Formats
 {
-    public unsafe class PakBinary_Hpl : PakBinary<PakBinary_Hpl>
+    #region PakBinary_XXX
+
+    public unsafe class PakBinary_XXX : PakBinary<PakBinary_XXX>
     {
         public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
         {
@@ -20,4 +22,6 @@ namespace GameX.MODEL.Formats
             throw new NotImplementedException();
         }
     }
+
+    #endregion
 }

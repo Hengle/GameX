@@ -399,6 +399,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StereoKit.Controls", "..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameX.Platform.Stride", "Platforms\GameX.Platform.Stride\GameX.Platform.Stride.csproj", "{81FF1CE5-5F70-D1F8-256C-FF2C92863C57}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bohemia", "Bohemia", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		..\python\gamex\Specs\BohemiaFamily.json = ..\python\gamex\Specs\BohemiaFamily.json
+		..\python\gamex\Specs\BohemiaFamily.Sample.json = ..\python\gamex\Specs\BohemiaFamily.Sample.json
+		..\docs\Families\Bohemia\Readme.md = ..\docs\Families\Bohemia\Readme.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameX.Bohemia", "Bohemia\GameX.Bohemia\GameX.Bohemia.csproj", "{49EF9340-A39B-01FC-DE4E-3BF7960D9432}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameX.Bohemia.Platform", "Bohemia\GameX.Bohemia.Platform\GameX.Bohemia.Platform.csproj", "{468D9429-60A6-6B3F-81FB-B35A03117256}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1441,6 +1452,30 @@ Global
 		{81FF1CE5-5F70-D1F8-256C-FF2C92863C57}.Release|x64.Build.0 = Release|Any CPU
 		{81FF1CE5-5F70-D1F8-256C-FF2C92863C57}.Release|x86.ActiveCfg = Release|Any CPU
 		{81FF1CE5-5F70-D1F8-256C-FF2C92863C57}.Release|x86.Build.0 = Release|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Debug|x64.Build.0 = Debug|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Debug|x86.Build.0 = Debug|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Release|x64.ActiveCfg = Release|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Release|x64.Build.0 = Release|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Release|x86.ActiveCfg = Release|Any CPU
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432}.Release|x86.Build.0 = Release|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Debug|x64.Build.0 = Debug|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Debug|x86.Build.0 = Debug|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Release|Any CPU.Build.0 = Release|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Release|x64.ActiveCfg = Release|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Release|x64.Build.0 = Release|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Release|x86.ActiveCfg = Release|Any CPU
+		{468D9429-60A6-6B3F-81FB-B35A03117256}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1538,6 +1573,8 @@ Global
 		{A03AB697-52A1-4DB9-B6CE-E810071C61ED} = {0911DDF1-E514-4BCF-915A-49999D5D168C}
 		{AF8F2186-E7D1-4F02-BBC2-5E7A46798E26} = {0911DDF1-E514-4BCF-915A-49999D5D168C}
 		{81FF1CE5-5F70-D1F8-256C-FF2C92863C57} = {6EC2027E-D509-415E-8939-62A2A3C2CE1F}
+		{49EF9340-A39B-01FC-DE4E-3BF7960D9432} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{468D9429-60A6-6B3F-81FB-B35A03117256} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9F1BB93-CFBC-4E41-A865-325B22465054}

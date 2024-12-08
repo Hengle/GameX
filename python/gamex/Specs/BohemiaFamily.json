@@ -1,0 +1,308 @@
+﻿{
+  "id": "Bohemia",
+  "name": "Bohemia Interactive",
+  "studio": "Bohemia Interactive",
+  "url": "https://en.wikipedia.org/wiki/Bohemia_Interactive",
+  "samples": [
+    "BohemiaFamily.Sample.json"
+  ],
+  "engines": {
+    "Real Virtuality": {},
+    "Enforce": {}
+  },
+  "games": {
+    "*": {
+      "pakFileType": "GameX.Bohemia.BohemiaPakFile, GameX.Bohemia",
+      "pakExt": ".pak"
+    },
+    "FTaFFIaN": {
+      "name": "Fairy Tale about Father Frost, Ivan and Nastya",
+      "url": "https://en.wikipedia.org/wiki/Fairy_Tale_about_Father_Frost,_Ivan_and_Nastya",
+      "date": "December 20, 2000"
+    },
+    "MoLI": {
+      "n/a": true,
+      "name": "Missing on Lost Island",
+      "url": "https://en.wikipedia.org/wiki/Missing_on_Lost_Island",
+      "date": "2000-01-01"
+    },
+    "OF": {
+      "name": "Operation Flashpoint: Cold War Crisis",
+      "url": "https://en.wikipedia.org/wiki/Operation_Flashpoint:_Cold_War_Crisis",
+      "date": "June 21, 2001",
+      "dlcs": {
+        "resistance": {
+          "name": "Operation Flashpoint: Resistance",
+          "url": "https://en.wikipedia.org/wiki/Operation_Flashpoint:_Resistance",
+          "date": "June 28, 2002",
+          "path": "xxx"
+        },
+        "gold": {
+          "name": "Operation Flashpoint: Red Hammer",
+          "url": "https://en.wikipedia.org/wiki/Operation_Flashpoint:_Red_Hammer",
+          "date": "February 1, 2002",
+          "path": "xxx"
+        }
+      }
+    },
+    "A": {
+      "name": "Arma: Armed Assault",
+      "engine": "Real Virtuality:1",
+      "url": "https://en.wikipedia.org/wiki/Arma:_Armed_Assault",
+      "date": "November 10, 2006",
+      "dlcs": {
+        "qg": {
+          "name": "Arma: Queen's Gambit",
+          "url": "https://en.wikipedia.org/wiki/Arma:_Queen%27s_Gambit",
+          "date": "28 September 2007",
+          "path": "xxx"
+        }
+      }
+    },
+    "MM": {
+      "n/a": true,
+      "name": "Memento Mori",
+      "url": "https://en.wikipedia.org/wiki/Memento_Mori_(video_game)",
+      "date": "2008-01-01"
+    },
+    "A2": {
+      "name": "Arma 2",
+      "engine": "Real Virtuality:3",
+      "url": "https://en.wikipedia.org/wiki/Arma_2",
+      "date": "May 29, 2009"
+    },
+    "PM": {
+      "n/a": true,
+      "name": "Pat & Mat",
+      "url": "https://en.wikipedia.org/wiki/Pat_%26_Mat",
+      "date": "2009-01-01"
+    },
+    "A2:OA": {
+      "name": "Arma 2: Operation Arrowhead",
+      "url": "https://en.wikipedia.org/wiki/Arma_2:_Operation_Arrowhead",
+      "date": "June 29, 2010"
+    },
+    "Alternativa": {
+      "n/a": true,
+      "name": "Alternativa",
+      "url": "https://en.wikipedia.org/wiki/Alternativa_(video_game)",
+      "date": "2010-01-01"
+    },
+    "TOH": {
+      "name": "Take On Helicopters",
+      "engine": "Real Virtuality:3",
+      "url": "https://en.wikipedia.org/wiki/Take_On_Helicopters",
+      "date": "October 27, 2011",
+      "dlcs": {
+        "xxx": {
+          "name": "Take On Helicopters: Hinds",
+          "url": "https://en.wikipedia.org/wiki/Take_On_Helicopters",
+          "date": "March 5, 2012",
+          "path": "xxx"
+        }
+      }
+    },
+    "MM2": {
+      "name": "Memento Mori 2: Guardians of Immortality",
+      "url": "https://store.steampowered.com/app/237970/Memento_Mori_2/",
+      "date": "June 15, 2012"
+    },
+    "CC:GM": {
+      "name": "Carrier Command: Gaea Mission",
+      "engine": "Enforce",
+      "url": "https://en.wikipedia.org/wiki/Carrier_Command:_Gaea_Mission",
+      "date": "September 28, 2012"
+    },
+    "AT": {
+      "name": "Arma Tactics",
+      "engine": "Unity",
+      "url": "https://en.wikipedia.org/wiki/Arma_Tactics",
+      "date": "May 1, 2013"
+    },
+    "A3": {
+      "name": "Arma 3",
+      "engine": "Real Virtuality:4",
+      "url": "https://en.wikipedia.org/wiki/Arma_3",
+      "date": "1994-10-10",
+      "dlcs": {
+        "contact": {
+          "name": "Contact",
+          "date": "July 25, 2019",
+          "path": "XXX"
+        },
+        "gm": {
+          "name": "Global Mobilization - Cold War Germany",
+          "date": "April 29, 2019",
+          "path": "XXX"
+        },
+        "sog": {
+          "name": "S.O.G Prairie Fire",
+          "date": "May 6, 2021",
+          "path": "XXX"
+        },
+        "csla": {
+          "name": "CSLA Iron Curtain",
+          "date": "June 16, 2021",
+          "path": "XXX"
+        },
+        "ws": {
+          "name": "Western Sahara",
+          "date": "July 25, 2023",
+          "path": "XXX"
+        },
+        "rf": {
+          "name": "Reaction Forces",
+          "date": "March 26, 2024",
+          "path": "XXX"
+        }
+      }
+    },
+    "AMO": {
+      "n/a": true,
+      "name": "Arma Mobile Ops",
+      "date": "2016-01-01"
+    },
+    "TOM": {
+      "name": "Take On Mars",
+      "url": "https://en.wikipedia.org/wiki/Take_On_Helicopters",
+      "date": "February 9, 2017",
+      "dlcs": {
+        "dlc": {
+          "name": "Dlc",
+          "date": "November 15, 2017",
+          "path": "xxx"
+        }
+      }
+    },
+    "DZ:M": {
+      "n/a": true,
+      "name": "Mini DayZ",
+      "date": "2017-01-01",
+      "tag": "Mobile"
+    },
+    "AG": {
+      "n/a": true,
+      "name": "Argo",
+      "engine": "Real Virtuality:4",
+      "url": "https://en.wikipedia.org/wiki/Argo_(video_game)",
+      "date": "June 22, 2017"
+    },
+    "DZ": {
+      "name": "DayZ",
+      "url": "https://en.wikipedia.org/wiki/DayZ_(video_game)",
+      "date": "December 13, 2018"
+    },
+    "V": {
+      "name": "Vigor",
+      "url": "https://en.wikipedia.org/wiki/Vigor_(video_game)",
+      "date": "August 19, 2019"
+    },
+    "YL": {
+      "name": "Ylands",
+      "engine": "Unity",
+      "url": "https://en.wikipedia.org/wiki/Ylands",
+      "date": "December 5, 2019"
+    },
+    "DZ:M2": {
+      "n/a": true,
+      "name": "Mini DayZ 2",
+      "date": "2021-01-01",
+      "tag": "Mobile"
+    },
+    "AR": {
+      "name": "Arma Reforger",
+      "url": "https://en.wikipedia.org/wiki/Arma_(series)#Arma_Reforger",
+      "date": "November 1, 2023"
+    },
+    "SYR": {
+      "name": "Someday You'll Return",
+      "engine": "Unreal:4",
+      "url": "https://en.wikipedia.org/wiki/Someday_You%27ll_Return",
+      "date": "May 5, 2020"
+    },
+    "SL": {
+      "name": "Silica",
+      "url": "https://en.wikipedia.org/wiki/Silica_(video_game)",
+      "date": "May 3, 2023"
+    },
+    "A4": {
+      "n/a": true,
+      "name": "Arma 4",
+      "url": "https://en.wikipedia.org/wiki/Arma_(series)#Arma_4",
+      "date": "2027-01-01"
+    },
+    "BH": {
+      "n/a": true,
+      "name": "Brute Horse"
+    },
+    "SV": {
+      "n/a": true,
+      "name": "Skyverse"
+    }
+  },
+  "fileManager": {
+    "applications": {
+      "FTaFFIaN": {
+        "key": "Steam:289320",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 289320",
+        "dir": "XXX"
+      },
+      "OF": {
+        "key": "Steam:2320",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2320",
+        "dir": "XXX"
+      },
+      "Q3": {
+        "key": [
+          "Steam:2200",
+          "Gog:1441704920"
+        ],
+        "reg": [
+          "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2200",
+          "GOG.com/Games/1441704920"
+        ],
+        "dir": "Quake III"
+      },
+      "D3": {
+        "key": "Steam:9050",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 9050",
+        "dir": "Doom 3"
+      },
+      "Q:L": {
+        "key": "Steam:282440",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 282440",
+        "dir": "Quake Live"
+      },
+      "R": {
+        "key": "Steam:9200",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 9200",
+        "dir": "Rage"
+      },
+      "D": {
+        "key": "Steam:0",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 0",
+        "dir": "Doom"
+      },
+      "D:VFR": {
+        "key": "Steam:650000",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 650000",
+        "dir": "DOOM VFR"
+      },
+      "R2": {
+        "key": "Steam:548570",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 0",
+        "dir": "Rage 2"
+      },
+      "D:E": {
+        "key": "Steam:0",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 0",
+        "dir": "Doom Eternal"
+      },
+      "Q:C": {
+        "key": "Steam:611500",
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 611500",
+        "dir": "Quake Champions"
+      }
+    }
+  }
+}
