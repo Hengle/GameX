@@ -438,7 +438,7 @@ namespace GameX
         /// <param name="path">The path.</param>
         /// <param name="pooled">The pooled.</param>
         /// <returns></returns>
-        public void Reader(Action<BinaryReader> func, string path = default, bool pooled = false) => GetReader(path, pooled).Action(func);
+        public void Reader(Action<BinaryReader> func, string path = default, bool pooled = true) => GetReader(path, pooled).Action(func);
 
         /// <summary>
         /// Reader
@@ -447,7 +447,7 @@ namespace GameX
         /// <param name="path">The path.</param>
         /// <param name="pooled">The pooled.</param>
         /// <returns></returns>
-        public TResult ReaderT<TResult>(Func<BinaryReader, TResult> func, string path = default, bool pooled = false) => GetReader(path, pooled).Func(func);
+        public TResult ReaderT<TResult>(Func<BinaryReader, TResult> func, string path = default, bool pooled = true) => GetReader(path, pooled).Func(func);
 
         /// <summary>
         /// Reader
@@ -1065,7 +1065,7 @@ namespace GameX
                 Open();
             }
 
-            public async override void Opening() { if (File != null) { R = new BinaryReader(await Source.ReadData(File)); Pool = new StaticPool<BinaryReader>(R); } base.Opening(); }
+            public async override void Opening() { R = new BinaryReader(await Source.ReadData(File)); Pool = new StaticPool<BinaryReader>(R); base.Opening(); }
             public override void Closing() { R?.Dispose(); base.Closing(); }
             public override IGenericPool<BinaryReader> GetReader(string path = null, bool pooled = true) => Pool;
         }

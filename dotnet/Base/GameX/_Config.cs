@@ -5,7 +5,7 @@
 //#define Blizzard
 //#define Bohemia
 //#define Bullfrog
-//#define Capcom
+#define Capcom
 //#define Cig
 //#define Cryptic
 //#define Crytek
@@ -14,7 +14,7 @@
 //#define Epic
 //#define Frictional
 //#define Frontier
-#define ID
+//#define ID
 //#define IW
 //#define Lucas
 //#define Monolith
@@ -178,10 +178,48 @@ namespace GameX
 
         public static GlobalOption Option = new()
         {
-            ForceOpen = true,
+            //ForceOpen = true,
             ForcePath = "sample:*",
             Family = "Capcom",
-            Game = "CAS", // [Kpka] Capcom Arcade Stadium
+            // 0+D
+            //Game = "AAI:ME", // Ace Attorney Investigations: Miles Edgeworth
+            //Game = "AoB", // Age of Booty [console]
+            //Game = "AJ:AA", // Apollo Justice: Ace Attorney
+            //Game = "AYSTa5G", // Are You Smarter Than a 5th Grader? 2009 Edition [mobile]
+            //Game = "RE7:BH", // Resident Evil 7: Biohazard
+            //Game = "RE7:CV", // Resident Evil - Code: Veronica [console]
+            //Game = "BC", // Bionic Commando
+            //Game = "BC:R", // Bionic Commando Rearmed
+            //Game = "BC:R2", // Bionic Commando Rearmed 2
+            //Game = "BlackCommand", // Black Command [mobile]
+            //Game = "BoF4", // Breath of Fire IV
+            //Game = "CAS2", // Capcom Arcade 2nd Stadium
+            //Game = "CAS", // Capcom Arcade Stadium
+            //Game = "CAC", // Capcom Arcade Cabinet [console]
+            //Game = "BEUB", // Capcom Beat 'Em Up Bundle
+            //Game = "DV", // Dark Void
+            //Game = "DV:Z", // Dark Void Zero
+            //Game = "DR", // Dead Rising
+            //Game = "DR2", // Dead Rising 2
+            //Game = "DR2:OtR", // Dead Rising 2: Off the Record
+            //Game = "DR3", // Dead Rising 3
+            //Game = "DR4", // Dead Rising 4
+            //Game = "DR4:FBP", // Dead Rising 4: Frank's Big Package [console]
+            //Game = "DmC", // Devil May Cry [missing]
+            //Game = "DmC2", // Devil May Cry 2 [missing]
+            //Game = "DmC3:DA", // Devil May Cry 3: Dante's Awakening [missing]
+            //Game = "DmC3:S", // Devil May Cry 3: Special Edition
+            //Game = "DmC4:S", // Devil May Cry 4: Special Edition
+            //Game = "DmC5", // Devil May Cry 5
+            //Game = "DmC5:S", // Devil May Cry 5: Special Edition
+            //Game = "DmC:HD", // Devil May Cry: HD Collection
+            //Game = "DmC:X", // DmC: Devil May Cry
+            //Game = "DD", // Dragon's Dogma
+            //Game = "DD2", // Dragon's Dogma II
+            //Game = "DT:R", // DuckTales: Remastered
+            //Game = "DnD:CoM", // Dungeons & Dragons: Chronicles of Mystara
+
+            // 0+D
             //Game = "Fighting:C", // [] Capcom Fighting Collection
             //Game = "GNG:R", // Ghosts 'n Goblins Resurrection
             //Game = "MM:LC", // Mega Man Legacy Collection
@@ -200,24 +238,8 @@ namespace GameX
             //Game = "TGAA:C", // The Great Ace Attorney Chronicles
             //Game = "USF4", // Ultra Street Fighter IV
 
-            //Game = "BionicCommando", // Bionic Commando (2009 video game)
-            //Game = "BionicCommando:R", // Bionic Commando Rearmed
-            //Game = "Arcade:S", // Capcom Arcade 2nd Stadium
-            //Game = "BEU:B", // Capcom Beat 'Em Up Bundle
-            //Game = "DV", // Dark Void
-            //Game = "DV:Z", // Dark Void Zero
-            //Game = "DR", // Dead Rising
-            //Game = "DR2", // Dead Rising 2
-            //Game = "DR2:OtR", // Dead Rising 2: Off the Record
-            //Game = "DR3", // Dead Rising 3
-            //Game = "DR4", // Dead Rising 4
-            //Game = "DMC3:S", // XX
-            //Game = "DMC4:S", // XX
-            //Game = "DMC5", // XX
-            //Game = "DMC:HD", // XX
-            //Game = "DMC:DMC", // XX
-            //Game = "Dragon", // XX
-            //Game = "DT:R", // XX
+
+
         };
 #elif Cig
         static readonly string[] FamilyKeys = ["Cig", "Unknown"];

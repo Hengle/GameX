@@ -37,63 +37,6 @@
       "url": "https://en.wikipedia.org/wiki/MT_Framework"
     }
   },
-  "games+0-D": {
-    "BionicCommando": {},
-    "BionicCommando:R": {},
-    "CAS2": {},
-    "BEU:B": {},
-    "DV": {},
-    "DV:Z": {},
-    "DR": {},
-    "DR2": {},
-    "DR2:OtR": {},
-    "DR3": {},
-    "DR4": {},
-    "DMC3:S": {},
-    "DMC4:S": {},
-    "DMC5": {},
-    "DMC:HD": {},
-    "DMC:DMC": {},
-    "Dragon": {},
-    "DT:R": {}
-  },
-  "games+E-L": {
-    "Flock": {},
-    "LP:EC": {},
-    "LP3": {}
-  },
-  "games+M": {
-    "MVC:I": {},
-    "MM11": {},
-    "MMX:LC": {},
-    "MMX:LC2": {},
-    "MH:W": {}
-  },
-  "games+N-R": {
-    "Okami:HD": {},
-    "O:W": {},
-    "RememberMe": {},
-    "RE": {},
-    "REZ": {},
-    "RE2": {},
-    "RE3": {},
-    "RE4": {},
-    "RE5": {},
-    "RE6": {},
-    "RE7": {},
-    "RE:R": {},
-    "RE:R2": {},
-    "RE:V": {}
-  },
-  "games+S": {
-    "SF:30AC": {},
-    "SF5": {},
-    "Strider": {}
-  },
-  "games+T-Z": {
-    "UMVC3": {},
-    "UmbrellaCorps": {}
-  },
   "games": {
     "*": {
       "pakFileType": "GameX.Capcom.CapcomPakFile, GameX.Capcom"
@@ -120,7 +63,7 @@
       "searchBy": "AllDir",
       "pakExt": ".arc"
     },
-    "GNG:R": {
+    "GnG:R": {
       "name": "Ghosts 'n Goblins Resurrection",
       "url": "https://store.steampowered.com/app/1375400",
       "date": "May 31, 2021",
@@ -170,17 +113,19 @@
     },
     "MH:S2": {
       "name": "Monster Hunter Stories 2: Wings of Ruin",
+      "engine": "MT2",
       "url": "https://store.steampowered.com/app/1277400",
       "date": "Jul 8, 2021",
-      "engine": "MT2",
       "searchBy": "AllDir",
       "pakExt": ".arc",
       "pak": "game:/archive/**/*.arc"
     },
     "PWAA:T": {
       "name": "Phoenix Wright: Ace Attorney Trilogy",
+      "engine": "Unity",
       "url": "https://store.steampowered.com/app/787480",
-      "date": "Apr 9, 2019"
+      "date": "Apr 9, 2019",
+      "pakExt": ".assets"
     },
     "RDR2": {
       "name": "Red Dead Redemption 2",
@@ -275,7 +220,7 @@
         "key": "Steam:787480",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 787480",
         "dir": "Phoenix Wright Ace Attorney Trilogy",
-        "path": "main"
+        "path": "PWAAT_Data"
       },
       "RDR2": {
         "key": "Steam:1174180",

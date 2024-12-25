@@ -1,17 +1,122 @@
 ﻿using GameX.Formats;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using static GameX.Util;
 
 namespace GameX.Capcom.Formats
 {
+    #region PakBinary_Arc
+
+    public unsafe class PakBinary_Arc : PakBinary<PakBinary_Arc>
+    {
+        #region Headers
+
+        const uint K_MAGIC = 0x00435241;
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        struct X_Header
+        {
+            public ushort Version;
+            public ushort NumFiles;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        struct X_File
+        {
+            public fixed byte Path[0x40];
+            public uint Compressed;
+            public uint PackedSize;
+            public uint FileSize;
+            public uint Offset;
+        }
+
+        #endregion
+
+        public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
+        {
+            var magic = r.ReadUInt32();
+            magic &= 0x00FFFFFF;
+            if (magic != K_MAGIC) throw new FormatException("BAD MAGIC");
+
+            // get header
+            var header = r.ReadS<X_Header>();
+
+            // get files
+            source.Files = r.ReadSArray<X_File>(header.NumFiles)
+                .Select(x => new FileSource
+                {
+                    Path = $"{Encoding.UTF8.GetString(new Span<byte>(x.Path, 0x40)).TrimEnd('\0')}{GetExtension(r, x.Offset)}".Replace('\\', '/'),
+                    Compressed = (int)x.Compressed,
+                    PackedSize = x.PackedSize,
+                    FileSize = x.FileSize,
+                    Offset = x.Offset,
+                }).ToArray();
+            return Task.CompletedTask;
+        }
+
+        public override Task<Stream> ReadData(BinaryPakFile source, BinaryReader r, FileSource file, FileOption option = default)
+        {
+            r.Seek(file.Offset);
+            return Task.FromResult<Stream>(new MemoryStream(r.DecompressZlib((int)file.PackedSize, (int)file.FileSize)));
+        }
+
+        static string GetExtension(BinaryReader r, long position)
+        {
+            r.Seek(position);
+            return _guessExtension(r.DecompressZlib(150, 0));
+        }
+    }
+
+    #endregion
+
+    #region PakBinary_Big
+
+    public unsafe class PakBinary_Big : PakBinary<PakBinary_Big>
+    {
+        public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
+        {
+            var files = source.Files = new List<FileSource>();
+
+            return Task.CompletedTask;
+        }
+
+        public override Task<Stream> ReadData(BinaryPakFile source, BinaryReader r, FileSource file, FileOption option = default)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    #endregion
+
+    #region PakBinary_Bundle
+
+    public unsafe class PakBinary_Bundle : PakBinary<PakBinary_Bundle>
+    {
+        public override Task Read(BinaryPakFile source, BinaryReader r, object tag)
+        {
+            var files = source.Files = new List<FileSource>();
+
+            return Task.CompletedTask;
+        }
+
+        public override Task<Stream> ReadData(BinaryPakFile source, BinaryReader r, FileSource file, FileOption option = default)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    #endregion
+
+    #region PakBinary_Kpka
+
     public unsafe class PakBinary_Kpka : PakBinary<PakBinary_Kpka>
     {
-        // Header
         #region Headers
 
         const uint K_MAGIC = 0x414b504b;
@@ -153,4 +258,6 @@ namespace GameX.Capcom.Formats
             return new MemoryStream(buf);
         }
     }
+
+    #endregion
 }

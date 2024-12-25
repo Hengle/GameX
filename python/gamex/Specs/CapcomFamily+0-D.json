@@ -4,547 +4,721 @@
   "games": {
     "*": {
       "n/a": true,
+      "dev": "Capcom",
       "pakFileType": "GameX.Capcom.CapcomPakFile, GameX.Capcom"
     },
     "1941:CA": {
       "name": "1941: Counter Attack",
       "url": "https://en.wikipedia.org/wiki/1941:_Counter_Attack",
-      "date": "1990-02-01"
+      "date": "1990-02-01",
+      "form": "Arcade"
     },
     "1942": {
       "name": "1942",
       "url": "https://en.wikipedia.org/wiki/1942_(video_game)",
-      "date": "1984-11-30"
+      "dev": "Micronics",
+      "date": "1984-11-30",
+      "form": "Console"
     },
     "1942:FS": {
       "name": "1942: First Strike",
       "url": "https://en.wikipedia.org/wiki/1942_(video_game)",
-      "date": "2010-07-01"
+      "dev": "Beeline Interactive",
+      "date": "2010-07-01",
+      "form": "Mobile"
     },
     "1942:JS": {
       "name": "1942: Joint Strike",
       "url": "https://en.wikipedia.org/wiki/1942:_Joint_Strike",
-      "date": "2008-07-23"
+      "dev": "Backbone Entertainment",
+      "date": "2008-07-23",
+      "form": "Console"
     },
     "1943:TBoM": {
       "name": "1943: The Battle of Midway",
       "url": "https://en.wikipedia.org/wiki/1943:_The_Battle_of_Midway",
-      "date": "1987-06-01"
+      "date": "1987-06-01",
+      "form": "Console"
     },
     "1944:TLM": {
       "name": "1944: The Loop Master",
       "url": "https://en.wikipedia.org/wiki/1944:_The_Loop_Master",
-      "date": "2000-06-20"
+      "dev": "Eighting",
+      "date": "2000-06-20",
+      "form": "Arcade"
     },
     "19XX:TWAD": {
       "name": "19XX: The War Against Destiny",
       "url": "https://en.wikipedia.org/wiki/19XX:_The_War_Against_Destiny",
-      "date": "1995-12-07"
+      "date": "1995-12-07",
+      "form": "Arcade"
     },
     "AAI:ME": {
+      "n/a": false,
       "name": "Ace Attorney Investigations: Miles Edgeworth",
-      "url": "https://en.wikipedia.org/wiki/Ace_Attorney_Investigations:_Miles_Edgeworth",
-      "date": "2009-05-28"
+      "url": [
+        "https://store.steampowered.com/app/2401970/Ace_Attorney_Investigations_Collection/",
+        "https://www.xbox.com/en-US/games/store/ace-attorney-investigations-collection/9P25VS66VJVN/0010",
+        "https://en.wikipedia.org/wiki/Ace_Attorney_Investigations:_Miles_Edgeworth"
+      ],
+      "date": "2009-05-28",
+      "form": "Console;Windows"
     },
     "AQ:CW": {
       "name": "Adventure Quiz: Capcom World",
-      "date": "1989-01-01"
+      "date": "1989-01-01",
+      "form": "Arcade"
     },
     "AQ:CW2": {
       "name": "Adventure Quiz: Capcom World 2",
-      "date": "1992-06-11"
+      "date": "1992-06-11",
+      "form": "Arcade"
     },
     "AQ2:H": {
       "name": "Adventure Quiz 2: Hatena? no Daibouken",
-      "date": "1990-02-28"
+      "date": "1990-02-28",
+      "form": "Arcade"
     },
     "AITMK": {
       "name": "Adventures in the Magic Kingdom",
       "url": "https://en.wikipedia.org/wiki/Adventures_in_the_Magic_Kingdom",
-      "date": "1990-06-01"
+      "date": "1990-06-01",
+      "form": "Console"
     },
-    "AOB": {
+    "AoB": {
+      "n/a": false,
       "name": "Age of Booty",
-      "url": "https://en.wikipedia.org/wiki/Age_of_Booty",
-      "date": "2008-10-15"
+      "dev": "Certain Affinity",
+      "url": [
+        "https://www.xbox.com/en-US/games/store/age-of-booty/BZ46NPQNX334/0001",
+        "https://en.wikipedia.org/wiki/Age_of_Booty"
+      ],
+      "date": "2008-10-15",
+      "form": "Console"
     },
     "Airborne": {
       "name": "Airborne",
-      "date": "1996-01-01"
+      "date": "1996-01-01",
+      "form": "Arcade"
     },
     "AVP": {
       "name": "Alien vs. Predator",
       "url": "https://en.wikipedia.org/wiki/Alien_vs._Predator_(arcade_game)",
-      "date": "1994-05-20"
+      "date": "1994-05-20",
+      "form": "Arcade"
     },
     "AJ:AA": {
+      "n/a": false,
       "name": "Apollo Justice: Ace Attorney",
-      "url": "https://en.wikipedia.org/wiki/Apollo_Justice:_Ace_Attorney",
+      "url": [
+        "https://store.steampowered.com/app/2187220/Apollo_Justice_Ace_Attorney_Trilogy/",
+        "https://www.xbox.com/en-US/games/store/apollo-justice-ace-attorney-trilogy/9P5L65VNTWCV/0010",
+        "https://play.google.com/store/apps/details?id=jp.co.capcom.gyakusai123&hl=en_US",
+        "https://en.wikipedia.org/wiki/Apollo_Justice:_Ace_Attorney"
+      ],
+      "form": "Mobile;Console;Windows",
       "date": "2007-05-12"
     },
-    "AYSTA5G": {
+    "AYSTa5G": {
+      "n/a": false,
       "name": "Are You Smarter Than a 5th Grader? 2009 Edition",
-      "date": "2008-11-24"
+      "url": [
+        "https://play.google.com/store/apps/details?id=dh3games.areyousmarterthana5thgrader&hl=en_US"
+      ],
+      "dev": "Beeline Interactive",
+      "date": "2008-11-24",
+      "form": "Mobile"
     },
     "ArmoredWarriors": {
       "name": "Armored Warriors",
       "url": "https://en.wikipedia.org/wiki/Armored_Warriors",
-      "date": "1994-10-24"
+      "date": "1994-10-24",
+      "form": "Arcade"
     },
     "AANM:IT": {
       "name": "Arthur & Astrot NazoMakaimura: Incredible Toons",
       "url": "https://en.wikipedia.org/wiki/Arthur_to_Astaroth_no_Nazomakaimura:_Incredible_Toons",
-      "date": "1996-08-30"
+      "dev": "Magical Formation",
+      "date": "1996-08-30",
+      "form": "Console"
     },
     "ANJ2:TASR": {
       "name": "Ashita no Joe 2: The Anime Super Remix",
-      "date": "2002-01-01"
+      "date": "2002-01-01",
+      "form": "Console"
     },
     "AsuraWrath": {
       "name": "Asura's Wrath",
       "url": "https://en.wikipedia.org/wiki/Asura%27s_Wrath",
-      "date": "2012-02-21"
+      "dev": "CyberConnect2",
+      "date": "2012-02-21",
+      "form": "Console"
     },
     "Ataxx": {
       "name": "Ataxx",
       "url": "https://en.wikipedia.org/wiki/Ataxx",
-      "date": "1990-01-01"
+      "date": "1990-01-01",
+      "form": "Arcade"
     },
     "AM": {
       "name": "Auto Modellista",
       "url": "https://en.wikipedia.org/wiki/Auto_Modellista",
-      "date": "2002-08-22"
+      "date": "2002-08-22",
+      "form": "Console"
     },
     "Avengers": {
       "name": "Avengers",
       "url": "https://en.wikipedia.org/wiki/Avengers_(1987_video_game)",
-      "date": "1986-12-01"
+      "date": "1986-12-01",
+      "form": "Arcade"
     },
     "BattleCircuit": {
       "name": "Battle Circuit",
       "url": "https://en.wikipedia.org/wiki/Battle_Circuit",
-      "date": "2008-11-11"
+      "date": "2008-11-11",
+      "form": "Arcade"
     },
     "BD:FoV": {
       "name": "Beat Down: Fists of Vengeance",
       "url": "https://en.wikipedia.org/wiki/Beat_Down:_Fists_of_Vengeance",
-      "date": "2008-11-11"
+      "dev": "Cavia",
+      "date": "2008-11-11",
+      "form": "Console"
     },
     "BigBangBar": {
       "name": "Big Bang Bar",
-      "date": "1996-01-01"
+      "date": "1996-01-01",
+      "form": "Arcade"
     },
     "RE7:BH": {
       "n/a": false,
       "name": "Resident Evil 7: Biohazard",
+      "engine": "RE",
       "url": [
-        "https://store.steampowered.com/app/418370",
+        "https://store.steampowered.com/app/418370/Resident_Evil_7_Biohazard/",
+        "https://www.xbox.com/en-US/games/store/resident-evil-7-biohazard/BVFDTJ1XF6CS/0001",
         "https://en.wikipedia.org/wiki/Resident_Evil_7:_Biohazard"
       ],
       "date": "2017-01-24",
-      "engine": "RE",
+      "form": "Console;Windows",
       "resource": "RE7_PC_Release",
       "pakExt": ".pak"
     },
-    "RE:VC": {
-      "name": "Resident Evil - Code: Veronica",
-      "url": "https://en.wikipedia.org/wiki/Resident_Evil_%E2%80%93_Code:_Veronica",
-      "date": "2000-02-03"
-    },
-    "BionicCommando:Arcade": {
-      "name": "Bionic Commando (arcade)",
-      "url": "https://en.wikipedia.org/wiki/Bionic_Commando_(1987_video_game)",
-      "date": "1987-03-20"
-    },
-    "BionicCommando:NES": {
-      "name": "Bionic Commando (NES video game)",
-      "date": "2008-11-11"
-    },
-    "BionicCommando:GB": {
-      "name": "Bionic Commando (Game Boy)",
-      "url": "https://en.wikipedia.org/wiki/Bionic_Commando_(1988_video_game)",
-      "date": "1988-07-20"
-    },
-    "BionicCommando": {
+    "RE:CV": {
       "n/a": false,
-      "name": "Bionic Commando (2009 video game)",
+      "name": "Resident Evil - Code: Veronica",
       "url": [
-        "https://store.steampowered.com/app/21670",
+        "https://www.xbox.com/en-US/games/store/resident-evil-code-veronica-x/BQW8J8XM62JW",
+        "https://store.playstation.com/en-us/product/UP0102-CUSA07104_00-SLUS201840000001",
+        "https://en.wikipedia.org/wiki/Resident_Evil_%E2%80%93_Code:_Veronica"
+      ],
+      "date": "2000-02-03",
+      "form": "Console"
+    },
+    "BC:1980": {
+      "name": "Bionic Commando (1980)",
+      "url": [
+        "https://en.wikipedia.org/wiki/Bionic_Commando_(1987_video_game)",
+        "https://en.wikipedia.org/wiki/Bionic_Commando_(1988_video_game)",
+        "https://en.wikipedia.org/wiki/Bionic_Commando_(1992_video_game)"
+      ],
+      "date": "1987-03-20",
+      "form": "Console"
+    },
+    "BC": {
+      "n/a": false,
+      "name": "Bionic Commando",
+      "url": [
+        "https://store.steampowered.com/app/21670/Bionic_Commando/",
         "https://en.wikipedia.org/wiki/Bionic_Commando_(2009_video_game)"
       ],
       "date": "2009-11-11",
+      "form": "Console;Windows",
       "pakExt": ".bundle"
     },
-    "BionicCommando:R": {
+    "BC:R": {
       "n/a": false,
       "name": "Bionic Commando Rearmed",
       "url": [
-        "https://store.steampowered.com/app/21680",
+        "https://store.steampowered.com/app/21680/Bionic_Commando_Rearmed/",
         "https://en.wikipedia.org/wiki/Bionic_Commando_Rearmed"
       ],
+      "dev": "Grin",
       "date": "2008-08-13",
+      "form": "Console;Windows",
       "pakExt": ".bundle"
     },
-    "BionicCommando:R2": {
+    "BC:R2": {
+      "n/a": false,
       "name": "Bionic Commando Rearmed 2",
-      "url": "https://en.wikipedia.org/wiki/Bionic_Commando_Rearmed_2",
-      "date": "2011-02-01"
+      "url": [
+        "https://www.xbox.com/en-US/games/store/bc-rearmed-2/C34MG6M35D3S",
+        "https://en.wikipedia.org/wiki/Bionic_Commando_Rearmed_2"
+      ],
+      "dev": "Fatshark",
+      "date": "2011-02-01",
+      "form": "Console"
     },
     "BlackTiger": {
       "name": "Black Tiger",
       "url": "https://en.wikipedia.org/wiki/Black_Tiger_(video_game)",
-      "date": "1987-08-01"
+      "date": "1987-08-01",
+      "form": "Console"
     },
     "BlockBlock": {
       "name": "Block Block",
       "url": "https://en.wikipedia.org/wiki/Capcom_Classics_Collection",
-      "date": "1991-09-10"
+      "date": "1991-09-10",
+      "form": "Arcade"
     },
     "BlackCommand": {
+      "n/a": false,
       "name": "Black Command",
-      "date": "2018-09-26"
+      "url": [
+        "https://black-command.en.uptodown.com/android"
+      ],
+      "dev": "Beeline Interactive",
+      "date": "2018-09-26",
+      "form": "Mobile"
     },
     "Bombastic": {
       "name": "Bombastic",
       "url": "https://en.wikipedia.org/wiki/Bombastic_(video_game)",
-      "date": "2002-12-19"
+      "dev": "Shift",
+      "date": "2002-12-19",
+      "form": "Console"
     },
     "BombLink": {
       "name": "BombLink",
-      "date": "2009-10-05"
+      "date": "2009-10-05",
+      "form": "Mobile"
     },
     "Bonkers": {
       "name": "Bonkers",
       "url": "https://en.wikipedia.org/wiki/Bonkers_(SNES_video_game)",
-      "date": "1994-10-01"
+      "date": "1994-10-01",
+      "form": "Console"
     },
     "Bounty Hunter Sara": {
       "name": "Bounty Hunter Sara: Holy Mountain no Teiou",
-      "date": "2001-11-11"
+      "dev": "Flagship",
+      "date": "2001-11-11",
+      "form": "Console"
     },
     "BreakShot": {
       "name": "BreakShot",
       "url": "https://en.wikipedia.org/wiki/Break_Shot",
-      "date": "1996-11-11"
+      "date": "1996-11-11",
+      "form": "Arcade"
     },
-    "BOF": {
+    "BoF": {
       "name": "Breath of Fire",
       "url": "https://en.wikipedia.org/wiki/Breath_of_Fire_(video_game)",
-      "date": "1993-04-03"
+      "date": "1993-04-03",
+      "form": "Console"
     },
-    "BOF2": {
+    "BoF2": {
       "name": "Breath of Fire II",
       "url": "https://en.wikipedia.org/wiki/Breath_of_Fire_II",
-      "date": "1994-12-02"
+      "date": "1994-12-02",
+      "form": "Console"
     },
-    "BOF3": {
+    "BoF3": {
       "name": "Breath of Fire III",
       "url": "https://en.wikipedia.org/wiki/Breath_of_Fire_III",
-      "date": "1997-09-11"
+      "date": "1997-09-11",
+      "form": "Console"
     },
-    "BOF4": {
+    "BoF4": {
+      "n/a": false,
       "name": "Breath of Fire IV",
-      "url": "https://en.wikipedia.org/wiki/Breath_of_Fire_IV",
-      "date": "2000-04-27"
+      "url": [
+        "https://www.myabandonware.com/game/breath-of-fire-iv-bgw",
+        "https://en.wikipedia.org/wiki/Breath_of_Fire_IV"
+      ],
+      "date": "2000-04-27",
+      "form": "Console;Windows"
     },
-    "BOF6": {
+    "BoF6": {
       "name": "Breath of Fire 6",
       "url": "https://en.wikipedia.org/wiki/Breath_of_Fire_6",
-      "date": "2016-02-24"
+      "date": "2016-02-24",
+      "form": "Console"
     },
-    "BOF:DQ": {
+    "BoF:DQ": {
       "name": "Breath of Fire: Dragon Quarter",
       "url": "https://en.wikipedia.org/wiki/Breath_of_Fire:_Dragon_Quarter",
-      "date": "2002-11-14"
+      "date": "2002-11-14",
+      "form": "Console"
     },
     "BusterBros": {
       "name": "Buster Bros.",
       "url": "https://en.wikipedia.org/wiki/Buster_Bros.",
-      "date": "1989-11-29"
+      "dev": "Mitchell",
+      "date": "1989-11-29",
+      "form": "Console"
     },
     "BusterBros:C": {
       "name": "Buster Bros. Collection",
       "url": "https://en.wikipedia.org/wiki/Buster_Bros._Collection",
-      "date": "1997-03-14"
+      "dev": "Mitchell",
+      "date": "1997-03-14",
+      "form": "Console"
     },
     "Cabal": {
       "name": "Cabal",
       "url": "https://en.wikipedia.org/wiki/Cabal_(video_game)",
-      "date": "1988-07-25"
+      "dev": "TAD Corporation",
+      "date": "1988-07-25",
+      "form": "Arcade"
     },
     "Cadillacs+Dinosaurs": {
       "name": "Cadillacs and Dinosaurs",
       "url": "https://en.wikipedia.org/wiki/Cadillacs_and_Dinosaurs_(video_game)",
-      "date": "1993-01-01"
+      "date": "1993-01-01",
+      "form": "Arcade"
     },
     "CannonSpike": {
       "name": "Cannon Spike",
       "url": "https://en.wikipedia.org/wiki/Cannon_Spike",
-      "date": "2000-01-01"
+      "dev": "Psikyo",
+      "date": "2000-01-01",
+      "form": "Arcade"
     },
     "CAS2": {
       "n/a": false,
       "name": "Capcom Arcade 2nd Stadium",
+      "engine": "RE",
       "url": [
-        "https://store.steampowered.com/app/1755910",
+        "https://store.steampowered.com/app/1755910/Capcom_Arcade_2nd_Stadium/",
+        "https://www.xbox.com/en-US/games/store/capcom-arcade-2nd-stadium/9N3KJT4MHM4Z/0010",
         "https://en.wikipedia.org/wiki/Capcom_Arcade_Stadium#Capcom_Arcade_2nd_Stadium"
       ],
       "date": "2022-07-22",
-      "engine": "RE",
+      "form": "Console;Windows",
       "resource": "CAS2_PC_Release",
       "pakExt": ".pak"
     },
     "CAC": {
+      "n/a": false,
       "name": "Capcom Arcade Cabinet",
-      "url": "https://en.wikipedia.org/wiki/Capcom_Arcade_Cabinet",
-      "date": "2003-11-11"
+      "url": [
+        "https://www.xbox.com/en-US/games/store/capcom-arcade-cabinet/C26KM7D5BG4S/0001",
+        "https://en.wikipedia.org/wiki/Capcom_Arcade_Cabinet"
+      ],
+      "dev": "M2",
+      "date": "2003-11-11",
+      "form": "Console"
     },
-    "CAH:V2": {
+    "CAH2": {
       "name": "Capcom Arcade Hits Volume 2",
-      "date": "2003-01-01"
+      "date": "2003-01-01",
+      "form": "Windows"
     },
     "Baseball:SGO": {
       "name": "Capcom Baseball - Suketto Gaijin Oo-Abare",
-      "date": "1989-10-01"
+      "date": "1989-10-01",
+      "form": "Arcade"
     },
-    "BEU:B": {
+    "BEUB": {
       "n/a": false,
       "name": "Capcom Beat 'Em Up Bundle",
-      "url": "https://store.steampowered.com/app/885150",
-      "date": "Oct 10, 2018",
       "engine": "MT2",
+      "url": [
+        "https://store.steampowered.com/app/885150/Capcom_Beat_Em_Up_Bundle/",
+        "https://www.xbox.com/en-US/games/store/capcom-beat-em-up-bundle/BV26W4BTCLKG/0001",
+        "https://en.wikipedia.org/wiki/Capcom_Beat_%27Em_Up_Bundle"
+      ],
+      "date": "2018-09-18",
+      "form": "Console;Windows",
       "path": "arc",
       "pakExt": ".arc"
     },
     "Bowling": {
       "name": "Capcom Bowling",
       "url": "https://en.wikipedia.org/wiki/Capcom_Bowling",
-      "date": "1988-08-10"
+      "date": "1988-08-10",
+      "form": "Arcade"
     },
-    "Class:V1": {
+    "Classics": {
       "name": "Capcom Classics Collection",
       "url": "https://en.wikipedia.org/wiki/Capcom_Classics_Collection",
-      "date": "2005-09-27"
+      "date": "2005-09-27",
+      "form": "Console"
     },
-    "Class:RL": {
+    "Classics:RL": {
       "name": "Capcom Classics Collection Reloaded",
       "url": "https://en.wikipedia.org/wiki/Capcom_Classics_Collection#Capcom_Classics_Collection_Reloaded",
-      "date": "2006-09-07"
+      "date": "2006-09-07",
+      "form": "Console"
     },
-    "Class:RM": {
+    "Classics:RM": {
       "name": "Capcom Classics Collection Remixed",
       "url": "https://en.wikipedia.org/wiki/Capcom_Classics_Collection#Capcom_Classics_Collection_Remixed",
-      "date": "2006-03-22"
+      "date": "2006-03-22",
+      "form": "Console"
     },
-    "Class:V2": {
+    "Classics:V2": {
       "name": "Capcom Classics Collection Vol. 2",
       "url": "https://en.wikipedia.org/wiki/Capcom_Classics_Collection",
-      "date": "2006-11-24"
+      "date": "2006-11-24",
+      "form": "Console"
     },
-    "Class:MM": {
+    "Classics:MM": {
       "name": "Capcom Classics Mini-Mix",
       "url": "https://en.wikipedia.org/wiki/Capcom_Classics_Collection#Capcom_Classics_Mini_Mix",
-      "date": "2006-09-19"
+      "dev": "Sensory Sweep Studios",
+      "date": "2005-09-27",
+      "form": "Console"
     },
     "FightingEvolution": {
       "name": "Capcom Fighting Evolution",
       "url": "https://en.wikipedia.org/wiki/Capcom_Fighting_Evolution",
-      "date": "2004-10-01"
+      "date": "2004-10-01",
+      "form": "Console"
     },
     "Gen1": {
       "name": "Capcom Generation 1",
       "url": "https://en.wikipedia.org/wiki/Capcom_Generations#Capcom_Generations_1:_Wings_of_Destiny",
-      "date": "1998-01-01"
+      "date": "1998-01-01",
+      "form": "Console"
     },
     "Gen2": {
       "name": "Capcom Generation 2",
       "url": "https://en.wikipedia.org/wiki/Capcom_Generations#Capcom_Generations_2:_Chronicles_of_Arthur",
-      "date": "1998-01-01"
+      "date": "1998-01-01",
+      "form": "Console"
     },
     "Gen3": {
       "name": "Capcom Generation 3",
       "url": "https://en.wikipedia.org/wiki/Capcom_Generations#Capcom_Generations_3:_The_First_Generation",
-      "date": "1998-01-01"
+      "date": "1998-01-01",
+      "form": "Console"
     },
     "Gen4": {
       "name": "Capcom Generation 4",
       "url": "https://en.wikipedia.org/wiki/Capcom_Generations#Capcom_Generations_4:_Blazing_Guns",
-      "date": "1998-01-01"
+      "date": "1998-01-01",
+      "form": "Console"
     },
     "Gen5": {
       "name": "Capcom Generation 5",
       "url": "https://en.wikipedia.org/wiki/Capcom_Generations#Capcom_Generations_5:_Street_Fighter_Collection_2",
-      "date": "1998-01-01"
+      "dev": "Mitchell Corporation",
+      "date": "1998-01-01",
+      "form": "Console"
     },
     "Golf": {
       "name": "Capcom Golf",
-      "date": "1991-03-01"
+      "date": "1991-03-01",
+      "form": "Arcade"
     },
     "Quiz:T": {
       "name": "Capcom no Quiz: Tonosama no Yabou",
-      "date": "1991-01-01"
+      "date": "1991-01-01",
+      "form": "Console"
     },
     "Puzzle:World": {
       "name": "Capcom Puzzle World",
       "url": "https://en.wikipedia.org/wiki/Capcom_Puzzle_World",
-      "date": "2007-02-06"
+      "dev": "Sensory Sweep Studios",
+      "date": "2007-02-06",
+      "form": "Console"
     },
     "Quiz:H": {
       "name": "Capcom Quiz: Hatena? no Daibouken",
-      "date": "1990-12-21"
+      "date": "1990-12-21",
+      "form": "Console"
     },
     "SportsClub": {
       "name": "Capcom Sports Club",
-      "date": "1997-01-01"
+      "date": "1997-01-01",
+      "form": "Arcade"
     },
     "TaisenFanDisk": {
-      "name": "Capcom Taisen Fan Disc"
+      "name": "Capcom Taisen Fan Disc",
+      "form": "Console"
     },
     "VS2": {
-      "name": "Capcom vs. SNK 2",
-      "url": "https://en.wikipedia.org/wiki/Capcom_vs._SNK_2",
-      "date": "2001-08-01"
-    },
-    "VS2:EO": {
-      "name": "Capcom vs. SNK 2 EO",
-      "url": "https://en.wikipedia.org/wiki/Capcom_vs._SNK_2",
-      "date": "2002-07-04"
-    },
-    "VS2:MM": {
       "name": "Capcom vs. SNK 2: Mark of the Millennium",
       "url": "https://en.wikipedia.org/wiki/Capcom_vs._SNK_2",
-      "date": "2001-09-13"
+      "date": "2001-08-01",
+      "form": "Console",
+      "editions": {
+        "mm": {
+          "name": "Capcom vs. SNK 2: Mark of the Millennium",
+          "date": "2001-09-13"
+        },
+        "eo": {
+          "name": "Capcom vs. SNK 2 EO",
+          "date": "2002-07-04"
+        },
+        "mf": {
+          "name": "Capcom vs. SNK 2: Millionaire Fighting 2001",
+          "date": "2001-09-13"
+        }
+      }
     },
-    "VS2:MF01": {
-      "name": "Capcom vs. SNK 2: Millionaire Fighting 2001",
-      "url": "https://en.wikipedia.org/wiki/Capcom_vs._SNK_2",
-      "date": "2001-09-13"
-    },
-    "VS:P": {
-      "name": "Capcom vs. SNK Pro",
-      "url": "https://en.wikipedia.org/wiki/Capcom_vs._SNK:_Millennium_Fight_2000#Versions",
-      "date": "2002-04-18"
-    },
-    "VS:MF00": {
+    "VS": {
       "name": "Capcom vs. SNK: Millennium Fight 2000",
-      "url": "https://en.wikipedia.org/wiki/Capcom_vs._SNK:_Millennium_Fight_2000",
-      "date": "2000-01-01"
-    },
-    "VS:MF00P": {
-      "name": "Capcom vs. SNK: Millennium Fight 2000 Pro",
-      "url": "https://en.wikipedia.org/wiki/Capcom_vs._SNK:_Millennium_Fight_2000",
-      "date": "2001-06-14"
+      "url": "https://en.wikipedia.org/wiki/Capcom_vs._SNK:_Millennium_Fight_2000#Versions",
+      "date": "2000-08-06",
+      "form": "Console",
+      "editions": {
+        "mf": {
+          "name": "Capcom vs. SNK: Millennium Fight 2000 Pro",
+          "date": "2001-06-14"
+        },
+        "pro": {
+          "name": "Capcom vs. SNK Pro",
+          "date": "2002-04-18"
+        }
+      }
     },
     "Football:MVP": {
       "name": "Capcom's MVP Football",
       "url": "https://en.wikipedia.org/wiki/Capcom%27s_MVP_Football",
-      "date": "1993-10-01"
+      "dev": "Equilibrium",
+      "date": "1993-10-01",
+      "form": "Console"
     },
     "Soccer:Shootout": {
       "name": "Capcom's Soccer Shootout",
-      "date": "1994-05-01"
+      "dev": "A-Max",
+      "date": "1994-05-01",
+      "form": "Console"
     },
     "CaptainCommando": {
       "name": "Captain Commando",
       "url": "https://en.wikipedia.org/wiki/Captain_Commando",
-      "date": "1991-09-28"
+      "date": "1991-09-28",
+      "form": "Console"
     },
     "CarrierAirWing": {
       "name": "Carrier Air Wing",
       "url": "https://en.wikipedia.org/wiki/Carrier_Air_Wing_(video_game)",
-      "date": "1990-10-01"
+      "date": "1990-10-01",
+      "form": "Arcade"
     },
     "CashCab": {
       "name": "Cash Cab",
       "url": "https://en.wikipedia.org/wiki/Cash_Cab_(British_game_show)",
-      "date": "2009-12-05"
+      "date": "2009-12-05",
+      "form": "Mobile"
     },
     "Catan": {
       "name": "Catan",
       "url": "https://en.wikipedia.org/wiki/Catan",
-      "date": "2002-01-01"
+      "date": "2002-01-01",
+      "form": "Console"
     },
     "ChaosLegion": {
       "name": "Chaos Legion",
       "url": "https://en.wikipedia.org/wiki/Chaos_Legion",
-      "date": "2003-05-06"
+      "date": "2003-05-06",
+      "form": "Console;Windows"
     },
     "CTHCC": {
       "name": "Cherry Tree High Comedy Club",
       "url": "https://en.wikipedia.org/wiki/Cherry_Tree_High_Comedy_Club",
-      "date": "2010-06-20"
+      "dev": "773",
+      "date": "2010-06-20",
+      "form": "Windows"
     },
-    "CND:RR": {
+    "CnD:RR": {
       "name": "Chip 'n Dale Rescue Rangers",
       "url": "https://en.wikipedia.org/wiki/Chip_%27n_Dale_Rescue_Rangers_(video_game)",
-      "date": "1990-06-08"
+      "date": "1990-06-08",
+      "form": "Console"
     },
-    "CND:RR2": {
+    "CnD:RR2": {
       "name": "Chip 'n Dale Rescue Rangers 2",
       "url": "https://en.wikipedia.org/wiki/Chip_%27n_Dale_Rescue_Rangers_2",
-      "date": "1993-12-10"
+      "dev": "Make Software",
+      "date": "1993-12-10",
+      "form": "Console"
     },
     "Choko": {
       "name": "Choko",
-      "date": "1986-01-01"
+      "dev": "Solid Image",
+      "date": "1986-01-01",
+      "form": "Arcade"
     },
     "CT3": {
       "name": "Clock Tower 3",
       "url": "https://en.wikipedia.org/wiki/Clock_Tower_3",
-      "date": "2002-12-12"
+      "dev": "Capcom;Sunsoft",
+      "date": "2002-12-12",
+      "form": "Console"
     },
     "CN:V": {
       "name": "Code Name: Viper",
       "url": "https://en.wikipedia.org/wiki/Code_Name:_Viper",
-      "date": "1990-02-23"
+      "dev": "Arc System Works",
+      "date": "1990-02-23",
+      "form": "Console"
     },
     "Commando": {
       "name": "Commando",
       "url": "https://en.wikipedia.org/wiki/Commando_(video_game)",
-      "date": "1985-05-02"
+      "date": "1985-05-02",
+      "form": "Console"
     },
     "CrimsonTears": {
       "name": "Crimson Tears",
       "url": "https://en.wikipedia.org/wiki/Crimson_Tears",
-      "date": "2004-05-22"
+      "dev": "Spike;DreamFactory",
+      "date": "2004-05-22",
+      "form": "Console"
     },
     "CriticalBullet": {
       "name": "Critical Bullet: 7th Target",
-      "date": "2002-01-01"
+      "dev": "Flagship",
+      "date": "2002-01-01",
+      "form": "Console"
     },
     "Cyberbots": {
       "name": "Cyberbots: Full Metal Madness",
       "url": "https://en.wikipedia.org/wiki/Cyberbots:_Full_Metal_Madness",
-      "date": "1995-05-20"
+      "date": "1995-05-20",
+      "form": "Console"
     },
     "DS:TNW": {
       "name": "Darkstalkers: The Night Warriors",
       "url": "https://en.wikipedia.org/wiki/Darkstalkers:_The_Night_Warriors",
-      "date": "1994-07-12"
+      "date": "1994-07-12",
+      "form": "Console"
     },
     "DS3": {
       "name": "Darkstalkers 3",
       "url": "https://en.wikipedia.org/wiki/Darkstalkers_3",
-      "date": "1997-03-01"
+      "date": "1997-03-01",
+      "form": "Console"
     },
     "DS:TCT": {
       "name": "Darkstalkers Chronicle: The Chaos Tower",
       "url": "https://en.wikipedia.org/wiki/Darkstalkers_Chronicle:_The_Chaos_Tower",
-      "date": "2000-08-10"
+      "date": "2000-08-10",
+      "form": "Console"
     },
     "DS:R": {
       "name": "Darkstalkers Resurrection",
       "url": "https://en.wikipedia.org/wiki/Darkstalkers_Resurrection",
-      "date": "2013-03-12"
+      "dev": "Iron Galaxy Studios",
+      "date": "2013-03-12",
+      "form": "Console"
     },
     "DV": {
       "n/a": false,
       "name": "Dark Void",
       "url": [
-        "https://store.steampowered.com/app/45710",
+        "https://store.steampowered.com/app/45710/Dark_Void/",
+        "https://www.xbox.com/en-US/games/store/dark-void/C47VK1FQBPND/0001",
         "https://en.wikipedia.org/wiki/Dark_Void"
       ],
+      "dev": "Airtight Games",
       "date": "2010-01-19",
+      "form": "Console;Windows",
       "path": [
         "Engine",
         "SkyGame"
@@ -556,36 +730,44 @@
       "n/a": false,
       "name": "Dark Void Zero",
       "url": [
-        "https://store.steampowered.com/app/45730",
+        "https://store.steampowered.com/app/45730/Dark_Void_Zero/",
         "https://en.wikipedia.org/wiki/Dark_Void_Zero"
       ],
+      "dev": "Other Ocean Interactive",
       "date": "2010-01-18",
+      "form": "Console;Windows",
       "pak": "game:/DVZDATA.*"
     },
     "Darkwatch": {
       "name": "Darkwatch",
       "url": "https://en.wikipedia.org/wiki/Darkwatch",
-      "date": "2005-08-16"
+      "dev": "High Moon Studios",
+      "date": "2005-08-16",
+      "form": "Console"
     },
     "DarkwingDuck": {
       "name": "Darkwing Duck",
       "url": "https://en.wikipedia.org/wiki/Darkwing_Duck_(Capcom_video_game)",
-      "date": "1992-06-01"
+      "date": "1992-06-01",
+      "form": "Console"
     },
     "DeadPhoenix": {
-      "name": "Dead Phoenix",
+      "name": "Dead Phoenix (Canceled)",
       "url": "https://en.wikipedia.org/wiki/Capcom_Five#Dead_Phoenix",
+      "form": "Console",
       "tags": "Canceled"
     },
     "DR": {
       "n/a": false,
       "name": "Dead Rising",
+      "engine": "MT1",
       "url": [
-        "https://store.steampowered.com/app/427190",
+        "https://store.steampowered.com/app/427190/DEAD_RISING/",
+        "https://www.xbox.com/en-US/games/store/dead-rising/BZV7W98B3XN4/0001",
         "https://en.wikipedia.org/wiki/Dead_Rising_(video_game)"
       ],
       "date": "2006-08-08",
-      "engine": "MT1",
+      "form": "Console;Windows",
       "pakExt": ".arc",
       "pak": "game:/**/*.arc"
     },
@@ -593,31 +775,38 @@
       "n/a": false,
       "name": "Dead Rising 2",
       "url": [
-        "https://store.steampowered.com/app/45740",
+        "https://store.steampowered.com/app/45740/Dead_Rising_2/",
+        "https://www.xbox.com/en-US/games/store/dead-rising-2/C3CSPBFVQ80K/0001",
         "https://en.wikipedia.org/wiki/Dead_Rising_2"
       ],
+      "dev": "Blue Castle Games",
       "date": "2010-09-24",
+      "form": "Console;Windows",
       "pakExt": ".big",
-      "pak": "game:/*/*.big"
-    },
-    "DR2:CW": {
-      "name": "Dead Rising 2: Case West",
-      "url": "https://en.wikipedia.org/wiki/Dead_Rising_2#Case_West",
-      "date": "2010-09-15"
-    },
-    "DR2:CZ": {
-      "name": "Dead Rising 2: Case Zero",
-      "url": "https://en.wikipedia.org/wiki/Dead_Rising_2#Case_Zero",
-      "date": "2010-08-31"
+      "pak": "game:/*/*.big",
+      "dlc": {
+        "cw": {
+          "name": "Dead Rising 2: Case West",
+          "url": "https://en.wikipedia.org/wiki/Dead_Rising_2#Case_West",
+          "date": "2010-09-15"
+        },
+        "cz": {
+          "name": "Dead Rising 2: Case Zero",
+          "url": "https://en.wikipedia.org/wiki/Dead_Rising_2#Case_Zero",
+          "date": "2010-08-31"
+        }
+      }
     },
     "DR2:OtR": {
       "n/a": false,
       "name": "Dead Rising 2: Off the Record",
       "url": [
-        "https://store.steampowered.com/app/45770",
+        "https://store.steampowered.com/app/45770/Dead_Rising_2_Off_the_Record/",
+        "https://www.xbox.com/en-US/games/store/dead-rising-2-off-the-record/C4D52FGJTBGG/0001",
         "https://en.wikipedia.org/wiki/Dead_Rising_2:_Off_the_Record"
       ],
       "date": "2011-10-11",
+      "form": "Console;Windows",
       "pakExt": ".big",
       "pak": "game:/*/*.big"
     },
@@ -625,10 +814,12 @@
       "n/a": false,
       "name": "Dead Rising 3",
       "url": [
-        "https://store.steampowered.com/app/265550",
+        "https://store.steampowered.com/app/265550/Dead_Rising_3_Apocalypse_Edition/",
+        "https://www.xbox.com/en-US/games/store/dead-rising-3-apocalypse-edition/C3MPWS9W61S7/0001",
         "https://en.wikipedia.org/wiki/Dead_Rising_3"
       ],
       "date": "2013-11-22",
+      "form": "Console;Windows",
       "pakExt": ".big",
       "pak": "game:/**/*.big"
     },
@@ -636,172 +827,220 @@
       "n/a": false,
       "name": "Dead Rising 4",
       "url": [
-        "https://store.steampowered.com/app/543460",
+        "https://store.steampowered.com/app/543460/Dead_Rising_4/",
+        "https://www.xbox.com/en-US/games/store/dead-rising-4/C2JDCLLLBK1W/0001",
         "https://en.wikipedia.org/wiki/Dead_Rising_4"
       ],
       "date": "2016-12-06",
+      "form": "Console;Windows",
       "pakExt": ".big",
       "pak": "game:/**/*.big"
     },
     "DR4:FBP": {
+      "n/a": false,
       "name": "Dead Rising 4: Frank's Big Package",
-      "date": "2017-12-05"
+      "url": [
+        "https://store.playstation.com/en-us/product/UP0102-CUSA08540_00-DEADRISING4BUNDL",
+        "https://en.wikipedia.org/wiki/Dead_Rising_4"
+      ],
+      "date": "2017-12-05",
+      "form": "Console"
     },
     "DR:CTYD": {
       "name": "Dead Rising: Chop Till You Drop",
       "url": "https://en.wikipedia.org/wiki/Dead_Rising:_Chop_Till_You_Drop",
-      "date": "2009-02-19"
+      "dev": "Tose",
+      "date": "2009-02-19",
+      "form": "Console"
     },
     "DeepDown": {
       "name": "Deep Down",
       "url": "https://en.wikipedia.org/wiki/Deep_Down_(video_game)",
+      "form": "Console",
       "tags": "Coming"
     },
     "DemonsCrest": {
       "name": "Demon's Crest",
       "url": "https://en.wikipedia.org/wiki/Demon%27s_Crest",
-      "date": "1994-10-21"
+      "date": "1994-10-21",
+      "form": "Console"
     },
     "Desperado": {
       "name": "Desperado",
       "url": "https://en.wikipedia.org/wiki/Gun.Smoke",
-      "date": "1985-10-23"
+      "date": "1985-10-23",
+      "form": "Console"
     },
     "DOAE": {
       "name": "Destiny of an Emperor",
       "url": "https://en.wikipedia.org/wiki/Destiny_of_an_Emperor",
-      "date": "1989-05-19"
+      "date": "1989-05-19",
+      "form": "Console"
     },
     "DOAE2": {
       "name": "Destiny of an Emperor II",
       "url": "https://en.wikipedia.org/wiki/Tenchi_wo_Kurau_II",
-      "date": "1991-05-05"
+      "date": "1991-05-05",
+      "form": "Console"
     },
-    "DMC": {
+    "DmC": {
+      "n/a": false,
       "name": "Devil May Cry",
-      "url": "https://en.wikipedia.org/wiki/Devil_May_Cry_(video_game)",
-      "date": "2001-08-23"
+      "url": [
+        "https://en.wikipedia.org/wiki/Devil_May_Cry_(video_game)"
+      ],
+      "date": "2001-08-23",
+      "form": "Console;Windows"
     },
-    "DMC2": {
+    "DmC2": {
+      "n/a": false,
       "name": "Devil May Cry 2",
-      "url": "https://en.wikipedia.org/wiki/Devil_May_Cry_2",
-      "date": "2003-01-28"
+      "url": [
+        "https://en.wikipedia.org/wiki/Devil_May_Cry_2"
+      ],
+      "date": "2003-01-28",
+      "form": "Console;Windows"
     },
-    "DMC3:DA": {
+    "DmC3:DA": {
+      "n/a": false,
       "name": "Devil May Cry 3: Dante's Awakening",
-      "url": "https://en.wikipedia.org/wiki/Devil_May_Cry_3:_Dante%27s_Awakening",
-      "date": "2005-02-17"
+      "url": [
+        "https://en.wikipedia.org/wiki/Devil_May_Cry_3:_Dante%27s_Awakening"
+      ],
+      "date": "2005-02-17",
+      "form": "Console;Windows"
     },
-    "DMC3:S": {
+    "DmC3:S": {
       "n/a": false,
       "name": "Devil May Cry 3: Special Edition",
       "url": [
-        "https://store.steampowered.com/app/6550",
+        "https://store.steampowered.com/app/6550/Devil_May_Cry_3_Special_Edition/",
         "https://en.wikipedia.org/wiki/Devil_May_Cry_3:_Dante%27s_Awakening#Special_Edition"
       ],
       "date": "2008-11-11",
+      "form": "Console;Windows",
       "path": "data",
       "pakExt": ".pak",
       "pak": "game:/*.pak"
     },
-    "DMC4": {
+    "DmC4": {
       "name": "Devil May Cry 4",
-      "url": "https://en.wikipedia.org/wiki/Devil_May_Cry_4",
-      "date": "2008-01-31",
       "engine": "MT1",
-      "editions": {
-        "R": {
-          "name": "Devil May Cry 4: Refrain",
-          "date": "2011-02-03",
-          "tags": "iOS"
-        }
-      }
+      "url": "https://en.wikipedia.org/wiki/Devil_May_Cry_4",
+      "date": "2008-01-31"
     },
-    "DMC4:S": {
+    "DmC4:R": {
+      "name": "Devil May Cry 4: Refrain",
+      "url": "https://en.wikipedia.org/wiki/Devil_May_Cry_4",
+      "date": "2011-02-03",
+      "form": "Mobile"
+    },
+    "DmC4:S": {
       "n/a": false,
       "name": "Devil May Cry 4: Special Edition",
+      "engine": "MT2",
       "url": [
-        "https://store.steampowered.com/app/329050",
+        "https://store.steampowered.com/app/329050/Devil_May_Cry_4_Special_Edition/",
+        "https://www.xbox.com/en-US/games/store/devil-may-cry-4-special-edition/BPZT3CQCCWKG/0001",
         "https://en.wikipedia.org/wiki/Devil_May_Cry_4:_Special_Edition"
       ],
       "date": "2015-06-18",
-      "engine": "MT2",
+      "form": "Console;Windows",
       "searchBy": "AllDir",
       "pakExt": ".arc",
       "pakx": "game:/**/*.arc"
     },
-    "DMC5": {
+    "DmC5": {
       "n/a": false,
       "name": "Devil May Cry 5",
+      "engine": "RE",
       "url": [
-        "https://store.steampowered.com/app/601150",
+        "https://store.steampowered.com/app/601150/Devil_May_Cry_5/",
+        "https://www.xbox.com/en-US/games/store/devil-may-cry-5/BNLG5J5KDVJ3/0001",
         "https://en.wikipedia.org/wiki/Devil_May_Cry_5"
       ],
-      "engine": "RE",
       "resource": "DMC5_PC_Release",
       "date": "2019-03-08",
+      "form": "Console;Windows",
       "pakExt": ".pak"
     },
-    "DMC5:S": {
+    "DmC5:S": {
+      "n/a": false,
       "name": "Devil May Cry 5: Special Edition",
-      "url": "https://en.wikipedia.org/wiki/Devil_May_Cry_5#Special_Edition",
-      "date": "2020-11-10"
+      "url": [
+        "https://www.xbox.com/en-US/games/store/devil-may-cry-5-special-edition/9MZ11KT5KLP6/0010",
+        "https://en.wikipedia.org/wiki/Devil_May_Cry_5#Special_Edition"
+      ],
+      "date": "2020-11-10",
+      "form": "Console"
     },
-    "DMC:HD": {
+    "DmC:HD": {
       "n/a": false,
       "name": "Devil May Cry: HD Collection",
       "url": [
-        "https://store.steampowered.com/app/631510",
+        "https://store.steampowered.com/app/631510/Devil_May_Cry_HD_Collection/",
+        "https://www.xbox.com/en-US/games/store/devil-may-cry-hd-collection/BVNRFF9XJ6KM/0001",
         "https://en.wikipedia.org/wiki/Devil_May_Cry"
       ],
       "date": "2001-08-23",
+      "form": "Console;Windows",
       "pakExt": ".nbz",
       "pak": "game:/**/*.nbz"
     },
     "Dimahoo": {
       "name": "Dimahoo",
       "url": "https://en.wikipedia.org/wiki/Dimahoo",
-      "date": "2000-01-21"
+      "dev": "8ing;Raizing",
+      "date": "2000-01-21",
+      "form": "Arcade"
     },
     "DC": {
       "name": "Dino Crisis",
       "url": "https://en.wikipedia.org/wiki/Dino_Crisis_(video_game)",
-      "date": "1999-07-01"
+      "date": "1999-07-01",
+      "form": "Console;Windows"
     },
     "DC2": {
       "name": "Dino Crisis 2",
       "url": "https://en.wikipedia.org/wiki/Dino_Crisis_2",
-      "date": "2000-09-13"
+      "date": "2000-09-13",
+      "form": "Console;Windows"
     },
     "DC3": {
       "name": "Dino Crisis 3",
       "url": "https://en.wikipedia.org/wiki/Dino_Crisis_3",
-      "date": "2003-06-26"
+      "date": "2003-06-26",
+      "form": "Console"
     },
     "DC:S": {
       "name": "Dino Stalker",
       "url": "https://en.wikipedia.org/wiki/Dino_Stalker",
-      "date": "2002-06-27"
+      "date": "2002-06-27",
+      "form": "Console"
     },
     "Disney:A": {
       "name": "Disney's Aladdin",
       "url": "https://en.wikipedia.org/wiki/Disney%27s_Aladdin_(Capcom_video_game)",
-      "date": "1993-11-21"
+      "date": "1993-11-21",
+      "form": "Console"
     },
     "Disney:HaS": {
       "name": "Disney's Hide and Sneak",
       "url": "https://en.wikipedia.org/wiki/Disney%27s_Hide_and_Sneak",
-      "date": "2003-11-18"
+      "date": "2003-11-18",
+      "form": "Console"
     },
     "Disney:MM": {
       "name": "Disney's Magical Mirror Starring Mickey Mouse",
       "url": "https://en.wikipedia.org/wiki/Disney%27s_Magical_Mirror_Starring_Mickey_Mouse",
-      "date": "2002-08-09"
+      "date": "2002-08-09",
+      "form": "Console"
     },
     "Disney:MQ": {
       "name": "Disney's Magical Quest Starring Mickey Mouse",
       "url": "https://en.wikipedia.org/wiki/Disney%27s_Magical_Quest#The_Magical_Quest_Starring_Mickey_Mouse",
-      "date": "1992-11-20"
+      "date": "1992-11-20",
+      "form": "Console"
     },
     "Disney:MQ2": {
       "name": "Disney's Magical Quest 2 Starring Mickey and Minnie",
@@ -811,124 +1050,193 @@
     "Disney:MQ3": {
       "name": "Disney's Magical Quest 3 Starring Mickey & Donald",
       "url": "https://en.wikipedia.org/wiki/Disney%27s_Magical_Quest#Disney.27s_Magical_Quest_3_Starring_Mickey_.26_Donald",
-      "date": "1995-12-08"
+      "date": "1995-12-08",
+      "form": "Console"
     },
-    "DMC:DMC": {
+    "DmC:X": {
       "n/a": false,
       "name": "DmC: Devil May Cry",
       "url": [
-        "https://store.steampowered.com/app/220440",
+        "https://store.steampowered.com/app/220440/DmC_Devil_May_Cry/",
+        "https://www.xbox.com/en-US/games/store/dmc-devil-may-cry-definitive-edition/C27LHB0DH095/0001",
         "https://en.wikipedia.org/wiki/DmC:_Devil_May_Cry"
       ],
       "date": "2013-01-15",
+      "dev": "Ninja Theory",
+      "form": "Console;Windows",
       "path": "DevilGame/CookedPCConsole",
       "pakExt": ".upk"
     },
     "Dokaben": {
       "name": "Dokaben",
       "url": "https://en.wikipedia.org/wiki/Dokaben",
-      "date": "1989-03-01"
+      "date": "1989-03-01",
+      "form": "Arcade"
     },
     "Dokaben2": {
       "name": "Dokaben II",
       "url": "https://en.wikipedia.org/wiki/Dokaben",
-      "date": "1989-08-01"
+      "date": "1989-08-01",
+      "form": "Arcade"
     },
-    "Dragon": {
+    "DD": {
       "n/a": false,
       "name": "Dragon's Dogma",
+      "engine": "MT2",
       "url": [
-        "https://store.steampowered.com/app/367500",
+        "https://store.steampowered.com/app/367500/Dragons_Dogma_Dark_Arisen/",
+        "https://www.xbox.com/en-US/games/store/dragons-dogma-dark-arisen/BNGT6SZBFM2T/0001",
         "https://en.wikipedia.org/wiki/Dragon%27s_Dogma"
       ],
       "date": "2012-05-22",
-      "editions": {
-        "DA": {
+      "form": "Console",
+      "dlc": {
+        "da": {
           "name": "Dragon's Dogma: Dark Arisen",
           "url": "https://en.wikipedia.org/wiki/Dragon%27s_Dogma#Dragon's_Dogma:_Dark_Arisen",
           "date": "2013-04-25"
         }
       },
-      "engine": "MT2",
       "pakExt": ".arc",
       "pak": "game:/**/*.arc"
     },
-    "Dragon2": {
+    "DD2": {
+      "n/a": false,
       "name": "Dragon's Dogma II",
-      "url": "https://en.wikipedia.org/wiki/Dragon%27s_Dogma#Sequel",
+      "engine": "RE",
+      "url": [
+        "https://store.steampowered.com/app/2054970/Dragons_Dogma_2/",
+        "https://www.xbox.com/en-US/games/store/dragons-dogma-2/9PJQMBMJ3154/0010",
+        "https://en.wikipedia.org/wiki/Dragon%27s_Dogma#Sequel"
+      ],
       "date": "2008-11-11",
-      "engine": "RE"
+      "form": "Console;Windows"
     },
     "DT": {
       "name": "DuckTales",
       "url": "https://en.wikipedia.org/wiki/DuckTales_(video_game)",
-      "date": "1989-10-01"
+      "date": "1989-10-01",
+      "form": "Console"
     },
     "DT2": {
       "name": "DuckTales 2",
       "url": "https://en.wikipedia.org/wiki/DuckTales_2",
-      "date": "1993-05-23"
+      "dev": "Make Software",
+      "date": "1993-05-23",
+      "form": "Console"
     },
     "DT:R": {
       "n/a": false,
       "name": "DuckTales: Remastered",
       "url": [
-        "https://store.steampowered.com/app/237630",
+        "https://store.steampowered.com/app/237630/DuckTales_Remastered/",
+        "https://www.xbox.com/en-US/games/store/ducktales-remastered/C07J3ZJPGX6Z/0001",
         "https://en.wikipedia.org/wiki/DuckTales:_Remastered"
       ],
       "date": "2013-08-13",
+      "dev": "WayForward Technologies",
+      "form": "Mobile;Console;Windows",
       "pakExt": ".pak"
     },
     "DND:C": {
       "name": "Dungeons & Dragons Collection",
       "url": "https://en.wikipedia.org/wiki/Dungeons_%26_Dragons:_Tower_of_Doom#Dungeons_&_Dragons_Collection",
-      "date": "1999-03-04"
+      "date": "1999-03-04",
+      "form": "Console"
     },
-    "DMC:CoM": {
+    "DnD:CoM": {
+      "n/a": false,
       "name": "Dungeons & Dragons: Chronicles of Mystara",
       "url": [
-        "https://store.steampowered.com/app/229480",
+        "https://store.steampowered.com/app/229480/Dungeons__Dragons_Chronicles_of_Mystara/",
+        "https://www.xbox.com/en-US/games/store/dungeons-dragons-chronicles-of-mystara/C52HDXHZV2KR/0001",
         "https://en.wikipedia.org/wiki/Dungeons_%26_Dragons:_Chronicles_of_Mystara"
       ],
-      "date": "2013-08-22"
+      "dev": "Iron Galaxy Studios",
+      "date": "2013-08-22",
+      "form": "Console;Windows"
     },
-    "DMC:ToD": {
+    "DnD:ToD": {
       "name": "Dungeons & Dragons: Tower of Doom",
       "url": "https://en.wikipedia.org/wiki/Dungeons_%26_Dragons:_Tower_of_Doom",
-      "date": "1994-01-13"
+      "date": "1994-01-13",
+      "form": "Arcade"
     },
     "Dustforce": {
       "name": "Dustforce",
       "url": "https://en.wikipedia.org/wiki/Dustforce",
-      "date": "2012-01-17"
+      "dev": "Hitbox Team",
+      "date": "2012-01-17",
+      "form": "Console"
     },
     "Dynasty Wars": {
       "name": "Dynasty Wars",
       "url": "https://en.wikipedia.org/wiki/Dynasty_Wars",
-      "date": "1989-04-19"
+      "date": "1989-04-19",
+      "form": "Arcade"
     }
   },
   "fileManager": {
     "applications": {
+      "AAI:ME": {
+        "key": [
+          "Steam:2401970",
+          "Xbox:P25VS66VJVN"
+        ],
+        "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 2401970"
+      },
+      "AoB": {
+        "key": "Xbox:BZ46NPQNX334"
+      },
+      "AJ:AA": {
+        "key": [
+          "Steam:2187220",
+          "Xbox:9P5L65VNTWCV"
+        ]
+      },
+      "AYSTa5G": {
+        "key": "Driod:dh3games.areyousmarterthana5thgrader"
+      },
       "RE7:BH": {
-        "key": "Steam:418370",
+        "key": [
+          "Steam:418370",
+          "Xbox:BVFDTJ1XF6CS"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 418370",
         "dir": "RESIDENT EVIL 7 biohazard"
       },
-      "BionicCommando": {
+      "RE7:CV": {
+        "key": [
+          "Play:UP0102-CUSA07104_00-SLUS201840000001",
+          "Xbox:BQW8J8XM62JW"
+        ]
+      },
+      "BC": {
         "key": "Steam:21670",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 21670",
         "dir": "Bionic Commando",
         "path": "bundles"
       },
-      "BionicCommando:R": {
+      "BC:R": {
         "key": "Steam:21680",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 21680",
         "dir": "Bionic Commando Rearmed",
         "path": "bundles"
       },
+      "BC:R2": {
+        "key": "Xbox:C34MG6M35D3S"
+      },
+      "BlackCommand": {
+        "key": "Driod:XX"
+      },
+      "BoF4": {
+        "key": "Abandon:breath-of-fire-iv-bgw"
+      },
       "CAS2": {
-        "key": "Steam:1755910",
+        "key": [
+          "Steam:1755910",
+          "Xbox:9N3KJT4MHM4Z"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 1755910",
         "dir": "Capcom Arcade 2nd Stadium",
         "path": [
@@ -936,7 +1244,10 @@
           "dlc"
         ]
       },
-      "BEU:B": {
+      "CAC": {
+        "key": "Xbox:C26KM7D5BG4S"
+      },
+      "BEUB": {
         "key": "Steam:885150",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 885150",
         "dir": "CBEUB",
@@ -955,7 +1266,10 @@
         "path": "data"
       },
       "DR": {
-        "key": "Steam:427190",
+        "key": [
+          "Steam:427190",
+          "Xbox:C3CSPBFVQ80K"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 427190",
         "dir": "Dead Rising",
         "path": "nativeWin64"
@@ -970,7 +1284,10 @@
         ]
       },
       "DR2:OtR": {
-        "key": "Steam:45770",
+        "key": [
+          "Steam:45770",
+          "Xbox:C4D52FGJTBGG"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 45770",
         "dir": "Dead Rising 2 Off the Record",
         "path": [
@@ -979,7 +1296,10 @@
         ]
       },
       "DR3": {
-        "key": "Steam:265550",
+        "key": [
+          "Steam:265550",
+          "Xbox:C3MPWS9W61S7"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 265550",
         "dir": "deadrising3",
         "path": [
@@ -988,7 +1308,10 @@
         ]
       },
       "DR4": {
-        "key": "Steam:543460",
+        "key": [
+          "Steam:543460",
+          "Xbox:C2JDCLLLBK1W"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 543460",
         "dir": "DeadRising4",
         "path": [
@@ -996,44 +1319,83 @@
           "dlc"
         ]
       },
-      "DMC3:S": {
+      "DR4:FBP": {
+        "key": "Play:UP0102-CUSA08540_00-DEADRISING4BUNDL"
+      },
+      "DmC": {},
+      "DmC2": {},
+      "DmC3:DA": {},
+      "DmC3:S": {
         "key": "Steam:6550",
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 6550",
         "dir": "Devil May Cry 3"
       },
-      "DMC4:S": {
-        "key": "Steam:329050",
+      "DmC4:S": {
+        "key": [
+          "Steam:329050",
+          "Xbox:BPZT3CQCCWKG"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 329050",
         "dir": "Special Edition",
         "path": "nativeDX10"
       },
-      "DMC5": {
-        "key": "Steam:601150",
+      "DmC5": {
+        "key": [
+          "Steam:601150",
+          "Xbox:BNLG5J5KDVJ3"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 601150",
         "dir": "Devil May Cry 5"
       },
-      "DMC:HD": {
-        "key": "Steam:631510",
+      "DmC5:S": {
+        "key": "Xbox:9MZ11KT5KLP6"
+      },
+      "DmC:HD": {
+        "key": [
+          "Steam:631510",
+          "Xbox:BVNRFF9XJ6KM"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 631510",
         "dir": "Devil May Cry HD Collection",
         "path": "data"
       },
-      "DMC:DMC": {
-        "key": "Steam:220440",
+      "DmC:X": {
+        "key": [
+          "Steam:220440",
+          "Xbox:C27LHB0DH095"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 220440",
         "dir": "DmC Devil May Cry"
       },
-      "Dragon": {
-        "key": "Steam:367500",
+      "DD": {
+        "key": [
+          "Steam:367500",
+          "Xbox:C27LHB0DH095"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 367500",
         "dir": "DDDA",
         "path": "nativePC"
       },
+      "DD2": {
+        "key": [
+          "Steam:2054970",
+          "Xbox:9PJQMBMJ3154"
+        ]
+      },
       "DT:R": {
-        "key": "Steam:237630",
+        "key": [
+          "Steam:237630",
+          "Xbox:C07J3ZJPGX6Z"
+        ],
         "reg": "Microsoft/Windows/CurrentVersion/Uninstall/Steam App 237630",
         "dir": "DuckTales Remastered",
         "path": "data"
+      },
+      "DnD:CoM": {
+        "key": [
+          "Steam:229480",
+          "Xbox:C52HDXHZV2KR"
+        ]
       }
     }
   }

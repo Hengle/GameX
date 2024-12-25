@@ -1,0 +1,54 @@
+﻿{
+  "id": "Rockstar",
+  "name": "Rockstar Games",
+  "studio": "Rockstar Games",
+  "description": "",
+  "url": "https://en.wikipedia.org/wiki/List_of_video_games_published_by_Rockstar_Games",
+  "samples": [
+    "RockstarFamily.Sample.json"
+  ],
+  "games": {
+    "*": {
+      "pakFileType": "GameX.Rockstar.RockstarPakFile, GameX.Rockstar"
+    },
+    "GTA3": {
+      "name": "Grand Theft Auto III",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto_III",
+      "date": "2003-09-25",
+      "form": "XX"
+    },
+    "GTA:VC": {
+      "name": "Grand Theft Auto: Vice City",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto:_Vice_City",
+      "date": "2003-09-25",
+      "form": "XX"
+    },
+    "GTA:SA": {
+      "name": "Grand Theft Auto: San Andreas",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto:_San_Andreas",
+      "date": "2007-01-25",
+      "form": "XX"
+    },
+    "GTA4": {
+      "name": "Grand Theft Auto IV",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto_IV",
+      "date": "2008-10-30",
+      "form": "XX"
+    },
+    "GTA:LCS": {
+      "name": "Grand Theft Auto: Liberty City Stories",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto:_Liberty_City_Stories",
+      "date": "2009-05-28",
+      "form": "XX"
+    },
+    "GTA:VCS": {
+      "name": "Grand Theft Auto: Vice City Stories",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto:_Vice_City_Stories",
+      "date": "2009-05-28",
+      "form": "XX"
+    }
+  },
+  "fileManager": {
+    "applications": {}
+  }
+}

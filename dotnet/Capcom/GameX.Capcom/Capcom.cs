@@ -33,7 +33,7 @@ namespace GameX.Capcom
 
         #region Factories
 
-        static readonly ConcurrentDictionary<string, PakBinary> PakBinarys = new ConcurrentDictionary<string, PakBinary>();
+        static readonly ConcurrentDictionary<string, PakBinary> PakBinarys = new();
 
         static PakBinary GetPakBinary(FamilyGame game, string extension) => PakBinarys.GetOrAdd(game.Id, _ => PakBinaryFactory(game, extension));
 
@@ -49,7 +49,7 @@ namespace GameX.Capcom
                     ".big" => PakBinary_Big.Current,
                     ".bundle" => PakBinary_Bundle.Current,
                     ".mbundle" => PakBinary_Plist.Current,
-                    _ => throw new ArgumentOutOfRangeException(nameof(extension)),
+                    _ => null, //throw new ArgumentOutOfRangeException(nameof(extension)),
                 },
             };
 

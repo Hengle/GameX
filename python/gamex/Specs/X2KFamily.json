@@ -1,0 +1,418 @@
+﻿{
+  "id": "2K",
+  "name": "Rockstar Games",
+  "studio": "Rockstar Games",
+  "description": "",
+  "url": "https://en.wikipedia.org/wiki/List_of_2K_games",
+  "samples": [
+    "2KFamily.Sample.json"
+  ],
+  "games": {
+    "*": {
+      "n/a": true,
+      "pakFileType": "GameX.2K.2KPakFile, GameX.2K"
+    },
+    "MLB2K5": {
+      "name": "Major League Baseball 2K5",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K5",
+      "dev": "Kush Games;Visual Concepts",
+      "date": "2005-02-28",
+      "form": "Console"
+    },
+    "FordRacing3": {
+      "name": "Ford Racing 3",
+      "url": "https://en.wikipedia.org/wiki/Ford_Racing_3",
+      "dev": "Razorworks",
+      "date": "2005-03-01",
+      "form": "Console"
+    },
+    "CloseCombat:FtF": {
+      "name": "Close Combat: First to Fight",
+      "url": "https://en.wikipedia.org/wiki/Close_Combat:_First_to_Fight",
+      "dev": "Destineer",
+      "date": "2005-04-06",
+      "form": "Console;Windows"
+    },
+    "FordMustang:TLL": {
+      "name": "Ford Mustang: The Legend Lives",
+      "url": "https://en.wikipedia.org/wiki/Ford_Mustang:_The_Legend_Lives",
+      "dev": "Eutechnyx",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "Stronghold2": {
+      "n/a": false,
+      "name": "Stronghold 2",
+      "url": [
+        "https://store.steampowered.com/app/40960/Stronghold_2_Steam_Edition/",
+        "https://en.wikipedia.org/wiki/Stronghold_2"
+      ],
+      "dev": "Firefly Studios",
+      "date": "2005-04-19",
+      "form": "Windows"
+    },
+    "MotocrossMania3": {
+      "name": "Motocross Mania 3",
+      "url": "https://en.wikipedia.org/wiki/Motocross_Mania_3",
+      "dev": "Deibus Studios",
+      "date": "2005-04-27",
+      "form": "Console"
+    },
+    "SidMeier:P": {
+      "name": "Sid Meier's Pirates!",
+      "url": "https://en.wikipedia.org/wiki/Sid_Meier%27s_Pirates!_(2004_video_game)",
+      "dev": "Firaxis Games",
+      "date": "2005-07-11",
+      "form": "Console"
+    },
+    "NHL2K6": {
+      "name": "NHL 2K6",
+      "url": "https://en.wikipedia.org/wiki/NHL_2K6",
+      "dev": "Kush Games;Visual Concepts",
+      "date": "2005-09-06",
+      "form": "Console",
+      "editions": {
+        "Gen2": {},
+        "Gen3": {
+          "date": "2005-11-16"
+        }
+      }
+    },
+    "NBA2K6": {
+      "name": "NBA 2K6",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K6",
+      "dev": "Visual Concepts",
+      "date": "2005-09-26",
+      "form": "Console",
+      "editions": {
+        "Gen2": {},
+        "Gen3": {
+          "date": "2005-11-16"
+        }
+      }
+    },
+    "TopSpin": {
+      "name": "Top Spin",
+      "url": "https://en.wikipedia.org/wiki/Top_Spin_(video_game)",
+      "dev": "PAM Development;Indie Built",
+      "date": "2005-09-26",
+      "form": "Console"
+    },
+    "Conflict:GT": {
+      "n/a": false,
+      "name": "Conflict: Global Terror",
+      "url": [
+        "https://www.myabandonware.com/game/conflict-global-terror-e39",
+        "https://en.wikipedia.org/wiki/Conflict:_Global_Terror"
+      ],
+      "dev": "Pivotal Games",
+      "date": "2005-10-04",
+      "form": "Console;Windows"
+    },
+    "SeriousSam2": {
+      "n/a": false,
+      "name": "Serious Sam 2",
+      "url": [
+        "https://store.steampowered.com/app/204340/Serious_Sam_2/",
+        "https://en.wikipedia.org/wiki/Serious_Sam_2"
+      ],
+      "dev": "Croteam",
+      "date": "2005-10-11",
+      "form": "Console;Windows"
+    },
+    "MLB2K5:WSE": {
+      "name": "Major League Baseball 2K5: World Series Edition",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K5#World_Series_Edition",
+      "dev": "Kush Games;Visual Concepts",
+      "date": "2005-10-18",
+      "form": "Console"
+    },
+    "ShatteredUnion": {
+      "n/a": false,
+      "name": "Shattered Union",
+      "url": [
+        "https://store.steampowered.com/app/3960/Shattered_Union/",
+        "https://en.wikipedia.org/wiki/Shattered_Union"
+      ],
+      "dev": "PopTop Software",
+      "date": "2005-10-18",
+      "form": "Console;Windows"
+    },
+    "WorldPokerTour": {
+      "name": "World Poker Tour",
+      "url": "https://en.wikipedia.org/wiki/World_Poker_Tour_(video_game)",
+      "dev": "Coresoft;Backbone Entertainment",
+      "date": "2005-10-18",
+      "form": "Console"
+    },
+    "CoC:DCotE": {
+      "name": "Call of Cthulhu: Dark Corners of the Earth",
+      "url": "https://en.wikipedia.org/wiki/Call_of_Cthulhu:_Dark_Corners_of_the_Earth",
+      "dev": "Headfirst Productions",
+      "date": "2005-10-25",
+      "form": "Console"
+    },
+    "Vietcong2": {
+      "n/a": false,
+      "name": "Vietcong 2",
+      "url": [
+        "https://www.myabandonware.com/game/vietcong-2-eop",
+        "https://en.wikipedia.org/wiki/Vietcong_2"
+      ],
+      "dev": "Pterodon;Outsider Development",
+      "date": "2005-10-25",
+      "form": "Windows"
+    },
+    "Civ4": {
+      "n/a": false,
+      "name": "Sid Meier's Civilization IV",
+      "url": [
+        "https://store.steampowered.com/app/3900/Sid_Meiers_Civilization_IV/",
+        "https://en.wikipedia.org/wiki/Civilization_IV"
+      ],
+      "dev": "Firaxis Games",
+      "date": "2005-10-25",
+      "form": "Windows"
+    },
+    "Zathura": {
+      "name": "Zathura",
+      "url": "https://en.wikipedia.org/wiki/Zathura_(video_game)",
+      "dev": "High Voltage Software",
+      "date": "2005-11-03",
+      "form": "Console"
+    },
+    "FvC": {
+      "name": "Ford vs Chevy",
+      "url": "https://en.wikipedia.org/wiki/Ford_vs._Chevy",
+      "dev": "Eutechnyx",
+      "date": "2005-11-10",
+      "form": "Console"
+    },
+    "Amped3": {
+      "name": "Amped 3",
+      "url": "https://en.wikipedia.org/wiki/Amped_3",
+      "dev": "Indie Built",
+      "date": "2005-11-15",
+      "form": "Console"
+    },
+    "Hoops2K6": {
+      "name": "College Hoops 2K6",
+      "url": "https://en.wikipedia.org/wiki/College_Hoops_2K6",
+      "dev": "Visual Concepts",
+      "date": "2005-11-21",
+      "form": "Console"
+    },
+    "Torino2006": {
+      "name": "Torino 2006",
+      "url": "https://en.wikipedia.org/wiki/Torino_2006_(video_game)",
+      "dev": "49Games",
+      "date": "2006-01-24",
+      "form": "Console;Windows"
+    },
+    "X24:TG": {
+      "name": "24: The Game",
+      "url": "https://en.wikipedia.org/wiki/24:_The_Game",
+      "dev": "SCE Cambridge Studio",
+      "date": "2006-02-28",
+      "form": "Console"
+    },
+    "Oblivion": {
+      "name": "The Elder Scrolls IV: Oblivion",
+      "url": [
+        "https://store.steampowered.com/app/22330/The_Elder_Scrolls_IV_Oblivion_Game_of_the_Year_Edition/",
+        "https://en.wikipedia.org/wiki/The_Elder_Scrolls_IV:_Oblivion"
+      ],
+      "dev": "Bethesda Game Studios",
+      "date": "2006-03-20",
+      "form": "Console;Windows"
+    },
+    "TopSpin2": {
+      "name": "Top Spin 2",
+      "url": "https://en.wikipedia.org/wiki/Top_Spin_2",
+      "dev": "PAM Development;Indie Built;Magic Pockets",
+      "date": "2006-03-29",
+      "form": "Console"
+    },
+    "MLB2K6": {
+      "name": "Major League Baseball 2K6",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K6",
+      "dev": "Kush Games;Visual Concepts",
+      "date": "2006-04-03",
+      "form": "Console"
+    },
+    "TDVC": {
+      "n/a": false,
+      "name": "The Da Vinci Code",
+      "url": [
+        "https://www.myabandonware.com/game/the-da-vinci-code-fjg",
+        "https://en.wikipedia.org/wiki/The_Da_Vinci_Code_(video_game)"
+      ],
+      "dev": "The Collective",
+      "date": "2006-04-15",
+      "form": "Console;Windows"
+    },
+    "Prey": {
+      "n/a": false,
+      "name": "Prey",
+      "url": [
+        "https://www.myabandonware.com/game/prey-dd1",
+        "https://www.xbox.com/en-US/games/store/prey/BVPGZMMDDZ0M/0001",
+        "https://en.wikipedia.org/wiki/Prey_(2006_video_game)"
+      ],
+      "dev": "Human Head Studios;3D Realms;Venom Games",
+      "date": "2006-07-11",
+      "form": "Console;Windows"
+    },
+    "CivCity:R": {
+      "name": "CivCity: Rome",
+      "url": [
+        "https://store.steampowered.com/app/3980/CivCity_Rome/",
+        "https://www.gog.com/en/game/civcity_rome",
+        "https://en.wikipedia.org/wiki/CivCity:_Rome"
+      ],
+      "dev": "Firefly Studios;Firaxis Games",
+      "date": "2006-07-26",
+      "form": "Windows"
+    },
+    "DS2": {
+      "name": "Dungeon Siege II: Broken World",
+      "url": [
+        "https://store.steampowered.com/app/39200/Dungeon_Siege_II/",
+        "https://www.gog.com/en/game/dungeon_siege_collection",
+        "https://en.wikipedia.org/wiki/Dungeon_Siege_II:_Broken_World"
+      ],
+      "dev": "Gas Powered Games",
+      "date": "2006-08-04",
+      "form": "Windows"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    },
+    "XX": {
+      "name": "XXX",
+      "url": "XXX",
+      "dev": "XXX",
+      "date": "2005-04-19",
+      "form": "Console"
+    }
+  },
+  "fileManager": {
+    "applications": {}
+  }
+}

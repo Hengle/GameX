@@ -39,7 +39,10 @@
     },
     "Oblivion": {
       "name": "The Elder Scrolls IV: Oblivion",
-      "url": "https://store.steampowered.com/app/22330",
+      "url": [
+        "https://store.steampowered.com/app/22330/The_Elder_Scrolls_IV_Oblivion_Game_of_the_Year_Edition/",
+        "https://en.wikipedia.org/wiki/The_Elder_Scrolls_IV:_Oblivion"
+      ],
       "date": "2007-09-11",
       "pakExt": ".bsa",
       "datExt": ".esm",
@@ -49,7 +52,7 @@
     },
     "Fallout3": {
       "name": "Fallout 3",
-      "url": "https://store.steampowered.com/app/22370",
+      "url": "https://store.steampowered.com/app/22370/Fallout_3_Game_of_the_Year_Edition/",
       "date": "2009-10-13",
       "pakExt": ".bsa",
       "datExt": ".esm",
