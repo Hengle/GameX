@@ -11,41 +11,511 @@
     "*": {
       "pakFileType": "GameX.Rockstar.RockstarPakFile, GameX.Rockstar"
     },
+    "MTM64": {
+      "name": "Monster Truck Madness 64",
+      "url": "https://en.wikipedia.org/wiki/Monster_Truck_Madness_2#Monster_Truck_Madness_64",
+      "dev": "Edge of Reality",
+      "date": "1999-07-30",
+      "form": "Console"
+    },
+    "GTA2": {
+      "name": "Grand Theft Auto 2",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto_2",
+      "dev": "DMA Design;Tarantula Studios",
+      "date": "1999-10-22",
+      "form": "Console;Windows"
+    },
+    "EWJ3D": {
+      "name": "Earthworm Jim 3D",
+      "url": "https://en.wikipedia.org/wiki/Earthworm_Jim_3D",
+      "dev": "VIS Entertainment",
+      "date": "1999-10-31",
+      "form": "Console"
+    },
+    "Thrasher:SaD": {
+      "name": "Thrasher: Skate and Destroy",
+      "url": "https://en.wikipedia.org/wiki/Thrasher_Presents_Skate_and_Destroy",
+      "dev": "Z-Axis",
+      "date": "1999-11-15",
+      "form": "Console"
+    },
+    "EvelKnievel": {
+      "name": "Evel Knievel",
+      "dev": "Tarantula Studios",
+      "date": "1999-11-22",
+      "form": "Console"
+    },
+    "GTA": {
+      "name": "Grand Theft Auto",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto_(video_game)",
+      "dev": "Tarantula Studios",
+      "date": "1999-11-22",
+      "form": "Console",
+      "dlc": {
+        "mp1": {
+          "name": "Mission Pack #1 - London 1969",
+          "date": "1999-04-06"
+        },
+        "mp2": {
+          "name": "Mission Pack #2 - London 1961",
+          "date": "1999-07-01"
+        }
+      }
+    },
+    "WM": {
+      "name": "Wild Metal",
+      "url": "https://en.wikipedia.org/wiki/Wild_Metal",
+      "dev": "DMA Design",
+      "date": "2000-02-01",
+      "form": "Console"
+    },
+    "AP:OB": {
+      "name": "Austin Powers: Oh, Behave!",
+      "url": "https://en.wikipedia.org/wiki/Austin_Powers:_Oh,_Behave!",
+      "dev": "Tarantula Studios",
+      "date": "2000-09-17",
+      "form": "Console"
+    },
+    "AP:WtMUL": {
+      "name": "Austin Powers: Welcome to My Underground Lair!",
+      "url": "https://en.wikipedia.org/wiki/Austin_Powers:_Welcome_to_My_Underground_Lair!",
+      "dev": "Tarantula Studios",
+      "date": "2000-09-17",
+      "form": "Console"
+    },
+    "MC:SR": {
+      "name": "Midnight Club: Street Racing",
+      "url": "https://en.wikipedia.org/wiki/Midnight_Club:_Street_Racing",
+      "dev": "Angel Studios",
+      "date": "2000-10-26",
+      "form": "Console"
+    },
+    "SmugglersRun": {
+      "name": "Smuggler's Run",
+      "url": "https://en.wikipedia.org/wiki/Smuggler%27s_Run",
+      "dev": "Angel Studios",
+      "date": "2000-10-26",
+      "form": "Console"
+    },
+    "SurfingH3O": {
+      "name": "Surfing H3O",
+      "url": "https://en.wikipedia.org/wiki/Surfing_H3O",
+      "dev": "Opus Corp",
+      "date": "2000-10-27",
+      "form": "Console"
+    },
+    "Oni": {
+      "name": "Oni",
+      "url": "https://en.wikipedia.org/wiki/Oni_(video_game)",
+      "dev": "Rockstar Canada;Tarantula Studios",
+      "date": "2001-01-29",
+      "form": "Console"
+    },
+    "YDKJ": {
+      "name": "You Don't Know Jack",
+      "url": "https://en.wikipedia.org/wiki/You_Don%27t_Know_Jack_(1999_video_game)",
+      "dev": "Starsphere",
+      "date": "2001-05-21",
+      "form": "Console"
+    },
     "GTA3": {
       "name": "Grand Theft Auto III",
       "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto_III",
-      "date": "2003-09-25",
-      "form": "XX"
+      "dev": "War Drum Studios",
+      "date": "2001-10-22",
+      "form": "Mobile;Console;Windows"
+    },
+    "SR2:HT": {
+      "name": "Smuggler's Run 2: Hostile Territory",
+      "url": "https://en.wikipedia.org/wiki/Smuggler%27s_Run_2:_Hostile_Territory",
+      "dev": "Angel Studios",
+      "date": "2001-10-29",
+      "form": "Console"
+    },
+    "MP": {
+      "name": "Max Payne",
+      "url": "https://en.wikipedia.org/wiki/Max_Payne_(video_game)",
+      "dev": "Neo Software Produktions;Rockstar Canada;Mobius Entertainment;War Drum Studios",
+      "date": "2001-12-06",
+      "form": "Mobile;Console"
+    },
+    "SoE": {
+      "name": "State of Emergency",
+      "url": "https://en.wikipedia.org/wiki/State_of_Emergency_(video_game)",
+      "dev": "VIS Entertainment",
+      "date": "2002-02-13",
+      "form": "Console"
+    },
+    "TIJ": {
+      "name": "The Italian Job",
+      "url": "https://en.wikipedia.org/wiki/The_Italian_Job_(2001_video_game)",
+      "dev": "Pixelogic Limited",
+      "date": "2002-05-03",
+      "form": "Console"
+    },
+    "SR:W": {
+      "name": "Smuggler's Run: Warzones",
+      "url": "https://en.wikipedia.org/wiki/Smuggler%27s_Run:_Warzones",
+      "dev": "Angel Studios",
+      "date": "2002-08-06",
+      "form": "Console"
     },
     "GTA:VC": {
       "name": "Grand Theft Auto: Vice City",
       "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto:_Vice_City",
-      "date": "2003-09-25",
-      "form": "XX"
+      "dev": "Rockstar North;TransGaming;War Drum Studios",
+      "date": "2002-10-29",
+      "form": "Mobile;Console;Windows"
+    },
+    "MC2": {
+      "name": "Midnight Club II",
+      "url": "https://en.wikipedia.org/wiki/Midnight_Club_II",
+      "dev": "Rockstar San Diego",
+      "date": "2003-04-08",
+      "form": "Console;Windows"
+    },
+    "MP2:TFoMP": {
+      "name": "Max Payne 2: The Fall of Max Payne",
+      "url": "https://en.wikipedia.org/wiki/Max_Payne_2:_The_Fall_of_Max_Payne",
+      "dev": "Remedy Entertainment;Rockstar Vienna",
+      "date": "2003-10-14",
+      "form": "Console;Windows"
+    },
+    "MH": {
+      "name": "Manhunt",
+      "url": "https://en.wikipedia.org/wiki/Manhunt_(video_game)",
+      "dev": "Rockstar North",
+      "date": "2003-11-18",
+      "form": "Console;Windows"
+    },
+    "RDR": {
+      "name": "Red Dead Revolver",
+      "url": "https://en.wikipedia.org/wiki/Red_Dead_Revolver",
+      "dev": "Rockstar San Diego",
+      "date": "2004-04-25",
+      "form": "Console"
+    },
+    "GTA:A": {
+      "name": "Grand Theft Auto Advance",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto_Advance",
+      "dev": "Digital Eclipse",
+      "date": "2004-10-26",
+      "form": "Console"
     },
     "GTA:SA": {
       "name": "Grand Theft Auto: San Andreas",
       "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto:_San_Andreas",
-      "date": "2007-01-25",
-      "form": "XX"
+      "dev": "Rockstar North;TransGaming;War Drum Studios",
+      "date": "2004-10-26",
+      "form": "Mobile;Console;Windows"
     },
-    "GTA4": {
-      "name": "Grand Theft Auto IV",
-      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto_IV",
-      "date": "2008-10-30",
-      "form": "XX"
+    "MC3:DE": {
+      "name": "Midnight Club 3: DUB Edition",
+      "url": "https://en.wikipedia.org/wiki/Midnight_Club_3:_Dub_Edition",
+      "dev": "Rockstar San Diego;Rockstar Leeds",
+      "date": "2005-04-12",
+      "form": "Console"
+    },
+    "TW": {
+      "name": "The Warriors",
+      "url": "https://en.wikipedia.org/wiki/The_Warriors_(video_game)",
+      "dev": "Rockstar Toronto;Rockstar Leeds",
+      "date": "2005-10-17",
+      "form": "Console"
     },
     "GTA:LCS": {
       "name": "Grand Theft Auto: Liberty City Stories",
       "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto:_Liberty_City_Stories",
-      "date": "2009-05-28",
-      "form": "XX"
+      "dev": "Rockstar Leeds;Rockstar North;Lucid Games",
+      "date": "2005-10-24",
+      "form": "Mobile;Console"
+    },
+    "MC3:DER": {
+      "name": "Midnight Club 3: DUB Edition Remix",
+      "url": "https://en.wikipedia.org/wiki/Midnight_Club_3:_Dub_Edition#Midnight_Club_3:_Dub_Edition_Remix",
+      "dev": "Rockstar San Diego",
+      "date": "2006-03-13",
+      "form": "Console"
+    },
+    "TableTennis": {
+      "name": "Rockstar Games Presents Table Tennis",
+      "url": "https://en.wikipedia.org/wiki/Rockstar_Games_Presents_Table_Tennis",
+      "dev": "Rockstar San Diego;Rockstar Vienna;Rockstar Leeds",
+      "date": "2006-05-22",
+      "form": "Console"
+    },
+    "B": {
+      "name": "Bully",
+      "url": "https://en.wikipedia.org/wiki/Bully_(video_game)",
+      "dev": "Rockstar Vancouver",
+      "date": "2006-10-17",
+      "form": "Console"
     },
     "GTA:VCS": {
       "name": "Grand Theft Auto: Vice City Stories",
       "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto:_Vice_City_Stories",
-      "date": "2009-05-28",
-      "form": "XX"
+      "dev": "Rockstar Leeds;Rockstar North",
+      "date": "2006-10-31",
+      "form": "Console"
+    },
+    "MH2": {
+      "name": "Manhunt 2",
+      "url": "https://en.wikipedia.org/wiki/Manhunt_2",
+      "dev": "Rockstar London;Rockstar North;Rockstar Leeds;Rockstar Toronto",
+      "date": "2007-10-30",
+      "form": "Console;Windows"
+    },
+    "B:SE": {
+      "name": "Bully: Scholarship Edition",
+      "url": "https://en.wikipedia.org/wiki/Bully_(video_game)#Scholarship_Edition",
+      "dev": "Rockstar Toronto;Mad Doc Software;Rockstar New England",
+      "date": "2008-03-04",
+      "form": "Console;Windows"
+    },
+    "GTA4": {
+      "name": "Grand Theft Auto IV",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto_IV",
+      "dev": "Rockstar North;Rockstar Toronto",
+      "date": "2008-04-29",
+      "form": "Console;Windows",
+      "dlc": {
+        "t": {
+          "name": "The Lost and Damned",
+          "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto_IV:_The_Lost_and_Damned",
+          "date": "2009-02-17"
+        }
+      }
+    },
+    "GTA:CW": {
+      "name": "Grand Theft Auto: Chinatown Wars",
+      "url": "https://en.wikipedia.org/wiki/Grand_Theft_Auto:_Chinatown_Wars",
+      "dev": "Rockstar Leeds;Rockstar North;War Drum Studios",
+      "date": "2009-03-17",
+      "form": "Mobile;Console;Windows"
+    },
+    "Beaterator": {
+      "name": "Beaterator",
+      "url": "https://en.wikipedia.org/wiki/Beaterator",
+      "dev": "Rockstar Leeds",
+      "date": "2009-09-29",
+      "form": "Mobile;Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
+    },
+    "XXX": {
+      "name": "XXX",
+      "url": "",
+      "dev": "",
+      "date": "2003-09-25",
+      "form": "Console"
     }
   },
   "fileManager": {

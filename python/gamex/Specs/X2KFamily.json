@@ -1695,6 +1695,7 @@
       "form": "Console;Windows"
     },
     "NBA2K23": {
+      "n/a": false,
       "name": "NBA 2K23",
       "url": [
         "https://store.steampowered.com/app/1919590/NBA_2K23/",
@@ -1734,7 +1735,6 @@
       "url": [
         "https://store.steampowered.com/app/368260/Marvels_Midnight_Suns/",
         "https://www.xbox.com/en-US/games/store/marvels-midnight-suns-for-xbox-one/9NS10SXBG0HX/0010",
-        "https://www.xbox.com/en-US/games/store/marvels-midnight-suns-enhanced-edition/9NZV28P1ZMQ0/0010",
         "https://en.wikipedia.org/wiki/Marvel%27s_Midnight_Suns"
       ],
       "dev": "Firaxis Games",
@@ -1742,6 +1742,7 @@
       "form": "Console;Windows"
     },
     "WWE2K23": {
+      "n/a": false,
       "name": "WWE 2K23",
       "url": [
         "https://store.steampowered.com/app/1942660/WWE_2K23/",
@@ -1749,15 +1750,15 @@
       ],
       "dev": "Visual Concepts",
       "date": "2022-12-02",
-      "form": "Console"
+      "form": "Console;Windows"
     },
     "Lego2KDrive": {
       "n/a": false,
       "name": "Lego 2K Drive",
       "url": [
         "https://store.steampowered.com/app/1451810/LEGO_2K_Drive/",
+        "https://store.playstation.com/en-us/product/UP1001-PPSA04048_00-CROSSGENEDPS4PS5",
         "https://www.xbox.com/en-US/games/store/lego-2k-drive-for-xbox-one/9PNH6BGC71FP",
-        "https://www.playstation.com/en-us/games/lego-2k-drive/",
         "https://en.wikipedia.org/wiki/Lego_2K_Drive"
       ],
       "dev": "Visual Concepts",
@@ -1765,6 +1766,7 @@
       "form": "Console;Windows"
     },
     "NBA2K24": {
+      "n/a": false,
       "name": "NBA 2K24",
       "url": "https://en.wikipedia.org/wiki/NBA_2K24",
       "dev": "Visual Concepts",
@@ -1772,116 +1774,66 @@
       "form": "Console;Windows"
     },
     "WWE2K24": {
+      "n/a": false,
       "name": "WWE 2K24",
-      "url": "https://en.wikipedia.org/wiki/WWE_2K24",
+      "url": [
+        "https://store.steampowered.com/app/2315690/WWE_2K24/",
+        "https://store.playstation.com/en-us/product/UP1001-PPSA16306_00-WWE2K24CROSSGEN0",
+        "https://www.xbox.com/en-US/games/store/wwe-2k24-cross-gen-digital-edition/9nbffpwtxbtj",
+        "https://en.wikipedia.org/wiki/WWE_2K24"
+      ],
       "dev": "Visual Concepts",
       "date": "2024-05-08",
       "form": "Console;Windows"
     },
     "TopSpin2K25": {
+      "n/a": false,
       "name": "TopSpin 2K25",
-      "url": "https://en.wikipedia.org/wiki/TopSpin_2K25",
+      "url": [
+        "https://store.steampowered.com/app/1785650/TopSpin_2K25/",
+        "https://store.playstation.com/en-us/product/UP1001-PPSA06898_00-TS2K25CROSSGENED",
+        "https://www.xbox.com/en-US/games/store/topspin-2k25-cross-gen-digital-edition/9n6kxjpxft38",
+        "https://en.wikipedia.org/wiki/TopSpin_2K25"
+      ],
       "dev": "Hangar 13",
       "date": "2024-05-26",
       "form": "Console;Windows"
     },
     "NBA2K25": {
+      "n/a": false,
       "name": "NBA 2K25",
-      "url": "https://en.wikipedia.org/wiki/NBA_2K25",
+      "url": [
+        "https://store.steampowered.com/app/2878980/NBA_2K25/",
+        "https://store.playstation.com/en-us/product/UP1001-PPSA22120_00-NBA2K25STANDARD0",
+        "https://www.xbox.com/en-US/games/store/nba-2k25-standard-edition/9PL2XQ4GF10R/0010",
+        "https://en.wikipedia.org/wiki/NBA_2K25"
+      ],
       "dev": "Visual Concepts",
       "date": "2024-09-06",
       "form": "Console;Windows"
     },
     "Mafia:TOC": {
+      "n/a": false,
       "name": "Mafia: The Old Country",
-      "url": "https://en.wikipedia.org/wiki/Mafia:_The_Old_Country",
+      "url": [
+        "https://store.steampowered.com/app/1941540/Mafia_The_Old_Country/",
+        "https://www.playstation.com/en-us/games/mafia-the-old-country/",
+        "https://en.wikipedia.org/wiki/Mafia:_The_Old_Country"
+      ],
       "dev": "Hangar 13",
       "date": "2025-01-01",
       "form": "Console;Windows"
     },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
+    "UK:3U": {
+      "name": "Untitled (31st Union)",
+      "dev": "31st Union"
     },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
+    "UK:BS": {
+      "name": "Untitled (BioShock)",
+      "dev": "Cloud Chamber"
     },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2010-00-00",
-      "form": "Console"
+    "UK:NFL2K": {
+      "name": "Untitled NFL 2K"
     }
   },
   "fileManager": {
