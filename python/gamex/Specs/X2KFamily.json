@@ -52,18 +52,22 @@
       "form": "Windows"
     },
     "MotocrossMania3": {
+      "n/a": false,
       "name": "Motocross Mania 3",
-      "url": "https://en.wikipedia.org/wiki/Motocross_Mania_3",
+      "url": [
+        "https://cdromance.org/ps2-iso/motocross-mania-3-usa/",
+        "https://en.wikipedia.org/wiki/Motocross_Mania_3"
+      ],
       "dev": "Deibus Studios",
       "date": "2005-04-27",
       "form": "Console"
     },
-    "SidMeier:P": {
+    "SM:P": {
       "name": "Sid Meier's Pirates!",
       "url": "https://en.wikipedia.org/wiki/Sid_Meier%27s_Pirates!_(2004_video_game)",
       "dev": "Firaxis Games",
       "date": "2005-07-11",
-      "form": "Console"
+      "form": "Mobile;Console"
     },
     "NHL2K6": {
       "name": "NHL 2K6",
@@ -163,7 +167,7 @@
       "date": "2005-10-25",
       "form": "Windows"
     },
-    "Civ4": {
+    "SM:C4": {
       "n/a": false,
       "name": "Sid Meier's Civilization IV",
       "url": [
@@ -264,6 +268,7 @@
       "form": "Console;Windows"
     },
     "CivCity:R": {
+      "n/a": false,
       "name": "CivCity: Rome",
       "url": [
         "https://store.steampowered.com/app/3980/CivCity_Rome/",
@@ -275,6 +280,7 @@
       "form": "Windows"
     },
     "DS2": {
+      "n/a": false,
       "name": "Dungeon Siege II: Broken World",
       "url": [
         "https://store.steampowered.com/app/39200/Dungeon_Siege_II/",
@@ -285,130 +291,1596 @@
       "date": "2006-08-04",
       "form": "Windows"
     },
+    "NHL2K7": {
+      "name": "NHL 2K7",
+      "url": "https://en.wikipedia.org/wiki/NHL_2K7",
+      "dev": "Kush Games;Visual Concepts",
+      "date": "2006-09-12",
+      "form": "Console"
+    },
+    "NBA2K7": {
+      "name": "NBA 2K7",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K7",
+      "dev": "Visual Concepts",
+      "date": "2006-09-25",
+      "form": "Console"
+    },
+    "FGVG": {
+      "name": "Family Guy Video Game!",
+      "url": "https://en.wikipedia.org/wiki/Family_Guy_Video_Game!",
+      "dev": "High Voltage Software",
+      "date": "2006-10-17",
+      "form": "Console"
+    },
+    "SM:R": {
+      "n/a": false,
+      "name": "Sid Meier's Railroads!",
+      "url": [
+        "https://store.steampowered.com/app/7600/Sid_Meiers_Railroads/",
+        "https://www.gog.com/en/game/sid_meiers_railroads",
+        "https://en.wikipedia.org/wiki/Sid_Meier%27s_Railroads!"
+      ],
+      "dev": "Firaxis Games;2K China",
+      "date": "2006-10-17",
+      "form": "Windows"
+    },
+    "StrongholdLegends": {
+      "n/a": false,
+      "name": "Stronghold Legends",
+      "url": [
+        "https://store.steampowered.com/app/40980/Stronghold_Legends_Steam_Edition/",
+        "https://en.wikipedia.org/wiki/Stronghold_Legends"
+      ],
+      "dev": "Firefly Studios",
+      "date": "2006-10-23",
+      "form": "Windows"
+    },
+    "DS:ToA": {
+      "n/a": false,
+      "name": "Dungeon Siege: Throne of Agony",
+      "url": [
+        "https://cdromance.org/psp/dungeon-siege-throne-of-agony/",
+        "https://en.wikipedia.org/wiki/Dungeon_Siege:_Throne_of_Agony"
+      ],
+      "dev": "SuperVillain Studios",
+      "date": "2006-10-29",
+      "form": "Console"
+    },
+    "Hoops2K7": {
+      "name": "College Hoops 2K7",
+      "url": "https://en.wikipedia.org/wiki/College_Hoops_2K7",
+      "dev": "Visual Concepts",
+      "date": "2006-11-20",
+      "form": "Console"
+    },
+    "GhostRider": {
+      "name": "Ghost Rider",
+      "url": "https://en.wikipedia.org/wiki/Ghost_Rider_(video_game)",
+      "dev": "Climax Studios;Magic Pockets",
+      "date": "2007-02-13",
+      "form": "Console"
+    },
+    "JE:SE": {
+      "n/a": false,
+      "name": "Jade Empire: Special Edition",
+      "url": [
+        "https://store.steampowered.com/app/7110/Jade_Empire_Special_Edition/",
+        "https://www.gog.com/en/game/jade_empire_special_edition",
+        "https://en.wikipedia.org/wiki/Jade_Empire#Jade_Empire:_Special_Edition"
+      ],
+      "dev": "LTI Gray Matter",
+      "date": "2007-02-27",
+      "form": "Console"
+    },
+    "MLB2K7": {
+      "name": "Major League Baseball 2K7",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K7",
+      "dev": "Kush Games;Visual Concepts;Skyworks Technologies",
+      "date": "2007-02-27",
+      "form": "Console"
+    },
+    "FF:RotSS": {
+      "name": "Fantastic Four: Rise of the Silver Surfer",
+      "url": "https://en.wikipedia.org/wiki/Fantastic_Four:_Rise_of_the_Silver_Surfer_(video_game)",
+      "dev": "Visual Concepts;DQ Entertainment;7 Studios",
+      "date": "2007-06-15",
+      "form": "Console"
+    },
+    "TheBigs": {
+      "name": "The Bigs",
+      "url": "https://en.wikipedia.org/wiki/The_Bigs",
+      "dev": "Blue Castle Games;Visual Concepts",
+      "date": "2007-06-25",
+      "form": "Console"
+    },
+    "TheDarkness": {
+      "n/a": false,
+      "name": "The Darkness",
+      "url": [
+        "https://www.xbox.com/en-US/games/store/the-darkness/C035L0NS3SQN",
+        "https://en.wikipedia.org/wiki/The_Darkness_(video_game)"
+      ],
+      "dev": "Starbreeze Studios",
+      "date": "2007-06-25",
+      "form": "Console"
+    },
+    "Football2K8": {
+      "name": "All-Pro Football 2K8",
+      "url": "XXX",
+      "dev": "Visual Concepts",
+      "date": "2007-07-16",
+      "form": "Console"
+    },
+    "BS": {
+      "name": "BioShock",
+      "url": [
+        "https://store.steampowered.com/app/7670/BioShock/",
+        "https://www.xbox.com/en-US/games/store/bioshock/BTBMZQ3FM2V8/0001",
+        "https://en.wikipedia.org/wiki/BioShock"
+      ],
+      "dev": "2K Boston;2K Australia",
+      "date": "2007-06-25",
+      "form": "Console"
+    },
+    "NHL2K8": {
+      "name": "NHL 2K8",
+      "url": "https://en.wikipedia.org/wiki/NHL_2K8",
+      "dev": "2K Los Angeles;Visual Concepts",
+      "date": "2007-09-11",
+      "form": "Console"
+    },
+    "NBA2K8": {
+      "name": "NBA 2K8",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K8",
+      "dev": "Visual Concepts",
+      "date": "2007-10-02",
+      "form": "Console"
+    },
+    "MLB::PP": {
+      "name": "MLB Power Pros",
+      "url": "https://en.wikipedia.org/wiki/MLB_Power_Pros",
+      "dev": "Konami",
+      "date": "2007-10-03",
+      "form": "Console"
+    },
+    "DtE:DStM": {
+      "name": "Dora the Explorer: Dora Saves the Mermaids",
+      "url": "https://en.wikipedia.org/wiki/Dora_the_Explorer_video_games#Dora_Saves_the_Mermaids",
+      "dev": "Black Lantern Studios;Totally Games",
+      "date": "2007-11-05",
+      "form": "Console"
+    },
+    "GDG:SR": {
+      "name": "Go, Diego, Go! Safari Rescue",
+      "url": "https://en.wikipedia.org/wiki/Go,_Diego,_Go!_Safari_Rescue",
+      "dev": "Black Lantern Studios;High Voltage Software",
+      "date": "2007-11-05",
+      "form": "Console"
+    },
+    "Hoops2K8": {
+      "name": "College Hoops 2K8",
+      "url": "https://en.wikipedia.org/wiki/College_Hoops_2K8",
+      "dev": "Visual Concepts",
+      "date": "2007-11-19",
+      "form": "Console"
+    },
+    "DoND:SVG": {
+      "n/a": false,
+      "name": "Deal or No Deal: Secret Vault Games",
+      "url": "https://www.myabandonware.com/game/deal-or-no-deal-secret-vault-games-imw",
+      "dev": "Cat Daddy Games",
+      "date": "2007-11-29",
+      "form": "Console"
+    },
+    "MLB2K8": {
+      "name": "Major League Baseball 2K8",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K8",
+      "dev": "2K Los Angeles;Visual Concepts;2K China",
+      "date": "2008-03-03",
+      "form": "Console"
+    },
+    "DKP:P": {
+      "name": "Don King Presents: Prizefighter",
+      "url": "https://en.wikipedia.org/wiki/Don_King_Presents:_Prizefighter",
+      "dev": "Venom Games;2K China;Symbio Digital Entertainment",
+      "date": "2008-06-10",
+      "form": "Console"
+    },
+    "TopSpin3": {
+      "name": "Top Spin 3",
+      "url": "https://en.wikipedia.org/wiki/Top_Spin_3",
+      "dev": "2K China;PAM Development",
+      "date": "2008-06-23",
+      "form": "Console"
+    },
+    "CG": {
+      "n/a": false,
+      "name": "Carnival Games",
+      "url": [
+        "https://store.steampowered.com/app/1249740/Carnival_Games/",
+        "https://en.wikipedia.org/wiki/Carnival_Games"
+      ],
+      "dev": "Cat Daddy Games;2K China;Mass Media Games",
+      "date": "2008-07-08",
+      "form": "Mobile;Console;Windows"
+    },
+    "SM:CR": {
+      "n/a": false,
+      "name": "Sid Meier's Civilization Revolution",
+      "url": [
+        "https://www.xbox.com/en-US/games/store/sid-meiers-civilization-revolution/BQ0WGG6B6X2H",
+        "https://en.wikipedia.org/wiki/Civilization_Revolution"
+      ],
+      "dev": "Firaxis Games;2K China",
+      "date": "2007-10-19",
+      "form": "Console;Mobile"
+    },
+    "MLB2K8:PP": {
+      "name": "MLB Power Pros 2008",
+      "url": "https://en.wikipedia.org/wiki/MLB_Power_Pros_2008",
+      "dev": "Konami",
+      "date": "2008-07-29",
+      "form": "Console"
+    },
+    "NHL2K9": {
+      "name": "NHL 2K9",
+      "url": "https://en.wikipedia.org/wiki/NHL_2K9",
+      "dev": "Visual Concepts",
+      "date": "2008-09-08",
+      "form": "Console"
+    },
+    "NBA2K9": {
+      "name": "NBA 2K9",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K9",
+      "dev": "Visual Concepts",
+      "date": "2008-10-07",
+      "form": "Console"
+    },
+    "MLB:SB": {
+      "name": "MLB Stickball",
+      "url": "https://en.wikipedia.org/wiki/MLB_Stickball",
+      "dev": "Gaia Industries",
+      "date": "2008-10-08",
+      "form": "Console"
+    },
+    "CG:MG": {
+      "name": "Carnival Games: Mini-Golf",
+      "url": "https://en.wikipedia.org/wiki/Carnival_Games:_Mini-Golf",
+      "dev": "Cat Daddy Games",
+      "date": "2008-10-20",
+      "form": "Console"
+    },
+    "DtE:DStSP": {
+      "name": "Dora the Explorer: Dora Saves the Snow Princess",
+      "url": "https://en.wikipedia.org/wiki/Dora_the_Explorer_video_games#Dora_Saves_the_Snow_Princess",
+      "dev": "High Voltage Software;Black Lantern Studios",
+      "date": "2008-10-28",
+      "form": "Console"
+    },
+    "GDG:GDR": {
+      "name": "Go, Diego, Go! Great Dinosaur Rescue",
+      "url": "https://en.wikipedia.org/wiki/Go,_Diego,_Go!#Video_games",
+      "dev": "High Voltage Software;Black Lantern Studios",
+      "date": "2008-10-28",
+      "form": "Console"
+    },
+    "WP:StA": {
+      "name": "Wonder Pets! Save the Animals!",
+      "url": "https://en.wikipedia.org/wiki/Wonder_Pets!#Game",
+      "dev": "Black Lantern Studios",
+      "date": "2008-10-28",
+      "form": "Console"
+    },
+    "MLB:SS": {
+      "name": "MLB Superstars",
+      "url": "https://en.wikipedia.org/wiki/MLB_Superstars",
+      "dev": "Deep Fried Entertainment",
+      "date": "2008-11-10",
+      "form": "Console"
+    },
+    "MLB:FOM": {
+      "name": "MLB Front Office Manager",
+      "url": "https://en.wikipedia.org/wiki/MLB_Front_Office_Manager",
+      "dev": "Blue Castle Games",
+      "date": "2009-01-26",
+      "form": "Console;Windows"
+    },
+    "MLB2K9": {
+      "name": "Major League Baseball 2K9",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K9",
+      "dev": "Visual Concepts;2K China",
+      "date": "2009-03-03",
+      "form": "Console;Windows"
+    },
+    "MLB2K9:FAS": {
+      "name": "Major League Baseball 2K9: Fantasy All-Stars",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K9_Fantasy_All-Stars",
+      "dev": "Deep Fried Entertainment",
+      "date": "2009-03-03",
+      "form": "Console"
+    },
+    "BS2:SitS": {
+      "name": "There's Something in the Sea",
+      "url": "https://en.wikipedia.org/wiki/BioShock_2#Release",
+      "dev": "2K Marin",
+      "date": "2009-03-04",
+      "form": "Other"
+    },
+    "DKB": {
+      "name": "Don King Boxing",
+      "url": "XXX",
+      "dev": "2K China;Mineloader Software",
+      "date": "2009-03-31",
+      "form": "Console"
+    },
+    "TheBigs2": {
+      "name": "The Bigs 2",
+      "url": "https://en.wikipedia.org/wiki/The_Bigs_2",
+      "dev": "Blue Castle Games;Sensory Sweep Studios",
+      "date": "2009-07-07",
+      "form": "Console"
+    },
+    "BPB": {
+      "name": "Birthday Party Bash",
+      "url": "https://en.wikipedia.org/wiki/Birthday_Party_Bash",
+      "dev": "Cat Daddy Games",
+      "date": "2009-07-14",
+      "form": "Console"
+    },
+    "NBA2K10:DC": {
+      "name": "NBA 2K10: Draft Combine",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K10_Draft_Combine",
+      "dev": "Visual Concepts",
+      "date": "2009-08-26",
+      "form": "Console"
+    },
+    "NHL2K10": {
+      "name": "NHL 2K10",
+      "url": "https://en.wikipedia.org/wiki/NHL_2K10",
+      "dev": "Visual Concepts",
+      "date": "2009-09-15",
+      "form": "Console"
+    },
+    "BaseballBlast": {
+      "name": "Baseball Blast!",
+      "url": "https://nintendo.fandom.com/wiki/Baseball_Blast!",
+      "dev": "WayForward",
+      "date": "2009-09-29",
+      "form": "Console"
+    },
+    "NBA2K10": {
+      "name": "NBA 2K10",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K10",
+      "dev": "2K China;Visual Concepts",
+      "date": "2009-10-06",
+      "form": "Console;Windows"
+    },
+    "Axel+Pixel": {
+      "n/a": false,
+      "name": "Axel & Pixel",
+      "url": [
+        "https://store.steampowered.com/app/8970/Axel__Pixel/",
+        "https://en.wikipedia.org/wiki/Axel_%26_Pixel"
+      ],
+      "dev": "Silver Wish Games",
+      "date": "2009-10-14",
+      "form": "Console;Windows"
+    },
+    "BL": {
+      "n/a": false,
+      "name": "Borderlands",
+      "url": [
+        "https://store.steampowered.com/app/729040/Borderlands_Game_of_the_Year_Enhanced/",
+        "https://www.xbox.com/en-US/games/store/borderlands/C0NDKFJXW9SZ/0001",
+        "https://en.wikipedia.org/wiki/Borderlands_(video_game)"
+      ],
+      "dev": "Gearbox Software; Critical Mass Interactive;Demiurge Studios",
+      "date": "2009-10-20",
+      "form": "Console;Windows"
+    },
+    "DoraPuppy": {
+      "name": "Dora Puppy",
+      "url": "https://en.wikipedia.org/wiki/Dora_the_Explorer_video_games#Dora_Puppy",
+      "dev": "Black Lantern Studios",
+      "date": "2009-11-05",
+      "form": "Console"
+    },
+    "DtE:DStCK": {
+      "name": "Dora the Explorer: Dora Saves the Crystal Kingdom",
+      "url": "https://en.wikipedia.org/wiki/Dora_the_Explorer_video_games#Dora_Saves_the_Crystal_Kingdom",
+      "dev": "High Voltage Software",
+      "date": "2009-11-05",
+      "form": "Console"
+    },
+    "NHKL:NYC": {
+      "name": "Ni Hao, Kai-Lan: New Year Celebration",
+      "dev": "Black Lantern Studios",
+      "date": "2009-11-05",
+      "form": "Console"
+    },
+    "NHKL:SGDay": {
+      "name": "Ni Hao, Kai-Lan: Super Game Day",
+      "dev": "High Voltage Software",
+      "date": "2009-11-05",
+      "form": "Console"
+    },
+    "TheBackyardigans": {
+      "name": "The Backyardigans",
+      "dev": "Black Lantern Studios",
+      "date": "2009-11-05",
+      "form": "Console"
+    },
+    "RBaBB:CFAE": {
+      "name": "Ringling Bros. and Barnum & Bailey: Circus Friends - Asian Elephants",
+      "dev": "Cat Daddy Games",
+      "date": "2009-11-10",
+      "form": "Console"
+    },
+    "RBaBB:TGSoEarth": {
+      "name": "Ringling Bros. and Barnum & Bailey: The Greatest Show on Earth",
+      "dev": "Cat Daddy Games",
+      "date": "2009-11-10",
+      "form": "Console"
+    },
+    "BS2": {
+      "name": "BioShock 2",
+      "url": "https://en.wikipedia.org/wiki/BioShock_2",
+      "dev": "2K Marin;2K Australia;Digital Extremes;Arkane Studios;2K Boston",
+      "date": "2010-02-09",
+      "form": "Console;Windows"
+    },
+    "TMoPBW": {
+      "n/a": false,
+      "name": "The Misadventures of P.B. Winterbottom",
+      "url": [
+        "https://store.steampowered.com/app/40930/The_Misadventures_of_PB_Winterbottom/",
+        "https://en.wikipedia.org/wiki/The_Misadventures_of_P.B._Winterbottom"
+      ],
+      "dev": "The Odd Gentlemen;2K Hangzhou",
+      "date": "2010-02-17",
+      "form": "Console"
+    },
+    "MLB2K10": {
+      "name": "Major League Baseball 2K10",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K10",
+      "dev": "2K China;Visual Concepts;Powerhead Studios",
+      "date": "2010-03-02",
+      "form": "Console;Windows"
+    },
+    "DtE:DBBA": {
+      "name": "Dora the Explorer: Dora's Big Birthday Adventure",
+      "dev": "Black Lantern Studios",
+      "date": "2010-08-03",
+      "form": "Console"
+    },
+    "Mafia2": {
+      "n/a": false,
+      "name": "Mafia II",
+      "url": [
+        "https://store.steampowered.com/app/50130/Mafia_II_Classic/",
+        "https://www.xbox.com/en-US/games/store/mafia-ii/C1H15FFSH2CB/0001",
+        "https://www.playstation.com/en-us/games/mafia-ii-remaster/",
+        "https://en.wikipedia.org/wiki/Mafia_II"
+      ],
+      "dev": "2K Czech",
+      "date": "2010-08-24",
+      "form": "Console;Windows"
+    },
+    "NHL2K11": {
+      "name": "NHL 2K11",
+      "url": "https://en.wikipedia.org/wiki/NHL_2K11",
+      "dev": "2K China;Visual Concepts",
+      "date": "2010-08-24",
+      "form": "Mobile;Console"
+    },
+    "CG:N": {
+      "name": "New Carnival Games",
+      "url": "https://en.wikipedia.org/wiki/New_Carnival_Games",
+      "dev": "Cat Daddy Games",
+      "date": "2010-09-21",
+      "form": "Console"
+    },
+    "SM:C5": {
+      "n/a": false,
+      "name": "Sid Meier's Civilization V",
+      "url": [
+        "https://store.steampowered.com/app/8930/Sid_Meiers_Civilization_V/",
+        "https://en.wikipedia.org/wiki/Civilization_V"
+      ],
+      "dev": "Firaxis Games;2K Shanghai",
+      "date": "2010-09-21",
+      "form": "Windows"
+    },
+    "NBA2K11": {
+      "name": "NBA 2K11",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K11",
+      "dev": "2K China;Visual Concepts",
+      "date": "2010-10-05",
+      "form": "Console;Windows"
+    },
+    "DCC": {
+      "name": "Dora's Cooking Club",
+      "url": "https://en.wikipedia.org/wiki/Dora_the_Explorer_video_games#Dora's_Cooking_Club",
+      "dev": "Black Lantern Studios",
+      "date": "2010-10-26",
+      "form": "Console"
+    },
+    "MB:DBaR": {
+      "name": "Mega Bloks: Diego's Build and Rescue",
+      "dev": "Black Lantern Studios",
+      "date": "2010-10-26",
+      "form": "Console"
+    },
+    "NickFit": {
+      "name": "Nickelodeon Fit",
+      "dev": "High Voltage Software",
+      "date": "2010-11-10",
+      "form": "Console"
+    },
+    "CG:V2": {
+      "name": "Carnival Games Volume II",
+      "dev": "2K China",
+      "date": "2011-02-09",
+      "form": "Mobile"
+    },
+    "MLB2K11": {
+      "name": "Major League Baseball 2K11",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K11",
+      "dev": "Virtuos;2K China;Visual Concepts",
+      "date": "2011-03-08",
+      "form": "Console;Windows"
+    },
+    "TopSpin4": {
+      "name": "Top Spin 4",
+      "url": "https://en.wikipedia.org/wiki/Top_Spin_4",
+      "dev": "2K Czech;2K China",
+      "date": "2011-04-15",
+      "form": "Console"
+    },
+    "DukeNudem": {
+      "name": "Duke Nudem",
+      "dev": "Ralph Creative Agency",
+      "date": "2011-04-16",
+      "form": "Other"
+    },
+    "DukeNukem": {
+      "name": "Duke Nukem Forever",
+      "url": "https://en.wikipedia.org/wiki/Duke_Nukem_Forever",
+      "dev": "Gearbox Software;Triptych Games;Piranha Games;3D Realms",
+      "date": "2011-06-14",
+      "form": "Console"
+    },
+    "SM:CW": {
+      "name": "Sid Meier's Civilization World",
+      "url": "https://en.wikipedia.org/wiki/Civilization_World",
+      "dev": "Firaxis Games",
+      "date": "2011-06-06",
+      "form": "Other"
+    },
+    "NicktoonsMLB": {
+      "name": "Nicktoons MLB",
+      "url": "https://en.wikipedia.org/wiki/Nicktoons_MLB",
+      "dev": "High Voltage Software;Black Lantern Studios",
+      "date": "2011-09-13",
+      "form": "Console"
+    },
+    "NBA2K12": {
+      "name": "NBA 2K12",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K12",
+      "dev": "Visual Concepts;Virtuos;2K China",
+      "date": "2011-10-04",
+      "form": "Mobile;Console;Windows"
+    },
+    "DKL:PS": {
+      "name": "Dora & Kai-Lan's Pet Shelter",
+      "dev": "Black Lantern Studios",
+      "date": "2011-11-01",
+      "form": "Console"
+    },
+    "TeamUmizoomi": {
+      "name": "Team Umizoomi",
+      "dev": "Black Lantern Studios",
+      "date": "2011-11-01",
+      "form": "Console"
+    },
+    "NickelodeonDance": {
+      "name": "Nickelodeon Dance",
+      "dev": "High Voltage Software",
+      "date": "2011-11-08",
+      "form": "Console"
+    },
+    "LetsCheer": {
+      "name": "Let's Cheer!",
+      "dev": "Cat Daddy Games",
+      "date": "2011-11-15",
+      "form": "Console"
+    },
+    "CG:WW3": {
+      "name": "Carnival Games: Wild West 3D",
+      "url": "https://en.wikipedia.org/wiki/Carnival_Games:_Wild_West_3D",
+      "dev": "Cat Daddy Games",
+      "date": "2011-11-21",
+      "form": "Console"
+    },
+    "TheDarkness2": {
+      "n/a": false,
+      "name": "The Darkness II",
+      "url": [
+        "https://store.steampowered.com/app/67370/The_Darkness_II/",
+        "https://www.xbox.com/en-US/games/store/the-darkness-ii/C20T418C1T43",
+        "https://en.wikipedia.org/wiki/The_Darkness_II"
+      ],
+      "dev": "Digital Extremes;2K China",
+      "date": "2012-02-07",
+      "form": "Console;Windows"
+    },
+    "CG:MSMD": {
+      "name": "Carnival Games: Monkey See, Monkey Do",
+      "dev": "Cat Daddy Games",
+      "date": "2012-03-06",
+      "form": "Console"
+    },
+    "MLB2K12": {
+      "name": "Major League Baseball 2K12",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K12",
+      "dev": "Visual Concepts;Virtuos;2K China",
+      "date": "2012-03-06",
+      "form": "Console;Windows"
+    },
+    "NicktoonsMLB3D": {
+      "name": "Nicktoons MLB 3D",
+      "url": "https://en.wikipedia.org/wiki/Nicktoons_MLB_3D",
+      "dev": "Black Lantern Studios",
+      "date": "2012-03-06",
+      "form": "Console"
+    },
+    "SpecOps:TL": {
+      "name": "Spec Ops: The Line",
+      "url": [
+        "https://store.steampowered.com/app/50300/Spec_Ops_The_Line/",
+        "https://www.xbox.com/en-US/games/store/spec-ops-the-line/c160k9cdddcw",
+        "https://en.wikipedia.org/wiki/Spec_Ops:_The_Line"
+      ],
+      "dev": "Yager Development;Darkside Game Studios;Blind Squirrel Games",
+      "date": "2012-06-26",
+      "form": "Console;Windows",
+      "tag": "Removed"
+    },
+    "CCIG": {
+      "name": "Comedy Central's Indecision Game",
+      "dev": "Cat Daddy Games;345 Games",
+      "date": "2012-07-10",
+      "form": "Mobile"
+    },
+    "NBA2K:AS": {
+      "name": "NBA 2K All Stars",
+      "dev": "CyberX",
+      "date": "2012-07-19",
+      "form": "Other"
+    },
+    "HPfFtC": {
+      "name": "House Pest featuring Fiasco the Cat",
+      "dev": "Cat Daddy Games",
+      "date": "2012-09-10",
+      "form": "Mobile"
+    },
+    "BL2": {
+      "n/a": false,
+      "name": "Borderlands 2",
+      "url": [
+        "https://store.steampowered.com/app/49520/Borderlands_2/",
+        "https://www.xbox.com/en-US/games/store/borderlands-2/BRC33X34H2C9/0001",
+        "https://en.wikipedia.org/wiki/Borderlands_2"
+      ],
+      "dev": "Gearbox Software",
+      "date": "2012-09-18",
+      "form": "Mobile;Console;Windows",
+      "dlc": {
+        "hd": {
+          "name": "Borderlands 2: Ultra HD",
+          "date": "2019-04-03"
+        }
+      }
+    },
+    "GridBlock": {
+      "name": "GridBlock",
+      "dev": "Cat Daddy Games",
+      "date": "2012-09-20",
+      "form": "Mobile"
+    },
+    "NBA2K13": {
+      "name": "NBA 2K13",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K13",
+      "dev": "Visual Concepts;2K China;Virtuos",
+      "date": "2012-10-02",
+      "form": "Mobile;Console;Windows"
+    },
+    "NBA2K:ML": {
+      "name": "NBA 2K MyLIFE",
+      "dev": "Visual Concepts",
+      "date": "2012-10-02",
+      "form": "Other"
+    },
+    "NBA2K:M": {
+      "name": "MyNBA 2K",
+      "dev": "Visual Concepts",
+      "date": "2012-10-05",
+      "form": "Mobile"
+    },
+    "XCOM:EU": {
+      "name": "XCOM: Enemy Unknown",
+      "url": [
+        "https://store.steampowered.com/app/200510/XCOM_Enemy_Unknown/",
+        "https://www.xbox.com/en-US/games/store/xcom-enemy-unknown/BQZ0V5R1HPXF/0001",
+        "https://en.wikipedia.org/wiki/XCOM:_Enemy_Unknown"
+      ],
+      "dev": "Firaxis Games;2K China;Blind Squirrel Games;Darkside Game Studios;Digital Extremes",
+      "date": "2012-10-09",
+      "form": "Console;Windows"
+    },
+    "BLL": {
+      "name": "Borderlands Legends",
+      "url": "https://en.wikipedia.org/wiki/Borderlands_Legends",
+      "dev": "Gearbox Software",
+      "date": "2012-10-31",
+      "form": "Mobile"
+    },
+    "BubbleGuppies": {
+      "name": "Bubble Guppies",
+      "dev": "Black Lantern Studios",
+      "date": "2012-11-06",
+      "form": "Console"
+    },
+    "NickDance2": {
+      "name": "Nickelodeon Dance 2",
+      "dev": "High Voltage Software",
+      "date": "2012-11-06",
+      "form": "Console"
+    },
+    "TUD:FF": {
+      "name": "Team Umizoomi & Dora's Fantastic Flight",
+      "dev": "Black Lantern Studios",
+      "date": "2012-11-06",
+      "form": "Console"
+    },
+    "Herd3": {
+      "name": "Herd, Herd, Herd",
+      "dev": "Cat Daddy Games",
+      "date": "2012-12-06",
+      "form": "Console"
+    },
+    "BSI:IR": {
+      "name": "BioShock Infinite: Industrial Revolution",
+      "dev": "Lazy 8 Studios",
+      "date": "2013-01-24",
+      "form": "Other"
+    },
+    "MLB2K13": {
+      "name": "Major League Baseball 2K13",
+      "url": "https://en.wikipedia.org/wiki/Major_League_Baseball_2K13",
+      "dev": "Visual Concepts",
+      "date": "2013-03-05",
+      "form": "Console"
+    },
+    "BSI": {
+      "n/a": false,
+      "name": "BioShock Infinite",
+      "url": [
+        "https://store.steampowered.com/app/8870/BioShock_Infinite/",
+        "https://www.xbox.com/en-US/games/store/bioshock-infinite/C4XX6JL0N0DM",
+        "https://en.wikipedia.org/wiki/BioShock_Infinite"
+      ],
+      "dev": "Irrational Games;2K Australia",
+      "date": "2013-03-26",
+      "form": "Console;Windows"
+    },
+    "HauntedHollow": {
+      "name": "Haunted Hollow",
+      "url": "https://en.wikipedia.org/wiki/Haunted_Hollow",
+      "dev": "Firaxis Games",
+      "date": "2013-05-02",
+      "form": "Mobile"
+    },
+    "Baseball2K:P": {
+      "name": "Pro Baseball 2K",
+      "dev": "Nexon",
+      "date": "2013-05-02",
+      "form": "Windows"
+    },
+    "SM:AP": {
+      "n/a": false,
+      "name": "Sid Meier's Ace Patrol",
+      "url": [
+        "https://store.steampowered.com/app/244070/Sid_Meiers_Ace_Patrol/",
+        "https://en.wikipedia.org/wiki/Sid_Meier%27s_Ace_Patrol"
+      ],
+      "dev": "Firaxis Games",
+      "date": "2013-05-02",
+      "form": "Mobile"
+    },
+    "Beejumbled": {
+      "name": "Beejumbled",
+      "dev": "Cat Daddy Games",
+      "date": "2013-06-13",
+      "form": "Console"
+    },
+    "TurdBirds": {
+      "name": "Turd Birds",
+      "url": "XXX",
+      "dev": "Cat Daddy Games",
+      "date": "2013-07-11",
+      "form": "Mobile"
+    },
+    "XCOM:TBD": {
+      "n/a": false,
+      "name": "The Bureau: XCOM Declassified",
+      "url": [
+        "https://store.steampowered.com/app/65930/The_Bureau_XCOM_Declassified/",
+        "https://www.gog.com/en/game/the_bureau_xcom_declassified",
+        "https://www.xbox.com/en-US/games/store/the-bureau/BWGWPKRVZZV2",
+        "https://en.wikipedia.org/wiki/The_Bureau:_XCOM_Declassified"
+      ],
+      "dev": "2K Marin;2K Australia;2K China",
+      "date": "2013-08-20",
+      "form": "Console;Windows"
+    },
+    "2KDrive": {
+      "name": "2K Drive",
+      "url": "https://en.wikipedia.org/wiki/2K_Drive",
+      "dev": "Lucid Games",
+      "date": "2013-09-05",
+      "form": "Mobile"
+    },
+    "NBA2K14": {
+      "name": "NBA 2K14",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K14",
+      "dev": "Visual Concepts;Visual Concepts China",
+      "date": "2013-10-01",
+      "form": "Mobile;Console;Windows"
+    },
+    "WWE2K14": {
+      "name": "WWE 2K14",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K14",
+      "dev": "Yuke's;Visual Concepts",
+      "date": "2013-10-01",
+      "form": "Console"
+    },
+    "NBA2K14:M": {
+      "name": "MyNBA 2K14",
+      "dev": "Cat Daddy Games",
+      "date": "2013-11-08",
+      "form": "Mobile"
+    },
+    "SenseiWars": {
+      "name": "Sensei Wars",
+      "dev": "Cat Daddy Games",
+      "date": "2013-12-11",
+      "form": "Mobile"
+    },
+    "SM:CR2": {
+      "name": "Sid Meier's Civilization Revolution 2",
+      "url": "https://en.wikipedia.org/wiki/Civilization_Revolution_2",
+      "dev": "2K China;Firaxis Games",
+      "date": "2014-07-02",
+      "form": "Mobile"
+    },
+    "WWE:SC": {
+      "name": "WWE SuperCard",
+      "url": "https://en.wikipedia.org/wiki/WWE_SuperCard",
+      "dev": "Cat Daddy Games",
+      "date": "2014-08-14",
+      "form": "Console"
+    },
+    "NBA2K15": {
+      "name": "NBA 2K15",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K15",
+      "dev": "Visual Concepts",
+      "date": "2014-10-07",
+      "form": "Mobile;Console;Windows"
+    },
+    "NBA2K15:M": {
+      "name": "MyNBA 2K15",
+      "dev": "Cat Daddy Games",
+      "date": "2014-10-13",
+      "form": "Mobile"
+    },
+    "BL:TPS": {
+      "n/a": false,
+      "name": "Borderlands: The Pre-Sequel!",
+      "url": [
+        "https://store.steampowered.com/app/261640/Borderlands_The_PreSequel/",
+        "https://www.xbox.com/en-US/games/store/borderlands-the-pre-sequel/BT056K0FLWHT",
+        "https://en.wikipedia.org/wiki/Borderlands:_The_Pre-Sequel"
+      ],
+      "dev": "2K Australia;Gearbox Software;Darkside Game Studios;2K China",
+      "date": "2014-10-14",
+      "form": "Mobile;Console;Windows"
+    },
+    "NHL2K": {
+      "name": "NHL 2K",
+      "url": "https://en.wikipedia.org/wiki/NHL_2K_(2014_video_game)",
+      "dev": "Visual Concepts China;Virtuos",
+      "date": "2014-10-23",
+      "form": "Mobile"
+    },
+    "SM:CBE": {
+      "n/a": false,
+      "name": "Sid Meier's Civilization: Beyond Earth",
+      "url": [
+        "https://store.steampowered.com/app/65980/Sid_Meiers_Civilization_Beyond_Earth/",
+        "https://en.wikipedia.org/wiki/Civilization:_Beyond_Earth"
+      ],
+      "dev": "Firaxis Games",
+      "date": "2014-10-24",
+      "form": "Windows"
+    },
+    "WWE2K15": {
+      "name": "WWE 2K15",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K15",
+      "dev": "Yuke's;Visual Concepts;QLOC;Mineloader;Winking Entertainment;Original Force;Pixelgun Studio",
+      "date": "2014-10-28",
+      "form": "Console;Windows"
+    },
+    "Evolve:HQ": {
+      "name": "Evolve: Hunter's Quest",
+      "dev": "Cat Daddy Games",
+      "date": "2015-01-29",
+      "form": "Mobile"
+    },
+    "Evolve": {
+      "n/a": false,
+      "name": "Evolve",
+      "url": [
+        "https://www.xbox.com/en-US/games/store/evolve/C4HHJM5JSSJ1/0001",
+        "https://en.wikipedia.org/wiki/Evolve_(video_game)"
+      ],
+      "dev": "Turtle Rock Studios;Agora Games;Blind Squirrel Games;Crytek;IllFonic;Mass Media Games",
+      "date": "2015-02-10",
+      "form": "Console;Windows"
+    },
+    "SM:S": {
+      "n/a": false,
+      "name": "Sid Meier's Starships",
+      "url": [
+        "https://store.steampowered.com/app/282210/Sid_Meiers_Starships/",
+        "https://en.wikipedia.org/wiki/Sid_Meier%27s_Starships"
+      ],
+      "dev": "Firaxis Games",
+      "date": "2015-03-12",
+      "form": "Console"
+    },
+    "BL:THC": {
+      "name": "Borderlands: The Handsome Collection",
+      "url": [
+        "https://store.steampowered.com/bundle/8133/Borderlands_The_Handsome_Collection/",
+        "https://www.xbox.com/en-US/games/store/borderlands-the-handsome-collection/C4DQHRNN1ZN5",
+        "https://en.wikipedia.org/wiki/Borderlands:_The_Handsome_Collection"
+      ],
+      "dev": "Armature Studio;Iron Galaxy Studios",
+      "date": "2015-03-24",
+      "form": "Bundle"
+    },
+    "WWE2K": {
+      "name": "WWE 2K",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K_(video_game)",
+      "dev": "N-Space",
+      "date": "2015-04-16",
+      "form": "Mobile"
+    },
+    "NBA2K16": {
+      "name": "NBA 2K16",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K16",
+      "dev": "Visual Concepts;Visual Concepts South Korea;Visual Concepts China",
+      "date": "2015-09-29",
+      "form": "Mobile;Console;Windows"
+    },
+    "NBA2K16:M": {
+      "name": "MyNBA 2K16",
+      "dev": "Cat Daddy Games",
+      "date": "2015-10-01",
+      "form": "Mobile"
+    },
+    "NHL:SC": {
+      "name": "NHL SuperCard",
+      "dev": "Cat Daddy Games;Wahoo Studios",
+      "date": "2015-10-08",
+      "form": "Mobile"
+    },
+    "WWE2K16": {
+      "name": "WWE 2K16",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K16",
+      "dev": "Yuke's;Visual Concepts",
+      "date": "2015-10-27",
+      "form": "Console;Windows"
+    },
+    "SM:CO": {
+      "name": "Sid Meier's Civilization Online",
+      "dev": "XL Games",
+      "date": "2015-12-02",
+      "form": "Windows"
+    },
+    "XCOM2": {
+      "n/a": false,
+      "name": "XCOM 2",
+      "url": [
+        "https://store.steampowered.com/app/268500/XCOM_2/",
+        "https://www.gog.com/en/game/xcom_2",
+        "https://www.xbox.com/en-US/games/store/xcom-2-collection/C46J5M9FS4N6",
+        "https://en.wikipedia.org/wiki/XCOM_2"
+      ],
+      "dev": "Firaxis Games;The Workshop;Blind Squirrel Games",
+      "date": "2016-02-05",
+      "form": "Console;Windows"
+    },
+    "XCOM:EUP": {
+      "name": "XCOM: Enemy Unknown Plus",
+      "dev": "Firaxis Games",
+      "date": "2016-03-22",
+      "form": "Console"
+    },
+    "SM:CR2P": {
+      "name": "Sid Meier's Civilization Revolution 2 Plus",
+      "dev": "Firaxis Games",
+      "date": "2016-03-22",
+      "form": "Console"
+    },
+    "BattlebornTap": {
+      "name": "Battleborn Tap",
+      "dev": "Bee Square",
+      "date": "2016-04-27",
+      "form": "Mobile"
+    },
+    "Battleborn": {
+      "name": "Battleborn",
+      "url": [
+        "https://store.steampowered.com/app/394230/Battleborn/",
+        "https://en.wikipedia.org/wiki/Battleborn_(video_game)"
+      ],
+      "dev": "Gearbox Software",
+      "date": "2016-05-03",
+      "form": "Console;Windows"
+    },
+    "EvolveStage2": {
+      "name": "Evolve Stage 2",
+      "url": "https://store.steampowered.com/app/273350/Evolve_Stage_2/",
+      "dev": "Turtle Rock Studios",
+      "date": "2016-07-07",
+      "form": "Windows"
+    },
+    "NBA2K17:M": {
+      "name": "MyNBA 2K17",
+      "dev": "Cat Daddy Games",
+      "date": "2016-09-08",
+      "form": "Mobile"
+    },
+    "NBA2K17:TP": {
+      "name": "NBA 2K17: The Prelude",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K17:_The_Prelude",
+      "dev": "Visual Concepts",
+      "date": "2016-09-09",
+      "form": "Console"
+    },
+    "BS:TC": {
+      "name": "BioShock: The Collection",
+      "url": [
+        "https://store.steampowered.com/sub/127633/",
+        "https://www.xbox.com/en-US/games/store/bioshock-the-collection/C2HCDG7L1469",
+        "https://store.epicgames.com/en-US/bundles/bioshock-the-collection",
+        "https://en.wikipedia.org/wiki/BioShock:_The_Collection"
+      ],
+      "dev": "Blind Squirrel Games",
+      "date": "2016-09-13",
+      "form": "Bundle"
+    },
+    "BS:R": {
+      "n/a": false,
+      "name": "BioShock Remastered",
+      "url": [
+        "https://store.steampowered.com/app/409710/BioShock_Remastered/",
+        "https://www.gog.com/en/game/bioshock_remastered",
+        "https://www.xbox.com/en-US/games/store/bioshock-remastered/BNCBCS5RJWH7"
+      ],
+      "dev": "Blind Squirrel Games",
+      "date": "2016-09-15",
+      "form": "Windows"
+    },
+    "BS2:R": {
+      "n/a": false,
+      "name": "BioShock 2 Remastered",
+      "url": [
+        "https://store.steampowered.com/app/409720/BioShock_2_Remastered/",
+        "https://www.gog.com/en/game/bioshock_2_remastered",
+        "https://www.xbox.com/en-US/games/store/bioshock-2-remastered/BP8T903FZL2X"
+      ],
+      "dev": "Blind Squirrel Games",
+      "date": "2016-09-15",
+      "form": "Windows"
+    },
+    "NBA2K17": {
+      "name": "NBA 2K17",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K17",
+      "dev": "Virtuos;Visual Concepts",
+      "date": "2016-08-20",
+      "form": "Console;Windows"
+    },
+    "Mafia3": {
+      "n/a": false,
+      "name": "Mafia III",
+      "url": [
+        "https://store.steampowered.com/app/360430/Mafia_III_Definitive_Edition/",
+        "https://www.gog.com/en/game/mafia_iii_definitive_edition",
+        "https://www.xbox.com/en-US/games/store/mafia-iii-definitive-edition/BVZLS7XZ68KF/0001",
+        "https://www.playstation.com/en-us/games/mafia-iii/",
+        "https://en.wikipedia.org/wiki/Mafia_III"
+      ],
+      "dev": "Hangar 13;2K Czech;22nd Century Toys;Blind Squirrel Games;Certain Affinity;Mass Media Games",
+      "date": "2016-10-07",
+      "form": "Console;Windows"
+    },
+    "Mafia3:R": {
+      "name": "Mafia III: Rivals",
+      "dev": "Cat Daddy Games",
+      "date": "2016-10-07",
+      "form": "Mobile"
+    },
+    "WWE2K17": {
+      "name": "WWE 2K17",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K17",
+      "dev": "Yuke's;Visual Concepts",
+      "date": "2016-10-11",
+      "form": "Console;Windows"
+    },
+    "NHL2K17:SC": {
+      "name": "NHL SuperCard 2K17",
+      "dev": "Koolhaus Games;Cat Daddy Games",
+      "date": "2016-10-11",
+      "form": "Mobile"
+    },
+    "SM:C6": {
+      "n/a": false,
+      "name": "Sid Meier's Civilization VI",
+      "url": [
+        "https://store.steampowered.com/app/289070/Sid_Meiers_Civilization_VI/",
+        "https://www.xbox.com/en-US/games/store/sid-meiers-civilization-vi/9n4rsg99kv1x",
+        "https://en.wikipedia.org/wiki/Civilization_VI"
+      ],
+      "dev": "Firaxis Games;Aspyr",
+      "date": "2016-10-21",
+      "form": "Console;Windows"
+    },
+    "CG:VR": {
+      "n/a": false,
+      "name": "Carnival Games VR",
+      "url": [
+        "https://store.steampowered.com/app/458920/Carnival_Games_VR/",
+        "https://www.meta.com/experiences/carnival-adventure-vr/5722284594538668/"
+      ],
+      "dev": "Cat Daddy Games;Wahoo Studios",
+      "date": "2016-10-28",
+      "form": "Console;Windows"
+    },
+    "NBA2K:VR": {
+      "n/a": false,
+      "name": "NBA 2KVR Experience",
+      "url": [
+        "https://store.steampowered.com/app/519490/NBA_2KVR_Experience/",
+        "https://www.meta.com/experiences/pcvr/nba-2kvr-experience/1096989123704521/",
+        "https://en.wikipedia.org/wiki/NBA_2KVR_Experience"
+      ],
+      "dev": "Specular Interactive;Visual Concepts",
+      "date": "2016-11-22",
+      "form": "Console"
+    },
+    "Battleborn:FT": {
+      "name": "Battleborn: Free Trial",
+      "dev": "Gearbox Software",
+      "date": "2017-06-06",
+      "form": "Console;Windows"
+    },
+    "NBA2K18:M": {
+      "name": "MyNBA 2K18",
+      "dev": "Cat Daddy Games",
+      "date": "2017-09-07",
+      "form": "Mobile"
+    },
+    "NBA2K18:TP": {
+      "name": "NBA 2K18: The Prelude",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K18:_The_Prelude",
+      "dev": "Visual Concepts",
+      "date": "2017-09-08",
+      "form": "Console"
+    },
+    "NBA2K18": {
+      "name": "NBA 2K18",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K18",
+      "dev": "Virtuos;Visual Concepts;Visual Concepts Orange County;Visual Concepts China;Visual Concepts South Korea",
+      "date": "2017-09-19",
+      "form": "Mobile;Console;Windows"
+    },
+    "NHL2K18:SC": {
+      "name": "NHL SuperCard 2K18",
+      "dev": "Koolhaus Games;Cat Daddy Games",
+      "date": "2017-10-04",
+      "form": "Mobile"
+    },
+    "WWE2K18": {
+      "name": "WWE 2K18",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K18",
+      "dev": "Yuke's;Visual Concepts;Blind Squirrel Games",
+      "date": "2017-10-17",
+      "form": "Console;Windows"
+    },
+    "NBA2K:O2": {
+      "name": "NBA 2K Online 2",
+      "dev": "Tencent Games",
+      "date": "2018-08-02",
+      "form": "Windows"
+    },
+    "TGC2019:fPT": {
+      "name": "The Golf Club 2019 featuring PGA Tour",
+      "url": "https://en.wikipedia.org/wiki/The_Golf_Club_2019_featuring_PGA_Tour",
+      "dev": "HB Studios",
+      "date": "2018-08-02",
+      "form": "Console;Windows"
+    },
+    "NBA2K19:M": {
+      "name": "MyNBA 2K19",
+      "dev": "Koolhaus Games;Cat Daddy Games",
+      "date": "2018-08-30",
+      "form": "Mobile"
+    },
+    "NBA2K19:TP": {
+      "name": "NBA 2K19: The Prelude",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K19:_The_Prelude",
+      "dev": "Visual Concepts",
+      "date": "2018-08-31",
+      "form": "Console"
+    },
+    "NBA2K19": {
+      "name": "NBA 2K19",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K19",
+      "dev": "Visual Concepts",
+      "date": "2018-09-11",
+      "form": "Mobile;Console;Windows"
+    },
+    "WWE2K19": {
+      "name": "WWE 2K19",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K19",
+      "dev": "Yuke's;Visual Concepts",
+      "date": "2018-10-09",
+      "form": "Console;Windows"
+    },
+    "NBA2K:P2": {
+      "name": "NBA 2K Playgrounds 2",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K_Playgrounds_2",
+      "dev": "Saber Interactive",
+      "date": "2018-10-16",
+      "form": "Console;Windows"
+    },
+    "NBA2K:MB": {
+      "name": "NBA 2K Mobile",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K_Mobile",
+      "dev": "Cat Daddy Games",
+      "date": "2018-11-19",
+      "form": "Mobile"
+    },
+    "BL2:VR": {
+      "name": "Borderlands 2 VR",
+      "url": "https://en.wikipedia.org/wiki/Borderlands_2#PlayStation_VR_port",
+      "dev": "Gearbox Software",
+      "date": "2018-12-14",
+      "form": "Console"
+    },
+    "NBA2K20:M": {
+      "name": "MyNBA 2K20",
+      "dev": "Koolhaus Games;Cat Daddy Games",
+      "date": "2019-08-20",
+      "form": "Mobile"
+    },
+    "NBA2K20": {
+      "name": "NBA 2K20",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K20",
+      "dev": "Visual Concepts China;Visual Concepts South Korea",
+      "date": "2019-09-04",
+      "form": "Mobile;Console;Windows"
+    },
+    "BL3": {
+      "n/a": false,
+      "name": "Borderlands 3",
+      "url": [
+        "https://store.steampowered.com/app/397540/Borderlands_3/",
+        "https://www.xbox.com/en-US/games/store/borderlands-3/C34NB0F1B5WQ",
+        "https://store.epicgames.com/en-US/p/borderlands-3",
+        "https://en.wikipedia.org/wiki/Borderlands_3"
+      ],
+      "dev": "Gearbox Software",
+      "date": "2019-09-13",
+      "form": "Console;Windows"
+    },
+    "WWE2K20": {
+      "name": "WWE 2K20",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K20",
+      "dev": "Visual Concepts;HB Studios;Saber Interactive",
+      "date": "2019-10-22",
+      "form": "Console;Windows"
+    },
+    "XCOM:CS": {
+      "name": "XCOM: Chimera Squad",
+      "url": [
+        "https://store.steampowered.com/app/882100/XCOM_Chimera_Squad/",
+        "https://www.gog.com/en/game/xcom_chimera_squad",
+        "https://en.wikipedia.org/wiki/XCOM:_Chimera_Squad"
+      ],
+      "dev": "Firaxis Games",
+      "date": "2020-04-24",
+      "form": "Windows"
+    },
+    "PGATour2K21": {
+      "name": "PGA Tour 2K21",
+      "url": "https://en.wikipedia.org/wiki/PGA_Tour_2K21",
+      "dev": "HB Studios;Illogika",
+      "date": "2020-08-21",
+      "form": "Console"
+    },
+    "NBA2K21:M": {
+      "name": "MyNBA 2K21",
+      "dev": "Koolhaus Games;Cat Daddy Games",
+      "date": "2020-08-24",
+      "form": "Mobile"
+    },
+    "NBA2K21": {
+      "name": "NBA 2K21",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K21",
+      "dev": "Visual Concepts",
+      "date": "2020-09-04",
+      "form": "Console;Windows"
+    },
+    "WWE2K:B": {
+      "name": "WWE 2K Battlegrounds",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K_Battlegrounds",
+      "dev": "Saber Interactive Madrid",
+      "date": "2020-09-18",
+      "form": "Console;Windows"
+    },
+    "Mafia": {
+      "name": "Mafia: Definitive Edition",
+      "url": "https://en.wikipedia.org/wiki/Mafia:_Definitive_Edition",
+      "dev": "Hangar 13;Climax Studios;Snappers Systems",
+      "date": "2020-09-25",
+      "form": "Console;Windows"
+    },
+    "NBA:SC": {
+      "name": "NBA SuperCard",
+      "dev": "Koolhaus Games;Cat Daddy Games",
+      "date": "2020-12-10",
+      "form": "Mobile"
+    },
+    "NBA2K22": {
+      "name": "NBA 2K22",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K22",
+      "dev": "Visual Concepts",
+      "date": "2021-09-10",
+      "form": "Console;Windows"
+    },
+    "WWE2K22": {
+      "name": "WWE 2K22",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K22",
+      "dev": "Visual Concepts;HB Studios;Lost Boys Interactive;Leviathan Games",
+      "date": "2022-03-11",
+      "form": "Console;Windows"
+    },
+    "TTW": {
+      "n/a": false,
+      "name": "Tiny Tina's Wonderlands",
+      "url": [
+        "https://store.steampowered.com/app/1286680/Tiny_Tinas_Wonderlands/",
+        "https://www.xbox.com/en-US/games/store/tiny-tinas-wonderlands/9NFRN3NDXR2D/0010",
+        "https://en.wikipedia.org/wiki/Tiny_Tina%27s_Wonderlands"
+      ],
+      "dev": "Gearbox Software",
+      "date": "2022-03-25",
+      "form": "Console;Windows"
+    },
+    "TheQuarry": {
+      "n/a": false,
+      "name": "The Quarry",
+      "url": [
+        "https://store.steampowered.com/app/1577120/The_Quarry/",
+        "https://www.xbox.com/en-US/games/store/the-quarry-for-xbox-series-xs/9N5HDNDWVV34/0010",
+        "https://www.xbox.com/en-US/games/store/the-quarry-for-xbox-one/9N833N5FFF9P/0010",
+        "https://en.wikipedia.org/wiki/The_Quarry_(video_game)"
+      ],
+      "dev": "Supermassive Games",
+      "date": "2022-06-10",
+      "form": "Console;Windows"
+    },
+    "NBA2K23": {
+      "name": "NBA 2K23",
+      "url": [
+        "https://store.steampowered.com/app/1919590/NBA_2K23/",
+        "https://en.wikipedia.org/wiki/NBA_2K23"
+      ],
+      "dev": "Visual Concepts",
+      "date": "2022-09-09",
+      "form": "Console;Windows"
+    },
+    "PGATour2K23": {
+      "n/a": false,
+      "name": "PGA Tour 2K23",
+      "url": [
+        "https://store.steampowered.com/app/1588010/PGA_TOUR_2K23/",
+        "https://www.xbox.com/en-US/games/store/pga-tour-2k23/9PF7HB2DJ7CR",
+        "https://en.wikipedia.org/wiki/PGA_Tour_2K23"
+      ],
+      "dev": "HB Studios",
+      "date": "2022-10-14",
+      "form": "Console;Windows"
+    },
+    "BL:NT": {
+      "n/a": false,
+      "name": "New Tales from the Borderlands",
+      "url": [
+        "https://store.steampowered.com/app/1454970/New_Tales_from_the_Borderlands/",
+        "https://www.xbox.com/en-US/games/store/new-tales-from-the-borderlands/9NTZV27BDFCP",
+        "https://en.wikipedia.org/wiki/New_Tales_from_the_Borderlands"
+      ],
+      "dev": "Gearbox Software Quebec",
+      "date": "2022-10-21",
+      "form": "Console;Windows"
+    },
+    "Marvel:MS": {
+      "n/a": false,
+      "name": "Marvel's Midnight Suns",
+      "url": [
+        "https://store.steampowered.com/app/368260/Marvels_Midnight_Suns/",
+        "https://www.xbox.com/en-US/games/store/marvels-midnight-suns-for-xbox-one/9NS10SXBG0HX/0010",
+        "https://www.xbox.com/en-US/games/store/marvels-midnight-suns-enhanced-edition/9NZV28P1ZMQ0/0010",
+        "https://en.wikipedia.org/wiki/Marvel%27s_Midnight_Suns"
+      ],
+      "dev": "Firaxis Games",
+      "date": "2022-12-02",
+      "form": "Console;Windows"
+    },
+    "WWE2K23": {
+      "name": "WWE 2K23",
+      "url": [
+        "https://store.steampowered.com/app/1942660/WWE_2K23/",
+        "https://en.wikipedia.org/wiki/WWE_2K23"
+      ],
+      "dev": "Visual Concepts",
+      "date": "2022-12-02",
+      "form": "Console"
+    },
+    "Lego2KDrive": {
+      "n/a": false,
+      "name": "Lego 2K Drive",
+      "url": [
+        "https://store.steampowered.com/app/1451810/LEGO_2K_Drive/",
+        "https://www.xbox.com/en-US/games/store/lego-2k-drive-for-xbox-one/9PNH6BGC71FP",
+        "https://www.playstation.com/en-us/games/lego-2k-drive/",
+        "https://en.wikipedia.org/wiki/Lego_2K_Drive"
+      ],
+      "dev": "Visual Concepts",
+      "date": "2022-12-02",
+      "form": "Console;Windows"
+    },
+    "NBA2K24": {
+      "name": "NBA 2K24",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K24",
+      "dev": "Visual Concepts",
+      "date": "2022-12-02",
+      "form": "Console;Windows"
+    },
+    "WWE2K24": {
+      "name": "WWE 2K24",
+      "url": "https://en.wikipedia.org/wiki/WWE_2K24",
+      "dev": "Visual Concepts",
+      "date": "2024-05-08",
+      "form": "Console;Windows"
+    },
+    "TopSpin2K25": {
+      "name": "TopSpin 2K25",
+      "url": "https://en.wikipedia.org/wiki/TopSpin_2K25",
+      "dev": "Hangar 13",
+      "date": "2024-05-26",
+      "form": "Console;Windows"
+    },
+    "NBA2K25": {
+      "name": "NBA 2K25",
+      "url": "https://en.wikipedia.org/wiki/NBA_2K25",
+      "dev": "Visual Concepts",
+      "date": "2024-09-06",
+      "form": "Console;Windows"
+    },
+    "Mafia:TOC": {
+      "name": "Mafia: The Old Country",
+      "url": "https://en.wikipedia.org/wiki/Mafia:_The_Old_Country",
+      "dev": "Hangar 13",
+      "date": "2025-01-01",
+      "form": "Console;Windows"
+    },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     },
     "XX": {
       "name": "XXX",
       "url": "XXX",
       "dev": "XXX",
-      "date": "2005-04-19",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2005-04-19",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2005-04-19",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2005-04-19",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2005-04-19",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2005-04-19",
-      "form": "Console"
-    },
-    "XX": {
-      "name": "XXX",
-      "url": "XXX",
-      "dev": "XXX",
-      "date": "2005-04-19",
+      "date": "2010-00-00",
       "form": "Console"
     }
   },
